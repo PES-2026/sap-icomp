@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Breadcrumb } from "../breadcrumb/Breadcrumb";
 
 const ROUTE_NAMES: Record<string, string> = {
   "/admin": "Início",
@@ -39,21 +40,7 @@ export default function Header() {
             Olá, Ana Lúcia
           </div>
           <div className="text-sm text-[#9a9590]">
-            <Link
-              href="/admin"
-              className="cursor-pointer text-[#6bc4a6] hover:underline transition-all duration-150"
-            >
-              Início
-            </Link>
-
-            {pathname !== "/admin" && (
-              <>
-                {" > "}
-                <span className="text-[#3a3530] font-medium">
-                  {currentPathName}
-                </span>
-              </>
-            )}
+            <Breadcrumb />
           </div>
         </div>
       </div>

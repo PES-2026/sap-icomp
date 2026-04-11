@@ -30,7 +30,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[280px] bg-[#faf7f0] border-r border-[#ece7db] flex flex-col py-6 shrink-0 min-h-screen">
+    <aside className="w-[240px] bg-[#faf7f0] border-r border-[#ece7db] flex flex-col py-6 shrink-0 min-h-screen">
       <div className="px-5 pb-7">
         <div className="text-[22px] font-extrabold text-[#3a3530] leading-[1.1] text-center">
           SAP IComp
