@@ -1,27 +1,28 @@
 ---
-name: User Story
-about: Define a new user story for the project
-title: "As a **, I want to **, So that **"
+name: História de Usuário
+about: Defina uma nova história de usuário para o projeto
+title: "Como um **, Eu quero **, Para que **"
 labels: ""
 assignees: "Story"
 ---
 
-## User Story
+## História de Usuário
 
-**As a** [role/user]
-**I want to** [action/feature]
-**So that** [value/benefit]
-
----
-
-## Acceptance Criteria
-
-_Describe the behavior that system must have using scenarios or topics_
-
-- [ ] **Scenario 1:** - [ ] **Scenario 2:** ---
+**Como um** [papel/usuário],
+**Eu quero** [ação/implementação],
+**Para que** [valor/benefício]
 
 ---
 
-## Additional Notes / UI References
+## Critérios de Aceitação
 
-- [Add Figma links, pedagogical constraints, or rough notes here]
+_Descreva o comportamento que o sistema deverá ter utilizando cenários e tópicos_
+
+- [ ] **Cenário 1:** - [ ] **Cenário 2:** ---
+- O sistema deverá fazer x - O sistema deverá verificar Y
+
+---
+
+## Notas Adicionais / Referências de UI
+
+- [Adicione links do Figma, Restrições ou outras notas aqui]
