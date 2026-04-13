@@ -1,13 +1,13 @@
-import { StudentId } from "./studentId.js";
-import { Name } from "./name.js";
-import { Enrollment } from "./enrollment.js";
-import { DtBirth } from "./dtBirth.js";
-import { Email } from "./email.js";
-import { PhoneNumber } from "./phoneNumber.js";
-import { Course } from "./course.js";
-import { Diagnosis } from "./diagnosis.js";
-import { Potential } from "./potential.js";
-import { Difficulties } from "./difficulties.js";
+import { StudentId } from "./valueObjects/studentId.js";
+import { Name } from "./valueObjects/name.js";
+import { Enrollment } from "./valueObjects/enrollment.js";
+import { DtBirth } from "./valueObjects/dtBirth.js";
+import { Email } from "./valueObjects/email.js";
+import { PhoneNumber } from "./valueObjects/phoneNumber.js";
+import { Course } from "./valueObjects/course.js";
+import { Diagnosis } from "./valueObjects/diagnosis.js";
+import { Potential } from "./valueObjects/potential.js";
+import { Difficulties } from "./valueObjects/difficulties.js";
 
 export class Student {
   constructor(
