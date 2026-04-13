@@ -35,14 +35,14 @@ export const ConfirmModal = ({
       onClick={onCancel}
     >
       <div
-        className="w-[90%] max-w-[400px] rounded-2xl bg-white p-6 shadow-[0_8px_40px_rgba(0,0,0,0.18)]"
+        className="w-[90%] max-w-100 rounded-2xl bg-white p-6 shadow-[0_8px_40px_rgba(0,0,0,0.18)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-2.5 text-[18px] font-extrabold text-[#3a3530]">
+        <h2 className="mb-2.5 text-lg font-extrabold text-[#3a3530]">
           {title}
         </h2>
 
-        <p className="mb-7 text-[14px] leading-[1.6] text-[#6a6560]">
+        <p className="mb-7 text-sm leading-[1.6] text-[#6a6560]">
           {message}
         </p>
 

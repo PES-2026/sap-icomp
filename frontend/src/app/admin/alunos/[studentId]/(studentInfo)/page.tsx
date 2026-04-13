@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { ConfirmModal } from "@/components/confirm_modal/ConfirmModal";
-import { ArrowLeft, Eye } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, Edit, Eye } from "lucide-react";
+import { cn } from "@/utils/cn";
 import CommonButton from "@/components/common_button/CommonButton";
-import { SelectInput } from "@/components/select_input/SelectInput";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { SelectInput } from "@/components/select_input/FilterSelect";
+import { SpecialNeed } from "@/types/special_need";
+import { useAppNavigation } from "@/utils/navigator";
 
 type AttendanceType =
   | "Atendimento"
@@ -16,13 +16,6 @@ type AttendanceType =
   | "Alinhamento"
   | "Orientação"
   | "Outro";
-
-type SpecialNeed =
-  | "TDAH TAG"
-  | "TEA"
-  | "PCD"
-  | "Dificuldade de aprendizado"
-  | "Nenhuma";
 
 interface Attendance {
   id: string;
@@ -40,8 +33,6 @@ interface Student {
   isActive: boolean;
   attendances: Attendance[];
 }
-
-// ─── Mock Database ─────────────────────────────────────────────────────────────
 
 const STUDENTS_DB: Record<string, Student> = {
   "1234-5678": {
@@ -134,8 +125,6 @@ const ALL_TYPES: AttendanceType[] = [
   "Outro",
 ];
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
 interface ToastProps {
   message: string;
   isVisible: boolean;
@@ -152,13 +141,13 @@ const Toast = ({ message, isVisible }: ToastProps) => (
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function StudentPage() {
   const params = useParams();
   const id = decodeURIComponent((params?.studentId as string) ?? "");
 
   const student = STUDENTS_DB[id] ?? null;
+
+  const { handleNavigation } = useAppNavigation();
 
   const [isActive, setIsActive] = useState<boolean>(student?.isActive ?? true);
   const [filterType, setFilterType] = useState<string>("Todos os Tipos");
@@ -226,7 +215,7 @@ export default function StudentPage() {
             <div className="shrink-0">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="mb-2 text-[22px] font-semibold text-[#3a3530]">
+                  <h1 className="mb-2 text-2xl font-bold text-[#3a3530]">
                     {student.fullName} - {student.registration}
                   </h1>
                   <div className="flex items-center gap-2.5">
@@ -235,7 +224,7 @@ export default function StudentPage() {
                     </p>
                     <span
                       className={cn(
-                        "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
+                        "rounded-full px-2.5 py-0.5 text-sm font-bold",
                         isActive
                           ? "bg-[#d4edda] text-[#155724]"
                           : "bg-[#f8d7da] text-[#721c24]",
@@ -249,26 +238,26 @@ export default function StudentPage() {
                 {/* Info pills */}
                 <div className="flex shrink-0 flex-wrap justify-end gap-2.5">
                   <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-[#a0a098]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
                       Período
                     </div>
-                    <div className="text-base font-extrabold text-[#3a3530]">
+                    <div className="text-sm font-bold text-[#3a3530]">
                       {student.period}º
                     </div>
                   </div>
                   <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-[#a0a098]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
                       Necessidade
                     </div>
-                    <div className="text-[13px] font-bold text-[#3a3530]">
+                    <div className="text-sm font-bold text-[#3a3530]">
                       {student.activeNeed}
                     </div>
                   </div>
                   <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-[#a0a098]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
                       Atendimentos
                     </div>
-                    <div className="text-base font-extrabold text-[#3a3530]">
+                    <div className="text-sm font-bold text-[#3a3530]">
                       {student.attendances.length}
                     </div>
                   </div>
@@ -281,7 +270,7 @@ export default function StudentPage() {
               <div className="flex flex-1 flex-col overflow-hidden rounded-[14px] border border-[#c5e8dc] bg-[#e8f7f2] min-h-0">
                 {/* Card header */}
                 <div className="flex shrink-0 items-center justify-between border-b border-[#c5e8dc] px-5 pb-3 pt-3.5">
-                  <div className="text-[15px] font-extrabold text-[#3a3530]">
+                  <div className="text-base font-bold text-[#3a3530]">
                     Histórico de Atendimentos
                   </div>
 
@@ -298,7 +287,7 @@ export default function StudentPage() {
                 {/* Attendance list */}
                 <div className="flex-1 overflow-y-auto">
                   {filteredAttendances.length === 0 ? (
-                    <div className="px-5 py-8 text-center text-[13px] text-[#8a9e96]">
+                    <div className="px-5 py-8 text-center text-sm text-[#8a9e96]">
                       Nenhum atendimento encontrado para este filtro.
                     </div>
                   ) : (
@@ -308,10 +297,10 @@ export default function StudentPage() {
                         className="group flex items-center justify-between border-b border-[#c5e8dc] px-5 py-3.5 transition-colors duration-150 last:border-none hover:bg-[#d4f0e8]"
                       >
                         <div>
-                          <div className="text-[13px] text-[#3a3530]">
+                          <div className="text-sm text-[#3a3530]">
                             <strong>Data:</strong> {attendance.date}
                           </div>
-                          <div className="mt-0.5 text-xs text-[#5a7a70]">
+                          <div className="mt-0.5 text-sm text-[#5a7a70]">
                             <strong>Tipo:</strong> {attendance.type}
                           </div>
                         </div>
@@ -338,6 +327,15 @@ export default function StudentPage() {
                   isActive
                     ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
                     : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
+                }
+              />
+              <CommonButton
+                label="Editar Aluno"
+                endIcon={Edit}
+                onClick={() =>
+                  handleNavigation({
+                    path: `/admin/alunos/${student.id}/editar`,
+                  })
                 }
               />
 

@@ -22,7 +22,7 @@ export const SearchInput = ({
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full pl-[26px] pr-2 py-1.5 border border-[#e2ddd5] rounded-lg bg-[#faf8f4] text-xs text-[#4a4540] outline-none box-border font-inherit transition-colors duration-200 focus:border-[#6bc4a6]"
+      className="w-full pl-6.5 pr-2 py-1.5 border border-[#e2ddd5] rounded-lg bg-[#faf8f4] text-sm text-[#4a4540] outline-none box-border font-inherit transition-colors duration-200 focus:border-[#6bc4a6]"
     />
   </div>
 );

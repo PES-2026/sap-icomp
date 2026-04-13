@@ -30,12 +30,12 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[240px] bg-[#faf7f0] border-r border-[#ece7db] flex flex-col py-6 shrink-0 min-h-screen">
+    <aside className="w-60 bg-[#faf7f0] border-r border-[#ece7db] flex flex-col py-6 shrink-0 min-h-screen">
       <div className="px-5 pb-7">
-        <div className="text-[22px] font-extrabold text-[#3a3530] leading-[1.1] text-center">
+        <div className="text-2xl font-extrabold text-[#3a3530] leading-[1.1] text-center">
           SAP IComp
         </div>
-        <div className="text-[14px] text-[#8a8075] mt-1.5 leading-[1.3] text-center">
+        <div className="text-sm text-[#8a8075] mt-1.5 leading-[1.3] text-center">
           Serviço de Apoio Pedagógico
         </div>
       </div>
@@ -49,7 +49,7 @@ export default function Sidebar() {
               key={item.id}
               href={item.href}
               className={`
-                flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] text-left text-[12.5px] leading-[1.35] whitespace-pre-line
+                flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] text-left text-sm leading-[1.35] whitespace-pre-line
                 transition-all duration-300 ease-in-out
                 ${
                   isActive

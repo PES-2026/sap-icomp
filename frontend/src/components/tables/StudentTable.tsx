@@ -3,53 +3,16 @@
 import { Edit, Eye, Plus } from "lucide-react";
 import { SearchInput } from "../search_input/SearchInput";
 import { useState } from "react";
-import { SelectInput } from "../select_input/SelectInput";
+import { SelectInput } from "../select_input/FilterSelect";
 import CommonButton from "../common_button/CommonButton";
 import Link from "next/link";
-
-export type SpecialNeed =
-  | "TDAH TAG"
-  | "TEA"
-  | "PCD"
-  | "Dificuldade de aprendizado"
-  | "Nenhuma";
-
-export type Course = "E.S." | "C.C." | "A.B.I." | "S.I." | "Outros";
-
-const COURSES: Course[] = ["E.S.", "C.C.", "A.B.I.", "S.I.", "Outros"];
-
-export interface Student {
-  enrollmentId: string;
-  fullName: string;
-  course: Course;
-  period: number;
-  lastAppointment: string;
-  activeNeed: SpecialNeed;
-}
-
-interface NeedBadgeProps {
-  value: SpecialNeed;
-}
-
-const NeedBadge = ({ value }: NeedBadgeProps) => {
-  const colorMap: Record<SpecialNeed, string> = {
-    "TDAH TAG": "bg-[#fff3cd] text-[#856404]",
-    TEA: "bg-[#d1ecf1] text-[#0c5460]",
-    PCD: "bg-[#d4edda] text-[#155724]",
-    "Dificuldade de aprendizado": "bg-[#f8d7da] text-[#721c24]",
-    Nenhuma: "bg-[#e9ecef] text-[#495057]",
-  };
-
-  return (
-    <span
-      className={`inline-block rounded-md px-2 py-[3px] text-[11px] font-semibold whitespace-nowrap ${colorMap[value]}`}
-    >
-      {value}
-    </span>
-  );
-};
+import { useAppNavigation } from "@/utils/navigator";
+import { Student } from "@/types/student";
+import { NeedBadge } from "../need_badge/NeedBadge";
+import { COURSES_ACRONYM } from "@/constants/courses";
 
 export default function StudentTable({ students }: { students: Student[] }) {
+  const { handleNavigation } = useAppNavigation();
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("Todos");
@@ -57,7 +20,7 @@ export default function StudentTable({ students }: { students: Student[] }) {
   const [appointmentFilter, setAppointmentFilter] = useState("");
   const [needFilter, setNeedFilter] = useState("");
 
-  const periods = ["Todos", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const periods = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   const filteredStudents = students.filter((student) => {
     const matchEnrollment = student.enrollmentId
@@ -104,19 +67,25 @@ export default function StudentTable({ students }: { students: Student[] }) {
           <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
             Lista Geral de Alunos
           </h1>
-          <CommonButton label="Adicionar Novo Aluno" startIcon={Plus} />
+          <CommonButton
+            label="Adicionar Novo Aluno"
+            startIcon={Plus}
+            onClick={() =>
+              handleNavigation({ path: "/admin/alunos/cadastrar" })
+            }
+          />
         </div>
 
         {/* Table Container */}
         <div className="flex-1 overflow-auto">
-          <table className="w-full border-separate border-spacing-0 text-[13px]">
+          <table className="w-full border-separate border-spacing-0 text-sm">
             <thead className="sticky top-0 z-10">
               {/* Column labels */}
               <tr>
                 {columns.map((col, index) => (
                   <th
                     key={index}
-                    className={`whitespace-nowrap border-y border-[#ece7db] bg-[#faf7f0] px-4 py-3 text-center text-[12.5px] font-bold text-[#4a4540] ${col.width}`}
+                    className={`whitespace-nowrap border-y border-[#ece7db] bg-[#faf7f0] px-4 py-3 text-center font-bold text-[#4a4540] ${col.width}`}
                   >
                     {col.label}
                   </th>
@@ -138,7 +107,7 @@ export default function StudentTable({ students }: { students: Student[] }) {
                   <SelectInput
                     value={courseFilter}
                     onChange={setCourseFilter}
-                    options={COURSES}
+                    options={COURSES_ACRONYM}
                     defaultOption="Todos"
                   />
                 </td>
@@ -146,18 +115,7 @@ export default function StudentTable({ students }: { students: Student[] }) {
                   <SelectInput
                     value={periodFilter}
                     onChange={setPeriodFilter}
-                    options={[
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                      "8",
-                      "9",
-                      "10",
-                    ]}
+                    options={periods}
                     defaultOption="Todos"
                   />
                 </td>
@@ -231,12 +189,13 @@ export default function StudentTable({ students }: { students: Student[] }) {
                           >
                             <Eye size={20} />
                           </Link>
-                          <button
+                          <Link
+                            href={`/admin/alunos/${student.enrollmentId}/editar`}
                             title="Editar"
                             className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
                           >
                             <Edit size={20} />
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>
@@ -248,7 +207,7 @@ export default function StudentTable({ students }: { students: Student[] }) {
         </div>
 
         {/* Pagination */}
-        <div className="shrink-0 border-t border-[#f0ebe0] px-6 py-3 text-xs text-[#a0a098]">
+        <div className="shrink-0 border-t border-[#f0ebe0] px-6 py-3 text-sm text-[#a0a098]">
           {students.length} aluno
           {students.length !== 1 ? "s" : ""} encontrado
           {students.length !== 1 ? "s" : ""}
