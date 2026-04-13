@@ -1,21 +1,6 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { Breadcrumb } from "../breadcrumb/Breadcrumb";
 
-const ROUTE_NAMES: Record<string, string> = {
-  "/admin": "Início",
-  "/admin/agendamentos": "Agendamentos",
-  "/admin/alunos": "Alunos",
-  "/admin/relatorios": "Relatórios",
-};
-
 export default function Header() {
-  const pathname = usePathname();
-
-  const currentPathName = ROUTE_NAMES[pathname] || "Página";
-
   return (
     <header className="bg-[#faf7f0] border-b border-[#ece7db] px-4 py-4 flex items-center gap-4 shrink-0">
       <div className="flex items-center gap-3 flex-1">
