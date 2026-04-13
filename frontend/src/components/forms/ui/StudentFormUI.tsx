@@ -1,7 +1,6 @@
 import CommonButton from "@/components/common_button/CommonButton";
 import { useAppNavigation } from "@/utils/navigator";
 import { Check } from "lucide-react";
-import Link from "next/link";
 
 export const Toast = ({
   message,
