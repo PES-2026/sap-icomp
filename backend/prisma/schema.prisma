@@ -6,25 +6,31 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String   @id @default(uuid()) 
-  cpf       String   @unique
-  name      String
-  birthDate DateTime @map("birth_date")
-  email     String   @unique @map("e_mail")
-  idRole    Int      @map("id_role")
-  role      UserRole @relation(fields: [idRole], references: [id])
+model Student {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  enrollmentId String @unique
+  name         String
+  email        String @unique
+  phoneNumber  String
+  dtBirth      DateTime
+
+  diagnosis    String?
+  potential    String?
+  difficulties String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   removed   Boolean  @default(false)
-  
-  @@map("users")
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
 }
 
-model UserRole {
-  id    Int    @id @default(autoincrement())
-  name  String  // STUDENT, TEACHER, ADMIN
-  users User[]
+model Course {
+  id   String @id
+  name String
 
-  @@map("user_role")
+  students Student[]
 }
