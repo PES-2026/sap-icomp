@@ -1,14 +1,13 @@
-import { StudentId } from "./studentId.js";
-import { Name } from "./name.js";
-import { Enrollment } from "./enrollment.js";
-import { DtBirth } from "./dtBirth.js";
-import { Email } from "./email.js";
-import { PhoneNumber } from "./phoneNumber.js";
-import { Course } from "./course.js";
-import { Diagnosis } from "./diagnosis.js";
-import { Potential } from "./potential.js";
-import { Difficulties } from "./difficulties.js";
-import { Cpf } from "./cpf.js";
+import { StudentId } from "./valueObjects/studentId.js";
+import { Name } from "./valueObjects/name.js";
+import { Enrollment } from "./valueObjects/enrollment.js";
+import { DtBirth } from "./valueObjects/dtBirth.js";
+import { Email } from "./valueObjects/email.js";
+import { PhoneNumber } from "./valueObjects/phoneNumber.js";
+import { Course } from "./valueObjects/course.js";
+import { Diagnosis } from "./valueObjects/diagnosis.js";
+import { Potential } from "./valueObjects/potential.js";
+import { Difficulties } from "./valueObjects/difficulties.js";
 
 export class Student {
   constructor(
@@ -16,7 +15,6 @@ export class Student {
     public name: Name,
     public enrollmentId: Enrollment,
     public dtBirth: DtBirth,
-    public cpf: Cpf,
     public email: Email,
     public phoneNumber: PhoneNumber,
     public course: Course,
@@ -28,7 +26,6 @@ export class Student {
     name: string,
     enrollmentId: string,
     dtBirth: string,
-    cpf: string,
     email: string,
     phoneNumber: string,
     course: string,
@@ -41,7 +38,6 @@ export class Student {
       const nameStud = Name.create(name);
       const enrollmentStud = Enrollment.create(enrollmentId);
       const dtBirthStud = DtBirth.create(dtBirth);
-      const cpfStud = Cpf.create(cpf);
       const emailStud = Email.create(email);
       const phoneNumberStud = PhoneNumber.create(phoneNumber);
       const courseStud = Course.create(course);
@@ -54,7 +50,6 @@ export class Student {
         nameStud,
         enrollmentStud,
         dtBirthStud,
-        cpfStud,
         emailStud,
         phoneNumberStud,
         courseStud,
@@ -63,7 +58,7 @@ export class Student {
         difficultiesStud,
       );
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 }

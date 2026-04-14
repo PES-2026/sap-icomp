@@ -3,43 +3,44 @@ import { Student } from "../../domain/entities/student.js";
 import {
   type IStudentRepository,
   type SaveStudentParams,
-} from "../../domain/use-cases/interfaces/IStudentRepository.js";
-import { CpfAlreadyExistsError } from "../../domain/use-cases/register-student.js";
+} from "../../application/use-cases/interfaces/IStudentRepository.js";
+import { EmailAlreadyExistsError } from "../../application/use-cases/register-student.js";
 
 export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findRoleIdByName(roleName: string): Promise<number | null> {
-    const role = await this.prisma.userRole.findFirst({
-      where: { name: roleName },
-      select: { id: true },
+  async existsByEmail(email: string): Promise<boolean> {
+    const row = await this.prisma.student.findUnique({
+      where: { email },
+      select: { internalId: true },
     });
-
-    return role?.id ?? null;
+    return !!row;
   }
 
-  // A validação de unicidade #73 do usecase
-  async existsByCpf(cpf: string): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { cpf },
-      select: { id: true },
+  async existsByEnrollmentId(enrollmentId: string): Promise<boolean> {
+    const row = await this.prisma.student.findUnique({
+      where: { enrollmentId },
+      select: { internalId: true },
     });
-
-    return !!user;
+    return !!row;
   }
 
   async save(params: SaveStudentParams): Promise<Student> {
-    const { student, idRole, removed } = params;
+    const { student } = params;
 
     try {
-      await this.prisma.user.create({
+      await this.prisma.student.create({
         data: {
+          externalId: student.studentId.value,
+          enrollmentId: student.enrollmentId.value,
           name: student.name.value,
-          cpf: student.cpf.value,
-          birthDate: student.dtBirth.value,
+          dtBirth: student.dtBirth.value,
           email: student.email.value,
-          idRole,
-          removed,
+          phoneNumber: student.phoneNumber.value,
+          courseId: student.course.value,
+          diagnosis: student.diagnosis.value || null,
+          potential: student.potential.value || null,
+          difficulties: student.difficulties.value || null,
         },
       });
 
@@ -49,7 +50,7 @@ export class PrismaStudentRepository implements IStudentRepository {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new CpfAlreadyExistsError();
+        throw new EmailAlreadyExistsError();
       }
       throw error;
     }
