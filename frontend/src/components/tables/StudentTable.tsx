@@ -1,14 +1,14 @@
 "use client";
 
 import { Edit, Eye, Plus } from "lucide-react";
-import { SearchInput } from "../search_input/SearchInput";
+import { SearchInput } from "../search-input/SearchInput";
 import { useState } from "react";
-import { SelectInput } from "../select_input/FilterSelect";
-import CommonButton from "../common_button/CommonButton";
+import { SelectInput } from "../select-input/FilterSelect";
+import CommonButton from "../common-button/CommonButton";
 import Link from "next/link";
 import { useAppNavigation } from "@/utils/navigator";
 import { Student } from "@/types/student";
-import { NeedBadge } from "../need_badge/NeedBadge";
+import { NeedBadge } from "../need-badge/NeedBadge";
 import { COURSES_ACRONYM } from "@/constants/courses";
 
 export default function StudentTable({ students }: { students: Student[] }) {

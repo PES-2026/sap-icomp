@@ -1,4 +1,4 @@
-import CommonButton from "../common_button/CommonButton";
+import CommonButton from "../common-button/CommonButton";
 
 export type ConfirmVariant = "primary" | "warning" | "critical";
 
@@ -42,9 +42,7 @@ export const ConfirmModal = ({
           {title}
         </h2>
 
-        <p className="mb-7 text-sm leading-[1.6] text-[#6a6560]">
-          {message}
-        </p>
+        <p className="mb-7 text-sm leading-[1.6] text-[#6a6560]">{message}</p>
 
         <div className="flex justify-end gap-3">
           <CommonButton

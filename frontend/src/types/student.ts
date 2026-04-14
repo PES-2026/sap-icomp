@@ -1,5 +1,5 @@
 import { CourseAcronym, CourseName } from "./course";
-import { SpecialNeed } from "./special_need";
+import { SpecialNeed } from "./specialNeed";
 
 export interface Student {
   enrollmentId: string;

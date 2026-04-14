@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { ConfirmModal } from "@/components/confirm_modal/ConfirmModal";
+import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
 import { ArrowLeft, Edit, Eye } from "lucide-react";
 import { cn } from "@/utils/cn";
-import CommonButton from "@/components/common_button/CommonButton";
-import { SelectInput } from "@/components/select_input/FilterSelect";
-import { SpecialNeed } from "@/types/special_need";
+import CommonButton from "@/components/common-button/CommonButton";
+import { SelectInput } from "@/components/select-input/FilterSelect";
+import { SpecialNeed } from "@/types/specialNeed";
 import { useAppNavigation } from "@/utils/navigator";
 
 type AttendanceType =

@@ -1,4 +1,4 @@
-import { SpecialNeed } from "@/types/special_need";
+import { SpecialNeed } from "@/types/specialNeed";
 
 export interface NeedBadgeProps {
   value: SpecialNeed;

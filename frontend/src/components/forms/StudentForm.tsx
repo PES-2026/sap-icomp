@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import CommonButton from "@/components/common_button/CommonButton";
+import CommonButton from "@/components/common-button/CommonButton";
 import {
   maskRegistration,
   maskDate,
@@ -10,7 +10,7 @@ import {
 } from "@/utils/studentFormUtils";
 import { SuccessScreen, Toast } from "./ui/StudentFormUI";
 import { Field } from "../field/Field";
-import { CustomSelect } from "../select_input/CustomSelect";
+import { CustomSelect } from "../select-input/CustomSelect";
 import { FormErrors, StudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
