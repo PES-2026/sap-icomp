@@ -13,7 +13,7 @@ app.use(express.json());
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 
-app.get("/users", async (req, res) => {
+app.get("/students", async (req, res) => {
   try {
     const students = await prisma.student.findMany();
     res.json(students);
