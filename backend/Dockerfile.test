@@ -16,4 +16,4 @@ RUN npx prisma generate
 ENV NODE_ENV=test
 
 # Run the development script with hot-reloading
-CMD ["npm", "run", "test"]
+CMD ["npm", "run", "dev"]
