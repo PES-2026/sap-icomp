@@ -1,0 +1,1 @@
+To access the project's documentation such as docx or excel files, please click on this [Drive Folder link](https://drive.google.com/drive/folders/119angkeO88OHV7-Kz61YVPy15PJrqn8y)
