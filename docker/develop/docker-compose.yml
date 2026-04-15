@@ -1,7 +1,7 @@
 services:
   db:
-    image: postgres:latest
-    container_name: postgres_database_develop
+    image: postgres:17-alpine
+    container_name: sap-icomp-postgres-database-develop
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -14,6 +14,7 @@ services:
 
   backend:
     image: sap-icomp-backend-develop:latest
+    container_name: sap-icomp-backend-develop
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
