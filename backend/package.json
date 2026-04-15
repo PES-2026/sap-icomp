@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx ./presentation/server.ts"
+    "dev": "tsx --watch ./src/presentation/server.ts",
+    "build": "tsc",
+    "start": "node dist/presentation/server.js",
+    "test": "jest"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",

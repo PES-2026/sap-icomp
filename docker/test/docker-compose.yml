@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:latest
-    container_name: postgres_database_test
+    container_name: sap-icomp-postgres-database-test
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -14,6 +14,7 @@ services:
 
   backend:
     image: sap-icomp-backend-test:latest
+    container_name: sap-icomp-backend-test
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
