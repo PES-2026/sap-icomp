@@ -12,7 +12,7 @@ export const Toast = ({
   type?: "success" | "error";
 }) => (
   <div
-    className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-[13px] font-semibold text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] whitespace-nowrap transition-all duration-250 pointer-events-none z-[2000]
+    className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-[13px] font-semibold text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)] whitespace-nowrap transition-all duration-250 pointer-events-none z-2000
     ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}
     ${type === "success" ? "bg-stone-800" : "bg-red-600"}`}
   >
