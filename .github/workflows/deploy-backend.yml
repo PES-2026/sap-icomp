@@ -67,9 +67,10 @@ jobs:
             cd /var/www/${{ secrets.HOST_MAIN_FOLDER }}
             chmod 600 .env
 
+            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env down
+
             docker load < sap-icomp-backend-$APP_ENV.tar.gz
 
-            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env down
             docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env up -d db backend
 
             rm -f sap-icomp-backend-$APP_ENV.tar.gz
