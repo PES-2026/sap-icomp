@@ -7,17 +7,19 @@ import {
   maskDate,
   maskPhone,
   validateStudentForm,
+  formatForBackend,
 } from "@/utils/studentFormUtils";
 import { SuccessScreen, Toast } from "./ui/StudentFormUI";
 import { Field } from "../field/Field";
 import { CustomSelect } from "../select-input/CustomSelect";
-import { FormErrors, StudentFormData } from "@/types/student";
+import { FormErrors, NewStudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
+import { studentService } from "@/services";
 
 interface StudentFormProps {
-  initialData?: StudentFormData;
-  onSubmitSuccess?: (data: StudentFormData) => void;
+  initialData?: NewStudentFormData;
+  onSubmitSuccess?: (data: NewStudentFormData) => void;
   onCancel?: () => void;
 }
 
@@ -28,46 +30,57 @@ export default function StudentForm({
 }: StudentFormProps) {
   const isEditMode = !!initialData;
 
-  const [formData, setFormData] = useState<StudentFormData>(
+  const [formData, setFormData] = useState<NewStudentFormData>(
     initialData || EMPTY_FORM,
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<
-    Partial<Record<keyof StudentFormData, boolean>>
+    Partial<Record<keyof NewStudentFormData, boolean>>
   >({});
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMsg, setToastMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ visible: false, msg: "" });
+
+  const showToast = (msg: string) => {
+    setToast({ visible: true, msg });
+    setTimeout(() => setToast({ visible: false, msg: "" }), 3000);
+  };
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
-
-  const getValidationClass = (field: keyof StudentFormData) =>
+  const getValidationClass = (field: keyof NewStudentFormData) =>
     errors[field]
       ? `${baseInputClass} border-red-300 bg-red-50 focus:border-red-400`
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
-  const handleFieldChange = (key: keyof StudentFormData, value: string) => {
+  const handleFieldChange = (key: keyof NewStudentFormData, value: string) => {
     const updated = { ...formData, [key]: value };
     setFormData(updated);
     if (touched[key]) {
-      const currentErrors = validateStudentForm(updated);
-      setErrors((prev) => ({ ...prev, [key]: currentErrors[key] }));
+      setErrors((prev) => ({
+        ...prev,
+        [key]: validateStudentForm(updated)[key],
+      }));
     }
   };
 
-  const handleFieldBlur = (key: keyof StudentFormData) => {
+  const handleFieldBlur = (key: keyof NewStudentFormData) => {
     setTouched((prev) => ({ ...prev, [key]: true }));
-    const currentErrors = validateStudentForm(formData);
-    setErrors((prev) => ({ ...prev, [key]: currentErrors[key] }));
+    setErrors((prev) => ({
+      ...prev,
+      [key]: validateStudentForm(formData)[key],
+    }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const allTouched = Object.keys(EMPTY_FORM).reduce(
-      (acc, k) => ({ ...acc, [k as keyof StudentFormData]: true }),
+    const allFields = Object.keys(EMPTY_FORM) as Array<
+      keyof NewStudentFormData
+    >;
+    const allTouched = allFields.reduce(
+      (acc, k) => ({ ...acc, [k]: true }),
       {},
     );
     setTouched(allTouched);
@@ -76,15 +89,28 @@ export default function StudentForm({
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
-      setToastMsg("Preencha os campos obrigatórios corretamente.");
-      setToastVisible(true);
-      setTimeout(() => setToastVisible(false), 3000);
-      return;
+      return showToast("Preencha os campos obrigatórios corretamente.");
     }
 
-    setIsSubmitted(true);
-    if (onSubmitSuccess) {
-      onSubmitSuccess(formData);
+    try {
+      setIsLoading(true);
+
+      const payload = formatForBackend(formData);
+
+      const response = await studentService.createStudent(
+        payload as NewStudentFormData,
+      );
+
+      showToast("Estudante cadastrado com sucesso!");
+      setIsSubmitted(true);
+
+      if (onSubmitSuccess) onSubmitSuccess(response);
+    } catch (error: any) {
+      showToast(
+        error.response?.data?.message || "Erro ao conectar com o servidor.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,7 +126,7 @@ export default function StudentForm({
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
         {isSubmitted ? (
           <SuccessScreen
-            studentName={formData.studentName}
+            studentName={formData.name}
             isEditMode={isEditMode}
             onNew={handleReset}
           />
@@ -117,50 +143,46 @@ export default function StudentForm({
             </div>
 
             <div className="flex-1 px-7 pb-4 overflow-y-auto">
-              {/* Row 1: Name | Registration | Birth Day */}
               <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_140px] gap-3.5 mb-3.5">
-                <Field label="Aluno (a):" error={errors.studentName}>
+                <Field label="Aluno (a):" error={errors.name}>
                   <input
                     type="text"
                     placeholder="João Vitor Mesquita da Frota"
-                    value={formData.studentName}
-                    onChange={(e) =>
-                      handleFieldChange("studentName", e.target.value)
-                    }
-                    onBlur={() => handleFieldBlur("studentName")}
-                    className={getValidationClass("studentName")}
+                    value={formData.name}
+                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                    onBlur={() => handleFieldBlur("name")}
+                    className={getValidationClass("name")}
                   />
                 </Field>
-                <Field label="Matrícula:" error={errors.registration}>
+                <Field label="Matrícula:" error={errors.enrollmentId}>
                   <input
                     type="text"
-                    placeholder="1234-5678"
-                    value={formData.registration}
+                    placeholder="12345678"
+                    value={formData.enrollmentId}
                     onChange={(e) =>
                       handleFieldChange(
-                        "registration",
+                        "enrollmentId",
                         maskRegistration(e.target.value),
                       )
                     }
-                    onBlur={() => handleFieldBlur("registration")}
-                    className={getValidationClass("registration")}
+                    onBlur={() => handleFieldBlur("enrollmentId")}
+                    className={getValidationClass("enrollmentId")}
                   />
                 </Field>
-                <Field label="Nascimento:" error={errors.birthDate}>
+                <Field label="Nascimento:" error={errors.dtBirth}>
                   <input
                     type="text"
                     placeholder="01/01/2001"
-                    value={formData.birthDate}
+                    value={formData.dtBirth}
                     onChange={(e) =>
-                      handleFieldChange("birthDate", maskDate(e.target.value))
+                      handleFieldChange("dtBirth", maskDate(e.target.value))
                     }
-                    onBlur={() => handleFieldBlur("birthDate")}
-                    className={getValidationClass("birthDate")}
+                    onBlur={() => handleFieldBlur("dtBirth")}
+                    className={getValidationClass("dtBirth")}
                   />
                 </Field>
               </div>
 
-              {/* Row 2: Email | Phone | Course */}
               <div className="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-3.5 mb-3.5">
                 <Field label="Email:" error={errors.email}>
                   <input
@@ -172,29 +194,31 @@ export default function StudentForm({
                     className={getValidationClass("email")}
                   />
                 </Field>
-                <Field label="Telefone:" error={errors.phone}>
+                <Field label="Telefone:" error={errors.phoneNumber}>
                   <input
                     type="text"
                     placeholder="(99) 99999-9999"
-                    value={formData.phone}
+                    value={formData.phoneNumber}
                     onChange={(e) =>
-                      handleFieldChange("phone", maskPhone(e.target.value))
+                      handleFieldChange(
+                        "phoneNumber",
+                        maskPhone(e.target.value),
+                      )
                     }
-                    onBlur={() => handleFieldBlur("phone")}
-                    className={getValidationClass("phone")}
+                    onBlur={() => handleFieldBlur("phoneNumber")}
+                    className={getValidationClass("phoneNumber")}
                   />
                 </Field>
                 <CustomSelect
-                  value={formData.course}
+                  value={formData.courseId}
                   label="Curso:"
-                  error={errors.course}
-                  onChange={(val) => handleFieldChange("course", val)}
-                  onBlur={() => handleFieldBlur("course")}
+                  error={errors.courseId}
+                  onChange={(val) => handleFieldChange("courseId", val)}
+                  onBlur={() => handleFieldBlur("courseId")}
                   options={COURSES_NAME}
                 />
               </div>
 
-              {/* Diagnosis */}
               <div className="mb-3.5">
                 <Field label="Diagnóstico:">
                   <input
@@ -209,14 +233,13 @@ export default function StudentForm({
                 </Field>
               </div>
 
-              {/* Potentialities */}
               <div className="mb-3.5">
                 <Field label="Potencialidades:">
                   <textarea
-                    placeholder="Realiza atividades em grupo quando mediado e incluído no grupo pelo(a) professor(a)."
-                    value={formData.potentialities}
+                    placeholder="Realiza atividades em grupo..."
+                    value={formData.potential}
                     onChange={(e) =>
-                      handleFieldChange("potentialities", e.target.value)
+                      handleFieldChange("potential", e.target.value)
                     }
                     rows={2}
                     className={`${baseInputClass} resize-y leading-relaxed min-h-16 border-stone-300 focus:border-teal-400`}
@@ -224,14 +247,13 @@ export default function StudentForm({
                 </Field>
               </div>
 
-              {/* Demands and Barriers */}
               <div className="mb-1.5">
                 <Field label="Identificação inicial das demandas e barreiras:">
                   <textarea
-                    placeholder="Descreva as demandas e barreiras identificadas..."
-                    value={formData.demandsAndBarriers}
+                    placeholder="Descreva as demandas..."
+                    value={formData.difficulties}
                     onChange={(e) =>
-                      handleFieldChange("demandsAndBarriers", e.target.value)
+                      handleFieldChange("difficulties", e.target.value)
                     }
                     rows={5}
                     className={`${baseInputClass} resize-y leading-relaxed min-h-30 bg-stone-50 border-stone-300 focus:bg-white focus:border-teal-400`}
@@ -248,15 +270,22 @@ export default function StudentForm({
                 className="bg-[#f4a598] text-white hover:bg-[#f0a195]"
               />
               <CommonButton
-                label={isEditMode ? "Salvar Alterações" : "Confirmar Registro"}
+                label={
+                  isLoading
+                    ? "Salvando..."
+                    : isEditMode
+                      ? "Salvar Alterações"
+                      : "Confirmar Registro"
+                }
                 type="submit"
+                disabled={isLoading}
               />
             </div>
           </form>
         )}
       </main>
 
-      <Toast message={toastMsg} visible={toastVisible} type="error" />
+      <Toast message={toast.msg} visible={toast.visible} type="error" />
     </>
   );
 }

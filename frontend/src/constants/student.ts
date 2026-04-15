@@ -1,13 +1,13 @@
-import { StudentFormData } from "@/types/student";
+import { NewStudentFormData } from "@/types/student";
 
-export const EMPTY_FORM: StudentFormData = {
-  studentName: "",
-  registration: "",
-  birthDate: "",
+export const EMPTY_FORM: NewStudentFormData = {
+  enrollmentId: "",
+  name: "",
+  dtBirth: "",
   email: "",
-  phone: "",
-  course: "",
+  phoneNumber: "",
+  courseId: "",
   diagnosis: "",
-  potentialities: "",
-  demandsAndBarriers: "",
+  potential: "",
+  difficulties: "",
 };
