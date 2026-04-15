@@ -22,7 +22,7 @@ app.get("/students", async (req, res) => {
   }
 });
 
-app.post("/students", async (req, res) => {
+app.post("/student", async (req, res) => {
   try {
     const {
       name,
