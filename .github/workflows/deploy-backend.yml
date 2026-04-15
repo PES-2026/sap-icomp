@@ -12,6 +12,8 @@ jobs:
   deploy:
     environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     env:
       APP_ENV: ${{ vars.ENVIRONMENT }}
