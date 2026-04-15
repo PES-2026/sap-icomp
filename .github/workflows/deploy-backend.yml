@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t sap-icomp-backend-$APP_ENV:latest -f ./backend/Dockerfile.$APP_ENV .
+          docker build -t sap-icomp-backend-$APP_ENV:latest -f ./backend/Dockerfile.$APP_ENV ./backend
 
       - name: Export image to tar.gz
         run: |
