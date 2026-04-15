@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_database_develop
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - postgres_datadevelop:/var/lib/postgresql/data
+
+  backend:
+    image: sap-icomp-backend-develop:latest
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    depends_on:
+      - db
+
+volumes:
+  postgres_datadevelop:
