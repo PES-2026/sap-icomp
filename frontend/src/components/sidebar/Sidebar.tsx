@@ -8,25 +8,25 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Início", icon: Home, id: "Início", href: "/admin" },
-    {
-      label: "Agendamentos",
-      icon: Calendar,
-      id: "Calendário",
-      href: "/admin/agendamentos",
-    },
+    // { label: "Início", icon: Home, id: "Início", href: "/admin" },
+    // {
+    //   label: "Agendamentos",
+    //   icon: Calendar,
+    //   id: "Calendário",
+    //   href: "/admin/agendamentos",
+    // },
     {
       label: "Alunos",
       icon: Users,
       id: "Base de Alunos",
-      href: "/admin/alunos",
+      href: "/admin/students",
     },
-    {
-      label: "Relatórios",
-      icon: FileText,
-      id: "Envio",
-      href: "/admin/relatorios",
-    },
+    // {
+    //   label: "Relatórios",
+    //   icon: FileText,
+    //   id: "Envio",
+    //   href: "/admin/relatorios",
+    // },
   ];
 
   return (
