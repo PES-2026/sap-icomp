@@ -139,7 +139,7 @@ export default function StudentForm({
 
   const handleToggleActive = async () => {
     try {
-      const response = await studentService.deleteStudent(formData.externalId);
+      await studentService.deleteStudent(formData.externalId);
       showToast("Estudante cadastrado com sucesso!");
     } catch (error: any) {
       showToast(
