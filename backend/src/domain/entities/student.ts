@@ -64,32 +64,19 @@ export class Student {
     }
   }
   static update(student: StudentData) {
-    try {
-      const studentId = StudentId.reutilise(student.externalId); //Reuses the existing externalId instead of generating a new one
-      const nameStud = Name.create(student.name);
-      const enrollmentStud = Enrollment.create(student.enrollmentId);
-      const dtBirthStud = DtBirth.create(student.dtBirth);
-      const emailStud = Email.create(student.email);
-      const phoneNumberStud = PhoneNumber.create(student.phoneNumber);
-      const courseStud = Course.create(student.course);
-      const diagnosisStud = Diagnosis.create(student.diagnosis);
-      const potentialStud = Potential.create(student.potential);
-      const difficultiesStud = Difficulties.create(student.difficulties);
+    const studentId = StudentId.reutilise(student.externalId);
 
-      return new Student(
-        studentId,
-        nameStud,
-        enrollmentStud,
-        dtBirthStud,
-        emailStud,
-        phoneNumberStud,
-        courseStud,
-        diagnosisStud,
-        potentialStud,
-        difficultiesStud,
-      );
-    } catch (error) {
-      throw error;
-    }
+    return new Student(
+      studentId,
+      Name.create(student.name),
+      Enrollment.create(student.enrollmentId),
+      DtBirth.create(student.dtBirth),
+      Email.create(student.email),
+      PhoneNumber.create(student.phoneNumber),
+      Course.create(student.course),
+      Diagnosis.create(student.diagnosis),
+      Potential.create(student.potential),
+      Difficulties.create(student.difficulties),
+    );
   }
 }

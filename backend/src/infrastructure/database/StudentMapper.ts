@@ -1,8 +1,9 @@
-import type { StudentData } from "./student-data.js";
+import type { StudentData } from "../../domain/entities/student-data";
 import type { PrismaStudent } from "../../infrastructure/database/prismaTypes.js";
+import { Student } from "../../domain/entities/student";
 export class StudentMapper {
-  static toDomain(prismaStudent: PrismaStudent): StudentData {
-    return {
+  static toDomain(prismaStudent: PrismaStudent): Student {
+    return Student.update({
       externalId: prismaStudent.externalId,
       name: prismaStudent.name,
       enrollmentId: prismaStudent.enrollmentId,
@@ -10,11 +11,10 @@ export class StudentMapper {
       email: prismaStudent.email,
       phoneNumber: prismaStudent.phoneNumber,
       course: prismaStudent.courseId,
-
       diagnosis: prismaStudent.diagnosis ?? "",
       potential: prismaStudent.potential ?? "",
       difficulties: prismaStudent.difficulties ?? "",
-    };
+    });
   }
 
   static toPersistence(student: StudentData) {
