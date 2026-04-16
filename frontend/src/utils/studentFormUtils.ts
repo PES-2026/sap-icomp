@@ -38,8 +38,10 @@ export const validateStudentForm = (data: NewStudentFormData): FormErrors => {
 export const formatForBackend = (data: NewStudentFormData) => {
   const [day, month, year] = data.dtBirth.split("/");
 
+  const { externalId, ...restData } = data;
+
   return {
-    ...data,
+    ...restData,
     dtBirth: `${year}-${month}-${day}`,
     enrollmentId: data.enrollmentId.replace(/\D/g, ""),
     phoneNumber: data.phoneNumber.replace(/\D/g, ""),

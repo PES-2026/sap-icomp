@@ -208,6 +208,13 @@ export default function StudentTable() {
                           >
                             <Edit size={20} />
                           </Link>
+                          <Link
+                            href={PATHS.edit_student(student.externalId)}
+                            title="Editar"
+                            className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
+                          >
+                            <Edit size={20} />
+                          </Link>
                         </div>
                       </td>
                     </tr>

@@ -16,6 +16,7 @@ import { FormErrors, NewStudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
+import { ConfirmModal } from "../confirm-modal/ConfirmModal";
 
 interface StudentFormProps {
   initialData?: NewStudentFormData;
@@ -41,6 +42,9 @@ export default function StudentForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, msg: "" });
+
+  const [isActive, setIsActive] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const showToast = (msg: string) => {
     setToast({ visible: true, msg });
@@ -96,16 +100,15 @@ export default function StudentForm({
       setIsLoading(true);
 
       const payload = formatForBackend(formData);
-      let response;
 
-      if (isEditMode && initialData?.enrollmentId) {
-        response = await studentService.updateStudent(
-          initialData.enrollmentId,
+      if (isEditMode && initialData?.externalId) {
+        const response = await studentService.updateStudent(
+          initialData.externalId,
           payload,
         );
         showToast("Estudante atualizado com sucesso!");
       } else {
-        response = await studentService.createStudent(
+        const response = await studentService.createStudent(
           payload as NewStudentFormData,
         );
         showToast("Estudante cadastrado com sucesso!");
@@ -132,6 +135,26 @@ export default function StudentForm({
     setErrors({});
     setTouched({});
     setIsSubmitted(false);
+  };
+
+  const handleToggleActive = async () => {
+    try {
+      const response = await studentService.deleteStudent(formData.externalId);
+      showToast("Estudante cadastrado com sucesso!");
+    } catch (error: any) {
+      showToast(
+        error.response?.data?.message ||
+          "Erro ao conectar com o servidor, não foi possível registrar.",
+      );
+    } finally {
+      setIsActive((prev) => !prev);
+      setShowConfirm(false);
+      showToast(
+        isActive
+          ? "Aluno inativado com sucesso."
+          : "Aluno reativado com sucesso.",
+      );
+    }
   };
 
   return (
@@ -277,6 +300,18 @@ export default function StudentForm({
 
             <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
               <CommonButton
+                label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+                onClick={() => setShowConfirm(true)}
+                className={
+                  isActive
+                    ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
+                    : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
+                }
+              />
+
+              <div className="flex-1" />
+
+              <CommonButton
                 label="Cancelar"
                 onClick={onCancel || handleReset}
                 type="button"
@@ -297,6 +332,21 @@ export default function StudentForm({
           </form>
         )}
       </main>
+
+      {/* ── Confirm Modal ── */}
+      <ConfirmModal
+        open={showConfirm}
+        title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+        message={
+          isActive
+            ? `Tem certeza que deseja inativar ${formData.name}? O aluno não aparecerá mais na listagem ativa.`
+            : `Deseja reativar ${formData.name}? O aluno voltará à listagem ativa.`
+        }
+        confirmLabel={isActive ? "Inativar" : "Reativar"}
+        confirmColor={isActive ? "critical" : "primary"}
+        onConfirm={handleToggleActive}
+        onCancel={() => setShowConfirm(false)}
+      />
 
       <Toast message={toast.msg} visible={toast.visible} type="error" />
     </>
