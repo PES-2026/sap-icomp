@@ -21,5 +21,14 @@ services:
     depends_on:
       - db
 
+  frontend:
+    image: sap-icomp-frontend-production:latest
+    container_name: sap-icomp-frontend-production
+    restart: always
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    depends_on:
+      - backend
+
 volumes:
   postgres_dataproduction:
