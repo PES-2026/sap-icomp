@@ -27,8 +27,6 @@ services:
     restart: always
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-    depends_on:
-      - backend
 
 volumes:
   postgres_datatest:
