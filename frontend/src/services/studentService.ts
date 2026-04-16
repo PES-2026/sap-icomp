@@ -12,10 +12,10 @@ export const studentService = {
     return response.data;
   },
 
-  //   async getStudentById(id: string): Promise<Student> {
-  //     const response = await api.get<Student>(`/students/${id}`);
-  //     return response.data;
-  //   },
+  async getStudentById(id: string): Promise<Student> {
+    const response = await api.get<Student>(`/students/${id}`);
+    return response.data;
+  },
 
   async createStudent(data: NewStudentFormData): Promise<NewStudentFormData> {
     const response = await api.post<NewStudentFormData>("/students", data);

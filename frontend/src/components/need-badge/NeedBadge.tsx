@@ -1,11 +1,9 @@
-import { SpecialNeed } from "@/types/specialNeed";
-
 export interface NeedBadgeProps {
-  value: SpecialNeed;
+  value: string;
 }
 
 export const NeedBadge = ({ value }: NeedBadgeProps) => {
-  const colorMap: Record<SpecialNeed, string> = {
+  const colorMap: Record<string, string> = {
     "TDAH TAG": "bg-[#fff3cd] text-[#856404]",
     TEA: "bg-[#d1ecf1] text-[#0c5460]",
     PCD: "bg-[#d4edda] text-[#155724]",
