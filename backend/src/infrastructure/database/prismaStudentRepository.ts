@@ -55,4 +55,18 @@ export class PrismaStudentRepository implements IStudentRepository {
       throw error;
     }
   }
+
+  async findByUUID(externaID: string): Promise<Student | null> {
+    return await this.prisma.student.findUnique({
+      where: { externalId: externaID },
+    });
+  }
+  async existsByUUID(externalId: string): Promise<boolean> {
+    const student = await this.prisma.student.findUnique({
+      where: { externalId },
+      select: { internalId: true },
+    });
+
+    return !!student;
+  }
 }

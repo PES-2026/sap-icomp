@@ -1,6 +1,6 @@
 import type { IStudentRepository } from "./interfaces/IStudentRepository.js";
-import type { StudentData } from "../entities/student-data.js";
-import { Student } from "../entities/student.js";
+import type { StudentData } from "../../domain/entities/student-data.js";
+import { Student } from "../../domain/entities/student.js";
 
 export class EmailAlreadyExistsError extends Error {
   constructor() {
