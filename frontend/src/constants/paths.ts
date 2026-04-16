@@ -3,5 +3,5 @@ export const PATHS = {
   visualize_student: (enrollmentId: string) =>
     `/admin/students/${enrollmentId}`,
   edit_student: (enrollmentId: string) =>
-    `/admin/students/${enrollmentId}/editar`,
+    `/admin/students/${enrollmentId}/edit`,
 };
