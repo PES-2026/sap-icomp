@@ -102,13 +102,13 @@ export default function StudentForm({
       const payload = formatForBackend(formData);
 
       if (isEditMode && initialData?.externalId) {
-        const response = await studentService.updateStudent(
+        await studentService.updateStudent(
           initialData.externalId,
           payload,
         );
         showToast("Estudante atualizado com sucesso!");
       } else {
-        const response = await studentService.createStudent(
+        await studentService.createStudent(
           payload as NewStudentFormData,
         );
         showToast("Estudante cadastrado com sucesso!");
