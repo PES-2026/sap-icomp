@@ -299,19 +299,22 @@ export default function StudentForm({
             </div>
 
             <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
-              <CommonButton
-                label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
-                onClick={() => setShowConfirm(true)}
-                type="button"
-                className={
-                  isActive
-                    ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
-                    : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
-                }
-              />
+              {isEditMode ? (
+                <>
+                  <CommonButton
+                    label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+                    onClick={() => setShowConfirm(true)}
+                    type="button"
+                    className={
+                      isActive
+                        ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
+                        : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
+                    }
+                  />
 
-              <div className="flex-1" />
-
+                  <div className="flex-1" />
+                </>
+              ) : null}
               <CommonButton
                 label="Cancelar"
                 onClick={onCancel || handleReset}
