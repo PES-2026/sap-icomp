@@ -43,7 +43,7 @@ export default function StudentForm({
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, msg: "" });
 
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const showToast = (msg: string) => {
@@ -302,6 +302,7 @@ export default function StudentForm({
               <CommonButton
                 label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
                 onClick={() => setShowConfirm(true)}
+                type="button"
                 className={
                   isActive
                     ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
