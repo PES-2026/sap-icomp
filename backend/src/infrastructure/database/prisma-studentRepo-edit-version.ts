@@ -3,7 +3,7 @@ import type { StudentData } from "../../domain/entities/student-data.js";
 import { Prisma, PrismaClient } from "@prisma/client/extension";
 import { Student } from "../../domain/entities/student.js";
 import type { SaveStudentParams } from "../../domain/entities/studentRepositpry-EDIT-VERSION.js";
-import { EmailAlreadyExistsError } from "../../application/use-cases/edit-student.js";
+import { EmailAlreadyExistsError } from "../../application/use-cases/register-student.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 //UTILISE ONLY SAVE(), existsByUUID AND findByUUID

@@ -2,12 +2,6 @@ import type { IStudentRepository } from "./interfaces/IStudentRepository.js";
 import type { StudentData } from "../../domain/entities/student-data.js";
 import { Student } from "../../domain/entities/student.js";
 
-export class EmailAlreadyExistsError extends Error {
-  constructor() {
-    super("Este e-mail já está cadastrado no sistema");
-  }
-}
-
 export class EditStudent {
   private readonly studentRepository: IStudentRepository;
 
@@ -15,7 +9,7 @@ export class EditStudent {
     this.studentRepository = studentRepository;
   }
 
-  async editStudent(student: StudentData): Promise<Student> {
+  async execute(student: StudentData): Promise<Student> {
     const exists = await this.studentRepository.existsByUUID(
       student.externalId,
     );
