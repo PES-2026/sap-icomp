@@ -18,7 +18,7 @@ export const studentService = {
   },
 
   async createStudent(data: NewStudentFormData): Promise<NewStudentFormData> {
-    const response = await api.post<NewStudentFormData>("/students", data);
+    const response = await api.post<NewStudentFormData>("/student", data);
     return response.data;
   },
 

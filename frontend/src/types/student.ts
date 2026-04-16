@@ -40,6 +40,7 @@ export interface NewStudent {
 }
 
 export interface NewStudentFormData {
+  externalId: string;
   enrollmentId: string;
   name: string;
   dtBirth: string;

@@ -13,7 +13,7 @@ export const NeedBadge = ({ value }: NeedBadgeProps) => {
 
   return (
     <span
-      className={`inline-block rounded-md px-2 py-0.75 text-xs font-semibold whitespace-nowrap ${colorMap[value]}`}
+      className={`inline-block rounded-md px-2 py-0.75 text-xs font-semibold whitespace-nowrap bg-amber-100 text-amber-800`}
     >
       {value}
     </span>
