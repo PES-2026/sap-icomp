@@ -30,17 +30,20 @@ jobs:
         run: |
           docker save sap-icomp-backend-$APP_ENV:latest | gzip > sap-icomp-backend-$APP_ENV.tar.gz
 
-      - name: Generate .env.backend file for the backend
+      - name: Generate .env file for the backend
         run: |
-          cat <<EOF > .env.backend
+          cat <<EOF > .env
           ENVIRONMENT="$APP_ENV"
           BACKEND_PORT="${{ vars.BACKEND_PORT }}"
+          FRONTEND_PORT="${{ vars.FRONTEND_PORT }}"
           DB_PORT="${{ vars.DB_PORT }}"
           DB_NAME="${{ secrets.DB_NAME }}"
           DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
           DB_USER="${{ secrets.DB_USER }}"
           DB_HOST="${{ secrets.SERVER_HOST }}"
+          BACKEND_HOST="${{ secrets.SERVER_HOST }}"
           DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.SERVER_HOST }}:${{ vars.DB_PORT }}/${{ secrets.DB_NAME }}?schema=public&sslmode=prefer"
+          NEXT_PUBLIC_API_URL="http://${{ secrets.SERVER_HOST }}:${{ vars.BACKEND_PORT }}"
           EOF
 
       - name: Copy image, compose and env to VPS
@@ -51,7 +54,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,./docker/${{ env.APP_ENV }}/docker-compose.yml,.env.backend"
+          source: "sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,./docker/${{ env.APP_ENV }}/docker-compose.yml,.env"
           target: "/var/www/${{ secrets.HOST_MAIN_FOLDER }}"
 
       - name: Deploy via SSH
@@ -67,13 +70,13 @@ jobs:
           envs: APP_ENV
           script: |
             cd /var/www/${{ secrets.HOST_MAIN_FOLDER }}
-            chmod 600 .env.backend
+            chmod 600 .env
 
-            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env.backend down
+            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env down
 
             docker load < sap-icomp-backend-$APP_ENV.tar.gz
 
-            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env.backend up -d db backend
+            docker compose -f ./docker/$APP_ENV/docker-compose.yml -p sap-icomp-$APP_ENV --env-file .env up -d db backend
 
             rm -f sap-icomp-backend-$APP_ENV.tar.gz
             docker image prune -f
