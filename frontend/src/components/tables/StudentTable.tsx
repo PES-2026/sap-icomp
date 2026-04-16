@@ -195,14 +195,14 @@ export default function StudentTable() {
                       <td className={`px-4 py-3.5 ${borderClass}`}>
                         <div className="flex gap-2">
                           <Link
-                            href={PATHS.visualize_student(student.enrollmentId)}
+                            href={PATHS.visualize_student(student.externalId)}
                             title="Visualizar"
                             className="flex items-center rounded-md p-1 text-[#6bc4a6] transition-colors duration-150 hover:bg-[#e8f7f2]"
                           >
                             <Eye size={20} />
                           </Link>
                           <Link
-                            href={PATHS.edit_student(student.enrollmentId)}
+                            href={PATHS.edit_student(student.externalId)}
                             title="Editar"
                             className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
                           >

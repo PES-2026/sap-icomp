@@ -45,3 +45,14 @@ export const formatForBackend = (data: NewStudentFormData) => {
     phoneNumber: data.phoneNumber.replace(/\D/g, ""),
   };
 };
+
+export const formatForFrontend = (dataFromAPI: any): NewStudentFormData => {
+  const [year, month, day] = dataFromAPI.dtBirth.split("T")[0].split("-");
+
+  return {
+    ...dataFromAPI,
+    dtBirth: `${day}/${month}/${year}`,
+    enrollmentId: maskRegistration(dataFromAPI.enrollmentId),
+    phoneNumber: maskPhone(dataFromAPI.phoneNumber),
+  };
+};

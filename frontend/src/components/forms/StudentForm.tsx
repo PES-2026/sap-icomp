@@ -96,19 +96,32 @@ export default function StudentForm({
       setIsLoading(true);
 
       const payload = formatForBackend(formData);
+      let response;
 
-      const response = await studentService.createStudent(
-        payload as NewStudentFormData,
-      );
+      if (isEditMode && initialData?.enrollmentId) {
+        response = await studentService.updateStudent(
+          initialData.enrollmentId,
+          payload,
+        );
+        showToast("Estudante atualizado com sucesso!");
+      } else {
+        response = await studentService.createStudent(
+          payload as NewStudentFormData,
+        );
+        showToast("Estudante cadastrado com sucesso!");
+      }
 
-      showToast("Estudante cadastrado com sucesso!");
       setIsSubmitted(true);
-
-      if (onSubmitSuccess) onSubmitSuccess(response);
     } catch (error: any) {
-      showToast(
-        error.response?.data?.message || "Erro ao conectar com o servidor.",
-      );
+      isEditMode
+        ? showToast(
+            error.response?.data?.message ||
+              "Erro ao conectar com o servidor, não foi possível editar.",
+          )
+        : showToast(
+            error.response?.data?.message ||
+              "Erro ao conectar com o servidor, não foi possível registrar.",
+          );
     } finally {
       setIsLoading(false);
     }
@@ -224,7 +237,7 @@ export default function StudentForm({
                   <input
                     type="text"
                     placeholder="TDAH, TAG"
-                    value={formData.diagnosis}
+                    value={formData.diagnosis ?? ""}
                     onChange={(e) =>
                       handleFieldChange("diagnosis", e.target.value)
                     }
@@ -237,7 +250,7 @@ export default function StudentForm({
                 <Field label="Potencialidades:">
                   <textarea
                     placeholder="Realiza atividades em grupo..."
-                    value={formData.potential}
+                    value={formData.potential ?? ""}
                     onChange={(e) =>
                       handleFieldChange("potential", e.target.value)
                     }
@@ -251,7 +264,7 @@ export default function StudentForm({
                 <Field label="Identificação inicial das demandas e barreiras:">
                   <textarea
                     placeholder="Descreva as demandas..."
-                    value={formData.difficulties}
+                    value={formData.difficulties ?? ""}
                     onChange={(e) =>
                       handleFieldChange("difficulties", e.target.value)
                     }
