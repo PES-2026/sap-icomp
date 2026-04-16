@@ -2,7 +2,7 @@
 
 import StudentForm from "@/components/forms/StudentForm";
 import { useAppNavigation } from "@/utils/navigator";
-import { StudentFormData } from "@/utils/studentFormUtils";
+import { StudentFormData } from "@/types/student";
 import { useParams } from "next/navigation";
 
 const STUDENTS_DB: Record<string, StudentFormData> = {

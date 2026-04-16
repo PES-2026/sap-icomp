@@ -1,4 +1,5 @@
-import StudentTable, { Student } from "@/components/tables/StudentTable";
+import StudentTable from "@/components/tables/StudentTable";
+import { Student } from "@/types/student";
 
 const INITIAL_STUDENTS: Student[] = [
   {
