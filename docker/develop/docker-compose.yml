@@ -26,7 +26,7 @@ services:
     container_name: sap-icomp-frontend-develop
     restart: always
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:3000"
 
 volumes:
   postgres_datadevelop:
