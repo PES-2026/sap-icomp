@@ -9,6 +9,8 @@ import { Diagnosis } from "./valueObjects/diagnosis.js";
 import { Potential } from "./valueObjects/potential.js";
 import { Difficulties } from "./valueObjects/difficulties.js";
 
+import { StudentData } from "./student-data.js";
+
 export class Student {
   constructor(
     public readonly studentId: StudentId,
@@ -58,7 +60,36 @@ export class Student {
         difficultiesStud,
       );
     } catch (error) {
-      return error;
+      throw error;
+    }
+  }
+  static update(student: StudentData) {
+    try {
+      const studentId = StudentId.reutilise(student.externalId); //Reuses the existing externalId instead of generating a new one
+      const nameStud = Name.create(student.name);
+      const enrollmentStud = Enrollment.create(student.enrollmentId);
+      const dtBirthStud = DtBirth.create(student.dtBirth);
+      const emailStud = Email.create(student.email);
+      const phoneNumberStud = PhoneNumber.create(student.phoneNumber);
+      const courseStud = Course.create(student.course);
+      const diagnosisStud = Diagnosis.create(student.diagnosis);
+      const potentialStud = Potential.create(student.potential);
+      const difficultiesStud = Difficulties.create(student.difficulties);
+
+      return new Student(
+        studentId,
+        nameStud,
+        enrollmentStud,
+        dtBirthStud,
+        emailStud,
+        phoneNumberStud,
+        courseStud,
+        diagnosisStud,
+        potentialStud,
+        difficultiesStud,
+      );
+    } catch (error) {
+      throw error;
     }
   }
 }
