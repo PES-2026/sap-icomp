@@ -16,6 +16,7 @@ import { FormErrors, NewStudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
+import { ConfirmModal } from "../confirm-modal/ConfirmModal";
 
 interface StudentFormProps {
   initialData?: NewStudentFormData;
@@ -41,6 +42,9 @@ export default function StudentForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, msg: "" });
+
+  const [isActive, setIsActive] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const showToast = (msg: string) => {
     setToast({ visible: true, msg });
@@ -97,18 +101,30 @@ export default function StudentForm({
 
       const payload = formatForBackend(formData);
 
-      const response = await studentService.createStudent(
-        payload as NewStudentFormData,
-      );
+      if (isEditMode && initialData?.externalId) {
+        const response = await studentService.updateStudent(
+          initialData.externalId,
+          payload,
+        );
+        showToast("Estudante atualizado com sucesso!");
+      } else {
+        const response = await studentService.createStudent(
+          payload as NewStudentFormData,
+        );
+        showToast("Estudante cadastrado com sucesso!");
+      }
 
-      showToast("Estudante cadastrado com sucesso!");
       setIsSubmitted(true);
-
-      if (onSubmitSuccess) onSubmitSuccess(response);
     } catch (error: any) {
-      showToast(
-        error.response?.data?.message || "Erro ao conectar com o servidor.",
-      );
+      isEditMode
+        ? showToast(
+            error.response?.data?.message ||
+              "Erro ao conectar com o servidor, não foi possível editar.",
+          )
+        : showToast(
+            error.response?.data?.message ||
+              "Erro ao conectar com o servidor, não foi possível registrar.",
+          );
     } finally {
       setIsLoading(false);
     }
@@ -119,6 +135,26 @@ export default function StudentForm({
     setErrors({});
     setTouched({});
     setIsSubmitted(false);
+  };
+
+  const handleToggleActive = async () => {
+    try {
+      const response = await studentService.deleteStudent(formData.externalId);
+      showToast("Estudante cadastrado com sucesso!");
+    } catch (error: any) {
+      showToast(
+        error.response?.data?.message ||
+          "Erro ao conectar com o servidor, não foi possível registrar.",
+      );
+    } finally {
+      setIsActive((prev) => !prev);
+      setShowConfirm(false);
+      showToast(
+        isActive
+          ? "Aluno inativado com sucesso."
+          : "Aluno reativado com sucesso.",
+      );
+    }
   };
 
   return (
@@ -224,7 +260,7 @@ export default function StudentForm({
                   <input
                     type="text"
                     placeholder="TDAH, TAG"
-                    value={formData.diagnosis}
+                    value={formData.diagnosis ?? ""}
                     onChange={(e) =>
                       handleFieldChange("diagnosis", e.target.value)
                     }
@@ -237,7 +273,7 @@ export default function StudentForm({
                 <Field label="Potencialidades:">
                   <textarea
                     placeholder="Realiza atividades em grupo..."
-                    value={formData.potential}
+                    value={formData.potential ?? ""}
                     onChange={(e) =>
                       handleFieldChange("potential", e.target.value)
                     }
@@ -251,7 +287,7 @@ export default function StudentForm({
                 <Field label="Identificação inicial das demandas e barreiras:">
                   <textarea
                     placeholder="Descreva as demandas..."
-                    value={formData.difficulties}
+                    value={formData.difficulties ?? ""}
                     onChange={(e) =>
                       handleFieldChange("difficulties", e.target.value)
                     }
@@ -263,6 +299,22 @@ export default function StudentForm({
             </div>
 
             <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
+              {isEditMode ? (
+                <>
+                  <CommonButton
+                    label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+                    onClick={() => setShowConfirm(true)}
+                    type="button"
+                    className={
+                      isActive
+                        ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
+                        : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
+                    }
+                  />
+
+                  <div className="flex-1" />
+                </>
+              ) : null}
               <CommonButton
                 label="Cancelar"
                 onClick={onCancel || handleReset}
@@ -284,6 +336,21 @@ export default function StudentForm({
           </form>
         )}
       </main>
+
+      {/* ── Confirm Modal ── */}
+      <ConfirmModal
+        open={showConfirm}
+        title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+        message={
+          isActive
+            ? `Tem certeza que deseja inativar ${formData.name}? O aluno não aparecerá mais na listagem ativa.`
+            : `Deseja reativar ${formData.name}? O aluno voltará à listagem ativa.`
+        }
+        confirmLabel={isActive ? "Inativar" : "Reativar"}
+        confirmColor={isActive ? "critical" : "primary"}
+        onConfirm={handleToggleActive}
+        onCancel={() => setShowConfirm(false)}
+      />
 
       <Toast message={toast.msg} visible={toast.visible} type="error" />
     </>

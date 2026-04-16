@@ -9,6 +9,7 @@ import CommonButton from "@/components/common-button/CommonButton";
 import { SelectInput } from "@/components/select-input/FilterSelect";
 import { SpecialNeed } from "@/types/specialNeed";
 import { useAppNavigation } from "@/utils/navigator";
+import { PATHS } from "@/constants/paths";
 
 type AttendanceType =
   | "Atendimento"
@@ -189,7 +190,7 @@ export default function StudentPage() {
             Nenhum aluno com ID <strong>{id}</strong> foi localizado.
           </p>
           <a
-            href="/admin/alunos"
+            href={PATHS.students_list}
             className={cn(
               "mt-6 inline-flex items-center justify-center gap-2",
               "rounded-[10px] bg-[#6bc4a6] px-6 py-2.5",

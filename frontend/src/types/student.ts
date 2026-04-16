@@ -33,13 +33,14 @@ export interface NewStudent {
   diagnosis: string;
   potential: string;
   difficulties: string;
-  reatedAt: string;
+  createdAt: string;
   updatedAt: string;
   removed: boolean;
   courseId: string;
 }
 
 export interface NewStudentFormData {
+  externalId: string;
   enrollmentId: string;
   name: string;
   dtBirth: string;

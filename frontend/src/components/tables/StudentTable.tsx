@@ -2,17 +2,23 @@
 
 import { Edit, Eye, Plus } from "lucide-react";
 import { SearchInput } from "../search-input/SearchInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SelectInput } from "../select-input/FilterSelect";
 import CommonButton from "../common-button/CommonButton";
 import Link from "next/link";
 import { useAppNavigation } from "@/utils/navigator";
-import { Student } from "@/types/student";
+import { NewStudent } from "@/types/student";
 import { NeedBadge } from "../need-badge/NeedBadge";
 import { COURSES_ACRONYM } from "@/constants/courses";
+import { studentService } from "@/services";
+import { PATHS } from "@/constants/paths";
 
-export default function StudentTable({ students }: { students: Student[] }) {
+export default function StudentTable() {
   const { handleNavigation } = useAppNavigation();
+
+  const [students, setStudents] = useState<NewStudent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("Todos");
@@ -22,31 +28,37 @@ export default function StudentTable({ students }: { students: Student[] }) {
 
   const periods = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setIsLoading(true);
+        const data = await studentService.getStudents();
+        setStudents(data);
+        console.log(students);
+      } catch (error) {
+        console.error("Erro ao carregar a lista de alunos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
   const filteredStudents = students.filter((student) => {
     const matchEnrollment = student.enrollmentId
       .toLowerCase()
       .includes(enrollmentFilter.toLowerCase());
-    const matchName = student.fullName
+    const matchName = student.name
       .toLowerCase()
       .includes(nameFilter.toLowerCase());
     const matchCourse =
-      courseFilter === "Todos" || student.course === courseFilter;
-    const matchPeriod =
-      periodFilter === "Todos" || student.period.toString() === periodFilter;
-    const matchAppointment =
-      student.lastAppointment.includes(appointmentFilter);
-    const matchNeed = student.activeNeed
+      courseFilter === "Todos" || student.courseId === courseFilter;
+    const matchNeed = (student.diagnosis ?? "")
       .toLowerCase()
       .includes(needFilter.toLowerCase());
 
-    return (
-      matchEnrollment &&
-      matchName &&
-      matchCourse &&
-      matchPeriod &&
-      matchAppointment &&
-      matchNeed
-    );
+    return matchEnrollment && matchName && matchCourse && matchNeed;
   });
 
   const columns = [
@@ -62,7 +74,6 @@ export default function StudentTable({ students }: { students: Student[] }) {
   return (
     <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
-        {/* Header */}
         <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
           <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
             Lista Geral de Alunos
@@ -70,17 +81,13 @@ export default function StudentTable({ students }: { students: Student[] }) {
           <CommonButton
             label="Adicionar Novo Aluno"
             startIcon={Plus}
-            onClick={() =>
-              handleNavigation({ path: "/admin/alunos/cadastrar" })
-            }
+            onClick={() => handleNavigation({ path: PATHS.register_student })}
           />
         </div>
 
-        {/* Table Container */}
         <div className="flex-1 overflow-auto">
           <table className="w-full border-separate border-spacing-0 text-sm">
             <thead className="sticky top-0 z-10">
-              {/* Column labels */}
               <tr>
                 {columns.map((col, index) => (
                   <th
@@ -92,7 +99,6 @@ export default function StudentTable({ students }: { students: Student[] }) {
                 ))}
               </tr>
 
-              {/* Filter row */}
               <tr>
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SearchInput
@@ -150,7 +156,7 @@ export default function StudentTable({ students }: { students: Student[] }) {
                   return (
                     <tr
                       key={student.enrollmentId}
-                      className="transition-colors duration-150 bg-white hover:bg-[#faf7f0]"
+                      className="transition-colors duration-150 bg-white hover:bg-[#fcfcfc]"
                     >
                       <td
                         className={`px-4 py-3.5 text-center font-semibold text-[#4a4540] ${borderClass}`}
@@ -160,37 +166,43 @@ export default function StudentTable({ students }: { students: Student[] }) {
                       <td
                         className={`px-4 py-3.5 text-center font-medium text-[#3a3530] ${borderClass}`}
                       >
-                        {student.fullName}
+                        {student.name}
                       </td>
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
-                        {student.course}
+                        {student.courseId}
                       </td>
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
-                        {student.period}º
+                        -
                       </td>
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
-                        {student.lastAppointment}
+                        -
                       </td>
                       <td className={`px-4 py-3.5 text-center ${borderClass}`}>
-                        <NeedBadge value={student.activeNeed} />
+                        {student.diagnosis ? (
+                          <NeedBadge value={student.diagnosis} />
+                        ) : (
+                          <span className="text-[#6a6560]">
+                            Nenhum diagnóstico
+                          </span>
+                        )}
                       </td>
                       <td className={`px-4 py-3.5 ${borderClass}`}>
                         <div className="flex gap-2">
                           <Link
-                            href={`/admin/alunos/${student.enrollmentId}`}
+                            href={PATHS.visualize_student(student.externalId)}
                             title="Visualizar"
                             className="flex items-center rounded-md p-1 text-[#6bc4a6] transition-colors duration-150 hover:bg-[#e8f7f2]"
                           >
                             <Eye size={20} />
                           </Link>
                           <Link
-                            href={`/admin/alunos/${student.enrollmentId}/editar`}
+                            href={PATHS.edit_student(student.externalId)}
                             title="Editar"
                             className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
                           >
@@ -206,11 +218,14 @@ export default function StudentTable({ students }: { students: Student[] }) {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="shrink-0 border-t border-[#f0ebe0] px-6 py-3 text-sm text-[#a0a098]">
-          {students.length} aluno
-          {students.length !== 1 ? "s" : ""} encontrado
-          {students.length !== 1 ? "s" : ""}
+          {!isLoading && (
+            <>
+              {filteredStudents.length} aluno
+              {filteredStudents.length !== 1 ? "s" : ""} encontrado
+              {filteredStudents.length !== 1 ? "s" : ""}
+            </>
+          )}
         </div>
       </div>
     </main>
