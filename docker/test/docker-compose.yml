@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: sap-icomp-postgres-database-test
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - postgres_datatest:/var/lib/postgresql/data
+
+  backend:
+    image: sap-icomp-backend-test:latest
+    container_name: sap-icomp-backend-test
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    depends_on:
+      - db
+
+  frontend:
+    image: sap-icomp-frontend-test:latest
+    container_name: sap-icomp-frontend-test
+    restart: always
+    ports:
+      - "${FRONTEND_PORT}:3000"
+
+volumes:
+  postgres_datatest:
