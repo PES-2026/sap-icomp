@@ -42,7 +42,7 @@ jobs:
           DB_USER="${{ secrets.DB_USER }}"
           DB_HOST="${{ secrets.SERVER_HOST }}"
           BACKEND_HOST="${{ secrets.SERVER_HOST }}"
-          DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.SERVER_HOST }}:${{ vars.DB_PORT }}/${{ secrets.DB_NAME }}?schema=public&sslmode=prefer"
+          DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.SERVER_HOST }}:${{ vars.DB_PORT }}/${{ secrets.DB_NAME }}?schema=public"
           NEXT_PUBLIC_API_URL="http://${{ secrets.SERVER_HOST }}:${{ vars.BACKEND_PORT }}"
           EOF
 
