@@ -75,10 +75,9 @@ export default function StudentForm({
   };
 
   const handleFieldBlur = (key: keyof NewStudentFormData) => {
-    setTouched((prev) => ({ ...prev, [key]: true }));
-    setErrors((prev) => ({
+    setTouched((prev) => ({
       ...prev,
-      [key]: validateStudentForm(formData)[key],
+      [key]: true,
     }));
   };
 
