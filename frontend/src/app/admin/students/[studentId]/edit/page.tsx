@@ -34,11 +34,11 @@ export default function EditStudentPage() {
           const formattedData = formatForFrontend(foundStudent);
           setStudentData(formattedData);
         } else {
-          console.error("Aluno não encontrado.");
+          console.error("Student not found.");
           handleNavigation({ path: "/admin/students" });
         }
       } catch (error) {
-        console.error("Erro ao buscar dados do aluno:", error);
+        console.error("Error to fetch data student: ", error);
       } finally {
         setIsLoading(false);
       }
