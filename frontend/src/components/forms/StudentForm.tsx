@@ -17,7 +17,6 @@ import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
 import { ConfirmModal } from "../confirm-modal/ConfirmModal";
-import { error } from "console";
 
 interface StudentFormProps {
   initialData?: NewStudentFormData;
