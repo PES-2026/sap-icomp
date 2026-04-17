@@ -59,14 +59,19 @@ export default function StudentForm({
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
   const handleFieldChange = (key: keyof NewStudentFormData, value: string) => {
-    const updated = { ...formData, [key]: value };
-    setFormData(updated);
-    if (touched[key]) {
-      setErrors((prev) => ({
+    setFormData((prev) => {
+      const updated = {
         ...prev,
+        [key]: value,
+      };
+
+      setErrors((prevErrors) => ({
+        ...prevErrors,
         [key]: validateStudentForm(updated)[key],
       }));
-    }
+
+      return updated;
+    });
   };
 
   const handleFieldBlur = (key: keyof NewStudentFormData) => {
@@ -102,15 +107,10 @@ export default function StudentForm({
       const payload = formatForBackend(formData);
 
       if (isEditMode && initialData?.externalId) {
-        await studentService.updateStudent(
-          initialData.externalId,
-          payload,
-        );
+        await studentService.updateStudent(initialData.externalId, payload);
         showToast("Estudante atualizado com sucesso!");
       } else {
-        await studentService.createStudent(
-          payload as NewStudentFormData,
-        );
+        await studentService.createStudent(payload as NewStudentFormData);
         showToast("Estudante cadastrado com sucesso!");
       }
 
@@ -299,7 +299,7 @@ export default function StudentForm({
             </div>
 
             <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
-              {isEditMode ? (
+              {isEditMode && false ? (
                 <>
                   <CommonButton
                     label={isActive ? "Inativar Aluno" : "Reativar Aluno"}

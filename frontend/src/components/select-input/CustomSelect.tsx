@@ -73,7 +73,6 @@ export function CustomSelect({
           </span>
         </button>
 
-        {/* Menu Dropdown */}
         {isOpen && (
           <div className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-white rounded-lg border-[1.5px] border-stone-300 shadow-lg overflow-hidden">
             <div className="max-h-60 flex flex-col overflow-y-auto">

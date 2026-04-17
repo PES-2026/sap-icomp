@@ -33,10 +33,9 @@ export default function StudentTable() {
       try {
         setIsLoading(true);
         const data = await studentService.getStudents();
-        setStudents(data);
-        console.log(students);
+        setStudents(data ?? []);
       } catch (error) {
-        console.error("Erro ao carregar a lista de alunos:", error);
+        console.error("Error loading students list:", error);
       } finally {
         setIsLoading(false);
       }
