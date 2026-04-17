@@ -12,3 +12,5 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ["sap-icomp.nelsul.com", "*.nelsul.com"],
 };
+
+export default nextConfig;
