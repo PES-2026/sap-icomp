@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { prisma } from "../infrastructure/database/prisma.js";
 import { PrismaStudentRepository } from "../infrastructure/database/prismaStudentRepository.js";
@@ -7,9 +8,22 @@ import {
   RegisterStudent,
 } from "../application/use-cases/register-student.js";
 import { EditStudent } from "../application/use-cases/edit-student.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+
+console.log(
+  "http://",
+  process.env.BACKEND_HOST,
+  ":",
+  process.env.FRONTEND_PORT,
+);
+app.use(
+  cors({
+    origin: `http://${process.env.BACKEND_HOST}:${process.env.FRONTEND_PORT}`,
+  }),
+);
 
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
@@ -20,6 +34,7 @@ app.get("/students", async (req, res) => {
     const students = await prisma.student.findMany();
     res.json(students);
   } catch (error) {
+    console.error("erro real:", error);
     res.status(500).json({ error: "Fail to retrieve students" });
   }
 });
@@ -128,7 +143,7 @@ app.put("/students/:id", async (req, res) => {
   }
 });
 
-const PORT = process.env.BACKEND_PORT || 3000;
+const PORT = process.env.BACKEND_PORT || 8107;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
