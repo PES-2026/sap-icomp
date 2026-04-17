@@ -13,12 +13,6 @@ import cors from "cors";
 const app = express();
 app.use(express.json());
 
-console.log(
-  "http://",
-  process.env.BACKEND_HOST,
-  ":",
-  process.env.FRONTEND_PORT,
-);
 app.use(
   cors({
     origin: `http://${process.env.BACKEND_HOST}:${process.env.FRONTEND_PORT}`,
@@ -34,7 +28,6 @@ app.get("/students", async (req, res) => {
     const students = await prisma.student.findMany();
     res.json(students);
   } catch (error) {
-    console.error("erro real:", error);
     res.status(500).json({ error: "Fail to retrieve students" });
   }
 });
@@ -143,7 +136,7 @@ app.put("/students/:id", async (req, res) => {
   }
 });
 
-const PORT = process.env.BACKEND_PORT || 8107;
+const PORT = process.env.BACKEND_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
