@@ -31,7 +31,7 @@ services:
     container_name: sap-icomp-frontend-production
     restart: always
     environment:
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - API_URL=${API_URL}
     ports:
       - "${FRONTEND_PORT}:3000"
 
