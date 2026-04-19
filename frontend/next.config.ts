@@ -10,6 +10,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.API_URL}/:path*`,
+      },
+    ];
+  },
+
   allowedDevOrigins: ["sap-icomp.nelsul.com", "*.nelsul.com"],
 };
 
