@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t sap-icomp-frontend-$APP_ENV:latest -f ./frontend/Dockerfile.$APP_ENV ./frontend
+          docker build --build-arg NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_HOST }} -t sap-icomp-frontend-$APP_ENV:latest -f ./frontend/Dockerfile.$APP_ENV ./frontend
 
       - name: Export image to tar.gz
         run: |
