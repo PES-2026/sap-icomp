@@ -44,7 +44,7 @@ jobs:
           BACKEND_HOST="${{ secrets.BACKEND_HOST }}"
           FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
           DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.SERVER_HOST }}:${{ vars.DB_PORT }}/${{ secrets.DB_NAME }}?schema=public"
-          API_URL="http://${{ secrets.BACKEND_HOST }}"
+          NEXT_PUBLIC_API_URL="http://${{ secrets.BACKEND_HOST }}"
           EOF
 
       - name: Copy image, compose and env to VPS
