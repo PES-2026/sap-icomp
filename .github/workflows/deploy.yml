@@ -94,10 +94,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: |
-            "sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,
+            sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,
             sap-icomp-frontend-${{ env.APP_ENV }}.tar.gz,
             ./docker/${{ env.APP_ENV }}/docker-compose.yml,
-            .env"
+            .env
           target: "/var/www/${{ secrets.HOST_MAIN_FOLDER }}"
 
       - name: Deploy via SSH
