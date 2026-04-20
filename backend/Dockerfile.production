@@ -32,4 +32,4 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 
 # Run the development script with hot-reloading
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npm run db:deploy && npm start"]

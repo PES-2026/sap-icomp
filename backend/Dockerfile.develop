@@ -10,7 +10,6 @@ RUN npm install
 
 # Copy the code and generate the Prisma Client
 COPY . .
-RUN npx prisma generate
 
-# Run the development script with hot-reloading
-CMD ["npm", "run", "dev"]
+# Run the development script with hot-reloading and database deployment
+CMD ["sh", "-c", "npm run db:deploy && npm run dev"]

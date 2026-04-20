@@ -6,7 +6,8 @@
     "dev": "tsx --watch ./src/presentation/server.ts",
     "build": "tsc",
     "start": "node dist/presentation/server.js",
-    "test": "jest"
+    "test": "jest",
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
   },
   "type": "module",
   "keywords": [],
