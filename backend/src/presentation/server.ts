@@ -15,7 +15,11 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+    origin: [
+      `https://${process.env.FRONTEND_HOST}`,
+      `http://${process.env.FRONTEND_HOST}`,
+      `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+    ],
   }),
 );
 

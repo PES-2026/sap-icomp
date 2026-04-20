@@ -67,7 +67,15 @@ jobs:
           echo "Images exported successfully: sap-icomp-frontend-$APP_ENV.tar.gz and sap-icomp-backend-$APP_ENV.tar.gz"
 
       - name: Generate .env file for the backend
+        env:
+          RAW_DB_USER: ${{ secrets.DB_USER }}
+          RAW_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
+          echo "Encoding database credentials for environment: $APP_ENV"
+          DB_USER_ENC=$(node -p "encodeURIComponent(process.env.RAW_DB_USER)")
+          DB_PASSWORD_ENC=$(node -p "encodeURIComponent(process.env.RAW_DB_PASSWORD)")
+          echo "Database credentials encoded successfully for environment: $APP_ENV"
+
           echo "Generating .env file for environment: $APP_ENV"
           cat <<EOF > .env
           ENVIRONMENT="$APP_ENV"
@@ -80,7 +88,7 @@ jobs:
           DB_HOST="${{ secrets.SERVER_HOST }}"
           BACKEND_HOST="${{ secrets.BACKEND_HOST }}"
           FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
-          DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@db:5432/${{ secrets.DB_NAME }}?schema=public"
+          DATABASE_URL="postgresql://${DB_USER_ENC}:${DB_PASSWORD_ENC}@db:5432/${{ secrets.DB_NAME }}?schema=public"
           NEXT_PUBLIC_API_URL="http://${{ secrets.BACKEND_HOST }}"
           EOF
           echo ".env file generated successfully"
@@ -94,10 +102,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: |
-            "sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,
+            sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,
             sap-icomp-frontend-${{ env.APP_ENV }}.tar.gz,
             ./docker/${{ env.APP_ENV }}/docker-compose.yml,
-            .env"
+            .env
           target: "/var/www/${{ secrets.HOST_MAIN_FOLDER }}"
 
       - name: Deploy via SSH
