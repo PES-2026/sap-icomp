@@ -1,4 +1,4 @@
-name: SAP Icomp's Deploy Backend
+name: SAP Icomp's Deploy
 
 on:
   push:
