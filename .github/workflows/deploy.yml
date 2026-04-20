@@ -67,10 +67,13 @@ jobs:
           echo "Images exported successfully: sap-icomp-frontend-$APP_ENV.tar.gz and sap-icomp-backend-$APP_ENV.tar.gz"
 
       - name: Generate .env file for the backend
+        env:
+          RAW_DB_USER: ${{ secrets.DB_USER }}
+          RAW_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           echo "Encoding database credentials for environment: $APP_ENV"
-          DB_USER_ENC=$(node -p "encodeURIComponent({{ secrets.DB_USER }})")
-          DB_PASSWORD_ENC=$(node -p "encodeURIComponent({{ secrets.DB_PASSWORD }})")
+          DB_USER_ENC=$(node -p "encodeURIComponent(process.env.RAW_DB_USER)")
+          DB_PASSWORD_ENC=$(node -p "encodeURIComponent(process.env.RAW_DB_PASSWORD)")
           echo "Database credentials encoded successfully for environment: $APP_ENV"
 
           echo "Generating .env file for environment: $APP_ENV"
