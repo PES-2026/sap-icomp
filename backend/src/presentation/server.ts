@@ -18,6 +18,7 @@ app.use(
     origin: [
       `https://${process.env.FRONTEND_HOST}`,
       `http://${process.env.FRONTEND_HOST}`,
+      `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
     ],
   }),
 );
