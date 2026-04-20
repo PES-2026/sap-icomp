@@ -26,8 +26,10 @@ const editStudent = new EditStudent(studentRepository);
 app.get("/students", async (req, res) => {
   try {
     const students = await prisma.student.findMany();
+    console.log("Retrieved students:", students);
     res.json(students);
   } catch (error) {
+    console.log("Error retrieving students:", error);
     res.status(500).json({ error: "Fail to retrieve students" });
   }
 });
@@ -64,6 +66,14 @@ app.post("/student", async (req, res) => {
       !phoneNumber ||
       !courseId
     ) {
+      console.log("Missing required fields:", {
+        name,
+        dtBirth,
+        email,
+        enrollmentId,
+        phoneNumber,
+        courseId,
+      });
       return res.status(400).json({
         error:
           "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
@@ -92,12 +102,15 @@ app.post("/student", async (req, res) => {
       error instanceof EmailAlreadyExistsError ||
       error instanceof EnrollmentAlreadyExistsError
     ) {
+      console.log("Conflict error:", error.message);
       return res.status(409).json({ error: error.message });
     }
     if (error instanceof Error) {
+      console.log("Validation error:", error.message);
       return res.status(400).json({ error: error.message });
     }
 
+    console.log("Unexpected error:", error);
     return res.status(500).json({ error: "Failure to register a student" });
   }
 });
@@ -129,9 +142,10 @@ app.put("/students/:id", async (req, res) => {
       potential,
       difficulties,
     });
-
+    console.log("Student updated successfully:", result);
     return res.status(200).json(result);
   } catch (err: any) {
+    console.log("Error updating student:", err);
     return res.status(400).json({ message: err.message });
   }
 });
