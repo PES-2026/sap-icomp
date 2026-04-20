@@ -1,0 +1,147 @@
+name: SAP Icomp's Deploy Backend
+
+on:
+  push:
+    branches: [develop, test, main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "docker/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        type: choice
+        options:
+          - develop
+          - test
+          - production
+
+jobs:
+  deploy:
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_name == 'main' && 'production' || github.ref_name) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      APP_ENV: ${{ vars.ENVIRONMENT }}
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          echo "Building backend image for environment: $APP_ENV"
+
+          docker build \
+              -t sap-icomp-backend-$APP_ENV:latest \
+              -f ./backend/Dockerfile.$APP_ENV \
+              ./backend
+
+          echo "Backend image built successfully: sap-icomp-backend-$APP_ENV:latest"
+
+          echo "Building frontend image for environment: $APP_ENV"
+
+          docker build \
+              --build-arg NEXT_PUBLIC_API_URL=https://${{ secrets.BACKEND_HOST }} \
+              -t sap-icomp-frontend-$APP_ENV:latest \
+              -f ./frontend/Dockerfile.$APP_ENV \
+              ./frontend
+
+          echo "Frontend image built successfully: sap-icomp-frontend-$APP_ENV:latest"
+
+      - name: Export image to tar.gz
+        run: |
+          echo "Exporting backend and frontend images to tar.gz for environment: $APP_ENV"
+
+          docker save sap-icomp-backend-$APP_ENV:latest \
+            | gzip > sap-icomp-backend-$APP_ENV.tar.gz
+
+          docker save sap-icomp-frontend-$APP_ENV:latest \
+            | gzip > sap-icomp-frontend-$APP_ENV.tar.gz
+
+          echo "Images exported successfully: sap-icomp-frontend-$APP_ENV.tar.gz and sap-icomp-backend-$APP_ENV.tar.gz"
+
+      - name: Generate .env file for the backend
+        run: |
+          echo "Generating .env file for environment: $APP_ENV"
+          cat <<EOF > .env
+          ENVIRONMENT="$APP_ENV"
+          BACKEND_PORT="${{ vars.BACKEND_PORT }}"
+          FRONTEND_PORT="${{ vars.FRONTEND_PORT }}"
+          DB_PORT="${{ vars.DB_PORT }}"
+          DB_NAME="${{ secrets.DB_NAME }}"
+          DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+          DB_USER="${{ secrets.DB_USER }}"
+          DB_HOST="${{ secrets.SERVER_HOST }}"
+          BACKEND_HOST="${{ secrets.BACKEND_HOST }}"
+          FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
+          DATABASE_URL="postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@db:5432/${{ secrets.DB_NAME }}?schema=public"
+          NEXT_PUBLIC_API_URL="http://${{ secrets.BACKEND_HOST }}"
+          EOF
+          echo ".env file generated successfully"
+
+      - name: Copy image, compose and env to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: |
+            "sap-icomp-backend-${{ env.APP_ENV }}.tar.gz,
+            sap-icomp-frontend-${{ env.APP_ENV }}.tar.gz,
+            ./docker/${{ env.APP_ENV }}/docker-compose.yml,
+            .env"
+          target: "/var/www/${{ secrets.HOST_MAIN_FOLDER }}"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          APP_ENV: ${{ env.APP_ENV }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          envs: APP_ENV
+          script: |
+            echo "Deploying backend for environment: $APP_ENV"
+            cd /var/www/${{ secrets.HOST_MAIN_FOLDER }}
+            chmod 600 .env
+
+            echo "Stopping existing containers for environment: $APP_ENV"
+
+            docker compose \
+              -f ./docker/$APP_ENV/docker-compose.yml \
+              --env-file .env \
+              down
+
+            echo "Loading backend and frontend images from tar.gz for environment: $APP_ENV"
+
+            docker load < sap-icomp-backend-$APP_ENV.tar.gz
+            docker load < sap-icomp-frontend-$APP_ENV.tar.gz
+
+            echo "Starting containers for environment: $APP_ENV"
+
+            docker compose \
+              -f ./docker/$APP_ENV/docker-compose.yml \
+              --env-file .env \
+              up -d
+
+            echo "Cleaning up tar.gz files and unused images for environment: $APP_ENV"
+
+            rm -f sap-icomp-backend-$APP_ENV.tar.gz
+            rm -f sap-icomp-frontend-$APP_ENV.tar.gz
+
+            echo "Pruning unused Docker images for environment: $APP_ENV"
+
+            docker image prune -f
+
+            echo "Deploy finished successfully for environment: $APP_ENV"
