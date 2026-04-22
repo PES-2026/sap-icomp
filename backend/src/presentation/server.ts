@@ -19,9 +19,22 @@ const allowedOrigins = [
   `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
 ];
 
-app.use(cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-app.options("*", cors());
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
 
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);

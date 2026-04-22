@@ -12,4 +12,4 @@ RUN npm install
 COPY . .
 
 # Run the development script with hot-reloading and database deployment
-CMD ["sh", "-c", "npm run db:deploy && npm run dev"]
+CMD ["sh", "-c", "npm run db:deploy && npm run prisma:seed && npm run dev"]

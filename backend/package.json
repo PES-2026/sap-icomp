@@ -7,8 +7,9 @@
     "build": "tsc",
     "start": "node dist/presentation/server.js",
     "test": "jest",
-    "prisma:seed": "node --loader ts-node/esm src/infrastructure/database/prismaSeed.ts",
-    "db:deploy": "npx prisma migrate deploy && npx prisma generate && npm run prisma:seed"
+    "prisma:seed": "tsx src/infrastructure/database/prismaSeed.ts",
+    "prisma:seed:prod": "node dist/infrastructure/database/prismaSeed.js",
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
   },
   "type": "module",
   "keywords": [],
@@ -34,6 +35,6 @@
     "typescript": "^6.0.2"
   },
   "prisma": {
-    "seed": "node --loader ts-node/esm src/infrastructure/database/prismaSeed.ts"
+    "seed": "node dist/infrastructure/database/prismaSeed.js"
   }
 }
