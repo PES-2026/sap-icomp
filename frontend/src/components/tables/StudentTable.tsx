@@ -61,12 +61,12 @@ export default function StudentTable() {
   });
 
   const columns = [
-    { label: "Matrícula", width: "w-[110px]" },
-    { label: "Nome Completo", width: "w-[190px]" },
-    { label: "Curso", width: "w-[70px]" },
-    { label: "Período", width: "w-[70px]" },
-    { label: "Último Atendimento", width: "w-[140px]" },
-    { label: "Necessidade Ativa", width: "w-[160px]" },
+    { label: "Matrícula", width: "w-[160px]" },
+    { label: "Nome Completo", width: "w-[700px]" },
+    { label: "Curso", width: "w-[200px]" },
+    // { label: "Período", width: "w-[70px]" },
+    // { label: "Último Atendimento", width: "w-[140px]" },
+    // { label: "Necessidade Ativa", width: "w-[160px]" },
     { label: "", width: "w-[70px]" },
   ];
 
@@ -116,7 +116,7 @@ export default function StudentTable() {
                     defaultOption="Todos"
                   />
                 </td>
-                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
+                {/* <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SelectInput
                     value={periodFilter}
                     onChange={setPeriodFilter}
@@ -133,7 +133,7 @@ export default function StudentTable() {
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SearchInput value={needFilter} onChange={setNeedFilter} />
                 </td>
-                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2" />
+                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2" /> */}
               </tr>
             </thead>
 
