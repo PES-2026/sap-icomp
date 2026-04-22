@@ -73,7 +73,7 @@ export class Student {
       DtBirth.create(student.dtBirth),
       Email.create(student.email),
       PhoneNumber.create(student.phoneNumber),
-      Course.create(student.course),
+      Course.create(student.courseId),
       Diagnosis.create(student.diagnosis),
       Potential.create(student.potential),
       Difficulties.create(student.difficulties),

@@ -13,13 +13,26 @@ import cors from "cors";
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = [
+  `https://${process.env.FRONTEND_HOST}`,
+  `http://${process.env.FRONTEND_HOST}`,
+  `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+];
+
 app.use(
   cors({
-    origin: [
-      `https://${process.env.FRONTEND_HOST}`,
-      `http://${process.env.FRONTEND_HOST}`,
-      `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
-    ],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   }),
 );
 
@@ -128,7 +141,7 @@ app.put("/students/:id", async (req, res) => {
       dtBirth,
       email,
       phoneNumber,
-      course,
+      courseId,
       diagnosis,
       potential,
       difficulties,
@@ -141,7 +154,7 @@ app.put("/students/:id", async (req, res) => {
       dtBirth,
       email,
       phoneNumber,
-      course,
+      courseId,
       diagnosis,
       potential,
       difficulties,
