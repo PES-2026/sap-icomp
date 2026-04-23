@@ -9,7 +9,6 @@ import {
   validateStudentForm,
   formatForBackend,
 } from "@/utils/studentFormUtils";
-import { SuccessScreen, Toast } from "./ui/StudentFormUI";
 import { Field } from "../field/Field";
 import { CustomSelect } from "../select-input/CustomSelect";
 import { FormErrors, NewStudentFormData } from "@/types/student";
@@ -17,6 +16,8 @@ import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
 import { ConfirmModal } from "../confirm-modal/ConfirmModal";
+import { SuccessScreen } from "./ui/StudentFormUI";
+import toast from "react-hot-toast";
 
 interface StudentFormProps {
   initialData?: NewStudentFormData;
@@ -41,15 +42,9 @@ export default function StudentForm({
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [toast, setToast] = useState({ visible: false, msg: "" });
 
   const [isActive, setIsActive] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const showToast = (msg: string) => {
-    setToast({ visible: true, msg });
-    setTimeout(() => setToast({ visible: false, msg: "" }), 3000);
-  };
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
@@ -97,7 +92,7 @@ export default function StudentForm({
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
-      return showToast("Preencha os campos obrigatórios corretamente.");
+      return toast.error("Preencha os campos obrigatórios corretamente.");
     }
 
     try {
@@ -107,20 +102,20 @@ export default function StudentForm({
 
       if (isEditMode && initialData?.externalId) {
         await studentService.updateStudent(initialData.externalId, payload);
-        showToast("Estudante atualizado com sucesso!");
+        toast.success("Estudante atualizado com sucesso!");
       } else {
         await studentService.createStudent(payload as NewStudentFormData);
-        showToast("Estudante cadastrado com sucesso!");
+        toast.success("Estudante cadastrado com sucesso!");
       }
 
       setIsSubmitted(true);
     } catch (error: any) {
       isEditMode
-        ? showToast(
+        ? toast.error(
             error.response?.data?.message ||
               "Erro ao conectar com o servidor, não foi possível editar.",
           )
-        : showToast(
+        : toast.error(
             error.response?.data?.message ||
               "Erro ao conectar com o servidor, não foi possível registrar.",
           );
@@ -139,16 +134,16 @@ export default function StudentForm({
   const handleToggleActive = async () => {
     try {
       await studentService.deleteStudent(formData.externalId);
-      showToast("Estudante cadastrado com sucesso!");
+      toast.success("Estudante cadastrado com sucesso!");
     } catch (error: any) {
-      showToast(
+      toast.error(
         error.response?.data?.message ||
           "Erro ao conectar com o servidor, não foi possível registrar.",
       );
     } finally {
       setIsActive((prev) => !prev);
       setShowConfirm(false);
-      showToast(
+      toast.success(
         isActive
           ? "Aluno inativado com sucesso."
           : "Aluno reativado com sucesso.",
@@ -350,8 +345,6 @@ export default function StudentForm({
         onConfirm={handleToggleActive}
         onCancel={() => setShowConfirm(false)}
       />
-
-      <Toast message={toast.msg} visible={toast.visible} type="error" />
     </>
   );
 }

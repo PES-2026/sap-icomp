@@ -10,6 +10,7 @@ import { SelectInput } from "@/components/select-input/FilterSelect";
 import { SpecialNeed } from "@/types/specialNeed";
 import { useAppNavigation } from "@/utils/navigator";
 import { PATHS } from "@/constants/paths";
+import toast from "react-hot-toast";
 
 type AttendanceType =
   | "Atendimento"
@@ -126,22 +127,6 @@ const ALL_TYPES: AttendanceType[] = [
   "Outro",
 ];
 
-interface ToastProps {
-  message: string;
-  isVisible: boolean;
-}
-
-const Toast = ({ message, isVisible }: ToastProps) => (
-  <div
-    className={cn(
-      "pointer-events-none fixed bottom-8 left-1/2 z-2000 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#3a3530] px-6 py-3 text-[13px] font-semibold text-white shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300",
-      isVisible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0",
-    )}
-  >
-    {message}
-  </div>
-);
-
 export default function StudentPage() {
   const params = useParams();
   const id = decodeURIComponent((params?.studentId as string) ?? "");
@@ -153,19 +138,11 @@ export default function StudentPage() {
   const [isActive, setIsActive] = useState<boolean>(student?.isActive ?? true);
   const [filterType, setFilterType] = useState<string>("Todos os Tipos");
   const [showConfirm, setShowConfirm] = useState(false);
-  const [toastMsg, setToastMsg] = useState("");
-  const [toastVisible, setToastVisible] = useState(false);
-
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 2800);
-  };
 
   const handleToggleActive = () => {
     setIsActive((prev) => !prev);
     setShowConfirm(false);
-    showToast(
+    toast.success(
       isActive
         ? "Aluno inativado com sucesso."
         : "Aluno reativado com sucesso.",
@@ -344,12 +321,12 @@ export default function StudentPage() {
 
               <CommonButton
                 label="Criar Relatório"
-                onClick={() => showToast("Relatório gerado!")}
+                onClick={() => toast.success("Relatório gerado!")}
               />
 
               <CommonButton
                 label="Fazer Registro"
-                onClick={() => showToast("Registro adicionado!")}
+                onClick={() => toast.success("Registro adicionado!")}
               />
             </div>
           </div>
@@ -370,9 +347,6 @@ export default function StudentPage() {
         onConfirm={handleToggleActive}
         onCancel={() => setShowConfirm(false)}
       />
-
-      {/* ── Toast ── */}
-      <Toast message={toastMsg} isVisible={toastVisible} />
     </>
   );
 }
