@@ -43,8 +43,7 @@ export default function StudentForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isActive, setIsActive] = useState(true);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirmRegister, setShowConfirmRegister] = useState(false);
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
@@ -76,9 +75,7 @@ export default function StudentForm({
     }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const validateSubmit = () => {
     const allFields = Object.keys(EMPTY_FORM) as Array<
       keyof NewStudentFormData
     >;
@@ -95,6 +92,10 @@ export default function StudentForm({
       return toast.error("Preencha os campos obrigatórios corretamente.");
     }
 
+    setShowConfirmRegister(true);
+  };
+
+  const handleSubmit = async () => {
     try {
       setIsLoading(true);
 
@@ -121,6 +122,7 @@ export default function StudentForm({
           );
     } finally {
       setIsLoading(false);
+      setShowConfirmRegister(false);
     }
   };
 
@@ -129,26 +131,6 @@ export default function StudentForm({
     setErrors({});
     setTouched({});
     setIsSubmitted(false);
-  };
-
-  const handleToggleActive = async () => {
-    try {
-      await studentService.deleteStudent(formData.externalId);
-      toast.success("Estudante cadastrado com sucesso!");
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message ||
-          "Erro ao conectar com o servidor, não foi possível registrar.",
-      );
-    } finally {
-      setIsActive((prev) => !prev);
-      setShowConfirm(false);
-      toast.success(
-        isActive
-          ? "Aluno inativado com sucesso."
-          : "Aluno reativado com sucesso.",
-      );
-    }
   };
 
   return (
@@ -293,22 +275,6 @@ export default function StudentForm({
             </div>
 
             <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
-              {isEditMode && false ? (
-                <>
-                  <CommonButton
-                    label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
-                    onClick={() => setShowConfirm(true)}
-                    type="button"
-                    className={
-                      isActive
-                        ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
-                        : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
-                    }
-                  />
-
-                  <div className="flex-1" />
-                </>
-              ) : null}
               <CommonButton
                 label="Cancelar"
                 onClick={onCancel || handleReset}
@@ -323,7 +289,8 @@ export default function StudentForm({
                       ? "Salvar Alterações"
                       : "Confirmar Registro"
                 }
-                type="submit"
+                type="button"
+                onClick={validateSubmit}
                 disabled={isLoading}
               />
             </div>
@@ -331,19 +298,19 @@ export default function StudentForm({
         )}
       </main>
 
-      {/* ── Confirm Modal ── */}
+      {/* ── Confirm Modal to Update/Create Student ── */}
       <ConfirmModal
-        open={showConfirm}
-        title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+        open={showConfirmRegister}
+        title={isEditMode ? "Atualizar Aluno" : "Cadastrar Aluno"}
         message={
-          isActive
-            ? `Tem certeza que deseja inativar ${formData.name}? O aluno não aparecerá mais na listagem ativa.`
-            : `Deseja reativar ${formData.name}? O aluno voltará à listagem ativa.`
+          isEditMode
+            ? `Tem certeza que deseja atualizar ${formData.name}?`
+            : `Tem certeza que deseja cadastrar ${formData.name}?`
         }
-        confirmLabel={isActive ? "Inativar" : "Reativar"}
-        confirmColor={isActive ? "critical" : "primary"}
-        onConfirm={handleToggleActive}
-        onCancel={() => setShowConfirm(false)}
+        confirmLabel={isEditMode ? "Atualizar" : "Cadastrar"}
+        confirmColor="primary"
+        onConfirm={handleSubmit}
+        onCancel={() => setShowConfirmRegister(false)}
       />
     </>
   );
