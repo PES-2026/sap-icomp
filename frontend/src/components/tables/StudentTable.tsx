@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Eye, Plus, Trash, UserRoundX } from "lucide-react";
+import { Edit, Eye, Plus, UserRoundX } from "lucide-react";
 import { SearchInput } from "../search-input/SearchInput";
 import { useEffect, useState } from "react";
 import { SelectInput } from "../select-input/FilterSelect";
