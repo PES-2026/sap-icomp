@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { prisma } from "../infrastructure/database/prisma.js";
 import { PrismaStudentRepository } from "../infrastructure/database/prismaStudentRepository.js";
@@ -7,9 +8,33 @@ import {
   RegisterStudent,
 } from "../application/use-cases/register-student.js";
 import { EditStudent } from "../application/use-cases/edit-student.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+
+const allowedOrigins = [
+  `https://${process.env.FRONTEND_HOST}`,
+  `http://${process.env.FRONTEND_HOST}`,
+  `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
 
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
@@ -18,8 +43,10 @@ const editStudent = new EditStudent(studentRepository);
 app.get("/students", async (req, res) => {
   try {
     const students = await prisma.student.findMany();
+    console.log("Retrieved students:", students);
     res.json(students);
   } catch (error) {
+    console.log("Error retrieving students:", error);
     res.status(500).json({ error: "Fail to retrieve students" });
   }
 });
@@ -56,6 +83,14 @@ app.post("/student", async (req, res) => {
       !phoneNumber ||
       !courseId
     ) {
+      console.log("Missing required fields:", {
+        name,
+        dtBirth,
+        email,
+        enrollmentId,
+        phoneNumber,
+        courseId,
+      });
       return res.status(400).json({
         error:
           "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
@@ -84,12 +119,15 @@ app.post("/student", async (req, res) => {
       error instanceof EmailAlreadyExistsError ||
       error instanceof EnrollmentAlreadyExistsError
     ) {
+      console.log("Conflict error:", error.message);
       return res.status(409).json({ error: error.message });
     }
     if (error instanceof Error) {
+      console.log("Validation error:", error.message);
       return res.status(400).json({ error: error.message });
     }
 
+    console.log("Unexpected error:", error);
     return res.status(500).json({ error: "Failure to register a student" });
   }
 });
@@ -103,7 +141,7 @@ app.put("/students/:id", async (req, res) => {
       dtBirth,
       email,
       phoneNumber,
-      course,
+      courseId,
       diagnosis,
       potential,
       difficulties,
@@ -116,19 +154,20 @@ app.put("/students/:id", async (req, res) => {
       dtBirth,
       email,
       phoneNumber,
-      course,
+      courseId,
       diagnosis,
       potential,
       difficulties,
     });
-
+    console.log("Student updated successfully:", result);
     return res.status(200).json(result);
   } catch (err: any) {
+    console.log("Error updating student:", err);
     return res.status(400).json({ message: err.message });
   }
 });
 
-const PORT = process.env.BACKEND_PORT || 3000;
+const PORT = process.env.BACKEND_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);

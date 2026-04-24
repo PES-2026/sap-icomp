@@ -5,7 +5,7 @@ export interface StudentData {
   dtBirth: string;
   email: string;
   phoneNumber: string;
-  course: string;
+  courseId: string;
   diagnosis: string;
   potential: string;
   difficulties: string;
