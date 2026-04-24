@@ -11,7 +11,7 @@ import {
 } from "@/utils/studentFormUtils";
 import { Field } from "../field/Field";
 import { CustomSelect } from "../select-input/CustomSelect";
-import { FormErrors, NewStudentFormData } from "@/types/student";
+import { FormErrors, StudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
 import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
@@ -20,8 +20,8 @@ import { SuccessScreen } from "./ui/StudentFormUI";
 import toast from "react-hot-toast";
 
 interface StudentFormProps {
-  initialData?: NewStudentFormData;
-  onSubmitSuccess?: (data: NewStudentFormData) => void;
+  initialData?: StudentFormData;
+  onSubmitSuccess?: (data: StudentFormData) => void;
   onCancel?: () => void;
 }
 
@@ -32,12 +32,12 @@ export default function StudentForm({
 }: StudentFormProps) {
   const isEditMode = !!initialData;
 
-  const [formData, setFormData] = useState<NewStudentFormData>(
+  const [formData, setFormData] = useState<StudentFormData>(
     initialData || EMPTY_FORM,
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<
-    Partial<Record<keyof NewStudentFormData, boolean>>
+    Partial<Record<keyof StudentFormData, boolean>>
   >({});
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -47,12 +47,12 @@ export default function StudentForm({
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
-  const getValidationClass = (field: keyof NewStudentFormData) =>
+  const getValidationClass = (field: keyof StudentFormData) =>
     errors[field]
       ? `${baseInputClass} border-red-300 bg-red-50 focus:border-red-400`
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
-  const handleFieldChange = (key: keyof NewStudentFormData, value: string) => {
+  const handleFieldChange = (key: keyof StudentFormData, value: string) => {
     setFormData((prev) => {
       const updated = {
         ...prev,
@@ -68,7 +68,7 @@ export default function StudentForm({
     });
   };
 
-  const handleFieldBlur = (key: keyof NewStudentFormData) => {
+  const handleFieldBlur = (key: keyof StudentFormData) => {
     setTouched((prev) => ({
       ...prev,
       [key]: true,
@@ -77,7 +77,7 @@ export default function StudentForm({
 
   const validateSubmit = () => {
     const allFields = Object.keys(EMPTY_FORM) as Array<
-      keyof NewStudentFormData
+      keyof StudentFormData
     >;
     const allTouched = allFields.reduce(
       (acc, k) => ({ ...acc, [k]: true }),
@@ -105,7 +105,7 @@ export default function StudentForm({
         await studentService.updateStudent(initialData.externalId, payload);
         toast.success("Estudante atualizado com sucesso!");
       } else {
-        await studentService.createStudent(payload as NewStudentFormData);
+        await studentService.createStudent(payload as StudentFormData);
         toast.success("Estudante cadastrado com sucesso!");
       }
 
