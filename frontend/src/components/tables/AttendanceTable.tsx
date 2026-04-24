@@ -7,7 +7,6 @@ import { SelectInput } from "../select-input/FilterSelect";
 import CommonButton from "../common-button/CommonButton";
 import Link from "next/link";
 import { useAppNavigation } from "@/utils/navigator";
-import { NeedBadge } from "../need-badge/NeedBadge";
 import { COURSES_ACRONYM } from "@/constants/courses";
 import { PATHS } from "@/constants/paths";
 import { attendanceService } from "@/services/attendanceService";

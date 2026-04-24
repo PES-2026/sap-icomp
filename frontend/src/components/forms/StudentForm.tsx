@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import CommonButton from "@/components/common-button/CommonButton";
 import {
   maskRegistration,
