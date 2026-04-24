@@ -335,7 +335,7 @@ export default function StudentPage() {
                 endIcon={Edit}
                 onClick={() =>
                   handleNavigation({
-                    path: `/admin/alunos/${student.id}/editar`,
+                    path: `/admin/students/${student.id}/editar`,
                   })
                 }
               />

@@ -1,3 +1,4 @@
+name: sap-icomp-${ENVIRONMENT}
 services:
   db:
     image: postgres:17-alpine
@@ -8,25 +9,48 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_dataproduction:/var/lib/postgresql/data
+    networks:
+      - sapicomp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prisma -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   backend:
-    image: sap-icomp-backend-production:latest
-    container_name: sap-icomp-backend-production
+    image: sap-icomp-backend-${ENVIRONMENT}:latest
+    container_name: sap-icomp-backend-${ENVIRONMENT}
     restart: unless-stopped
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - FRONTEND_HOST=${FRONTEND_HOST}
+      - DATABASE_URL=${DATABASE_URL}
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - sapicomp-network
 
   frontend:
-    image: sap-icomp-frontend-production:latest
-    container_name: sap-icomp-frontend-production
+    image: sap-icomp-frontend-${ENVIRONMENT}:latest
+    container_name: sap-icomp-frontend-${ENVIRONMENT}
     restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - "${FRONTEND_PORT}:3000"
+    networks:
+      - sapicomp-network
+
+networks:
+  sapicomp-network:
+    name: sapicomp-network-${ENVIRONMENT}
 
 volumes:
   postgres_dataproduction:

@@ -47,7 +47,7 @@ export const SuccessScreen = ({
       <div className="flex gap-3 mt-2">
         <CommonButton
           label="Ver lista de alunos"
-          onClick={() => handleNavigation({ path: "/admin/alunos" })}
+          onClick={() => handleNavigation({ path: "/admin/students" })}
           className="border border-[#e7e4dd] bg-[#faf7f0] hover:bg-[#f0ede8] text-stone-600"
         />
         {!isEditMode && (
