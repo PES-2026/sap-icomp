@@ -8,3 +8,9 @@ export interface Attendance {
   attendanceType: string;
   attendanceDate: string;
 }
+
+export interface AttendanceSummary {
+  attendanceId: string;
+  attendanceType: string;
+  attendanceDate: string;
+}

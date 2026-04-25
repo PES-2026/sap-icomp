@@ -1,293 +1,271 @@
 "use client";
 
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
-import { ArrowLeft, Edit, Eye } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  Calendar,
+  BookOpen,
+  Mail,
+  Phone,
+  Cake,
+} from "lucide-react";
 import { cn } from "@/utils/cn";
 import CommonButton from "@/components/common-button/CommonButton";
 import { SelectInput } from "@/components/select-input/FilterSelect";
-import { SpecialNeed } from "@/types/specialNeed";
 import { useAppNavigation } from "@/utils/navigator";
 import { PATHS } from "@/constants/paths";
 import toast from "react-hot-toast";
+import { StudentAttendance } from "@/types/student";
+import { AttendanceTypes } from "@/constants/attendance";
+import { studentService } from "@/services";
 
-type AttendanceType =
-  | "Atendimento"
-  | "Primeiro Contato / Atendimento"
-  | "Alinhamento"
-  | "Orientação"
-  | "Outro";
-
-interface Attendance {
-  id: string;
-  date: string;
-  type: AttendanceType;
-}
-
-interface Student {
-  id: string;
-  registration: string;
-  fullName: string;
-  course: string;
-  period: number;
-  activeNeed: SpecialNeed;
-  isActive: boolean;
-  attendances: Attendance[];
-}
-
-const STUDENTS_DB: Record<string, Student> = {
-  "1234-5678": {
-    id: "1234-5678",
-    registration: "1234-5678",
-    fullName: "João Vitor Mesquita da Frota",
-    course: "Engenharia de Software",
-    period: 5,
-    activeNeed: "TDAH TAG",
-    isActive: true,
-    attendances: [
-      { id: "a1", date: "26/03/2026", type: "Atendimento" },
-      { id: "a2", date: "23/03/2026", type: "Atendimento" },
-      { id: "a3", date: "19/03/2026", type: "Atendimento" },
-      { id: "a4", date: "16/03/2026", type: "Primeiro Contato / Atendimento" },
-      { id: "a5", date: "12/03/2026", type: "Atendimento" },
-      { id: "a6", date: "10/03/2026", type: "Alinhamento" },
-      { id: "a7", date: "09/03/2026", type: "Orientação" },
-    ],
-  },
-  "1234-7985": {
-    id: "1234-7985",
-    registration: "1234-7985",
-    fullName: "David Yan dos Santos Prado",
-    course: "Ciência da Computação",
-    period: 3,
-    activeNeed: "TEA",
-    isActive: true,
-    attendances: [
-      { id: "b1", date: "17/02/2026", type: "Atendimento" },
-      { id: "b2", date: "10/02/2026", type: "Alinhamento" },
-      { id: "b3", date: "03/02/2026", type: "Orientação" },
-      { id: "c1", date: "04/01/2026", type: "Atendimento" },
-      { id: "c2", date: "28/12/2025", type: "Primeiro Contato / Atendimento" },
-      { id: "b12", date: "17/02/2026", type: "Atendimento" },
-      { id: "b22", date: "10/02/2026", type: "Alinhamento" },
-      { id: "b32", date: "03/02/2026", type: "Orientação" },
-      { id: "c12", date: "04/01/2026", type: "Atendimento" },
-      { id: "c23", date: "28/12/2025", type: "Primeiro Contato / Atendimento" },
-      { id: "b14", date: "17/02/2026", type: "Atendimento" },
-      { id: "b24", date: "10/02/2026", type: "Alinhamento" },
-      { id: "b36", date: "03/02/2026", type: "Orientação" },
-      { id: "c17", date: "04/01/2026", type: "Atendimento" },
-      { id: "c28", date: "28/12/2025", type: "Primeiro Contato / Atendimento" },
-    ],
-  },
-  "1234-3456": {
-    id: "1234-3456",
-    registration: "1234-3456",
-    fullName: "Lucas Eduardo Souza de Moura",
-    course: "Análise e Desenvolvimento de Sistemas",
-    period: 7,
-    activeNeed: "PCD",
-    isActive: true,
-    attendances: [
-      { id: "c1", date: "04/01/2026", type: "Atendimento" },
-      { id: "c2", date: "28/12/2025", type: "Primeiro Contato / Atendimento" },
-    ],
-  },
-  "1234-7423": {
-    id: "1234-7423",
-    registration: "1234-7423",
-    fullName: "Maria Eduarda Costa Lyra do Nascimento",
-    course: "Sistemas de Informação",
-    period: 1,
-    activeNeed: "Dificuldade de aprendizado",
-    isActive: true,
-    attendances: [
-      { id: "d1", date: "10/02/2026", type: "Atendimento" },
-      { id: "d2", date: "05/02/2026", type: "Orientação" },
-    ],
-  },
-  "1234-6984": {
-    id: "1234-6984",
-    registration: "1234-6984",
-    fullName: "Thiago Vinícius Costa Guimarães",
-    course: "Outros",
-    period: 9,
-    activeNeed: "Nenhuma",
-    isActive: true,
-    attendances: [{ id: "e1", date: "11/03/2026", type: "Atendimento" }],
-  },
-};
-
-const ALL_TYPES: AttendanceType[] = [
-  "Atendimento",
-  "Primeiro Contato / Atendimento",
-  "Alinhamento",
-  "Orientação",
-  "Outro",
-];
 
 export default function StudentPage() {
   const params = useParams();
-  const id = decodeURIComponent((params?.studentId as string) ?? "");
-
-  const student = STUDENTS_DB[id] ?? null;
-
+  const studentId = decodeURIComponent((params?.studentId as string) ?? "");
+  const [student, setStudent] = useState<StudentAttendance>();
   const { handleNavigation } = useAppNavigation();
 
-  const [isActive, setIsActive] = useState<boolean>(student?.isActive ?? true);
   const [filterType, setFilterType] = useState<string>("Todos os Tipos");
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showDisableStudent, setShowDisableStudent] = useState(false);
 
-  const handleToggleActive = () => {
-    setIsActive((prev) => !prev);
-    setShowConfirm(false);
-    toast.success(
-      isActive
-        ? "Aluno inativado com sucesso."
-        : "Aluno reativado com sucesso.",
-    );
-  };
+  useEffect(() => {
+    const fetchStudentInfo = async () => {
+      try {
+        const data = await studentService.getStudentById(studentId);
+        setStudent(data);
+      } catch (error) {
+        console.error("Error loading students list:", error);
+      }
+    };
+
+    fetchStudentInfo();
+  }, []);
 
   const filteredAttendances = student
     ? student.attendances.filter(
-        (a) => filterType === "Todos os Tipos" || a.type === filterType,
+        (a) =>
+          filterType === "Todos os Tipos" || a.attendanceType === filterType,
       )
     : [];
 
   if (!student) {
     return (
       <div className="flex h-full items-center justify-center bg-[#f5f0e8] p-4 font-sans">
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-4 text-[64px] leading-none">🔍</div>
-          <h1 className="mb-2 text-2xl font-extrabold text-[#3a3530]">
+        <div className="flex flex-col items-center text-center max-w-sm">
+          <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-sm">
+            <span className="text-4xl">🔍</span>
+          </div>
+          <h1 className="mb-2 text-xl font-bold text-[#2a2520]">
             Aluno não encontrado
           </h1>
-          <p className="text-sm text-[#8a8075]">
-            Nenhum aluno com ID <strong>{id}</strong> foi localizado.
+          <p className="mb-6 text-sm text-[#8a8075]">
+            Nenhum aluno com ID{" "}
+            <code className="rounded bg-[#e8e0d5] px-1.5 py-0.5 text-xs font-mono text-[#5a5248]">
+              {studentId}
+            </code>{" "}
+            foi localizado.
           </p>
           <a
             href={PATHS.students_list}
-            className={cn(
-              "mt-6 inline-flex items-center justify-center gap-2",
-              "rounded-[10px] bg-[#6bc4a6] px-6 py-2.5",
-              "text-[13px] font-bold text-white no-underline",
-              "transition-colors duration-150 hover:bg-[#52b594]",
-            )}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#6bc4a6] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-all hover:bg-[#52b594]"
           >
-            <ArrowLeft size={16} />
-            <span>Voltar à lista</span>
+            <ArrowLeft size={15} />
+            Voltar à lista
           </a>
         </div>
       </div>
     );
   }
 
+  const handleDisableStudent = async () => {
+    try {
+      await studentService.deleteStudent(studentId);
+      window.location.reload();
+      toast.success(
+        !student.removed
+          ? "Aluno inativado com sucesso."
+          : "Aluno reativado com sucesso.",
+      );
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Erro ao comunicar com o servidor.",
+      );
+    } finally {
+      setShowDisableStudent(false);
+    }
+  };
+
   return (
     <>
-      <main className="flex min-w-0 flex-1 flex-col h-full font-sans">
-        {/* ── Content ── */}
-        <div className="flex flex-1 flex-col p-7 min-h-0">
-          <div className="flex flex-1 flex-col gap-7 overflow-hidden rounded-2xl bg-white p-7 shadow-[0_2px_16px_rgba(107,196,166,0.10)] min-h-0">
-            {/* Student header */}
-            <div className="shrink-0">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="mb-2 text-2xl font-bold text-[#3a3530]">
-                    {student.fullName} - {student.registration}
+      <main className="flex min-w-0 flex-1 flex-col h-full font-sans bg-[#f5f0e8]">
+        <div className="flex flex-1 flex-col p-6 min-h-0 gap-4">
+          {/* ── Profile Card ── */}
+          <div className="rounded-2xl bg-white shadow-sm border border-[#ede8df] p-5">
+            <div className="flex items-start gap-5">
+              <CommonButton
+                onClick={() => handleNavigation({ isBack: true })}
+                label=""
+                title="Voltar"
+                startIcon={ArrowLeft}
+                sizeIcon={20}
+                className="flex w-fit items-center gap-0 rounded-xl p-2 text-sm font-semibold text-[#6bc4a6] bg-transparent transition-colors hover:bg-[#f1efe9]"
+              />
+
+              {/* Identity + contact info */}
+              <div className="flex-1 min-w-0">
+                {/* Name + status */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-lg font-bold text-[#2a2520] leading-tight truncate">
+                    {student.name}
                   </h1>
-                  <div className="flex items-center gap-2.5">
-                    <p className="m-0 text-sm text-[#8a8075]">
-                      {student.course}
-                    </p>
-                    <span
-                      className={cn(
-                        "rounded-full px-2.5 py-0.5 text-sm font-bold",
-                        isActive
-                          ? "bg-[#d4edda] text-[#155724]"
-                          : "bg-[#f8d7da] text-[#721c24]",
-                      )}
-                    >
-                      {isActive ? "Ativo" : "Inativo"}
-                    </span>
-                  </div>
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold",
+                      !student.removed
+                        ? "bg-[#d4f0e8] text-[#1a6e4e]"
+                        : "bg-[#fde8e8] text-[#9b2c2c]",
+                    )}
+                  >
+                    {!student.removed ? "Ativo" : "Inativo"}
+                  </span>
                 </div>
 
-                {/* Info pills */}
-                <div className="flex shrink-0 flex-wrap justify-end gap-2.5">
-                  <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
-                      Período
-                    </div>
-                    <div className="text-sm font-bold text-[#3a3530]">
-                      {student.period}º
-                    </div>
-                  </div>
-                  <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
-                      Necessidade
-                    </div>
-                    <div className="text-sm font-bold text-[#3a3530]">
-                      {student.activeNeed}
-                    </div>
-                  </div>
-                  <div className="rounded-[10px] bg-[#f5f0e8] px-3.5 py-1.5 text-center">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-[#a0a098]">
-                      Atendimentos
-                    </div>
-                    <div className="text-sm font-bold text-[#3a3530]">
-                      {student.attendances.length}
-                    </div>
-                  </div>
+                {/* Course */}
+                <div className="mt-1.5 flex items-center gap-1.5 text-sm text-[#7a7268]">
+                  <BookOpen size={13} className="shrink-0 text-[#6bc4a6]" />
+                  {student.course}
+                </div>
+
+                {/* Contact row */}
+                <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
+                  <span className="flex items-center gap-1.5 text-sm text-[#7a7268]">
+                    <Mail size={13} className="shrink-0 text-[#6bc4a6]" />
+                    {student.email}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-[#7a7268]">
+                    <Phone size={13} className="shrink-0 text-[#6bc4a6]" />
+                    {student.phoneNumber}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-[#7a7268]">
+                    <Cake size={13} className="shrink-0 text-[#6bc4a6]" />
+                    {student.dtBirth}
+                  </span>
+                </div>
+              </div>
+
+              {/* Stat pills */}
+              <div className="hidden sm:flex shrink-0 gap-3">
+                <div className="rounded-xl bg-[#f5f0e8] px-4 py-2.5 text-center min-w-22.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a0998e] mb-0.5">
+                    Matrícula
+                  </p>
+                  <p className="text-sm font-bold text-[#3a3530]">
+                    {student.enrollmentId}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-[#f5f0e8] px-4 py-2.5 text-center min-w-22.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a0998e] mb-0.5">
+                    Atendimentos
+                  </p>
+                  <p className="text-sm font-bold text-[#3a3530]">
+                    {student.attendances.length}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-[#fff8ec] px-4 py-2.5 text-center min-w-27.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#a0998e] mb-0.5">
+                    Necessidades
+                  </p>
+                  <p className="text-sm font-bold text-[#7a5c1e] leading-tight">
+                    {student.difficulties}
+                  </p>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* History card */}
-            <div className="flex flex-1 flex-col min-h-0">
-              <div className="flex flex-1 flex-col overflow-hidden rounded-[14px] border border-[#c5e8dc] bg-[#e8f7f2] min-h-0">
-                {/* Card header */}
-                <div className="flex shrink-0 items-center justify-between border-b border-[#c5e8dc] px-5 pb-3 pt-3.5">
-                  <div className="text-base font-bold text-[#3a3530]">
-                    Histórico de Atendimentos
-                  </div>
+          {/* ── History Card ── */}
+          <div className="flex flex-1 flex-col rounded-2xl bg-white shadow-sm overflow-hidden min-h-0">
+            {/* Card header */}
+            <div className="flex shrink-0 items-center justify-between px-6 py-4 border-b border-[#ede8df]">
+              <div>
+                <h2 className="text-sm font-bold text-[#2a2520]">
+                  Histórico de Atendimentos
+                </h2>
+                <p className="text-xs text-[#a0998e] mt-0.5">
+                  {filteredAttendances.length} registro
+                  {filteredAttendances.length !== 1 ? "s" : ""} encontrado
+                  {filteredAttendances.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+              <SelectInput
+                value={filterType}
+                onChange={setFilterType}
+                options={AttendanceTypes}
+                defaultOption="Todos"
+                width="w-55"
+              />
+            </div>
 
-                  {/* Dropdown filter */}
-                  <SelectInput
-                    value={filterType}
-                    onChange={setFilterType}
-                    options={ALL_TYPES}
-                    defaultOption="Todos"
-                    width="w-55"
-                  />
-                </div>
-
-                {/* Attendance list */}
-                <div className="flex-1 overflow-y-auto">
+            {/* Attendance list */}
+            <div className="flex-1 p-4 overflow-hidden flex flex-col ">
+              <style>{`
+                .custom-scroll::-webkit-scrollbar {
+                  width: 6px;
+                }
+                .custom-scroll::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .custom-scroll::-webkit-scrollbar-thumb {
+                  background-color: #badad1;
+                  border-radius: 10px;
+                }
+                .custom-scroll:hover::-webkit-scrollbar-thumb {
+                  background-color: #6bc4a6;
+                }
+              `}</style>
+              <div className="flex-1 flex flex-col overflow-hidden rounded-2xl bg-[#d4f0e8] ring-1 ring-[#badad1]">
+                <div className="custom-scroll flex-1 overflow-y-auto divide-y divide-[#badad1]">
                   {filteredAttendances.length === 0 ? (
-                    <div className="px-5 py-8 text-center text-sm text-[#8a9e96]">
-                      Nenhum atendimento encontrado para este filtro.
+                    <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
+                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f0e8]">
+                        <Calendar size={20} className="text-[#b0a898]" />
+                      </div>
+                      <p className="text-sm font-medium text-[#7a7268]">
+                        Nenhum atendimento encontrado
+                      </p>
+                      <p className="mt-1 text-xs text-[#a0998e]">
+                        Tente ajustar o filtro de tipo.
+                      </p>
                     </div>
                   ) : (
-                    filteredAttendances.map((attendance) => (
+                    filteredAttendances.map((attendance, idx) => (
                       <div
-                        key={attendance.id}
-                        className="group flex items-center justify-between border-b border-[#c5e8dc] px-5 py-3.5 transition-colors duration-150 last:border-none hover:bg-[#d4f0e8]"
+                        key={attendance.attendanceId}
+                        className="group flex items-center justify-between px-6 py-4 transition-colors duration-100 hover:bg-[#cde9e1]"
                       >
-                        <div>
-                          <div className="text-sm text-[#3a3530]">
-                            <strong>Data:</strong> {attendance.date}
-                          </div>
-                          <div className="mt-0.5 text-sm text-[#5a7a70]">
-                            <strong>Tipo:</strong> {attendance.type}
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-[#2a2520]">
+                              {attendance.attendanceType}
+                            </p>
+                            <p className="mt-0.5 flex items-center gap-1 text-xs text-[#1a6e4e]">
+                              <Calendar size={11} />
+                              {attendance.attendanceDate}
+                            </p>
                           </div>
                         </div>
 
                         <button
                           title="Visualizar detalhes do atendimento"
-                          className="flex rounded-md p-1 text-[#6bc4a6] transition-colors duration-150 hover:bg-[#e8f7f2]"
+                          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-[#6bc4a6] opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-[#e8f7f2]"
                         >
-                          <Eye size={20} />
+                          <Eye size={14} />
+                          Ver detalhes
                         </button>
                       </div>
                     ))
@@ -295,57 +273,70 @@ export default function StudentPage() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Action buttons */}
-            <div className="flex shrink-0 flex-wrap gap-3">
+          {/* ── Footer Actions ── */}
+          <div className="shrink-0 rounded-2xl bg-white shadow-sm border border-[#ede8df] p-4">
+            <div className="flex flex-wrap items-center gap-3">
               <CommonButton
-                label={isActive ? "Inativar Aluno" : "Reativar Aluno"}
-                onClick={() => setShowConfirm(true)}
-                className={
-                  isActive
-                    ? "bg-[#f4a598] text-white hover:bg-[#f0a195]"
-                    : "bg-[#6bc4a6] text-white hover:bg-[#52b594]"
-                }
+                label={!student.removed ? "Inativar Aluno" : "Reativar Aluno"}
+                onClick={() => setShowDisableStudent(true)}
+                className={cn(
+                  "text-sm font-semibold",
+                  !student.removed
+                    ? "bg-[#fde8e8] text-[#9b2c2c] hover:bg-[#fbd5d5]"
+                    : "bg-[#e8f7f2] text-[#1a6e4e] hover:bg-[#d4f0e8]",
+                )}
               />
-              <CommonButton
-                label="Editar Aluno"
-                endIcon={Edit}
-                onClick={() =>
-                  handleNavigation({
-                    path: `/admin/students/${student.id}/editar`,
-                  })
-                }
-              />
+
+              <div className="h-4 w-px bg-[#e8e0d5]" />
+
+              <div className="flex flex-wrap gap-4 text-xs text-[#a0998e]">
+                <span>
+                  <span className="font-semibold text-[#6a6258]">
+                    Criado em
+                  </span>{" "}
+                  {student.createdAt}
+                </span>
+                <span>
+                  <span className="font-semibold text-[#6a6258]">
+                    Atualizado em
+                  </span>{" "}
+                  {student.updatedAt}
+                </span>
+              </div>
 
               <div className="flex-1" />
 
-              <CommonButton
-                label="Criar Relatório"
-                onClick={() => toast.success("Relatório gerado!")}
-              />
-
-              <CommonButton
-                label="Fazer Registro"
-                onClick={() => toast.success("Registro adicionado!")}
-              />
+              <div className="flex gap-2.5">
+                <CommonButton
+                  label="Criar Relatório"
+                  onClick={() => toast.success("Relatório gerado!")}
+                  className="bg-[#f5f0e8] text-[#5a5248] hover:bg-[#ede8df] text-sm font-semibold"
+                />
+                <CommonButton
+                  label="Fazer Registro"
+                  onClick={() => toast.success("Registro adicionado!")}
+                  className="bg-[#6bc4a6] text-white hover:bg-[#52b594] text-sm font-semibold"
+                />
+              </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* ── Confirm Modal ── */}
       <ConfirmModal
-        open={showConfirm}
-        title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+        open={showDisableStudent}
+        title={!student.removed ? "Inativar Aluno" : "Reativar Aluno"}
         message={
-          isActive
-            ? `Tem certeza que deseja inativar ${student.fullName}? O aluno não aparecerá mais na listagem ativa.`
-            : `Deseja reativar ${student.fullName}? O aluno voltará à listagem ativa.`
+          !student.removed
+            ? `Tem certeza que deseja inativar ${student.name}? O aluno não aparecerá mais na listagem ativa.`
+            : `Deseja reativar ${student.name}? O aluno voltará à listagem ativa.`
         }
-        confirmLabel={isActive ? "Inativar" : "Reativar"}
-        confirmColor={isActive ? "critical" : "primary"}
-        onConfirm={handleToggleActive}
-        onCancel={() => setShowConfirm(false)}
+        confirmLabel={!student.removed ? "Inativar" : "Reativar"}
+        confirmColor={!student.removed ? "critical" : "primary"}
+        onConfirm={handleDisableStudent}
+        onCancel={() => setShowDisableStudent(false)}
       />
     </>
   );
