@@ -1,4 +1,5 @@
 import { Attendance } from "@/types/attendance";
+import { StudentAttendance } from "@/types/student";
 
 export const attendanceMock: Attendance[] = [
   {
@@ -52,3 +53,59 @@ export const attendanceMock: Attendance[] = [
     attendanceDate: "24/04/2026",
   },
 ];
+
+export const studentAttendanceMock: Record<string, StudentAttendance> = {
+  "0d9c5872-378b-449d-8a90-82e56cd20cdd": {
+    externalId: "87c438f7-404b-4e8d-8af7-2d6697f3d2eb",
+    internalId: 12,
+    enrollmentId: "22353217",
+    name: "David Yan dos Santos Prado",
+    email: "david.prado@icomp.ufam.edu.br",
+    phoneNumber: "(92) 98765-4321",
+    dtBirth: "15/03/2001",
+    course: "Engenharia de Software",
+    difficulties: "Dificuldade de aprendizado",
+    removed: false,
+    diagnosis: "",
+    potential: "",
+    createdAt: "24/06/2026 13:55",
+    updatedAt: "29/06/2026 18:32",
+    attendances: [
+      {
+        attendanceId: "0c438f7-404b-4e8d-8af7-2f09gjh5d2df",
+        attendanceDate: "10/02/2026",
+        attendanceType: "Atendimento",
+      },
+      {
+        attendanceId: "21c38f7-404b-4e8d-8af7-2f09gjh5d2dg",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+      {
+        attendanceId: "21c438f7-404b-4ed-8af7-2f09gjh5d2dg",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+      {
+        attendanceId: "21c438f7-404b-4e8d-af7-2f09gjh5d2dg",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+      {
+        attendanceId: "21c438f7-404b-4e8d-8af7-2f0gjh5d2dg",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+      {
+        attendanceId: "21c438f7-404b-4e8d-8af7-2f09gjh5ddg",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+      {
+        attendanceId: "21c438f7-404b-4e8d-8af7-2f09gjh5d2d",
+        attendanceDate: "05/02/2026",
+        attendanceType: "Orientação",
+      },
+    ],
+  },
+};
