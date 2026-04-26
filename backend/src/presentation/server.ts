@@ -13,6 +13,7 @@ import { attendanceRoutes } from "./routes/attendanceRoutes.js";
 import { AttendanceController } from "./controllers/attendanceController.js";
 import { CreateAttendance } from "../application/use-cases/attendance/createAttendance.js";
 import { PrismaAttendanceRepository } from "../infrastructure/database/prismaAttendanceRepository.js";
+import { DisableStudent } from "../application/use-cases/disable-student.js";
 
 const app = express();
 app.use(express.json());
@@ -43,11 +44,14 @@ app.use(
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
-const attedanceReposittory = new PrismaAttendanceRepository(prisma);
+const attedanceRepository = new PrismaAttendanceRepository(prisma);
+const disableStudent = new DisableStudent(studentRepository);
 
 app.get("/students", async (req, res) => {
   try {
-    const students = await prisma.student.findMany();
+    const students = await prisma.student.findMany({
+      where: { removed: false },
+    });
     console.log("Retrieved students:", students);
     res.json(students);
   } catch (error) {
@@ -136,6 +140,7 @@ app.post("/student", async (req, res) => {
     return res.status(500).json({ error: "Failure to register a student" });
   }
 });
+
 app.put("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;
@@ -173,10 +178,22 @@ app.put("/students/:id", async (req, res) => {
 });
 
 const attendanceControler = new AttendanceController(
-  new CreateAttendance(attedanceReposittory),
+  new CreateAttendance(attedanceRepository),
 );
 
 app.use(attendanceRoutes(attendanceControler));
+app.delete("/students/:id", async (req, res) => {
+  try {
+    const externalId = req.params.id;
+
+    const result = await disableStudent.execute(externalId);
+    console.log("Student successfully deactivated.");
+    return res.status(200).json(result);
+  } catch (err: any) {
+    console.log("Error deactivating student: ", err);
+    return res.status(400).json({ message: err.message });
+  }
+});
 
 const PORT = process.env.BACKEND_PORT;
 
