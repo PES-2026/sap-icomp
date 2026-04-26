@@ -5,14 +5,6 @@ import {
   validateStringField,
 } from "../../../domain/utils/validation.utils";
 
-// export interface CreateAttendanceDTO {
-//   studentId: string;
-//   date: Date;
-//   type: AttendanceType;
-//   demand: string;
-//   generalObservations: string;
-// }
-
 export class CreateAttendanceDTO {
   constructor(
     public readonly studentId: string,
