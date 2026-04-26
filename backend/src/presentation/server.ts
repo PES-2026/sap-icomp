@@ -9,6 +9,10 @@ import {
 } from "../application/use-cases/register-student.js";
 import { EditStudent } from "../application/use-cases/edit-student.js";
 import cors from "cors";
+import { attendanceRoutes } from "./routes/attendanceRoutes.js";
+import { AttendanceController } from "./controllers/attendanceController.js";
+import { CreateAttendance } from "../application/use-cases/attendance/createAttendance.js";
+import { PrismaAttendanceRepository } from "../infrastructure/database/prismaAttendanceRepository.js";
 
 const app = express();
 app.use(express.json());
@@ -39,6 +43,7 @@ app.use(
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
+const attedanceReposittory = new PrismaAttendanceRepository(prisma);
 
 app.get("/students", async (req, res) => {
   try {
@@ -166,6 +171,12 @@ app.put("/students/:id", async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 });
+
+const attendanceControler = new AttendanceController(
+  new CreateAttendance(attedanceReposittory),
+);
+
+app.use(attendanceRoutes(attendanceControler));
 
 const PORT = process.env.BACKEND_PORT;
 
