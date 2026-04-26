@@ -1,13 +1,13 @@
-import { StudentId } from "./valueObjects/studentId.js";
-import { Name } from "./valueObjects/name.js";
-import { Enrollment } from "./valueObjects/enrollment.js";
-import { DtBirth } from "./valueObjects/dtBirth.js";
-import { Email } from "./valueObjects/email.js";
-import { PhoneNumber } from "./valueObjects/phoneNumber.js";
-import { Course } from "./valueObjects/course.js";
-import { Diagnosis } from "./valueObjects/diagnosis.js";
-import { Potential } from "./valueObjects/potential.js";
-import { Difficulties } from "./valueObjects/difficulties.js";
+import { StudentId } from "../valueObjects/student/studentId.js";
+import { Name } from "../valueObjects/student/name.js";
+import { Enrollment } from "../valueObjects/student/enrollment.js";
+import { DtBirth } from "../valueObjects/student/dtBirth.js";
+import { Email } from "../valueObjects/student/email.js";
+import { PhoneNumber } from "../valueObjects/student/phoneNumber.js";
+import { Course } from "../valueObjects/course/course.js";
+import { Diagnosis } from "../valueObjects/student/diagnosis.js";
+import { Potential } from "../valueObjects/student/potential.js";
+import { Difficulties } from "../valueObjects/student/difficulties.js";
 
 import { StudentData } from "./student-data.js";
 
