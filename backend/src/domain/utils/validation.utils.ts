@@ -24,3 +24,12 @@ export function validateDateField(value: unknown, fieldName: string): Date {
 
   return parsedDate;
 }
+
+export function validateNumberField(value: unknown, fieldName: string): number {
+  if (typeof value !== "number" || isNaN(value)) {
+    throw new Error(
+      `${fieldName} is required and must a number. Please verify it!`,
+    );
+  }
+  return value as number;
+}
