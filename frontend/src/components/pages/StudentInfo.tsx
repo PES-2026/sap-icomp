@@ -111,7 +111,7 @@ export default function StudentInfo() {
 
   const handleDisableAttendance = async () => {
     try {
-      toast.success("Atendimento desativado com sucesso!");
+      toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
       fetchStudentInfo();
     } catch (error: any) {
       toast.error(
