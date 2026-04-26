@@ -2,7 +2,7 @@
 
 import StudentForm from "@/components/forms/StudentForm";
 import { studentService } from "@/services";
-import { NewStudentFormData } from "@/types/student";
+import { StudentFormData } from "@/types/student";
 import { useAppNavigation } from "@/utils/navigator";
 import { formatForFrontend } from "@/utils/studentFormUtils";
 import { Loader2 } from "lucide-react";
@@ -14,9 +14,7 @@ export default function EditStudentPage() {
   const id = decodeURIComponent((params?.studentId as string) ?? "");
   const { handleNavigation } = useAppNavigation();
 
-  const [studentData, setStudentData] = useState<NewStudentFormData | null>(
-    null,
-  );
+  const [studentData, setStudentData] = useState<StudentFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

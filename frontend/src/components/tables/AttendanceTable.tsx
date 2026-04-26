@@ -1,46 +1,38 @@
 "use client";
 
-import { Edit, Eye, Plus, UserRoundX } from "lucide-react";
+import { Edit, Eye, Plus } from "lucide-react";
 import { SearchInput } from "../search-input/SearchInput";
 import { useEffect, useState } from "react";
 import { SelectInput } from "../select-input/FilterSelect";
 import CommonButton from "../common-button/CommonButton";
 import Link from "next/link";
 import { useAppNavigation } from "@/utils/navigator";
-import { Student } from "@/types/student";
-import { NeedBadge } from "../need-badge/NeedBadge";
 import { COURSES_ACRONYM } from "@/constants/courses";
-import { studentService } from "@/services";
 import { PATHS } from "@/constants/paths";
-import { ConfirmModal } from "../confirm-modal/ConfirmModal";
-import toast from "react-hot-toast";
+import { attendanceService } from "@/services/attendanceService";
+import { Attendance } from "@/types/attendance";
 
-export default function StudentTable() {
+export default function AttendanceTable() {
   const { handleNavigation } = useAppNavigation();
 
-  const [students, setStudents] = useState<Student[]>([]);
+  const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("Todos");
   const [periodFilter, setPeriodFilter] = useState("Todos");
-  const [appointmentFilter, setAppointmentFilter] = useState("");
-  const [needFilter, setNeedFilter] = useState("");
-
-  const [showDisableStudent, setShowDisableStudent] = useState(false);
-  const [studentName, setStudentName] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  const [attendanceDateFilter, setAttendanceDateFilter] = useState("");
+  const [attendanceTypeFilter, setAttendanceTypeFilter] = useState("");
 
   const periods = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchAttendances = async () => {
       try {
         setIsLoading(true);
-        const data = await studentService.getStudents();
-        setStudents(data ?? []);
+        const data = await attendanceService.getAttendances();
+        setAttendances(data ?? []);
       } catch (error) {
         console.error("Error loading students list:", error);
       } finally {
@@ -48,52 +40,33 @@ export default function StudentTable() {
       }
     };
 
-    fetchStudents();
+    fetchAttendances();
   }, []);
 
-  const filteredStudents = students.filter((student) => {
-    const matchEnrollment = student.enrollmentId
+  const filteredAttendances = attendances.filter((attendance) => {
+    const matchEnrollment = attendance.enrollmentId
       .toLowerCase()
       .includes(enrollmentFilter.toLowerCase());
-    const matchName = student.name
+    const matchName = attendance.studentName
       .toLowerCase()
       .includes(nameFilter.toLowerCase());
     const matchCourse =
-      courseFilter === "Todos" || student.course === courseFilter;
-    const matchNeed = (student.diagnosis ?? "")
+      courseFilter === "Todos" || attendance.course === courseFilter;
+    const matchType = (attendance.attendanceType ?? "")
       .toLowerCase()
-      .includes(needFilter.toLowerCase());
+      .includes(attendanceTypeFilter.toLowerCase());
 
-    return matchEnrollment && matchName && matchCourse && matchNeed;
+    return matchEnrollment && matchName && matchCourse && matchType;
   });
 
-  const handleDisableStudent = async () => {
-    try {
-      await studentService.deleteStudent(studentId);
-      setIsActive((prev) => !prev);
-      window.location.reload();
-      toast.success(
-        isActive
-          ? "Aluno inativado com sucesso."
-          : "Aluno reativado com sucesso.",
-      );
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Erro ao comunicar com o servidor.",
-      );
-    } finally {
-      setShowDisableStudent(false);
-    }
-  };
-
   const columns = [
-    { label: "Matrícula", width: "w-[160px]" },
-    { label: "Nome Completo", width: "w-[700px]" },
+    { label: "Matrícula", width: "w-[120px]" },
+    { label: "Nome Completo", width: "w-[500px]" },
     { label: "Curso", width: "w-[200px]" },
     { label: "Período", width: "w-[70px]" },
-    { label: "Último Atendimento", width: "w-[140px]" },
-    { label: "Necessidade Ativa", width: "w-[160px]" },
-    { label: "", width: "w-[70px]" },
+    { label: "Tipo de Atendimento", width: "w-[140px]" },
+    { label: "Data do Atendimento", width: "w-[160px]" },
+    { label: "", width: "w-[50px]" },
   ];
 
   return (
@@ -101,12 +74,14 @@ export default function StudentTable() {
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
         <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
           <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
-            Lista Geral de Alunos
+            Atendimentos
           </h1>
           <CommonButton
-            label="Adicionar Novo Aluno"
+            label="Adicionar Novo Atendimento"
             startIcon={Plus}
-            onClick={() => handleNavigation({ path: PATHS.register_student })}
+            onClick={() =>
+              handleNavigation({ path: PATHS.register_attendance })
+            }
           />
         </div>
 
@@ -152,19 +127,22 @@ export default function StudentTable() {
                 </td>
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SearchInput
-                    value={appointmentFilter}
-                    onChange={setAppointmentFilter}
+                    value={attendanceTypeFilter}
+                    onChange={setAttendanceTypeFilter}
                   />
                 </td>
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                  <SearchInput value={needFilter} onChange={setNeedFilter} />
+                  <SearchInput
+                    value={attendanceDateFilter}
+                    onChange={setAttendanceDateFilter}
+                  />
                 </td>
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2" />
               </tr>
             </thead>
 
             <tbody>
-              {filteredStudents.length === 0 ? (
+              {filteredAttendances.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
@@ -174,8 +152,8 @@ export default function StudentTable() {
                   </td>
                 </tr>
               ) : (
-                filteredStudents.map((student, idx) => {
-                  const isLast = idx === filteredStudents.length - 1;
+                filteredAttendances.map((student, idx) => {
+                  const isLast = idx === filteredAttendances.length - 1;
                   const borderClass = isLast ? "" : "border-b border-[#f0ebe0]";
 
                   return (
@@ -191,7 +169,7 @@ export default function StudentTable() {
                       <td
                         className={`px-4 py-3.5 text-center font-medium text-[#3a3530] ${borderClass}`}
                       >
-                        {student.name}
+                        {student.studentName}
                       </td>
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
@@ -201,50 +179,40 @@ export default function StudentTable() {
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
-                        -
+                        {student.period === "Formado"
+                          ? "Formado(a)"
+                          : student.period + "º"}
                       </td>
                       <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
-                        -
+                        {student.attendanceType}
                       </td>
-                      <td className={`px-4 py-3.5 text-center ${borderClass}`}>
-                        {student.diagnosis ? (
-                          <NeedBadge value={student.diagnosis} />
-                        ) : (
-                          <span className="text-[#6a6560]">
-                            Nenhum diagnóstico
-                          </span>
-                        )}
+                      <td
+                        className={`px-4 py-3.5 text-[#6a6560] text-center ${borderClass}`}
+                      >
+                        {student.attendanceDate}
                       </td>
-                      <td className={`px-4 py-3.5 ${borderClass}`}>
-                        <div className="flex gap-0.5">
+                      <td
+                        className={`px-4 py-3.5 text-[#6a6560] ${borderClass}`}
+                      >
+                        <div className="flex gap-2">
                           <Link
-                            href={PATHS.visualize_student(student.externalId)}
+                            href={PATHS.visualize_attendance(
+                              student.attendanceId,
+                            )}
                             title="Visualizar"
                             className="flex items-center rounded-md p-1 text-[#6bc4a6] transition-colors duration-150 hover:bg-[#e8f7f2]"
                           >
                             <Eye size={20} />
                           </Link>
                           <Link
-                            href={PATHS.edit_student(student.externalId)}
+                            href={PATHS.edit_attendance(student.attendanceId)}
                             title="Editar"
                             className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
                           >
                             <Edit size={20} />
                           </Link>
-                          <CommonButton
-                            label=""
-                            title={isActive ? "Inativar aluno" : "Ativar aluno"}
-                            onClick={() => {
-                              setStudentId(student.externalId);
-                              setStudentName(student.name);
-                              setShowDisableStudent(true);
-                            }}
-                            startIcon={UserRoundX}
-                            sizeIcon={20}
-                            className="flex items-center rounded-md p-1 text-red-500 transition-colors duration-150 bg-transparent hover:bg-red-100 gap-0"
-                          />
                         </div>
                       </td>
                     </tr>
@@ -258,27 +226,12 @@ export default function StudentTable() {
         <div className="shrink-0 border-t border-[#f0ebe0] px-6 py-3 text-sm text-[#a0a098]">
           {!isLoading && (
             <>
-              {filteredStudents.length} aluno
-              {filteredStudents.length !== 1 ? "s" : ""} encontrado
-              {filteredStudents.length !== 1 ? "s" : ""}
+              {filteredAttendances.length} atendimento
+              {filteredAttendances.length !== 1 ? "s" : ""} encontrado
+              {filteredAttendances.length !== 1 ? "s" : ""}
             </>
           )}
         </div>
-
-        {/* ── Confirm Modal to delete Student ── */}
-        <ConfirmModal
-          open={showDisableStudent}
-          title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
-          message={
-            isActive
-              ? `Tem certeza que deseja inativar ${studentName}? O aluno não aparecerá mais na listagem ativa.`
-              : `Deseja reativar ${studentName}? O aluno voltará à listagem ativa.`
-          }
-          confirmLabel={isActive ? "Inativar" : "Reativar"}
-          confirmColor={isActive ? "critical" : "primary"}
-          onConfirm={handleDisableStudent}
-          onCancel={() => setShowDisableStudent(false)}
-        />
       </div>
     </main>
   );
