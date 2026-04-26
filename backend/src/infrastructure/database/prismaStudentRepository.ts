@@ -84,6 +84,7 @@ export class PrismaStudentRepository implements IStudentRepository {
 
     return StudentMapper.toDomain(raw);
   }
+
   async existsByUUID(externalId: string): Promise<boolean> {
     const student = await this.prisma.student.findUnique({
       where: { externalId },
@@ -91,5 +92,17 @@ export class PrismaStudentRepository implements IStudentRepository {
     });
 
     return !!student;
+  }
+
+  async disableByUUID(externalId: string): Promise<boolean> {
+    try {
+      await this.prisma.student.update({
+        where: { externalId },
+        data: { removed: true },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
