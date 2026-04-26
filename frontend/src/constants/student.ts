@@ -1,6 +1,6 @@
-import { NewStudentFormData } from "@/types/student";
+import { StudentFormData } from "@/types/student";
 
-export const EMPTY_FORM: NewStudentFormData = {
+export const EMPTY_FORM: StudentFormData = {
   externalId: "",
   enrollmentId: "",
   name: "",
