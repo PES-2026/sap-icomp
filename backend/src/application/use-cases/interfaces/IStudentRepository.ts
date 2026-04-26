@@ -10,4 +10,5 @@ export interface IStudentRepository {
   save(params: SaveStudentParams): Promise<Student>;
   existsByUUID(externaID: string): Promise<boolean>;
   findByUUID(externaID: string): Promise<Student | null>;
+  disableByUUID(externalId: string): Promise<boolean>;
 }
