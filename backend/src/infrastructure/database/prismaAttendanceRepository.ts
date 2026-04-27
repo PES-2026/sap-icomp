@@ -3,6 +3,10 @@ import {
   Prisma,
 } from "../../../prisma/src/infrastructure/database/generated/client";
 import {
+  AttendancesByStudentRequest,
+  AttendancesByStudentResponse,
+} from "../../application/dtos/attendance/attendancesByStudent.dto";
+import {
   AttendanceItemResponse,
   ListAttendanceRequest,
   ListAttendanceResponse,
@@ -119,5 +123,45 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         generalObservations: attendance.generalObservations.value,
       },
     });
+  }
+
+  async findByStudentId(
+    params: AttendancesByStudentRequest,
+  ): Promise<AttendancesByStudentResponse | null> {
+    const { page, limit, studentId } = params;
+    const offset = (page - 1) * limit;
+
+    const where: Prisma.AttendanceWhereInput = {
+      student: {
+        externalId: studentId,
+      },
+    };
+
+    const [totalItems, results] = await Promise.all([
+      this.prisma.attendance.count({ where }),
+      this.prisma.attendance.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { date: "desc" },
+        include: { student: true },
+      }),
+    ]);
+
+    const items: AttendanceItemResponse[] = results.map((record) => ({
+      studentId: record.student.externalId,
+      studentName: record.student.name,
+      enrollmentId: record.student.enrollmentId,
+      course: record.student.courseId,
+      attendenceType: record.type,
+      attendanceDate: record.date,
+    }));
+
+    return {
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      items,
+    };
   }
 }
