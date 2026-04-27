@@ -3,8 +3,10 @@ import { Student, StudentAttendance, StudentFormData } from "@/types/student";
 import { studentAttendanceMock } from "./mocks";
 
 export const studentService = {
-  async getStudents(): Promise<Student[]> {
-    const response = await api.get<Student[]>("/students");
+  async getStudents(page: number = 1, limit: number = 10): Promise<Student[]> {
+    const response = await api.get<Student[]>("/students", {
+      params: { page, limit },
+    });
     return response.data;
   },
 

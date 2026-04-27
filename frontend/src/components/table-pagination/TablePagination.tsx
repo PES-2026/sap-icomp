@@ -1,13 +1,17 @@
-import { SelectOption } from "@/types/selectOption";
 import { SelectInput } from "../select-input/FilterSelect";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const limitOptions = [
+  { value: "10", label: "10 por página" },
+  { value: "20", label: "20 por página" },
+  { value: "50", label: "50 por página" },
+];
 
 interface TablePaginationProps {
   page: number;
   setPage: (v: number) => void;
   limit: number;
   setLimit: (v: number) => void;
-  limitOptions: SelectOption[];
   lengthData: number;
 }
 
@@ -16,7 +20,6 @@ export default function TablePagination({
   setPage,
   limit,
   setLimit,
-  limitOptions,
   lengthData,
 }: TablePaginationProps) {
   const handleLimitChange = (newLimit: string) => {

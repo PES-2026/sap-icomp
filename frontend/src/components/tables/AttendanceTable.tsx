@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Edit, Eye, Plus } from "lucide-react";
+import { Edit, Eye, Plus } from "lucide-react";
 import { SearchInput } from "../search-input/SearchInput";
 import { useState } from "react";
 import { SelectInput } from "../select-input/FilterSelect";
@@ -22,12 +22,6 @@ const periods = [
   { value: "6", label: "6º" },
   { value: "7", label: "7º" },
   { value: "10", label: "8º" },
-];
-
-const limitOptions = [
-  { value: "10", label: "10 por página" },
-  { value: "20", label: "20 por página" },
-  { value: "50", label: "50 por página" },
 ];
 
 export default function AttendanceTable() {
@@ -213,7 +207,9 @@ export default function AttendanceTable() {
                               <Eye size={20} />
                             </Link>
                             <Link
-                              href={PATHS.edit_attendance(attendance.attendanceId)}
+                              href={PATHS.edit_attendance(
+                                attendance.attendanceId,
+                              )}
                               title="Editar"
                               className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
                             >
@@ -234,7 +230,6 @@ export default function AttendanceTable() {
             setPage={setPage}
             limit={limit}
             setLimit={setLimit}
-            limitOptions={limitOptions}
             lengthData={attendances.length}
           />
         </div>
