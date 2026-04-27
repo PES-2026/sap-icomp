@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Eye, Plus } from "lucide-react";
+import { Edit, Eye, Plus, UserRoundX } from "lucide-react";
 import { SearchInput } from "../search-input/SearchInput";
 import { useEffect, useState } from "react";
 import { SelectInput } from "../select-input/FilterSelect";
@@ -12,6 +12,8 @@ import { NeedBadge } from "../need-badge/NeedBadge";
 import { COURSES_ACRONYM } from "@/constants/courses";
 import { studentService } from "@/services";
 import { PATHS } from "@/constants/paths";
+import { ConfirmModal } from "../confirm-modal/ConfirmModal";
+import toast from "react-hot-toast";
 
 export default function StudentTable() {
   const { handleNavigation } = useAppNavigation();
@@ -25,6 +27,11 @@ export default function StudentTable() {
   const [periodFilter, setPeriodFilter] = useState("Todos");
   const [appointmentFilter, setAppointmentFilter] = useState("");
   const [needFilter, setNeedFilter] = useState("");
+
+  const [showDisableStudent, setShowDisableStudent] = useState(false);
+  const [studentName, setStudentName] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [isActive, setIsActive] = useState(true);
 
   const periods = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -60,13 +67,32 @@ export default function StudentTable() {
     return matchEnrollment && matchName && matchCourse && matchNeed;
   });
 
+  const handleDisableStudent = async () => {
+    try {
+      await studentService.deleteStudent(studentId);
+      setIsActive((prev) => !prev);
+      window.location.reload();
+      toast.success(
+        isActive
+          ? "Aluno inativado com sucesso."
+          : "Aluno reativado com sucesso.",
+      );
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Erro ao comunicar com o servidor.",
+      );
+    } finally {
+      setShowDisableStudent(false);
+    }
+  };
+
   const columns = [
     { label: "Matrícula", width: "w-[160px]" },
-    { label: "Nome Completo", width: "w-[700px]" },
-    { label: "Curso", width: "w-[200px]" },
-    { label: "Período", width: "w-[70px]" },
-    { label: "Último Atendimento", width: "w-[140px]" },
+    { label: "Nome Completo", width: "w-[600px]" },
+    { label: "Curso", width: "w-[300px]" },
+    // { label: "Período", width: "w-[70px]" },
     { label: "Necessidade Ativa", width: "w-[160px]" },
+    { label: "Último Atendimento", width: "w-[140px]" },
     { label: "", width: "w-[70px]" },
   ];
 
@@ -116,22 +142,22 @@ export default function StudentTable() {
                     defaultOption="Todos"
                   />
                 </td>
-                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
+                {/* <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SelectInput
                     value={periodFilter}
                     onChange={setPeriodFilter}
                     options={periods}
                     defaultOption="Todos"
                   />
-                </td>
-                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                  <SearchInput
-                    value={appointmentFilter}
-                    onChange={setAppointmentFilter}
-                  />
-                </td>
+                </td> */}
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
                   <SearchInput value={needFilter} onChange={setNeedFilter} />
+                </td>
+                <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
+                  {/* <SearchInput
+                    value={appointmentFilter}
+                    onChange={setAppointmentFilter}
+                  /> */}
                 </td>
                 <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2" />
               </tr>
@@ -172,16 +198,11 @@ export default function StudentTable() {
                       >
                         {student.course}
                       </td>
-                      <td
+                      {/* <td
                         className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                       >
                         -
-                      </td>
-                      <td
-                        className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
-                      >
-                        -
-                      </td>
+                      </td> */}
                       <td className={`px-4 py-3.5 text-center ${borderClass}`}>
                         {student.diagnosis ? (
                           <NeedBadge value={student.diagnosis} />
@@ -190,6 +211,11 @@ export default function StudentTable() {
                             Nenhum diagnóstico
                           </span>
                         )}
+                      </td>
+                      <td
+                        className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
+                      >
+                        -
                       </td>
                       <td className={`px-4 py-3.5 ${borderClass}`}>
                         <div className="flex gap-0.5">
@@ -207,6 +233,18 @@ export default function StudentTable() {
                           >
                             <Edit size={20} />
                           </Link>
+                          {/* <CommonButton
+                            label=""
+                            title={isActive ? "Inativar aluno" : "Ativar aluno"}
+                            onClick={() => {
+                              setStudentId(student.externalId);
+                              setStudentName(student.name);
+                              setShowDisableStudent(true);
+                            }}
+                            startIcon={UserRoundX}
+                            sizeIcon={20}
+                            className="flex items-center rounded-md p-1 text-red-500 transition-colors duration-150 bg-transparent hover:bg-red-100 gap-0"
+                          /> */}
                         </div>
                       </td>
                     </tr>
@@ -226,6 +264,21 @@ export default function StudentTable() {
             </>
           )}
         </div>
+
+        {/* ── Confirm Modal to delete Student ── */}
+        {/* <ConfirmModal
+          open={showDisableStudent}
+          title={isActive ? "Inativar Aluno" : "Reativar Aluno"}
+          message={
+            isActive
+              ? `Tem certeza que deseja inativar ${studentName}? O aluno não aparecerá mais na listagem ativa.`
+              : `Deseja reativar ${studentName}? O aluno voltará à listagem ativa.`
+          }
+          confirmLabel={isActive ? "Inativar" : "Reativar"}
+          confirmColor={isActive ? "critical" : "primary"}
+          onConfirm={handleDisableStudent}
+          onCancel={() => setShowDisableStudent(false)}
+        /> */}
       </div>
     </main>
   );

@@ -3,12 +3,18 @@ import api from "./api";
 import { attendanceMock } from "./mocks";
 
 export const attendanceService = {
-  async getAttendances(): Promise<Attendance[]> {
+  async getAttendances(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<Attendance[]> {
     try {
-      const response = await api.get<Attendance[]>("/attendances");
+      const response = await api.get<Attendance[]>("/attendances", {
+        params: { page, limit },
+      });
       return response.data;
     } catch {
-      return attendanceMock;
+      const startIndex = (page - 1) * limit;
+      return attendanceMock.slice(startIndex, startIndex + limit);
     }
   },
 };
