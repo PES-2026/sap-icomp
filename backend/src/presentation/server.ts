@@ -9,6 +9,7 @@ import {
 } from "../application/use-cases/register-student.js";
 import { EditStudent } from "../application/use-cases/edit-student.js";
 import cors from "cors";
+import { DisableStudent } from "../application/use-cases/disable-student.js";
 
 const app = express();
 app.use(express.json());
@@ -39,10 +40,13 @@ app.use(
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
+const disableStudent = new DisableStudent(studentRepository);
 
 app.get("/students", async (req, res) => {
   try {
-    const students = await prisma.student.findMany();
+    const students = await prisma.student.findMany({
+      where: { removed: false },
+    });
     console.log("Retrieved students:", students);
     res.json(students);
   } catch (error) {
@@ -131,6 +135,7 @@ app.post("/student", async (req, res) => {
     return res.status(500).json({ error: "Failure to register a student" });
   }
 });
+
 app.put("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;
@@ -163,6 +168,19 @@ app.put("/students/:id", async (req, res) => {
     return res.status(200).json(result);
   } catch (err: any) {
     console.log("Error updating student:", err);
+    return res.status(400).json({ message: err.message });
+  }
+});
+
+app.delete("/students/:id", async (req, res) => {
+  try {
+    const externalId = req.params.id;
+
+    const result = await disableStudent.execute(externalId);
+    console.log("Student successfully deactivated.");
+    return res.status(200).json(result);
+  } catch (err: any) {
+    console.log("Error deactivating student: ", err);
     return res.status(400).json({ message: err.message });
   }
 });
