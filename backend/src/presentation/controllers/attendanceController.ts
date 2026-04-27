@@ -5,12 +5,15 @@ import { ListAttendances } from "../../application/use-cases/attendance/listAtte
 import { ListAttendanceDTO } from "../../application/dtos/attendance/listAttendance.dto";
 import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAttedance.dto";
 import { UpdateAttendance } from "../../application/use-cases/attendance/updateAttendance";
+import { AttendancesByStudentDTO } from "../../application/dtos/attendance/attendancesByStudent.dto";
+import { AttendancesByStudent } from "../../application/use-cases/attendance/attendanceByStudent";
 
 export class AttendanceController {
   constructor(
     private createAttendance: CreateAttendance,
     private listAttendances: ListAttendances,
     private updateAttendance: UpdateAttendance,
+    private attendancesByStudent: AttendancesByStudent,
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -20,14 +23,7 @@ export class AttendanceController {
 
       res.status(201).json(attendance);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-        return;
-      }
-
-      res.status(500).json({
-        message: `Internal server error to: ${AttendanceController.name}:${this.create.name}`,
-      });
+      this.handleError(error, res, this.create);
     }
   }
 
@@ -37,14 +33,7 @@ export class AttendanceController {
       const result = await this.listAttendances.execute(dto);
       res.status(200).json(result);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-        return;
-      }
-
-      res.status(500).json({
-        message: `Internal server error to: ${AttendanceController.name}:${this.list.name}`,
-      });
+      this.handleError(error, res, this.list);
     }
   }
 
@@ -54,14 +43,28 @@ export class AttendanceController {
       const result = await this.updateAttendance.execute(dto);
       res.status(200).json(result);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-        return;
-      }
-
-      res.status(500).json({
-        message: `Internal server error to: ${AttendanceController.name}:${this.update.name}`,
-      });
+      this.handleError(error, res, this.update);
     }
+  }
+
+  async listByStudent(req: Request, res: Response) {
+    try {
+      const dto = AttendancesByStudentDTO.create(req.params.id, req.query);
+      const result = await this.attendancesByStudent.execute(dto);
+      res.status(200).json(result);
+    } catch (error) {
+      this.handleError(error, res, this.listByStudent);
+    }
+  }
+
+  handleError(error: unknown, res: Response, func: Function) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+      return;
+    }
+
+    res.status(500).json({
+      message: `Internal server error to: ${AttendanceController.name}:${func.name}`,
+    });
   }
 }
