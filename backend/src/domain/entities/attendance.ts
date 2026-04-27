@@ -8,10 +8,22 @@ import { StudentId } from "../valueObjects/student/studentId";
 export class Attendance {
   constructor(
     public readonly id: ExternalIdVO,
-    public readonly studentId: StudentId,
-    public readonly date: DateVO,
-    public readonly type: AttendanceTypeVO,
-    public readonly demand: DemandVO,
-    public readonly generalObservations: GeneralObservationsVO,
+    public studentId: StudentId,
+    public date: DateVO,
+    public type: AttendanceTypeVO,
+    public demand: DemandVO,
+    public generalObservations: GeneralObservationsVO,
   ) {}
+
+  update(
+    type: AttendanceTypeVO,
+    date: DateVO,
+    demand: DemandVO,
+    generalObservations: GeneralObservationsVO,
+  ): void {
+    this.type = type;
+    this.date = date;
+    this.demand = demand;
+    this.generalObservations = generalObservations;
+  }
 }
