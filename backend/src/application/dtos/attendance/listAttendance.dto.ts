@@ -5,7 +5,8 @@ import {
   validateNumberField,
   validateStringField,
 } from "../../../domain/utils/validation.utils";
-import { PaginatedResult } from "../shared/paginationDto";
+import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
+import { validatePageLimitValues } from "../shared/paginationValidations";
 
 export interface ListAttendanceFilters {
   studentName?: string;
@@ -14,12 +15,6 @@ export interface ListAttendanceFilters {
   attendanceType?: AttendanceType;
   startDate?: Date;
   endDate?: Date;
-}
-
-export interface ListAttendanceRequest {
-  page: number;
-  limit: number;
-  filters: ListAttendanceFilters;
 }
 
 export interface AttendanceItemResponse {
@@ -31,6 +26,10 @@ export interface AttendanceItemResponse {
   attendanceDate: Date;
 }
 
+export type ListAttendanceRequest = PaginatedRequest<
+  "filters",
+  ListAttendanceFilters
+>;
 export type ListAttendanceResponse = PaginatedResult<AttendanceItemResponse>;
 
 export class ListAttendanceDTO {
@@ -39,15 +38,6 @@ export class ListAttendanceDTO {
     public readonly limit: number,
     public readonly filters: ListAttendanceFilters,
   ) {}
-
-  private static validatePageLimitValues(page: number, limit: number) {
-    if (page < 1) {
-      throw new Error("Page must be greater than 0!");
-    }
-    if (limit < 1) {
-      throw new Error("Page Limit must be greater than 0!");
-    }
-  }
 
   private static validateStartEndDate(startDate?: Date, endDate?: Date) {
     if (!startDate && !endDate) return;
@@ -103,7 +93,7 @@ export class ListAttendanceDTO {
     if (raw.endDate)
       filters.endDate = validateDateField(raw.endDate, "endDate");
 
-    ListAttendanceDTO.validatePageLimitValues(page, limit);
+    validatePageLimitValues(page, limit);
     ListAttendanceDTO.validateStartEndDate(filters.startDate, filters.endDate);
 
     return new ListAttendanceDTO(page, limit, filters);
