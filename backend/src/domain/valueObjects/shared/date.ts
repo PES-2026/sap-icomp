@@ -1,5 +1,5 @@
 type DateNumber = [number, number, number]; // [day, month, year]
-type DateInput = DateNumber | string | Date;
+export type DateInput = DateNumber | string | Date;
 
 export class DateVO {
   private readonly _value: Date;
