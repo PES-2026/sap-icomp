@@ -26,10 +26,15 @@ export function validateDateField(value: unknown, fieldName: string): Date {
 }
 
 export function validateNumberField(value: unknown, fieldName: string): number {
-  if (typeof value !== "number" || isNaN(value)) {
-    throw new Error(
-      `${fieldName} is required and must a number. Please verify it!`,
-    );
+  if (typeof value === "number" && !isNaN(value)) {
+    return value;
   }
-  return value as number;
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (!isNaN(parsed)) return parsed;
+  }
+  throw new Error(
+    `${fieldName} is required and must a number. Please verify it!`,
+  );
 }
