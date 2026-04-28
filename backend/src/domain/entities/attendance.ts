@@ -13,6 +13,7 @@ export class Attendance {
     public type: AttendanceTypeVO,
     public demand: DemandVO,
     public generalObservations?: GeneralObservationsVO,
+    private _removed: boolean = false,
   ) {}
 
   static create(
@@ -46,5 +47,16 @@ export class Attendance {
     generalObservations?.value
       ? (this.generalObservations = generalObservations)
       : undefined;
+  }
+
+  remove(): void {
+    if (this._removed) {
+      throw new Error(`${Attendance.name}:${this.id} is already removed`);
+    }
+    this._removed = true;
+  }
+
+  get removed(): boolean {
+    return this._removed;
   }
 }
