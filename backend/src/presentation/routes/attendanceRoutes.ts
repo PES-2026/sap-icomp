@@ -7,6 +7,6 @@ export function attendanceRoutes(controller: AttendanceController): Router {
   router.get("/attendances", controller.list);
   router.put("/attendance/:id", controller.update);
   router.get("/attendances/student/:id", controller.listByStudent);
-  router.post("/attendances/:id", controller.remove);
+  router.post("/attendances/:id/remove", controller.remove);
   return router;
 }
