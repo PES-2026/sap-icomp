@@ -1,13 +1,13 @@
 import { Option } from "@/components/select-input/FilterSelect";
 
 export const AttendanceTypes: Option[] = [
-  { label: "Learning", value: "Aprendizado" },
+  { value: "Learning", label: "Aprendizado" },
   {
-    label: "SocioeconomicVulnerability",
-    value: "Vulnerabilidade Socioeconômica",
+    value: "SocioeconomicVulnerability",
+    label: "Vulnerabilidade Socioeconômica",
   },
-  { label: "Emotional", value: "Emocional" },
-  { label: "Deficiency", value: "Deficiência" },
-  { label: "AcademicOrientation", value: "Orientação Acadêmica" },
-  { label: "Others", value: "Outros" },
+  { value: "Emotional", label: "Emocional" },
+  { value: "Deficiency", label: "Deficiência" },
+  { value: "AcademicOrientation", label: "Orientação Acadêmica" },
+  { value: "Others", label: "Outros" },
 ];
