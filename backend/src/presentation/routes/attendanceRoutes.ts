@@ -9,5 +9,8 @@ export function attendanceRoutes(controller: AttendanceController): Router {
   router.get("/attendances/student/:id", (req, res) =>
     controller.listByStudent(req, res),
   );
+  router.post("/attendances/:id/remove", (req, res) =>
+    controller.remove(req, res),
+  );
   return router;
 }
