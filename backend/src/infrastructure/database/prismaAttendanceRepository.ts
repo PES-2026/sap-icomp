@@ -107,7 +107,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       DateVO.create(attendance.date),
       AttendanceTypeVO.create(attendance.type),
       DemandVO.create(attendance.demand),
-      GeneralObservationsVO.create(attendance.generalObversations),
+      attendance.generalObservations
+        ? GeneralObservationsVO.create(attendance.generalObservations)
+        : undefined,
     );
   }
 
@@ -118,7 +120,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         type: attendance.type.value,
         date: attendance.date.value,
         demand: attendance.demand.value,
-        generalObservations: attendance.generalObservations.value,
+        generalObservations: attendance.generalObservations?.value ?? "",
       },
     });
   }
