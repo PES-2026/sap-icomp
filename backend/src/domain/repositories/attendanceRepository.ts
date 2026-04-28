@@ -1,4 +1,8 @@
 import {
+  AttendancesByStudentRequest,
+  AttendancesByStudentResponse,
+} from "../../application/dtos/attendance/attendancesByStudent.dto";
+import {
   ListAttendanceRequest,
   ListAttendanceResponse,
 } from "../../application/dtos/attendance/listAttendance.dto";
@@ -8,5 +12,8 @@ export interface IAttendanceRepository {
   save(attendance: Attendance): Promise<void>;
   findAll(params: ListAttendanceRequest): Promise<ListAttendanceResponse>;
   findById(id: string): Promise<Attendance | null>;
+  findByStudentId(
+    params: AttendancesByStudentRequest,
+  ): Promise<AttendancesByStudentResponse | null>;
   update(attendance: Attendance): Promise<void>;
 }
