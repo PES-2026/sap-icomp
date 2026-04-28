@@ -15,6 +15,15 @@ export interface Attendance {
   period: string;
   attendanceType: AttendanceType;
   attendanceDate: string;
+  generalObservations: string;
+}
+
+export interface AttendanceFormData {
+  studentId: string;
+  attendanceDate: string;
+  attendanceType: string;
+  demand: string;
+  generalObservations: string;
 }
 
 export interface AttendanceSummary {
@@ -27,3 +36,7 @@ export interface AttendanceTypesFromBackend {
   id: string;
   name: string;
 }
+
+export type AttendanceFormErrors = Partial<
+  Record<keyof AttendanceFormData, string>
+>;

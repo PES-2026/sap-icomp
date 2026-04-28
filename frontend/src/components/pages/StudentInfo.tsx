@@ -24,9 +24,9 @@ import { useAppNavigation } from "@/utils/navigator";
 import { PATHS } from "@/constants/paths";
 import toast from "react-hot-toast";
 import { StudentAttendance } from "@/types/student";
-import { AttendanceTypes } from "@/constants/attendance";
 import { studentService } from "@/services";
 import Link from "next/link";
+import { useAttendanceTypesOptions } from "@/hooks/useAttendanceTypesOptions";
 
 export default function StudentInfo() {
   const params = useParams();
@@ -41,6 +41,8 @@ export default function StudentInfo() {
   const [showDisableStudent, setShowDisableStudent] = useState<boolean>(false);
   const [showDisableAttendance, setShowDisableAttendance] =
     useState<boolean>(false);
+
+  const { attendanceTypesOptions } = useAttendanceTypesOptions();
 
   const fetchStudentInfo = async () => {
     try {
@@ -227,8 +229,8 @@ export default function StudentInfo() {
               <SelectInput
                 value={filterType}
                 onChange={setFilterType}
-                options={AttendanceTypes}
-                defaultOption="Todos"
+                options={attendanceTypesOptions}
+                placeholder="Todos"
                 width="w-55"
               />
             </div>
@@ -366,7 +368,11 @@ export default function StudentInfo() {
                 <CommonButton
                   label="Fazer Registro"
                   endIcon={Plus}
-                  onClick={() => toast.success("Registro adicionado!")}
+                  onClick={() =>
+                    handleNavigation({
+                      path: `${studentId}/register-attendance`,
+                    })
+                  }
                   className="bg-[#6bc4a6] text-white hover:bg-[#52b594] text-sm font-semibold"
                 />
               </div>

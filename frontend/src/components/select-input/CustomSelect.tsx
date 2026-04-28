@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { Field } from "@/components/field/Field";
+import { SelectOption } from "@/types/selectOption";
 
 interface SelectProps {
-  options: string[];
+  options: SelectOption[];
   value: string;
   label: string;
   placeholder?: string;
@@ -23,6 +24,12 @@ export function CustomSelect({
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedLabel = options.find((opt) => opt.value === value)?.label;
+
+  const allOptions = placeholder
+    ? [{ value: "", label: placeholder }, ...options]
+    : options;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,7 +69,9 @@ export function CustomSelect({
           `}
         >
           <span className={value ? "text-stone-800" : "text-stone-400"}>
-            {value || placeholder}
+            <span className="block truncate">
+              {selectedLabel || placeholder}
+            </span>
           </span>
           <span
             className={`text-stone-500 transition-transform duration-150 ${
@@ -76,15 +85,16 @@ export function CustomSelect({
         {isOpen && (
           <div className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-white rounded-lg border-[1.5px] border-stone-300 shadow-lg overflow-hidden">
             <div className="max-h-60 flex flex-col overflow-y-auto">
-              {options.map((option) => {
-                const isSelected = value === option;
+              {allOptions.map((option) => {
+                const isSelected =
+                  value === option.value || (!value && option.value === "");
 
                 return (
                   <button
                     type="button"
-                    key={option}
+                    key={option.value}
                     onClick={() => {
-                      onChange(option);
+                      onChange(option.value);
                       setIsOpen(false);
                       onBlur();
                     }}
@@ -98,7 +108,7 @@ export function CustomSelect({
                       }
                     `}
                   >
-                    {option}
+                    {option.label}
                     {isSelected && (
                       <Check size={16} className="text-teal-700" />
                     )}

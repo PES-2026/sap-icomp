@@ -1,7 +1,10 @@
-export const AttendanceTypes = [
-  "Atendimento",
-  "Primeiro Contato / Atendimento",
-  "Alinhamento",
-  "Orientação",
-  "Outro",
-];
+import { AttendanceFormData } from "@/types/attendance";
+
+export const EMPTY_FORM_ATTENDANCE: AttendanceFormData = {
+  studentId: "",
+  attendenceId: "",
+  attendanceDate: "",
+  attendanceType: "",
+  demand: "",
+  generalObservations: "",
+};
