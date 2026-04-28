@@ -228,7 +228,7 @@ export default function StudentInfo() {
                 value={filterType}
                 onChange={setFilterType}
                 options={AttendanceTypes}
-                defaultOption="Todos"
+                // defaultOption="Todos"
                 width="w-55"
               />
             </div>
