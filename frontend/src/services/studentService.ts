@@ -1,14 +1,14 @@
 import api from "./api";
 import {
-  NewStudent,
-  NewStudentFormData,
+  Student,
+  StudentFormData,
   Student,
   StudentFormData,
 } from "@/types/student";
 
 export const studentService = {
-  async getStudents(): Promise<NewStudent[]> {
-    const response = await api.get<NewStudent[]>("/students");
+  async getStudents(): Promise<Student[]> {
+    const response = await api.get<Student[]>("/students");
     return response.data;
   },
 
@@ -17,8 +17,8 @@ export const studentService = {
     return response.data;
   },
 
-  async createStudent(data: NewStudentFormData): Promise<NewStudentFormData> {
-    const response = await api.post<NewStudentFormData>("/student", data);
+  async createStudent(data: StudentFormData): Promise<StudentFormData> {
+    const response = await api.post<StudentFormData>("/student", data);
     return response.data;
   },
 
