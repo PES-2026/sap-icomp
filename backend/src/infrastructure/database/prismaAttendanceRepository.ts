@@ -40,12 +40,14 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
       ...(filters.studentCourse && {
         student: {
-          name: { contains: filters.studentCourse, mode: "insensitive" },
+          course: {
+            name: { contains: filters.studentCourse, mode: "insensitive" },
+          },
         },
       }),
       ...(filters.studentEnrollment && {
         student: {
-          enrollmentId: filters.studentEnrollment,
+          enrollmentId: { contains: filters.studentEnrollment },
         },
       }),
       ...(filters.attendanceType && { type: filters.attendanceType }),
@@ -65,7 +67,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         skip: offset,
         take: limit,
         orderBy: { date: "desc" },
-        include: { student: true },
+        include: { student: { include: { course: true } } },
       }),
     ]);
 
