@@ -36,12 +36,12 @@ model Course {
 }
 
 model Attendance {
-  internalId          String   @id
+  internalId          Int      @id @default(autoincrement())
   externalId          String   @unique @default(uuid())
   date                DateTime
   type                String
   demand              String
-  generalObversations String
+  generalObservations String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
