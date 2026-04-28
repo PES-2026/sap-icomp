@@ -1,3 +1,5 @@
+import { AttendanceSummary } from "./attendance";
+
 export interface Student {
   internalId: number;
   externalId: string;
@@ -12,7 +14,7 @@ export interface Student {
   createdAt: string;
   updatedAt: string;
   removed: boolean;
-  courseId: string;
+  course: string;
 }
 
 export interface StudentFormData {
@@ -26,6 +28,10 @@ export interface StudentFormData {
   diagnosis: string;
   potential: string;
   difficulties: string;
+}
+
+export interface StudentAttendance extends Student {
+  attendances: AttendanceSummary[];
 }
 
 export type FormErrors = Partial<Record<keyof StudentFormData, string>>;

@@ -1,20 +1,22 @@
 import api from "./api";
-import {
-  Student,
-  StudentFormData,
-  Student,
-  StudentFormData,
-} from "@/types/student";
+import { Student, StudentAttendance, StudentFormData } from "@/types/student";
+import { studentAttendanceMock } from "./mocks";
 
 export const studentService = {
-  async getStudents(): Promise<Student[]> {
-    const response = await api.get<Student[]>("/students");
+  async getStudents(page: number = 1, limit: number = 10): Promise<Student[]> {
+    const response = await api.get<Student[]>("/students", {
+      params: { page, limit },
+    });
     return response.data;
   },
 
-  async getStudentById(id: string): Promise<Student> {
-    const response = await api.get<Student>(`/students/${id}`);
-    return response.data;
+  async getStudentById(id: string): Promise<StudentAttendance> {
+    try {
+      const response = await api.get<StudentAttendance>(`/students/${id}`);
+      return response.data;
+    } catch {
+      return studentAttendanceMock[id];
+    }
   },
 
   async createStudent(data: StudentFormData): Promise<StudentFormData> {

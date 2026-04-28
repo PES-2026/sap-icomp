@@ -3,11 +3,16 @@
 import { useState, useRef, useEffect } from "react";
 import { Filter, ChevronDown, Check } from "lucide-react";
 
+export interface Option {
+  value: string;
+  label: string;
+}
+
 interface SelectInputProps {
   value: string;
   onChange: (v: string) => void;
-  options: string[];
-  defaultOption?: string;
+  options: Option[];
+  placeholder?: string;
   width?: string;
   icon?: React.ElementType;
 }
@@ -16,14 +21,19 @@ export const SelectInput = ({
   value,
   onChange,
   options,
-  defaultOption,
+  placeholder = "Selecione",
   width = "w-full",
   icon: Icon = Filter,
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [openDirection, setOpenDirection] = useState<"up" | "down">("down");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const allOptions = defaultOption ? [defaultOption, ...options] : options;
+  const selectedLabel = options.find((opt) => opt.value === value)?.label;
+
+  const allOptions = placeholder
+    ? [{ value: "", label: placeholder }, ...options]
+    : options;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,6 +51,22 @@ export const SelectInput = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      const REQUIRED_SPACE = 260;
+
+      if (spaceBelow < REQUIRED_SPACE) {
+        setOpenDirection("up");
+      } else {
+        setOpenDirection("down");
+      }
+    }
+  }, [isOpen]);
+
   return (
     <div className={`relative ${width}`} ref={dropdownRef}>
       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#a0a0a0] pointer-events-none z-10">
@@ -50,12 +76,10 @@ export const SelectInput = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full text-left pl-6.5 pr-7 py-1.5 border rounded-lg bg-[#faf8f4] text-sm text-[#4a4540] outline-none box-border font-inherit cursor-pointer transition-colors duration-200
+        className={`w-full text-left pl-8 pr-7 py-2 border rounded-lg bg-[#faf8f4] text-sm text-[#4a4540] outline-none box-border font-inherit cursor-pointer transition-colors duration-200
           ${isOpen ? "border-[#6bc4a6]" : "border-[#e2ddd5]"}`}
       >
-        <span className="block truncate">
-          {value || defaultOption || "Selecione"}
-        </span>
+        <span className="block truncate">{selectedLabel || placeholder}</span>
       </button>
 
       <span
@@ -67,18 +91,22 @@ export const SelectInput = ({
       </span>
 
       {isOpen && (
-        <div className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 bg-white rounded-lg border-[1.5px] border-[#e2ddd5] shadow-[0_6px_24px_rgba(0,0,0,0.10)] overflow-hidden">
+        <div
+          className={`absolute left-0 right-0 z-50 bg-white rounded-lg border-[1.5px] border-[#e2ddd5] shadow-[0_6px_24px_rgba(0,0,0,0.10)] overflow-hidden
+            ${openDirection === "up" ? "bottom-[calc(100%+6px)]" : "top-[calc(100%+6px)]"}
+          `}
+        >
           <div className="max-h-60 flex flex-col overflow-y-auto py-1">
             {allOptions.map((option) => {
               const isSelected =
-                value === option || (!value && option === defaultOption);
+                value === option.value || (!value && option.value === "");
 
               return (
                 <button
                   type="button"
-                  key={option}
+                  key={option.value}
                   onClick={() => {
-                    onChange(option);
+                    onChange(option.value);
                     setIsOpen(false);
                   }}
                   className={`
@@ -91,7 +119,7 @@ export const SelectInput = ({
                     }
                   `}
                 >
-                  {option}
+                  {option.label}
                   {isSelected && <Check size={16} className="text-[#3a7060]" />}
                 </button>
               );
