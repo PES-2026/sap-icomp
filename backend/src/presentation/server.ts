@@ -15,6 +15,7 @@ import { CreateAttendance } from "../application/use-cases/attendance/createAtte
 import { PrismaAttendanceRepository } from "../infrastructure/database/prismaAttendanceRepository.js";
 import { DisableStudent } from "../application/use-cases/disable-student.js";
 import { ListAttendances } from "../application/use-cases/attendance/listAttendances.js";
+import { UpdateAttendance } from "../application/use-cases/attendance/updateAttendance.js";
 
 const app = express();
 app.use(express.json());
@@ -181,6 +182,7 @@ app.put("/students/:id", async (req, res) => {
 const attendanceControler = new AttendanceController(
   new CreateAttendance(attedanceRepository),
   new ListAttendances(attedanceRepository),
+  new UpdateAttendance(attedanceRepository),
 );
 
 app.use(attendanceRoutes(attendanceControler));
