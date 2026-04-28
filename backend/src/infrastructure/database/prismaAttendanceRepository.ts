@@ -8,12 +8,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
   async save(attendance: Attendance): Promise<void> {
     await this.prisma.attendance.create({
       data: {
-        id: attendance.id,
-        studentId: attendance.studentId,
-        date: attendance.date,
-        type: attendance.type,
-        demand: attendance.demand,
-        generalObservations: attendance.generalObservations,
+        externalId: attendance.id.value,
+        studentId: attendance.studentId.value,
+        date: attendance.date.value,
+        type: attendance.type.value,
+        demand: attendance.demand.value,
+        generalObservations: attendance.generalObservations?.value ?? "",
       },
     });
   }
