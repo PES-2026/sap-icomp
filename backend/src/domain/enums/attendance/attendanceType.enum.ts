@@ -1,8 +1,8 @@
 export enum AttendanceType {
-  Learning = "LEARNING",
-  SocioeconomicVulnerability = "SOCIOECONOMIC_VULNERABILITY",
-  Emotional = "EMOTIONAL",
-  Deficiency = "DEFICIENCY",
-  AcademicOrientation = "ACADEMIC_ORIENTATION",
-  Others = "OTHERS",
+  Learning = "Aprendizado",
+  SocioeconomicVulnerability = "Vulnerabilidade Socioeconômica",
+  Emotional = "Emocional",
+  Deficiency = "Deficiência",
+  AcademicOrientation = "Orientação Acadêmica",
+  Others = "Outros",
 }
