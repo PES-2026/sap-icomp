@@ -7,6 +7,8 @@ import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAtt
 import { UpdateAttendance } from "../../application/use-cases/attendance/updateAttendance";
 import { AttendancesByStudentDTO } from "../../application/dtos/attendance/attendancesByStudent.dto";
 import { AttendancesByStudent } from "../../application/use-cases/attendance/attendanceByStudent";
+import { RemoveAttendance } from "../../application/use-cases/attendance/removeAttendance";
+import { RemoveAttendanceDTO } from "../../application/dtos/attendance/removeAttendance";
 
 export class AttendanceController {
   constructor(
@@ -14,6 +16,7 @@ export class AttendanceController {
     private listAttendances: ListAttendances,
     private updateAttendance: UpdateAttendance,
     private attendancesByStudent: AttendancesByStudent,
+    private removeAttendance: RemoveAttendance,
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -54,6 +57,16 @@ export class AttendanceController {
       res.status(200).json(result);
     } catch (error) {
       this.handleError(error, res, this.listByStudent);
+    }
+  }
+
+  async remove(req: Request, res: Response) {
+    try {
+      const dto = RemoveAttendanceDTO.create(req.params.id);
+      await this.removeAttendance.execute(dto);
+      res.status(200).json({ message: "Attendance removed successfully!" });
+    } catch (error) {
+      this.handleError(error, res, this.remove);
     }
   }
 
