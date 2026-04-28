@@ -13,6 +13,7 @@ export class Attendance {
     public type: AttendanceTypeVO,
     public demand: DemandVO,
     public generalObservations: GeneralObservationsVO,
+    private _removed: boolean = false,
   ) {}
 
   update(
@@ -25,5 +26,16 @@ export class Attendance {
     this.date = date;
     this.demand = demand;
     this.generalObservations = generalObservations;
+  }
+
+  remove(): void {
+    if (this._removed) {
+      throw new Error(`${Attendance.name}:${this.id} is already removed`);
+    }
+    this._removed = true;
+  }
+
+  get removed(): boolean {
+    return this._removed;
   }
 }
