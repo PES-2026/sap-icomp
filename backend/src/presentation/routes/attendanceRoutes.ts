@@ -5,5 +5,6 @@ export function attendanceRoutes(controller: AttendanceController): Router {
   const router = Router();
   router.post("/attendances", (req, res) => controller.create(req, res));
   router.get("/attendances", (req, res) => controller.list(req, res));
+  router.put("/attendance/:id", (req, res) => controller.update(req, res));
   return router;
 }

@@ -33,4 +33,16 @@ export class Attendance {
         : undefined,
     );
   }
+
+  update(
+    type: AttendanceTypeVO,
+    date: DateVO,
+    demand: DemandVO,
+    generalObservations: GeneralObservationsVO,
+  ): void {
+    this.type = type;
+    this.date = date;
+    this.demand = demand;
+    this.generalObservations = generalObservations;
+  }
 }
