@@ -33,3 +33,21 @@ export function validateNumberField(value: unknown, fieldName: string): number {
   }
   return value as number;
 }
+
+export function validateBooleanField(
+  value: unknown,
+  fieldName: string,
+): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    if (value === "true") return true;
+    if (value === "false") return false;
+  }
+
+  throw new Error(
+    `${fieldName} is required and must be a boolean, or a string being 'true' or 'false'. Please verify it!`,
+  );
+}
