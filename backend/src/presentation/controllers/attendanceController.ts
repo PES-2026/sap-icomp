@@ -51,8 +51,8 @@ export class AttendanceController {
   async update(req: Request, res: Response): Promise<void> {
     try {
       const dto = UpdateAttendanceDTO.create(req.params.id, req.body);
-      await this.updateAttendance.execute(dto);
-      res.status(200).json({ message: "Attendance updated successfully!" });
+      const result = await this.updateAttendance.execute(dto);
+      res.status(200).json(result);
     } catch (error) {
       if (error instanceof Error) {
         res.status(400).json({ message: error.message });
