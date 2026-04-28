@@ -9,10 +9,10 @@ export class Attendance {
   constructor(
     public readonly id: ExternalIdVO,
     public readonly studentId: StudentId,
-    public readonly date: DateVO,
-    public readonly type: AttendanceTypeVO,
-    public readonly demand: DemandVO,
-    public readonly generalObservations?: GeneralObservationsVO,
+    public date: DateVO,
+    public type: AttendanceTypeVO,
+    public demand: DemandVO,
+    public generalObservations?: GeneralObservationsVO,
   ) {}
 
   static create(
@@ -35,14 +35,16 @@ export class Attendance {
   }
 
   update(
-    type: AttendanceTypeVO,
-    date: DateVO,
-    demand: DemandVO,
-    generalObservations: GeneralObservationsVO,
+    type?: AttendanceTypeVO,
+    date?: DateVO,
+    demand?: DemandVO,
+    generalObservations?: GeneralObservationsVO,
   ): void {
-    this.type = type;
-    this.date = date;
-    this.demand = demand;
-    this.generalObservations = generalObservations;
+    type?.value ? (this.type = type) : undefined;
+    date?.value ? (this.date = date) : undefined;
+    demand?.value ? (this.demand = demand) : undefined;
+    generalObservations?.value
+      ? (this.generalObservations = generalObservations)
+      : undefined;
   }
 }
