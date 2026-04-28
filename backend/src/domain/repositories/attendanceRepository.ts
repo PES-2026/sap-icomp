@@ -16,4 +16,5 @@ export interface IAttendanceRepository {
     params: AttendancesByStudentRequest,
   ): Promise<AttendancesByStudentResponse | null>;
   update(attendance: Attendance): Promise<void>;
+  remove(id: string): Promise<void>;
 }

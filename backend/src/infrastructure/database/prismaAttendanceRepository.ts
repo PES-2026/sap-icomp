@@ -43,6 +43,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     const offset = (page - 1) * limit;
 
     const where: Prisma.AttendanceWhereInput = {
+      removed: false,
       ...(filters.studentName && {
         student: {
           name: { contains: filters.studentName, mode: "insensitive" },
@@ -100,7 +101,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
   async findById(id: string): Promise<Attendance | null> {
     const attendance = await this.prisma.attendance.findUnique({
-      where: { externalId: id },
+      where: { externalId: id, removed: false },
     });
 
     if (!attendance) return null;
@@ -167,5 +168,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       currentPage: page,
       items,
     };
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.attendance.update({
+      where: { externalId: id },
+      data: { removed: true },
+    });
   }
 }
