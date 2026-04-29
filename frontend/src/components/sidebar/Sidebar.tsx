@@ -28,6 +28,12 @@ export default function Sidebar() {
       id: "Envio",
       href: PATHS.attendances_list,
     },
+    // {
+    //   label: "Relatórios",
+    //   icon: FileText,
+    //   id: "Envio",
+    //   href: "/admin/relatorios",
+    // },
   ];
 
   return (
