@@ -1,8 +1,10 @@
-import { PATHS } from "@/constants/paths";
 import { cn } from "@/utils/cn";
+import { useAppNavigation } from "@/utils/navigator";
 import { ArrowLeft } from "lucide-react";
 
 export default function AttendanceRegister() {
+  const { handleNavigation } = useAppNavigation();
+
   return (
     <div className="flex h-full items-center justify-center bg-[#f5f0e8] p-4 font-sans">
       <div className="flex flex-col items-center text-center">
@@ -10,8 +12,8 @@ export default function AttendanceRegister() {
         <h1 className="mb-2 text-2xl font-extrabold text-[#3a3530]">
           A página está em construção...
         </h1>
-        <a
-          href={PATHS.attendances_list}
+        <button
+          onClick={() => handleNavigation({ isBack: true })}
           className={cn(
             "mt-6 inline-flex items-center justify-center gap-2",
             "rounded-[10px] bg-[#6bc4a6] px-6 py-2.5",
@@ -21,7 +23,7 @@ export default function AttendanceRegister() {
         >
           <ArrowLeft size={16} />
           <span>Voltar à lista de atendimentos</span>
-        </a>
+        </button>
       </div>
     </div>
   );

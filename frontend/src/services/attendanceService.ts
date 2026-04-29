@@ -33,6 +33,29 @@ export const attendanceService = {
     }
   },
 
+  async getAttendancesByStudent(
+    studentId: string,
+    page: number,
+    limit: number,
+  ) {
+    try {
+      const response = await api.get(`/attendances/student/${studentId}`, {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch {
+      const attendance = attendanceMock.filter(
+        (s) => s.studentId === studentId,
+      );
+
+      if (!attendance) {
+        throw new Error(`Attendance with ID ${studentId} not found in mock.`);
+      }
+
+      return attendance;
+    }
+  },
+
   async create(data: AttendanceFormData): Promise<AttendanceFormData> {
     const response = await api.post<AttendanceFormData>("/attendances", data);
     return response.data;

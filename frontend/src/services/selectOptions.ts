@@ -27,15 +27,12 @@ export const attendanceTypeService = {
       return response.data;
     } catch {
       return [
-        { id: "Learning", name: "Aprendizado" },
-        {
-          id: "SocioeconomicVulnerability",
-          name: "Vulnerabilidade Socioeconômica",
-        },
-        { id: "Emotional", name: "Emocional" },
-        { id: "Deficiency", name: "Deficiência" },
-        { id: "AcademicOrientation", name: "Orientação Acadêmica" },
-        { id: "Others", name: "Outros" },
+        { id: "1", name: "Aprendizado" },
+        { id: "2", name: "Vulnerabilidade Socioeconômica" },
+        { id: "3", name: "Emocional" },
+        { id: "4", name: "Deficiência" },
+        { id: "5", name: "Orientação Acadêmica" },
+        { id: "6", name: "Outros" },
       ];
     }
   },

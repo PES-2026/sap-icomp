@@ -23,10 +23,12 @@ import { SelectInput } from "@/components/select-input/FilterSelect";
 import { useAppNavigation } from "@/utils/navigator";
 import { PATHS } from "@/constants/paths";
 import toast from "react-hot-toast";
-import { StudentAttendance } from "@/types/student";
+import { Student } from "@/types/student";
 import { studentService } from "@/services";
 import Link from "next/link";
 import { useAttendanceTypesOptions } from "@/hooks/useAttendanceTypesOptions";
+import { useStudentById } from "@/hooks/useStudentById";
+import { useAttendancesByStudent } from "@/hooks/useAttendancesByStudent";
 
 export default function StudentInfo() {
   const params = useParams();
@@ -34,7 +36,7 @@ export default function StudentInfo() {
 
   const { handleNavigation } = useAppNavigation();
 
-  const [student, setStudent] = useState<StudentAttendance>();
+  // const [student, setStudent] = useState<Student>();
   const [filterType, setFilterType] = useState<string>("Todos os tipos");
   const [attendanceId, setAttendanceId] = useState<string>("");
 
@@ -42,23 +44,25 @@ export default function StudentInfo() {
   const [showDisableAttendance, setShowDisableAttendance] =
     useState<boolean>(false);
 
+  const { student } = useStudentById(studentId);
+  const { attendances } = useAttendancesByStudent(studentId);
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
 
-  const fetchStudentInfo = async () => {
-    try {
-      const data = await studentService.getStudentById(studentId);
-      setStudent(data);
-    } catch (error) {
-      console.error("Error loading students info:", error);
-    }
-  };
+  // const fetchStudentInfo = async () => {
+  //   try {
+  //     const data = await studentService.getStudentById(studentId);
+  //     setStudent(data);
+  //   } catch (error) {
+  //     console.error("Error loading students info:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchStudentInfo();
-  }, []);
+  // useEffect(() => {
+  //   fetchStudentInfo();
+  // }, []);
 
   const filteredAttendances = student
-    ? student.attendances.filter(
+    ? attendances.filter(
         (a) =>
           filterType === "Todos os tipos" || a.attendanceType === filterType,
       )
@@ -101,7 +105,7 @@ export default function StudentInfo() {
           ? "Aluno inativado com sucesso."
           : "Aluno reativado com sucesso.",
       );
-      fetchStudentInfo();
+      // fetchStudentInfo();
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Erro ao comunicar com o servidor.",
@@ -114,7 +118,7 @@ export default function StudentInfo() {
   const handleDisableAttendance = async () => {
     try {
       toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
-      fetchStudentInfo();
+      // fetchStudentInfo();
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Erro ao comunicar com o servidor.",
@@ -197,7 +201,7 @@ export default function StudentInfo() {
                     Atendimentos
                   </p>
                   <p className="text-sm font-bold text-[#3a3530]">
-                    {student.attendances.length}
+                    {attendances.length}
                   </p>
                 </div>
                 <div className="rounded-xl bg-[#fff8ec] px-4 py-2.5 text-center min-w-27.5">
@@ -267,9 +271,9 @@ export default function StudentInfo() {
                       </p>
                     </div>
                   ) : (
-                    filteredAttendances.map((attendance) => (
+                    filteredAttendances.map((attendance, idx) => (
                       <div
-                        key={attendance.attendanceId}
+                        key={idx}
                         className="group flex items-center justify-between px-6 py-4 transition-colors duration-100 hover:bg-[#cde9e1]"
                       >
                         <div className="flex items-center gap-4">

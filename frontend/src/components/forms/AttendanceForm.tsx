@@ -175,19 +175,16 @@ export default function AttendanceForm({
                   className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400"
                 />
               </Field>
-              <Field label="Data:" error={errors.attendanceDate}>
+              <Field label="Data:" error={errors.date}>
                 <input
                   type="text"
                   placeholder="01/01/2001"
-                  value={formData.attendanceDate}
+                  value={formData.date}
                   onChange={(e) =>
-                    handleFieldChange(
-                      "attendanceDate",
-                      maskDate(e.target.value),
-                    )
+                    handleFieldChange("date", maskDate(e.target.value))
                   }
-                  onBlur={() => handleFieldBlur("attendanceDate")}
-                  className={getValidationClass("attendanceDate")}
+                  onBlur={() => handleFieldBlur("date")}
+                  className={getValidationClass("date")}
                 />
               </Field>
             </div>
@@ -203,12 +200,13 @@ export default function AttendanceForm({
                 />
               </Field>
               <CustomSelect
-                value={formData.attendanceType}
+                value={formData.type}
                 label="Tipo de Atendimento:"
-                error={errors.attendanceType}
-                onChange={(val) => handleFieldChange("attendanceType", val)}
-                onBlur={() => handleFieldBlur("attendanceType")}
+                error={errors.type}
+                onChange={(val) => handleFieldChange("type", val)}
+                onBlur={() => handleFieldBlur("type")}
                 options={attendanceTypesOptions}
+                isSetLabel={true}
               />
             </div>
 
@@ -262,7 +260,7 @@ export default function AttendanceForm({
         </form>
       </main>
 
-      {/* ── Confirm Modal to Update/Create Student ── */}
+      {/* ── Confirm Modal to Update/Create Attendance ── */}
       <ConfirmModal
         open={showConfirmRegister}
         title={isEditMode ? "Atualizar Atendimento" : "Registrar Atendimento"}

@@ -9,7 +9,15 @@ import {
 } from "../application/use-cases/register-student.js";
 import { EditStudent } from "../application/use-cases/edit-student.js";
 import cors from "cors";
+import { attendanceRoutes } from "./routes/attendanceRoutes.js";
+import { AttendanceController } from "./controllers/attendanceController.js";
+import { CreateAttendance } from "../application/use-cases/attendance/createAttendance.js";
+import { PrismaAttendanceRepository } from "../infrastructure/database/prismaAttendanceRepository.js";
 import { DisableStudent } from "../application/use-cases/disable-student.js";
+import { ListAttendances } from "../application/use-cases/attendance/listAttendances.js";
+import { UpdateAttendance } from "../application/use-cases/attendance/updateAttendance.js";
+import { AttendancesByStudent } from "../application/use-cases/attendance/attendanceByStudent.js";
+import { RemoveAttendance } from "../application/use-cases/attendance/removeAttendance.js";
 
 const app = express();
 app.use(express.json());
@@ -40,6 +48,7 @@ app.use(
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
+const attedanceRepository = new PrismaAttendanceRepository(prisma);
 const disableStudent = new DisableStudent(studentRepository);
 
 app.get("/students", async (req, res) => {
@@ -172,6 +181,15 @@ app.put("/students/:id", async (req, res) => {
   }
 });
 
+const attendanceControler = new AttendanceController(
+  new CreateAttendance(attedanceRepository),
+  new ListAttendances(attedanceRepository),
+  new UpdateAttendance(attedanceRepository),
+  new AttendancesByStudent(attedanceRepository),
+  new RemoveAttendance(attedanceRepository),
+);
+
+app.use(attendanceRoutes(attendanceControler));
 app.delete("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;

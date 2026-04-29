@@ -22,12 +22,12 @@ export default function Sidebar() {
       id: "Base de Alunos",
       href: PATHS.students_list,
     },
-    {
-      label: "Atendimentos",
-      icon: CalendarFold,
-      id: "Envio",
-      href: PATHS.attendances_list,
-    },
+    // {
+    //   label: "Atendimentos",
+    //   icon: CalendarFold,
+    //   id: "Envio",
+    //   href: PATHS.attendances_list,
+    // },
   ];
 
   return (

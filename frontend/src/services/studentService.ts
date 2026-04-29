@@ -1,6 +1,5 @@
 import api from "./api";
-import { Student, StudentAttendance, StudentFormData } from "@/types/student";
-import { studentAttendanceMock } from "./mocks";
+import { Student, StudentFormData } from "@/types/student";
 
 export const studentService = {
   async getStudents(page: number = 1, limit: number = 10): Promise<Student[]> {
@@ -10,12 +9,26 @@ export const studentService = {
     return response.data;
   },
 
-  async getStudentById(id: string): Promise<StudentAttendance> {
+  async getStudentById(id: string): Promise<Student> {
     try {
-      const response = await api.get<StudentAttendance>(`/students/${id}`);
+      const response = await api.get<Student>(`/students/${id}`);
       return response.data;
     } catch {
-      return studentAttendanceMock[id];
+      const response = await api.get<Student[]>("/students", {
+        params: { page: 1, limit: 1000 },
+      });
+
+      const student = response.data.find(
+        (item: Student) => item.externalId === id,
+      );
+
+      if (!student) {
+        throw new Error(
+          `Aluno com ID ${id} não encontrado na lista de fallback.`,
+        );
+      }
+
+      return student;
     }
   },
 

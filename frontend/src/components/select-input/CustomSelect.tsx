@@ -11,6 +11,7 @@ interface SelectProps {
   error?: string;
   onChange: (value: string) => void;
   onBlur: () => void;
+  isSetLabel?: boolean;
 }
 
 export function CustomSelect({
@@ -21,11 +22,14 @@ export function CustomSelect({
   error,
   onChange,
   onBlur,
+  isSetLabel = false,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedLabel = options.find((opt) => opt.value === value)?.label;
+  const selectedLabel = options.find(
+    (opt) => opt.value === value || opt.label === value,
+  )?.label;
 
   const allOptions = placeholder
     ? [{ value: "", label: placeholder }, ...options]
@@ -94,7 +98,7 @@ export function CustomSelect({
                     type="button"
                     key={option.value}
                     onClick={() => {
-                      onChange(option.value);
+                      onChange(isSetLabel ? option.label : option.value);
                       setIsOpen(false);
                       onBlur();
                     }}
