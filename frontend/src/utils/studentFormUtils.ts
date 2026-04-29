@@ -1,4 +1,4 @@
-import { FormErrors, NewStudentFormData } from "@/types/student";
+import { FormErrors, StudentFormData } from "@/types/student";
 
 export const maskRegistration = (v: string) => v.replace(/\D/g, "").slice(0, 8);
 
@@ -18,7 +18,7 @@ export const maskPhone = (v: string) => {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 };
 
-export const validateStudentForm = (data: NewStudentFormData): FormErrors => {
+export const validateStudentForm = (data: StudentFormData): FormErrors => {
   const errs: FormErrors = {};
 
   if (!data.name.trim() || data.name.trim().length < 5)
@@ -35,7 +35,7 @@ export const validateStudentForm = (data: NewStudentFormData): FormErrors => {
   return errs;
 };
 
-export const formatForBackend = (data: NewStudentFormData) => {
+export const formatForBackend = (data: StudentFormData) => {
   const [day, month, year] = data.dtBirth.split("/");
 
   const { externalId, ...restData } = data;
@@ -48,7 +48,7 @@ export const formatForBackend = (data: NewStudentFormData) => {
   };
 };
 
-export const formatForFrontend = (dataFromAPI: any): NewStudentFormData => {
+export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
   const [year, month, day] = dataFromAPI.dtBirth.split("T")[0].split("-");
 
   return {

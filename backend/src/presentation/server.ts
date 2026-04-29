@@ -39,6 +39,8 @@ app.use(
 const studentRepository = new PrismaStudentRepository(prisma);
 const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
+const attedanceRepository = new PrismaAttendanceRepository(prisma);
+const disableStudent = new DisableStudent(studentRepository);
 
 app.get("/students", async (req, res) => {
   try {
@@ -131,6 +133,7 @@ app.post("/student", async (req, res) => {
     return res.status(500).json({ error: "Failure to register a student" });
   }
 });
+
 app.put("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;
