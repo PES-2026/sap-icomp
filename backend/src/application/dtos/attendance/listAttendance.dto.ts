@@ -18,11 +18,12 @@ export interface ListAttendanceFilters {
 }
 
 export interface AttendanceItemResponse {
+  id: string;
   studentId: string;
   studentName: string;
   enrollmentId: string;
   course: string;
-  attendenceType: string;
+  attendanceType: string;
   attendanceDate: Date;
 }
 
