@@ -25,7 +25,6 @@ export const attendanceService = {
       return (response.data.items ?? []).map((item: any) => ({
         ...item,
         attendanceId: item.attendanceId ?? item.externalId ?? "",
-        attendanceType: item.attendanceType ?? item.attendenceType,
         period: item.period ?? "-",
       }));
     } catch {
