@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { StudentAttendance } from "@/types/student";
 import { AttendanceTypes } from "@/constants/attendance";
 import { studentService } from "@/services";
+import { attendanceService } from "@/services/attendanceService";
 import Link from "next/link";
 
 export default function StudentInfo() {
@@ -111,6 +112,7 @@ export default function StudentInfo() {
 
   const handleDisableAttendance = async () => {
     try {
+      await attendanceService.removeAttendance(attendanceId);
       toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
       fetchStudentInfo();
     } catch (error: any) {
@@ -119,6 +121,7 @@ export default function StudentInfo() {
       );
     } finally {
       setShowDisableAttendance(false);
+      setAttendanceId("");
     }
   };
 
@@ -398,7 +401,10 @@ export default function StudentInfo() {
         confirmLabel="Inativar"
         confirmColor="critical"
         onConfirm={handleDisableAttendance}
-        onCancel={() => setShowDisableAttendance(false)}
+        onCancel={() => {
+          setShowDisableAttendance(false);
+          setAttendanceId("");
+        }}
       />
     </>
   );
