@@ -29,7 +29,7 @@ import { studentService } from "@/services";
 const students = await studentService.getStudents();
 
 // Exemplo: Criar aluno
-const newStudent = await studentService.createStudent(formData);
+const student = await studentService.createStudent(formData);
 ```
 
 ## Autenticação

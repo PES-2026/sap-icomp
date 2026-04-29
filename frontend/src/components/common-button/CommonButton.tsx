@@ -6,6 +6,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   startIcon?: LucideIcon;
   endIcon?: LucideIcon;
+  sizeIcon?: number;
 }
 
 export default function CommonButton({
@@ -13,6 +14,7 @@ export default function CommonButton({
   className,
   startIcon: StartIcon,
   endIcon: EndIcon,
+  sizeIcon=16,
   ...props
 }: ButtonProps) {
   return (
@@ -26,9 +28,9 @@ export default function CommonButton({
         className,
       )}
     >
-      {StartIcon && <StartIcon size={16} />}
+      {StartIcon && <StartIcon size={sizeIcon} />}
       <span>{label}</span>
-      {EndIcon && <EndIcon size={16} />}
+      {EndIcon && <EndIcon size={sizeIcon} />}
     </button>
   );
 }
