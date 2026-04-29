@@ -83,11 +83,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     ]);
 
     const items: AttendanceItemResponse[] = results.map((record) => ({
+      id: record.student.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
       course: record.student.courseId,
-      attendenceType: record.type,
+      attendanceType: record.type,
       attendanceDate: record.date,
     }));
 
@@ -154,11 +155,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     ]);
 
     const items: AttendanceItemResponse[] = results.map((record) => ({
+      id: record.student.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
       course: record.student.courseId,
-      attendenceType: record.type,
+      attendanceType: record.type,
       attendanceDate: record.date,
     }));
 
