@@ -76,9 +76,7 @@ export default function StudentForm({
   };
 
   const validateSubmit = () => {
-    const allFields = Object.keys(EMPTY_FORM) as Array<
-      keyof StudentFormData
-    >;
+    const allFields = Object.keys(EMPTY_FORM) as Array<keyof StudentFormData>;
     const allTouched = allFields.reduce(
       (acc, k) => ({ ...acc, [k]: true }),
       {},
