@@ -22,7 +22,7 @@ export interface AttendanceItemResponse {
   studentName: string;
   enrollmentId: string;
   course: string;
-  attendenceType: string;
+  attendanceType: string;
   attendanceDate: Date;
 }
 

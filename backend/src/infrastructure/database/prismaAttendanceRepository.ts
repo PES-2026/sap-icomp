@@ -87,7 +87,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
       course: record.student.courseId,
-      attendenceType: record.type,
+      attendanceType: record.type,
       attendanceDate: record.date,
     }));
 
@@ -158,7 +158,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
       course: record.student.courseId,
-      attendenceType: record.type,
+      attendanceType: record.type,
       attendanceDate: record.date,
     }));
 
