@@ -25,8 +25,6 @@ const periods = [
 ];
 
 export default function AttendanceTable() {
-  const { handleNavigation } = useAppNavigation();
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
@@ -75,13 +73,6 @@ export default function AttendanceTable() {
             <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
               Atendimentos
             </h1>
-            <CommonButton
-              label="Adicionar Novo Atendimento"
-              startIcon={Plus}
-              onClick={() =>
-                handleNavigation({ path: PATHS.register_attendance })
-              }
-            />
           </div>
 
           <div className="flex-1 overflow-auto">
@@ -182,9 +173,11 @@ export default function AttendanceTable() {
                         <td
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                         >
-                          {attendance.period === "Formado"
-                            ? "Formado(a)"
-                            : attendance.period + "º"}
+                          {attendance.period
+                            ? attendance.period === "Formado"
+                              ? "Formado(a)"
+                              : attendance.period + "º"
+                            : "-"}
                         </td>
                         <td
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
@@ -202,6 +195,7 @@ export default function AttendanceTable() {
                           <div className="flex gap-2">
                             <Link
                               href={PATHS.visualize_attendance(
+                                attendance.studentId,
                                 attendance.attendanceId,
                               )}
                               title="Visualizar"
@@ -211,6 +205,7 @@ export default function AttendanceTable() {
                             </Link>
                             <Link
                               href={PATHS.edit_attendance(
+                                attendance.studentId,
                                 attendance.attendanceId,
                               )}
                               title="Editar"

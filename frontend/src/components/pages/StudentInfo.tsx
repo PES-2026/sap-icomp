@@ -152,7 +152,7 @@ export default function StudentInfo() {
           <div className="rounded-2xl bg-white shadow-sm p-5">
             <div className="flex items-start gap-5">
               <CommonButton
-                onClick={() => handleNavigation({ isBack: true })}
+                onClick={() => handleNavigation({ path: PATHS.students_list })}
                 label=""
                 title="Voltar"
                 startIcon={ArrowLeft}
@@ -315,6 +315,7 @@ export default function StudentInfo() {
                           <div className="flex gap-1">
                             <Link
                               href={PATHS.visualize_attendance(
+                                studentId,
                                 attendance.attendanceId,
                               )}
                               title="Visualizar"
@@ -324,6 +325,7 @@ export default function StudentInfo() {
                             </Link>
                             <Link
                               href={PATHS.edit_attendance(
+                                studentId,
                                 attendance.attendanceId,
                               )}
                               title="Editar"
@@ -408,7 +410,7 @@ export default function StudentInfo() {
                   endIcon={Plus}
                   onClick={() =>
                     handleNavigation({
-                      path: `${studentId}/attendance/register`,
+                      path: PATHS.register_attendance(studentId),
                     })
                   }
                   className="bg-[#6bc4a6] text-white hover:bg-[#52b594] text-sm font-semibold"

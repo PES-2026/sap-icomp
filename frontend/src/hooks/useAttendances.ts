@@ -7,7 +7,6 @@ import {
   formatAttendanceForFrontend,
   formatGetAttendancesForFrontend,
 } from "@/utils/attendanceFormUtils";
-import { useAppNavigation } from "@/utils/navigator";
 
 export const useAttendances = (page: number, limit: number) => {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
@@ -38,7 +37,7 @@ export const useAttendances = (page: number, limit: number) => {
 };
 
 interface useAttendanceFormProps {
-  attendanceId?: string;
+  attendanceId: string;
   isEditMode?: boolean;
 }
 
@@ -46,29 +45,25 @@ export const useAttendanceForm = ({
   attendanceId,
   isEditMode,
 }: useAttendanceFormProps) => {
-  const { handleNavigation } = useAppNavigation();
-
   const [formData, setFormData] = useState<AttendanceFormData>(
     EMPTY_FORM_ATTENDANCE,
+  );
+
+  const [isLoadingAttendances, setIsLoadingAttendances] = useState(
+    isEditMode ? true : false,
   );
 
   if (isEditMode) {
     useEffect(() => {
       const fetchAttendanceById = async () => {
-        if (!attendanceId) return;
-
         try {
+          setIsLoadingAttendances(true);
           const data = await attendanceService.getAttendancesById(attendanceId);
-
-          if (data) {
-            const formattedData = formatAttendanceForFrontend(data);
-            setFormData(formattedData);
-          } else {
-            console.error("Attendance not found.");
-            handleNavigation({ path: "/admin/students" });
-          }
+          setFormData(formatAttendanceForFrontend(data));
         } catch (error) {
           console.error("Error to fetch data attendance: ", error);
+        } finally {
+          setIsLoadingAttendances(false);
         }
       };
 
@@ -76,5 +71,5 @@ export const useAttendanceForm = ({
     }, []);
   }
 
-  return { formData, setFormData };
+  return { formData, setFormData, isLoadingAttendances };
 };

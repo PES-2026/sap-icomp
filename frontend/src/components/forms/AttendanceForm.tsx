@@ -38,15 +38,13 @@ export default function AttendanceForm({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<AttendanceFormErrors>({});
 
-  const { formData, setFormData } = useAttendanceForm({
+  const { formData, setFormData, isLoadingAttendances } = useAttendanceForm({
     attendanceId,
     isEditMode,
   });
 
-  const { student } = useStudentById(studentId);
+  const { student, isLoadingStudent } = useStudentById(studentId);
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
-
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [showConfirmRegister, setShowConfirmRegister] = useState(false);
 
@@ -91,14 +89,12 @@ export default function AttendanceForm({
       const payload = formatAttendanceForBackend(formData, studentId);
 
       if (isEditMode) {
-        await attendanceService.update(formData.studentId, payload);
+        await attendanceService.update(attendanceId, payload);
         toast.success("Atendimento atualizado com sucesso!");
       } else {
         await attendanceService.create(payload);
         toast.success("Atendimento registrado com sucesso!");
       }
-
-      setIsSubmitted(true);
     } catch (error: any) {
       isEditMode
         ? toast.error(
@@ -118,8 +114,18 @@ export default function AttendanceForm({
   const handleReset = () => {
     setFormData(EMPTY_FORM_ATTENDANCE);
     setErrors({});
-    setIsSubmitted(false);
   };
+
+  if (isLoadingAttendances || isLoadingStudent) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-7">
+        <div className="flex flex-col items-center gap-3 text-[#6a6560]">
+          <Loader2 className="animate-spin text-[#6bc4a6]" size={32} />
+          <p>Carregando dados do aluno...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
