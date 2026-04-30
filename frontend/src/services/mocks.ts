@@ -11,6 +11,7 @@ export const attendanceMock: Attendance[] = [
     period: "6",
     attendanceType: "Orientação Acadêmica",
     attendanceDate: "10/02/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a22222-2222-4222-8222-222222222222",
@@ -21,6 +22,7 @@ export const attendanceMock: Attendance[] = [
     period: "6",
     attendanceType: "Emocional",
     attendanceDate: "05/02/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a33333-3333-4333-8333-333333333333",
@@ -31,6 +33,7 @@ export const attendanceMock: Attendance[] = [
     period: "6",
     attendanceType: "Vulnerabilidade Socioeconômica",
     attendanceDate: "01/02/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a44444-4444-4444-8444-444444444444",
@@ -41,6 +44,7 @@ export const attendanceMock: Attendance[] = [
     period: "5",
     attendanceType: "Orientação Acadêmica",
     attendanceDate: "15/12/2025",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a55555-5555-4555-8555-555555555555",
@@ -51,6 +55,7 @@ export const attendanceMock: Attendance[] = [
     period: "5",
     attendanceType: "Aprendizagem",
     attendanceDate: "20/11/2025",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a66666-6666-4666-8666-666666666666",
@@ -61,6 +66,7 @@ export const attendanceMock: Attendance[] = [
     period: "5",
     attendanceType: "Deficiência",
     attendanceDate: "10/10/2025",
+    generalObservations: "",
   },
   {
     attendanceId: "d1a77777-7777-4777-8777-777777777777",
@@ -71,6 +77,7 @@ export const attendanceMock: Attendance[] = [
     period: "4",
     attendanceType: "Orientação Acadêmica",
     attendanceDate: "05/08/2025",
+    generalObservations: "",
   },
 
   {
@@ -82,6 +89,7 @@ export const attendanceMock: Attendance[] = [
     period: "1",
     attendanceType: "Vulnerabilidade Socioeconômica",
     attendanceDate: "24/04/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "9312e742-d698-4448-8316-258079075775",
@@ -92,6 +100,7 @@ export const attendanceMock: Attendance[] = [
     period: "4",
     attendanceType: "Emocional",
     attendanceDate: "22/04/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "0f127457-377a-4228-98e8-d10204780521",
@@ -102,6 +111,7 @@ export const attendanceMock: Attendance[] = [
     period: "Formado",
     attendanceType: "Vulnerabilidade Socioeconômica",
     attendanceDate: "20/04/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "65191b29-22a4-49c0-993d-66e3b081691a",
@@ -112,6 +122,7 @@ export const attendanceMock: Attendance[] = [
     period: "2",
     attendanceType: "Emocional",
     attendanceDate: "18/04/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "f9b6e82c-497b-402b-980b-93117565893d",
@@ -122,6 +133,7 @@ export const attendanceMock: Attendance[] = [
     period: "6",
     attendanceType: "Orientação Acadêmica",
     attendanceDate: "15/04/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "a1b2c3d4-e5f6-4a5b-8c7d-9e8f7a6b5c4d",
@@ -132,6 +144,7 @@ export const attendanceMock: Attendance[] = [
     period: "1",
     attendanceType: "Aprendizagem",
     attendanceDate: "10/03/2026",
+    generalObservations: "",
   },
   {
     attendanceId: "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
@@ -142,6 +155,7 @@ export const attendanceMock: Attendance[] = [
     period: "4",
     attendanceType: "Orientação Acadêmica",
     attendanceDate: "05/03/2026",
+    generalObservations: "",
   },
 ];
 

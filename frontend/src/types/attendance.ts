@@ -1,11 +1,3 @@
-export type AttendanceType =
-  | "Aprendizagem"
-  | "Vulnerabilidade Socioeconômica"
-  | "Emocional"
-  | "Deficiência"
-  | "Orientação Acadêmica"
-  | "Outros";
-
 export interface Attendance {
   attendanceId: string;
   studentId: string;
@@ -13,8 +5,17 @@ export interface Attendance {
   enrollmentId: string;
   course: string;
   period: string;
-  attendanceType: AttendanceType;
+  attendanceType: string;
   attendanceDate: string;
+  generalObservations: string;
+}
+
+export interface AttendanceFormData {
+  studentId: string;
+  date: string;
+  type: string;
+  demand: string;
+  generalObservations: string;
 }
 
 export interface AttendanceSummary {
@@ -23,7 +24,18 @@ export interface AttendanceSummary {
   attendanceDate: string;
 }
 
+export interface PaginatedAttendancesResponse {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  items: Attendance[];
+}
+
 export interface AttendanceTypesFromBackend {
   id: string;
   name: string;
 }
+
+export type AttendanceFormErrors = Partial<
+  Record<keyof AttendanceFormData, string>
+>;

@@ -1,6 +1,7 @@
 "use client";
 
 import StudentForm from "@/components/forms/StudentForm";
+import { PATHS } from "@/constants/paths";
 import { studentService } from "@/services";
 import { StudentFormData } from "@/types/student";
 import { useAppNavigation } from "@/utils/navigator";
@@ -67,7 +68,7 @@ export default function EditStudentPage() {
   return (
     <StudentForm
       initialData={studentData}
-      onCancel={() => handleNavigation({ isBack: true })}
+      onCancel={() => handleNavigation({ path: PATHS.students_list })}
     />
   );
 }

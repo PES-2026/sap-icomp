@@ -15,7 +15,7 @@ export const useStudents = (page: number, limit: number) => {
         setStudents(data ?? []);
       } catch (error) {
         console.error("Error loading students list:", error);
-        toast.error("Não foi possível carregar os atendimentos.");
+        toast.error("Não foi possível carregar a lista de alunos.");
       } finally {
         setIsLoading(false);
       }
