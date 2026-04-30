@@ -18,6 +18,7 @@ import { ListAttendances } from "../application/use-cases/attendance/listAttenda
 import { UpdateAttendance } from "../application/use-cases/attendance/updateAttendance.js";
 import { AttendancesByStudent } from "../application/use-cases/attendance/attendanceByStudent.js";
 import { RemoveAttendance } from "../application/use-cases/attendance/removeAttendance.js";
+import { AttendanceById } from "../application/use-cases/attendance/attendanceById.dto.js";
 
 const app = express();
 app.use(express.json());
@@ -187,6 +188,7 @@ const attendanceControler = new AttendanceController(
   new UpdateAttendance(attedanceRepository),
   new AttendancesByStudent(attedanceRepository),
   new RemoveAttendance(attedanceRepository),
+  new AttendanceById(attedanceRepository),
 );
 
 app.use(attendanceRoutes(attendanceControler));

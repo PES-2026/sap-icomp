@@ -12,5 +12,6 @@ export function attendanceRoutes(controller: AttendanceController): Router {
   router.post("/attendances/:id/remove", (req, res) =>
     controller.remove(req, res),
   );
+  router.get("/attendances/:id", (req, res) => controller.getById(req, res));
   return router;
 }
