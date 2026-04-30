@@ -30,7 +30,10 @@ export default function AttendanceTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { attendances, isLoading } = useAttendances(page, limit);
+  const { attendances, isLoadingAttendances, totalItems } = useAttendances(
+    page,
+    limit,
+  );
   const { coursesOptions } = useCoursesOptions();
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
 
@@ -65,7 +68,7 @@ export default function AttendanceTable() {
   ];
 
   return (
-    !isLoading && (
+    !isLoadingAttendances && (
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
           <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
@@ -230,7 +233,7 @@ export default function AttendanceTable() {
             setPage={setPage}
             limit={limit}
             setLimit={setLimit}
-            lengthData={attendances.length}
+            lengthData={totalItems}
           />
         </div>
       </main>

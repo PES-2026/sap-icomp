@@ -37,9 +37,6 @@ export default function AttendanceForm({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<AttendanceFormErrors>({});
-  const [touched, setTouched] = useState<
-    Partial<Record<keyof AttendanceFormData, boolean>>
-  >({});
 
   const { formData, setFormData } = useAttendanceForm({
     attendanceId,
@@ -77,23 +74,7 @@ export default function AttendanceForm({
     });
   };
 
-  const handleFieldBlur = (key: keyof AttendanceFormData) => {
-    setTouched((prev) => ({
-      ...prev,
-      [key]: true,
-    }));
-  };
-
   const validateSubmit = () => {
-    const allFields = Object.keys(EMPTY_FORM_ATTENDANCE) as Array<
-      keyof AttendanceFormData
-    >;
-    const allTouched = allFields.reduce(
-      (acc, k) => ({ ...acc, [k]: true }),
-      {},
-    );
-    setTouched(allTouched);
-
     const validationErrors = validateAttendanceForm(formData);
     setErrors(validationErrors);
 
@@ -137,7 +118,6 @@ export default function AttendanceForm({
   const handleReset = () => {
     setFormData(EMPTY_FORM_ATTENDANCE);
     setErrors({});
-    setTouched({});
     setIsSubmitted(false);
   };
 
@@ -163,7 +143,7 @@ export default function AttendanceForm({
                   type="text"
                   placeholder="João Vitor Mesquita da Frota"
                   value={student?.name || ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400"
+                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
                 />
               </Field>
               <Field label="Matrícula:">
@@ -172,7 +152,7 @@ export default function AttendanceForm({
                   type="text"
                   placeholder="12345678"
                   value={student?.enrollmentId || ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400"
+                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
                 />
               </Field>
               <Field label="Data:" error={errors.date}>
@@ -183,7 +163,6 @@ export default function AttendanceForm({
                   onChange={(e) =>
                     handleFieldChange("date", maskDate(e.target.value))
                   }
-                  onBlur={() => handleFieldBlur("date")}
                   className={getValidationClass("date")}
                 />
               </Field>
@@ -196,7 +175,7 @@ export default function AttendanceForm({
                   type="text"
                   placeholder="TDAH, TAG"
                   value={student?.difficulties ?? ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400"
+                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
                 />
               </Field>
               <CustomSelect
@@ -204,7 +183,6 @@ export default function AttendanceForm({
                 label="Tipo de Atendimento:"
                 error={errors.type}
                 onChange={(val) => handleFieldChange("type", val)}
-                onBlur={() => handleFieldBlur("type")}
                 options={attendanceTypesOptions}
                 isSetLabel={true}
               />

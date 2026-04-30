@@ -24,6 +24,13 @@ export interface AttendanceSummary {
   attendanceDate: string;
 }
 
+export interface PaginatedAttendancesResponse {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  items: Attendance[];
+}
+
 export interface AttendanceTypesFromBackend {
   id: string;
   name: string;

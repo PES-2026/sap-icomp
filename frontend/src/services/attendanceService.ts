@@ -1,4 +1,8 @@
-import { Attendance, AttendanceFormData } from "@/types/attendance";
+import {
+  Attendance,
+  AttendanceFormData,
+  PaginatedAttendancesResponse,
+} from "@/types/attendance";
 import api from "./api";
 import { attendanceMock } from "./mocks";
 
@@ -6,16 +10,15 @@ export const attendanceService = {
   async getAttendances(
     page: number = 1,
     limit: number = 10,
-  ): Promise<Attendance[]> {
-    try {
-      const response = await api.get<Attendance[]>("/attendances", {
+  ): Promise<PaginatedAttendancesResponse> {
+    const response = await api.get<PaginatedAttendancesResponse>(
+      "/attendances",
+      {
         params: { page, limit },
-      });
-      return response.data;
-    } catch {
-      const startIndex = (page - 1) * limit;
-      return attendanceMock.slice(startIndex, startIndex + limit);
-    }
+      },
+    );
+
+    return response.data;
   },
 
   async getAttendancesById(id: string): Promise<Attendance> {
@@ -34,6 +37,21 @@ export const attendanceService = {
   },
 
   async getAttendancesByStudent(
+    studentId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedAttendancesResponse> {
+    const response = await api.get<PaginatedAttendancesResponse>(
+      `/attendances/student/${studentId}`,
+      {
+        params: { page, limit },
+      },
+    );
+
+    return response.data;
+  },
+
+  async getAttendancesByStudentt(
     studentId: string,
     page: number,
     limit: number,
@@ -67,5 +85,9 @@ export const attendanceService = {
   ): Promise<Attendance> {
     const response = await api.put<Attendance>(`/attendances/${id}`, data);
     return response.data;
+  },
+
+  async removeAttendance(attendanceId: string): Promise<void> {
+    await api.post(`/attendances/${attendanceId}/remove`);
   },
 };

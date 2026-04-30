@@ -10,7 +10,7 @@ interface SelectProps {
   placeholder?: string;
   error?: string;
   onChange: (value: string) => void;
-  onBlur: () => void;
+  onBlur?: () => void;
   isSetLabel?: boolean;
 }
 
@@ -100,7 +100,6 @@ export function CustomSelect({
                     onClick={() => {
                       onChange(isSetLabel ? option.label : option.value);
                       setIsOpen(false);
-                      onBlur();
                     }}
                     className={`
                       flex w-full items-center justify-between text-left px-3.5 py-2.5 

@@ -1,5 +1,5 @@
-import { FormErrors, StudentFormData } from "@/types/student";
-import { maskPhone, maskRegistration } from "./utils";
+import { FormErrors, Student, StudentFormData } from "@/types/student";
+import { formatDate, maskPhone, maskRegistration } from "./utils";
 
 export const validateStudentForm = (data: StudentFormData): FormErrors => {
   const errs: FormErrors = {};
@@ -39,5 +39,15 @@ export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
     dtBirth: `${day}/${month}/${year}`,
     enrollmentId: maskRegistration(dataFromAPI.enrollmentId),
     phoneNumber: maskPhone(dataFromAPI.phoneNumber),
+  };
+};
+
+export const formatGetStudentForFrontend = (data: Student): Student => {
+  return {
+    ...data,
+    dtBirth: formatDate(data.dtBirth),
+    createdAt: formatDate(data.createdAt),
+    updatedAt: formatDate(data.updatedAt),
+    phoneNumber: maskPhone(data.phoneNumber),
   };
 };

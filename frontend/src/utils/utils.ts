@@ -15,3 +15,8 @@ export const maskPhone = (v: string) => {
     return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 };
+
+export const formatDate = (date: string) => {
+  const [year, month, day] = date.split("T")[0].split("-");
+  return `${day}/${month}/${year}`;
+};

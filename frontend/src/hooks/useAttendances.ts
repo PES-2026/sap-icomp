@@ -3,31 +3,38 @@ import toast from "react-hot-toast";
 import { Attendance, AttendanceFormData } from "@/types/attendance";
 import { attendanceService } from "@/services/attendanceService";
 import { EMPTY_FORM_ATTENDANCE } from "@/constants/attendance";
-import { formatAttendanceForFrontend } from "@/utils/attendanceFormUtils";
+import {
+  formatAttendanceForFrontend,
+  formatGetAttendancesForFrontend,
+} from "@/utils/attendanceFormUtils";
 import { useAppNavigation } from "@/utils/navigator";
 
 export const useAttendances = (page: number, limit: number) => {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingAttendances, setIsLoadingAttendances] =
+    useState<boolean>(false);
+
+  const [totalItems, setTotalItems] = useState<number>(0);
 
   useEffect(() => {
     const fetchAttendances = async () => {
       try {
-        setIsLoading(true);
+        setIsLoadingAttendances(true);
         const data = await attendanceService.getAttendances(page, limit);
-        setAttendances(data ?? []);
+        setTotalItems(data.totalItems);
+        setAttendances(formatGetAttendancesForFrontend(data.items) ?? []);
       } catch (error) {
         console.error("Error loading students list:", error);
         toast.error("Não foi possível carregar os atendimentos.");
       } finally {
-        setIsLoading(false);
+        setIsLoadingAttendances(false);
       }
     };
 
     fetchAttendances();
   }, [page, limit]);
 
-  return { attendances, isLoading };
+  return { attendances, isLoadingAttendances, totalItems };
 };
 
 interface useAttendanceFormProps {

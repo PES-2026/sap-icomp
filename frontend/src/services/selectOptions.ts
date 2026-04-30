@@ -9,11 +9,11 @@ export const coursesService = {
       return response.data;
     } catch {
       return [
-        { id: "1", name: "Engenharia de Software" },
-        { id: "2", name: "Engenharia de Computação" },
-        { id: "3", name: "Ciência da Computação" },
-        { id: "4", name: "ABI" },
-        { id: "5", name: "Outros" },
+        { id: "Engenharia de Software", name: "Engenharia de Software" },
+        { id: "Engenharia de Computação", name: "Engenharia de Computação" },
+        { id: "Ciência da Computação", name: "Ciência da Computação" },
+        { id: "ABI", name: "ABI" },
+        { id: "Outros", name: "Outros" },
       ];
     }
   },

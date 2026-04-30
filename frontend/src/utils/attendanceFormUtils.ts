@@ -1,6 +1,9 @@
-import { StudentFormData } from "@/types/student";
-import { maskPhone, maskRegistration } from "./utils";
-import { AttendanceFormData, AttendanceFormErrors } from "@/types/attendance";
+import {
+  Attendance,
+  AttendanceFormData,
+  AttendanceFormErrors,
+} from "@/types/attendance";
+import { formatDate } from "./utils";
 
 export const validateAttendanceForm = (
   data: AttendanceFormData,
@@ -9,6 +12,7 @@ export const validateAttendanceForm = (
 
   if (!data.type) errs.type = "Selecione o tipo";
   if (!data.demand) errs.demand = "A demanda é obrigatória";
+  if (!data.date) errs.date = "A data é obrigátoria";
 
   return errs;
 };
@@ -26,15 +30,20 @@ export const formatAttendanceForBackend = (
   };
 };
 
-export const formatAttendanceForFrontend = (
-  dataFromAPI: any,
-): AttendanceFormData => {
-  const [year, month, day] = dataFromAPI.attendanceDate
-    .split("T")[0]
-    .split("-");
-
+export const formatAttendanceForFrontend = (data: any): AttendanceFormData => {
   return {
-    ...dataFromAPI,
-    attendanceDate: `${day}/${month}/${year}`,
+    ...data,
+    attendanceDate: formatDate(data.attendanceDate),
   };
+};
+
+export const formatGetAttendancesForFrontend = (
+  data: Attendance[],
+): Attendance[] => {
+  return data.map((item) => {
+    return {
+      ...item,
+      attendanceDate: formatDate(item.attendanceDate),
+    };
+  });
 };
