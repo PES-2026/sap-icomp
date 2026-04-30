@@ -25,12 +25,13 @@ const periods = [
 ];
 
 export default function AttendanceTable() {
-  const { handleNavigation } = useAppNavigation();
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { attendances, isLoading } = useAttendances(page, limit);
+  const { attendances, isLoadingAttendances, totalItems } = useAttendances(
+    page,
+    limit,
+  );
   const { coursesOptions } = useCoursesOptions();
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
 
@@ -65,20 +66,13 @@ export default function AttendanceTable() {
   ];
 
   return (
-    !isLoading && (
+    !isLoadingAttendances && (
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
         <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
           <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
             <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
               Atendimentos
             </h1>
-            <CommonButton
-              label="Adicionar Novo Atendimento"
-              startIcon={Plus}
-              onClick={() =>
-                handleNavigation({ path: PATHS.register_attendance })
-              }
-            />
           </div>
 
           <div className="flex-1 overflow-auto">
@@ -179,9 +173,11 @@ export default function AttendanceTable() {
                         <td
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                         >
-                          {attendance.period === "Formado"
-                            ? "Formado(a)"
-                            : attendance.period + "º"}
+                          {attendance.period
+                            ? attendance.period === "Formado"
+                              ? "Formado(a)"
+                              : attendance.period + "º"
+                            : "-"}
                         </td>
                         <td
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
@@ -199,6 +195,7 @@ export default function AttendanceTable() {
                           <div className="flex gap-2">
                             <Link
                               href={PATHS.visualize_attendance(
+                                attendance.studentId,
                                 attendance.attendanceId,
                               )}
                               title="Visualizar"
@@ -208,6 +205,7 @@ export default function AttendanceTable() {
                             </Link>
                             <Link
                               href={PATHS.edit_attendance(
+                                attendance.studentId,
                                 attendance.attendanceId,
                               )}
                               title="Editar"
@@ -230,7 +228,7 @@ export default function AttendanceTable() {
             setPage={setPage}
             limit={limit}
             setLimit={setLimit}
-            lengthData={attendances.length}
+            lengthData={totalItems}
           />
         </div>
       </main>

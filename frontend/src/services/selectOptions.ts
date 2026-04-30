@@ -9,11 +9,11 @@ export const coursesService = {
       return response.data;
     } catch {
       return [
-        { id: "1", name: "Engenharia de Software" },
-        { id: "2", name: "Engenharia de Computação" },
-        { id: "3", name: "Ciência da Computação" },
-        { id: "4", name: "ABI" },
-        { id: "5", name: "Outros" },
+        { id: "Engenharia de Software", name: "Engenharia de Software" },
+        { id: "Engenharia de Computação", name: "Engenharia de Computação" },
+        { id: "Ciência da Computação", name: "Ciência da Computação" },
+        { id: "ABI", name: "ABI" },
+        { id: "Outros", name: "Outros" },
       ];
     }
   },
@@ -27,15 +27,12 @@ export const attendanceTypeService = {
       return response.data;
     } catch {
       return [
-        { id: "Learning", name: "Aprendizado" },
-        {
-          id: "SocioeconomicVulnerability",
-          name: "Vulnerabilidade Socioeconômica",
-        },
-        { id: "Emotional", name: "Emocional" },
-        { id: "Deficiency", name: "Deficiência" },
-        { id: "AcademicOrientation", name: "Orientação Acadêmica" },
-        { id: "Others", name: "Outros" },
+        { id: "1", name: "Aprendizado" },
+        { id: "2", name: "Vulnerabilidade Socioeconômica" },
+        { id: "3", name: "Emocional" },
+        { id: "4", name: "Deficiência" },
+        { id: "5", name: "Orientação Acadêmica" },
+        { id: "6", name: "Outros" },
       ];
     }
   },
