@@ -83,7 +83,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     ]);
 
     const items: AttendanceItemResponse[] = results.map((record) => ({
-      id: record.student.externalId,
+      id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
@@ -101,7 +101,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
   }
 
   async findById(id: string): Promise<Attendance | null> {
-    const attendance = await this.prisma.attendance.findUnique({
+    const attendance = await this.prisma.attendance.findFirst({
       where: { externalId: id, removed: false },
     });
 
@@ -155,7 +155,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     ]);
 
     const items: AttendanceItemResponse[] = results.map((record) => ({
-      id: record.student.externalId,
+      id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
