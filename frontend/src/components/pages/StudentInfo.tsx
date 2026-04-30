@@ -12,12 +12,10 @@ import {
   Phone,
   Cake,
   UserRoundX,
-  FileText,
   Plus,
   Edit,
   FileX,
   Loader2,
-  Edit2,
   UserPen,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
