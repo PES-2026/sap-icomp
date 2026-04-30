@@ -1,7 +1,6 @@
 import { attendanceService } from "@/services/attendanceService";
 import { Attendance } from "@/types/attendance";
 import { formatGetAttendancesForFrontend } from "@/utils/attendanceFormUtils";
-import { maskDate } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
