@@ -12,12 +12,10 @@ import {
   Phone,
   Cake,
   UserRoundX,
-  FileText,
   Plus,
   Edit,
   FileX,
   Loader2,
-  Edit2,
   UserPen,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -141,21 +139,6 @@ export default function StudentInfo() {
       );
     } finally {
       setShowDisableStudent(false);
-    }
-  };
-
-  const handleDisableAttendance = async () => {
-    try {
-      await attendanceService.removeAttendance(attendanceId);
-      toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
-      fetchStudentInfo();
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Erro ao comunicar com o servidor.",
-      );
-    } finally {
-      setShowDisableAttendance(false);
-      setAttendanceId("");
     }
   };
 
