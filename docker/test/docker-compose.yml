@@ -21,8 +21,8 @@ services:
       retries: 20
 
   backend:
-    image: sap-icomp-frontend-${ENVIRONMENT}:latest
-    container_name: sap-icomp-frontend-${ENVIRONMENT}
+    image: sap-icomp-backend-${ENVIRONMENT}:latest
+    container_name: sap-icomp-backend-${ENVIRONMENT}
     restart: unless-stopped
     environment:
       - BACKEND_PORT=${BACKEND_PORT}

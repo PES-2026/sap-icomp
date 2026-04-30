@@ -2,7 +2,7 @@ name: sap-icomp-${ENVIRONMENT}
 services:
   db:
     image: postgres:17-alpine
-    container_name: sap-icomp-postgres-database-production
+    container_name: sap-icomp-postgres-database-${ENVIRONMENT}
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
