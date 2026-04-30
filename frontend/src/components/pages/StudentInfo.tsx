@@ -144,6 +144,21 @@ export default function StudentInfo() {
     }
   };
 
+  const handleDisableAttendance = async () => {
+    try {
+      await attendanceService.removeAttendance(attendanceId);
+      toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
+      fetchStudentInfo();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Erro ao comunicar com o servidor.",
+      );
+    } finally {
+      setShowDisableAttendance(false);
+      setAttendanceId("");
+    }
+  };
+
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans bg-[#f5f0e8]">

@@ -6,6 +6,13 @@ import {
 import api from "./api";
 import { attendanceMock } from "./mocks";
 
+type PaginatedAttendancesResponse = {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  items: Attendance[];
+};
+
 export const attendanceService = {
   async getAttendances(
     page: number = 1,
