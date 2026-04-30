@@ -18,6 +18,7 @@ export interface ListAttendanceFilters {
 }
 
 export interface AttendanceItemResponse {
+  id: string;
   studentId: string;
   studentName: string;
   enrollmentId: string;
