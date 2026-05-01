@@ -1,28 +1,6 @@
-import { CourseAcronym, CourseName } from "./course";
-import { SpecialNeed } from "./specialNeed";
+import { AttendanceSummary } from "./attendance";
 
 export interface Student {
-  enrollmentId: string;
-  fullName: string;
-  course: CourseAcronym;
-  period: number;
-  lastAppointment: string;
-  activeNeed: SpecialNeed;
-}
-
-export interface StudentFormData {
-  studentName: string;
-  registration: string;
-  birthDate: string;
-  email: string;
-  phone: string;
-  course: CourseName;
-  diagnosis: string;
-  potentialities: string;
-  demandsAndBarriers: string;
-}
-
-export interface NewStudent {
   internalId: number;
   externalId: string;
   enrollmentId: string;
@@ -36,10 +14,10 @@ export interface NewStudent {
   createdAt: string;
   updatedAt: string;
   removed: boolean;
-  courseId: string;
+  course: string;
 }
 
-export interface NewStudentFormData {
+export interface StudentFormData {
   externalId: string;
   enrollmentId: string;
   name: string;
@@ -52,4 +30,8 @@ export interface NewStudentFormData {
   difficulties: string;
 }
 
-export type FormErrors = Partial<Record<keyof NewStudentFormData, string>>;
+export interface StudentAttendance extends Student {
+  attendances: AttendanceSummary[];
+}
+
+export type FormErrors = Partial<Record<keyof StudentFormData, string>>;

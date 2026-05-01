@@ -1,24 +1,39 @@
 import api from "./api";
-import {
-  NewStudent,
-  NewStudentFormData,
-  Student,
-  StudentFormData,
-} from "@/types/student";
+import { Student, StudentFormData } from "@/types/student";
 
 export const studentService = {
-  async getStudents(): Promise<NewStudent[]> {
-    const response = await api.get<NewStudent[]>("/students");
+  async getStudents(page: number = 1, limit: number = 10): Promise<Student[]> {
+    const response = await api.get<Student[]>("/students", {
+      params: { page, limit },
+    });
     return response.data;
   },
 
   async getStudentById(id: string): Promise<Student> {
-    const response = await api.get<Student>(`/students/${id}`);
-    return response.data;
+    try {
+      const response = await api.get<Student>(`/students/${id}`);
+      return response.data;
+    } catch {
+      const response = await api.get<Student[]>("/students", {
+        params: { page: 1, limit: 1000 },
+      });
+
+      const student = response.data.find(
+        (item: Student) => item.externalId === id,
+      );
+
+      if (!student) {
+        throw new Error(
+          `Aluno com ID ${id} não encontrado na lista de fallback.`,
+        );
+      }
+
+      return student;
+    }
   },
 
-  async createStudent(data: NewStudentFormData): Promise<NewStudentFormData> {
-    const response = await api.post<NewStudentFormData>("/student", data);
+  async createStudent(data: StudentFormData): Promise<StudentFormData> {
+    const response = await api.post<StudentFormData>("/student", data);
     return response.data;
   },
 

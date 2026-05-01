@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output = "./src/infrastructure/database/generated"
+  output   = "./src/infrastructure/database/generated"
 }
 
 datasource db {
@@ -8,15 +8,13 @@ datasource db {
 }
 
 model Student {
-  internalId Int    @id @default(autoincrement())
-  externalId String @unique
-
-  enrollmentId String @unique
+  internalId   Int      @id @default(autoincrement())
+  externalId   String   @unique
+  enrollmentId String   @unique
   name         String
-  email        String @unique
+  email        String   @unique
   phoneNumber  String
   dtBirth      DateTime
-
   diagnosis    String?
   potential    String?
   difficulties String?
@@ -25,8 +23,9 @@ model Student {
   updatedAt DateTime @default(now())
   removed   Boolean  @default(false)
 
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id])
+  courseId    String
+  course      Course       @relation(fields: [courseId], references: [id])
+  attendances Attendance[]
 }
 
 model Course {
@@ -34,4 +33,20 @@ model Course {
   name String
 
   students Student[]
+}
+
+model Attendance {
+  internalId          Int      @id @default(autoincrement())
+  externalId          String   @unique @default(uuid())
+  date                DateTime
+  type                String
+  demand              String
+  generalObservations String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  removed   Boolean  @default(false)
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [externalId])
 }

@@ -1,58 +1,55 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import CommonButton from "@/components/common-button/CommonButton";
 import {
-  maskRegistration,
-  maskDate,
-  maskPhone,
   validateStudentForm,
   formatForBackend,
 } from "@/utils/studentFormUtils";
 import { Field } from "../field/Field";
 import { CustomSelect } from "../select-input/CustomSelect";
-import { FormErrors, NewStudentFormData } from "@/types/student";
+import { FormErrors, StudentFormData } from "@/types/student";
 import { EMPTY_FORM } from "@/constants/student";
-import { COURSES_NAME } from "@/constants/courses";
 import { studentService } from "@/services";
 import { ConfirmModal } from "../confirm-modal/ConfirmModal";
 import { SuccessScreen } from "./ui/StudentFormUI";
 import toast from "react-hot-toast";
+import { useCoursesOptions } from "@/hooks/useCoursesOptions";
+import { maskDate, maskPhone, maskRegistration } from "@/utils/utils";
+import { StudentFormSkeleton } from "../skeletons/SkeletonStudentForm";
 
 interface StudentFormProps {
-  initialData?: NewStudentFormData;
-  onSubmitSuccess?: (data: NewStudentFormData) => void;
+  initialData?: StudentFormData;
   onCancel?: () => void;
 }
 
 export default function StudentForm({
   initialData,
-  onSubmitSuccess,
   onCancel,
 }: StudentFormProps) {
   const isEditMode = !!initialData;
 
-  const [formData, setFormData] = useState<NewStudentFormData>(
+  const [formData, setFormData] = useState<StudentFormData>(
     initialData || EMPTY_FORM,
   );
   const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState<
-    Partial<Record<keyof NewStudentFormData, boolean>>
-  >({});
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [showConfirmRegister, setShowConfirmRegister] = useState(false);
 
+  const { coursesOptions } = useCoursesOptions();
+
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
-  const getValidationClass = (field: keyof NewStudentFormData) =>
+
+  const getValidationClass = (field: keyof StudentFormData) =>
     errors[field]
       ? `${baseInputClass} border-red-300 bg-red-50 focus:border-red-400`
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
-  const handleFieldChange = (key: keyof NewStudentFormData, value: string) => {
+  const handleFieldChange = (key: keyof StudentFormData, value: string) => {
     setFormData((prev) => {
       const updated = {
         ...prev,
@@ -68,23 +65,7 @@ export default function StudentForm({
     });
   };
 
-  const handleFieldBlur = (key: keyof NewStudentFormData) => {
-    setTouched((prev) => ({
-      ...prev,
-      [key]: true,
-    }));
-  };
-
   const validateSubmit = () => {
-    const allFields = Object.keys(EMPTY_FORM) as Array<
-      keyof NewStudentFormData
-    >;
-    const allTouched = allFields.reduce(
-      (acc, k) => ({ ...acc, [k]: true }),
-      {},
-    );
-    setTouched(allTouched);
-
     const validationErrors = validateStudentForm(formData);
     setErrors(validationErrors);
 
@@ -105,7 +86,7 @@ export default function StudentForm({
         await studentService.updateStudent(initialData.externalId, payload);
         toast.success("Estudante atualizado com sucesso!");
       } else {
-        await studentService.createStudent(payload as NewStudentFormData);
+        await studentService.createStudent(payload as StudentFormData);
         toast.success("Estudante cadastrado com sucesso!");
       }
 
@@ -129,11 +110,12 @@ export default function StudentForm({
   const handleReset = () => {
     setFormData(EMPTY_FORM);
     setErrors({});
-    setTouched({});
     setIsSubmitted(false);
   };
 
-  return (
+  return isLoading ? (
+    <StudentFormSkeleton />
+  ) : (
     <>
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
         {isSubmitted ? (
@@ -162,7 +144,6 @@ export default function StudentForm({
                     placeholder="João Vitor Mesquita da Frota"
                     value={formData.name}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
-                    onBlur={() => handleFieldBlur("name")}
                     className={getValidationClass("name")}
                   />
                 </Field>
@@ -177,7 +158,6 @@ export default function StudentForm({
                         maskRegistration(e.target.value),
                       )
                     }
-                    onBlur={() => handleFieldBlur("enrollmentId")}
                     className={getValidationClass("enrollmentId")}
                   />
                 </Field>
@@ -189,7 +169,6 @@ export default function StudentForm({
                     onChange={(e) =>
                       handleFieldChange("dtBirth", maskDate(e.target.value))
                     }
-                    onBlur={() => handleFieldBlur("dtBirth")}
                     className={getValidationClass("dtBirth")}
                   />
                 </Field>
@@ -202,7 +181,6 @@ export default function StudentForm({
                     placeholder="joao.frota@icomp.ufam.edu.br"
                     value={formData.email}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
-                    onBlur={() => handleFieldBlur("email")}
                     className={getValidationClass("email")}
                   />
                 </Field>
@@ -217,7 +195,6 @@ export default function StudentForm({
                         maskPhone(e.target.value),
                       )
                     }
-                    onBlur={() => handleFieldBlur("phoneNumber")}
                     className={getValidationClass("phoneNumber")}
                   />
                 </Field>
@@ -226,8 +203,7 @@ export default function StudentForm({
                   label="Curso:"
                   error={errors.courseId}
                   onChange={(val) => handleFieldChange("courseId", val)}
-                  onBlur={() => handleFieldBlur("courseId")}
-                  options={COURSES_NAME}
+                  options={coursesOptions}
                 />
               </div>
 

@@ -1,5 +1,7 @@
 import { CourseAcronym, CourseName } from "@/types/course";
 
+
+
 export const COURSES_ACRONYM: CourseAcronym[] = [
   "E.S.",
   "C.C.",
@@ -15,3 +17,4 @@ export const COURSES_NAME: CourseName[] = [
   "Sistemas de Informação",
   "Outros",
 ];
+

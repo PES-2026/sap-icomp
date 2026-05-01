@@ -1,8 +1,9 @@
 "use client";
 
-import { Home, Calendar, Users, FileText } from "lucide-react";
+import { Users, CalendarFold } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { PATHS } from "@/constants/paths";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -19,14 +20,14 @@ export default function Sidebar() {
       label: "Alunos",
       icon: Users,
       id: "Base de Alunos",
-      href: "/admin/students",
+      href: PATHS.students_list,
     },
-    // {
-    //   label: "Relatórios",
-    //   icon: FileText,
-    //   id: "Envio",
-    //   href: "/admin/relatorios",
-    // },
+    {
+      label: "Atendimentos",
+      icon: CalendarFold,
+      id: "Envio",
+      href: PATHS.attendances_list,
+    },
   ];
 
   return (
