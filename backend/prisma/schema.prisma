@@ -15,38 +15,215 @@ model Student {
   email        String   @unique
   phoneNumber  String
   dtBirth      DateTime
-  diagnosis    String?
+  term         String?
   potential    String?
   difficulties String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  removed      Boolean  @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  removed   Boolean  @default(false)
+  courseId Int
+  course   Course @relation(fields: [courseId], references: [internalId])
 
-  courseId    String
-  course      Course       @relation(fields: [courseId], references: [id])
   attendances Attendance[]
+  reports     Report[]
+  diagnoses   StudentDiagnosis[]
+  enrollments Enrollment[]
 }
 
-model Course {
-  id   String @id
-  name String
+model Pedagogue {
+  internalId   Int      @id @default(autoincrement())
+  externalId   String   @unique
+  registration String   @unique
+  name         String
+  email        String   @unique
+  phoneNumber  String?
+  removed      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  students Student[]
+  attendances Attendance[]
+  reports     Report[]
+}
+
+model Professor {
+  internalId   Int      @id @default(autoincrement())
+  externalId   String   @unique
+  registration String   @unique
+  name         String
+  email        String   @unique
+  phoneNumber  String?
+  removed      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  feedbacks          Feedback[]
+  classProfessors    ClassProfessor[]
+  coordinatedCourses Course[]         @relation("Coordinator")
 }
 
 model Attendance {
-  internalId          Int      @id @default(autoincrement())
-  externalId          String   @unique @default(uuid())
-  date                DateTime
-  type                String
-  demand              String
-  generalObservations String
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  studentId   Int
+  pedagogueId Int
+  typeId      Int
+
+  createdAt  DateTime @default(now())
+  attendedAt DateTime
+  updatedAt  DateTime @updatedAt
+
+  demand      String?
+  observation String?
+  removed     Boolean @default(false)
+
+  student   Student        @relation(fields: [studentId], references: [internalId])
+  pedagogue Pedagogue      @relation(fields: [pedagogueId], references: [internalId])
+  type      AttendanceType @relation(fields: [typeId], references: [internalId])
+}
+
+model AttendanceType {
+  internalId Int    @id @default(autoincrement())
+  name       String
+
+  attendances Attendance[]
+}
+
+model Subject {
+  internalId Int      @id @default(autoincrement())
+  externalId String   @unique
+  name       String
+  code       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  classOfferings ClassOffering[]
+}
+
+model Course {
+  internalId Int      @id @default(autoincrement())
+  externalId String   @unique
+  name       String   @unique
+  acronym    String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  coordinatorId Int?
+  coordinator   Professor? @relation("Coordinator", fields: [coordinatorId], references: [internalId])
+
+  students       Student[]
+  classOfferings ClassOffering[]
+}
+
+model Semester {
+  internalId Int      @id @default(autoincrement())
+  externalId String   @unique
+  code       String   @unique
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  classOfferings ClassOffering[]
+}
+
+model Report {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  studentId   Int
+  pedagogueId Int
+
+  condition      String?
+  recommendation String?
+  conclusion     String?
+  status         String?
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  removed   Boolean  @default(false)
+  updatedAt DateTime @updatedAt
 
-  studentId String
-  student   Student @relation(fields: [studentId], references: [externalId])
+  student   Student   @relation(fields: [studentId], references: [internalId])
+  pedagogue Pedagogue @relation(fields: [pedagogueId], references: [internalId])
+
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  reportId    Int
+  professorId Int
+
+  title    String?
+  bodytext String?
+  status   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  report    Report    @relation(fields: [reportId], references: [internalId])
+  professor Professor @relation(fields: [professorId], references: [internalId])
+}
+
+model Diagnosis {
+  internalId Int     @id @default(autoincrement())
+  name       String  @unique
+  acronym    String  @unique
+  CID        String?
+
+  students StudentDiagnosis[]
+}
+
+model StudentDiagnosis {
+  studentId   Int
+  diagnosisId Int
+
+  student   Student   @relation(fields: [studentId], references: [internalId])
+  diagnosis Diagnosis @relation(fields: [diagnosisId], references: [internalId])
+
+  @@id([studentId, diagnosisId])
+}
+
+model ClassOffering {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  courseId   Int
+  semesterId Int
+  subjectId  Int
+
+  daysWeek String?
+  hour     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course   Course   @relation(fields: [courseId], references: [internalId])
+  semester Semester @relation(fields: [semesterId], references: [internalId])
+  subject  Subject  @relation(fields: [subjectId], references: [internalId])
+
+  enrollments     Enrollment[]
+  classProfessors ClassProfessor[]
+}
+
+model Enrollment {
+  studentId Int
+  classId   Int
+
+  student Student       @relation(fields: [studentId], references: [internalId])
+  class   ClassOffering @relation(fields: [classId], references: [internalId])
+
+  @@id([studentId, classId])
+}
+
+model ClassProfessor {
+  professorId Int
+  classId     Int
+
+  professor Professor     @relation(fields: [professorId], references: [internalId])
+  class     ClassOffering @relation(fields: [classId], references: [internalId])
+
+  @@id([professorId, classId])
 }
