@@ -1,11 +1,11 @@
 "use client";
 
-import StudentForm from "@/components/forms/StudentForm";
 import { PATHS } from "@/constants/paths";
-import { studentService } from "@/services";
-import { StudentFormData } from "@/types/student";
+import StudentForm from "@/features/students/components/form/StudentForm";
+import { studentService } from "@/features/students/services/studentService";
+import { StudentFormData } from "@/features/students/types/student";
+import { formatForFrontend } from "@/features/students/utils/studentUtils";
 import { useAppNavigation } from "@/utils/navigator";
-import { formatForFrontend } from "@/utils/studentFormUtils";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";

@@ -15,6 +15,7 @@ interface SelectInputProps {
   placeholder?: string;
   width?: string;
   icon?: React.ElementType;
+  isSetLabel?: boolean;
 }
 
 export const SelectInput = ({
@@ -24,6 +25,7 @@ export const SelectInput = ({
   placeholder = "Selecione",
   width = "w-full",
   icon: Icon = Filter,
+  isSetLabel = false,
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDirection, setOpenDirection] = useState<"up" | "down">("down");
@@ -106,7 +108,7 @@ export const SelectInput = ({
                   type="button"
                   key={option.value}
                   onClick={() => {
-                    onChange(option.value);
+                    onChange(isSetLabel ? option.label : option.value);
                     setIsOpen(false);
                   }}
                   className={`

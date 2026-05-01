@@ -1,6 +1,6 @@
 import { AttendanceTypesFromBackend } from "@/types/attendance";
-import api from "./api";
 import { CourseFromBackend } from "@/types/course";
+import api from "./api";
 
 export const coursesService = {
   async get(): Promise<CourseFromBackend[]> {
