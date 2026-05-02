@@ -47,7 +47,7 @@ jobs:
           echo "Building frontend image for environment: $APP_ENV"
 
           docker build \
-              --build-arg NEXT_PUBLIC_API_URL=https://${{ secrets.BACKEND_HOST }} \
+              --build-arg NEXT_PUBLIC_API_URL=https://${{ vars.BACKEND_HOST }} \
               -t sap-icomp-frontend-$APP_ENV:latest \
               -f ./frontend/Dockerfile.$APP_ENV \
               ./frontend
@@ -86,10 +86,10 @@ jobs:
           DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
           DB_USER="${{ secrets.DB_USER }}"
           DB_HOST="${{ secrets.SERVER_HOST }}"
-          BACKEND_HOST="${{ secrets.BACKEND_HOST }}"
-          FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
+          BACKEND_HOST="${{ vars.BACKEND_HOST }}"
+          FRONTEND_HOST="${{ vars.FRONTEND_HOST }}"
           DATABASE_URL="postgresql://${DB_USER_ENC}:${DB_PASSWORD_ENC}@db:5432/${{ secrets.DB_NAME }}?schema=public"
-          NEXT_PUBLIC_API_URL="http://${{ secrets.BACKEND_HOST }}"
+          NEXT_PUBLIC_API_URL="http://${{ vars.BACKEND_HOST }}"
           EOF
           echo ".env file generated successfully"
 
