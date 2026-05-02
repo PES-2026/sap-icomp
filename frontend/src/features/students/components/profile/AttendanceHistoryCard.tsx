@@ -84,21 +84,6 @@ export default function AttendanceHistoryCard({
           </div>
         ) : (
           <div className="flex-1 p-4 overflow-hidden flex flex-col ">
-            <style>{`
-                  .custom-scroll::-webkit-scrollbar {
-                    width: 6px;
-                  }
-                  .custom-scroll::-webkit-scrollbar-track {
-                    background: transparent;
-                  }
-                  .custom-scroll::-webkit-scrollbar-thumb {
-                    background-color: #badad1;
-                    border-radius: 10px;
-                  }
-                  .custom-scroll:hover::-webkit-scrollbar-thumb {
-                    background-color: #6bc4a6;
-                  }
-              `}</style>
             <div className="flex-1 flex flex-col overflow-hidden rounded-2xl bg-[#d4f0e8] ring-1 ring-[#badad1]">
               <div className="custom-scroll flex-1 overflow-y-auto divide-y divide-[#badad1]">
                 {filteredAttendances.length === 0 ? (

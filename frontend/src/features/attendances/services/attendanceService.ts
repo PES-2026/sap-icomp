@@ -1,5 +1,4 @@
-import { api } from "@/services";
-import { attendanceMock } from "@/services/mocks";
+import api from "@/services/api";
 import {
   Attendance,
   AttendanceFormData,
@@ -15,25 +14,17 @@ export const attendanceService = {
       "/attendances",
       {
         params: { page, limit },
+        fallbackMsg: "Não foi possível obter os atendimentos.",
       },
     );
-
     return response.data;
   },
 
   async getAttendancesById(id: string): Promise<Attendance> {
-    try {
-      const response = await api.get<Attendance>(`/attendances/${id}`);
-      return response.data;
-    } catch {
-      const attendance = attendanceMock.find((s) => s.attendanceId === id);
-
-      if (!attendance) {
-        throw new Error(`Attendance with ID ${id} not found in mock.`);
-      }
-
-      return attendance;
-    }
+    const response = await api.get<Attendance>(`/attendances/${id}`, {
+      fallbackMsg: "Não foi possível obter o atendimento.",
+    });
+    return response.data;
   },
 
   async getAttendancesByStudent(
@@ -45,37 +36,16 @@ export const attendanceService = {
       `/attendances/student/${studentId}`,
       {
         params: { page, limit },
+        fallbackMsg: "Não foi possível obter os atendimentos do estudante.",
       },
     );
-
     return response.data;
   },
 
-  async getAttendancesByStudentt(
-    studentId: string,
-    page: number,
-    limit: number,
-  ) {
-    try {
-      const response = await api.get(`/attendances/student/${studentId}`, {
-        params: { page, limit },
-      });
-      return response.data;
-    } catch {
-      const attendance = attendanceMock.filter(
-        (s) => s.studentId === studentId,
-      );
-
-      if (!attendance) {
-        throw new Error(`Attendance with ID ${studentId} not found in mock.`);
-      }
-
-      return attendance;
-    }
-  },
-
   async create(data: AttendanceFormData): Promise<AttendanceFormData> {
-    const response = await api.post<AttendanceFormData>("/attendances", data);
+    const response = await api.post<AttendanceFormData>("/attendances", data, {
+      fallbackMsg: "Não foi possível criar o atendimento.",
+    });
     return response.data;
   },
 
@@ -83,11 +53,15 @@ export const attendanceService = {
     id: string,
     data: Partial<AttendanceFormData>,
   ): Promise<Attendance> {
-    const response = await api.put<Attendance>(`/attendances/${id}`, data);
+    const response = await api.put<Attendance>(`/attendances/${id}`, data, {
+      fallbackMsg: "Não foi possível atualizar o atendimento.",
+    });
     return response.data;
   },
 
   async removeAttendance(attendanceId: string): Promise<void> {
-    await api.post(`/attendances/${attendanceId}/remove`);
+    await api.post(`/attendances/${attendanceId}/remove`, {
+      fallbackMsg: "Não foi possível remover o atendimento.",
+    });
   },
 };

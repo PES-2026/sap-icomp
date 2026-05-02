@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { SelectOption } from "@/types/selectOption";
-import { coursesService } from "@/services/selectOptions";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { coursesService } from "../services/courseService";
 
 export const useCoursesOptions = () => {
   const [coursesOptions, setCoursesOptions] = useState<SelectOption[]>([]);

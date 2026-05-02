@@ -31,11 +31,6 @@ export interface PaginatedAttendancesResponse {
   items: Attendance[];
 }
 
-export interface AttendanceTypesFromBackend {
-  id: string;
-  name: string;
-}
-
 export type AttendanceFormErrors = Partial<
   Record<keyof AttendanceFormData, string>
 >;

@@ -4,7 +4,7 @@ import { SearchInput } from "@/components/search-input/SearchInput";
 import { SelectInput } from "@/components/select-input/FilterSelect";
 import TablePagination from "@/components/table-pagination/TablePagination";
 import { PATHS } from "@/constants/paths";
-import { useCoursesOptions } from "@/hooks/useCoursesOptions";
+import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { Edit, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

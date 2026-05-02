@@ -1,7 +1,7 @@
-import { attendanceTypeService } from "@/services/selectOptions";
 import { SelectOption } from "@/types/selectOption";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { attendanceTypeService } from "../services/attendanceTypeService";
 
 export const useAttendanceTypesOptions = () => {
   const [attendanceTypesOptions, setAttendanceTypesOptions] = useState<
