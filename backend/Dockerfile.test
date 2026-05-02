@@ -15,4 +15,4 @@ COPY . .
 ENV NODE_ENV=test
 
 # Run the development script with hot-reloading
-CMD ["sh", "-c", "npm run db:deploy && npm run prisma:seed:prod && npm start"]
+CMD ["sh", "-c", "npm run db:deploy && npm run prisma:seed && npm run dev"]
