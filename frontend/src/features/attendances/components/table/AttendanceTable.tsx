@@ -1,8 +1,8 @@
 "use client";
 
+import { Column, DataTable } from "@/components/ui/DataTable";
 import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";
-import TablePagination from "@/components/ui/TablePagination";
 import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { Edit, Eye } from "lucide-react";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAttendanceTypesOptions } from "../../hooks/useAttendanceTypesOptions";
 import { useAttendances } from "../../hooks/useAttendances";
+import { Attendance } from "../../types/attendance";
 
 const periods = [
   { value: "1", label: "1º" },
@@ -55,183 +56,125 @@ export default function AttendanceTable() {
     return matchEnrollment && matchName;
   });
 
-  const columns = [
-    { label: "Matrícula", width: "w-[120px]" },
-    { label: "Nome Completo", width: "w-[500px]" },
-    { label: "Curso", width: "w-[200px]" },
-    { label: "Período", width: "w-[70px]" },
-    { label: "Tipo de Atendimento", width: "w-[140px]" },
-    { label: "Data do Atendimento", width: "w-[160px]" },
-    { label: "", width: "w-[50px]" },
+  const columns: Column<Attendance>[] = [
+    {
+      label: "Matrícula",
+      width: "w-[120px]",
+      renderFilter: () => (
+        <SearchInput value={enrollmentFilter} onChange={setEnrollmentFilter} />
+      ),
+      renderCell: (attendance) => (
+        <span className="font-semibold text-[#4a4540]">
+          {attendance.enrollmentId}
+        </span>
+      ),
+    },
+    {
+      label: "Nome Completo",
+      width: "w-[500px]",
+      renderFilter: () => (
+        <SearchInput value={nameFilter} onChange={setNameFilter} />
+      ),
+      renderCell: (attendance) => (
+        <span className="font-medium text-[#3a3530]">
+          {attendance.studentName}
+        </span>
+      ),
+    },
+    {
+      label: "Curso",
+      width: "w-[300px]",
+      renderFilter: () => (
+        <SelectInput
+          value={courseIdFilter}
+          onChange={setCourseIdFilter}
+          options={coursesOptions}
+          placeholder="Todos"
+        />
+      ),
+      renderCell: (attendance) => attendance.course,
+    },
+    {
+      label: "Período",
+      width: "w-[70px]",
+      renderFilter: () => (
+        <SelectInput
+          value={periodFilter}
+          onChange={setPeriodFilter}
+          options={periods}
+          placeholder="Todos"
+        />
+      ),
+      renderCell: (attendance) => attendance.period || "-",
+    },
+    {
+      label: "Tipo de Atendimento",
+      width: "w-[140px]",
+      renderFilter: () => (
+        <SelectInput
+          value={attendanceTypeIdFilter}
+          onChange={setAttendanceTypeIdFilter}
+          options={attendanceTypesOptions}
+          placeholder="Todos"
+        />
+      ),
+      renderCell: (attendance) => attendance.attendanceType,
+    },
+    {
+      label: "Data do Atendimento",
+      width: "w-[160px]",
+      renderFilter: () => (
+        <SearchInput
+          value={attendanceDateFilter}
+          onChange={setAttendanceDateFilter}
+        />
+      ),
+      renderCell: (attendance) => attendance.attendanceDate,
+    },
+    {
+      label: "",
+      width: "w-[50px]",
+      renderCell: (attendance) => (
+        <div className="flex justify-center gap-0.5">
+          <Link
+            aria-label="Visualizar Atendimento"
+            title="Visualizar"
+            href={PATHS.visualize_attendance(
+              attendance.studentId,
+              attendance.attendanceId,
+            )}
+            className="flex items-center rounded-md p-1 text-[#6bc4a6] hover:bg-[#e8f7f2]"
+          >
+            <Eye size={20} />
+          </Link>
+          <Link
+            aria-label="Editar Atendimento"
+            title="Editar"
+            href={PATHS.edit_attendance(
+              attendance.studentId,
+              attendance.attendanceId,
+            )}
+            className="flex items-center rounded-md p-1 text-[#b0a898] hover:bg-[#f0ebe0]"
+          >
+            <Edit size={20} />
+          </Link>
+        </div>
+      ),
+    },
   ];
 
   return (
-    !isLoadingAttendances && (
-      <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
-        <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
-          <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
-            <h1 className="m-0 text-xl font-semibold text-[#3a3530]">
-              Atendimentos
-            </h1>
-          </div>
-
-          <div className="flex-1 overflow-auto">
-            <table className="w-full border-separate border-spacing-0 text-sm">
-              <thead className="sticky top-0 z-10">
-                <tr>
-                  {columns.map((col, index) => (
-                    <th
-                      key={index}
-                      className={`whitespace-nowrap border-y border-[#ece7db] bg-[#faf7f0] px-4 py-3 text-center font-bold text-[#4a4540] ${col.width}`}
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                </tr>
-
-                <tr>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SearchInput
-                      value={enrollmentFilter}
-                      onChange={setEnrollmentFilter}
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SearchInput value={nameFilter} onChange={setNameFilter} />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SelectInput
-                      value={courseIdFilter}
-                      onChange={setCourseIdFilter}
-                      options={coursesOptions}
-                      placeholder="Todos"
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SelectInput
-                      value={periodFilter}
-                      onChange={setPeriodFilter}
-                      options={periods}
-                      placeholder="Todos"
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SelectInput
-                      value={attendanceTypeIdFilter}
-                      onChange={setAttendanceTypeIdFilter}
-                      options={attendanceTypesOptions}
-                      placeholder="Todos"
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SearchInput
-                      value={attendanceDateFilter}
-                      onChange={setAttendanceDateFilter}
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2" />
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredAttendances.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-4 py-8 text-center text-[#a0a0a0]"
-                    >
-                      Nenhum aluno encontrado.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredAttendances.map((attendance, idx) => {
-                    const isLast = idx === filteredAttendances.length - 1;
-                    const borderClass = isLast
-                      ? ""
-                      : "border-b border-[#f0ebe0]";
-
-                    return (
-                      <tr
-                        key={attendance.attendanceId}
-                        className="transition-colors duration-150 bg-white hover:bg-[#fcfcfc]"
-                      >
-                        <td
-                          className={`px-4 py-3.5 text-center font-semibold text-[#4a4540] ${borderClass}`}
-                        >
-                          {attendance.enrollmentId}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-center font-medium text-[#3a3530] ${borderClass}`}
-                        >
-                          {attendance.studentName}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
-                        >
-                          {attendance.course}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
-                        >
-                          {attendance.period
-                            ? attendance.period === "Formado"
-                              ? "Formado(a)"
-                              : attendance.period + "º"
-                            : "-"}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
-                        >
-                          {attendance.attendanceType}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-[#6a6560] text-center ${borderClass}`}
-                        >
-                          {attendance.attendanceDate}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-[#6a6560] ${borderClass}`}
-                        >
-                          <div className="flex gap-2">
-                            <Link
-                              href={PATHS.visualize_attendance(
-                                attendance.studentId,
-                                attendance.attendanceId,
-                              )}
-                              title="Visualizar"
-                              className="flex items-center rounded-md p-1 text-[#6bc4a6] transition-colors duration-150 hover:bg-[#e8f7f2]"
-                            >
-                              <Eye size={20} />
-                            </Link>
-                            <Link
-                              href={PATHS.edit_attendance(
-                                attendance.studentId,
-                                attendance.attendanceId,
-                              )}
-                              title="Editar"
-                              className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#f0ebe0]"
-                            >
-                              <Edit size={20} />
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <TablePagination
-            page={page}
-            setPage={setPage}
-            limit={limit}
-            setLimit={setLimit}
-            lengthData={totalItems}
-          />
-        </div>
-      </main>
-    )
+    <DataTable
+      title="Lista de Atendimentos"
+      isLoading={isLoadingAttendances}
+      data={filteredAttendances}
+      columns={columns}
+      page={page}
+      setPage={setPage}
+      limit={limit}
+      setLimit={setLimit}
+      totalItems={attendances.length}
+      emptyMessage="Nenhum atendimento encontrado."
+    />
   );
 }

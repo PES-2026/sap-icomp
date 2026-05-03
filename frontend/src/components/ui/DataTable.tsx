@@ -1,0 +1,125 @@
+import TablePagination from "@/components/ui/TablePagination";
+import { ReactNode } from "react";
+
+export interface Column<T> {
+  label: string;
+  width?: string;
+  renderFilter?: () => ReactNode;
+  renderCell: (item: T) => ReactNode;
+}
+
+interface DataTableProps<T> {
+  title: string;
+  headerAction?: ReactNode;
+  columns: Column<T>[];
+  data: T[];
+  isLoading?: boolean;
+  loadingComponent?: ReactNode;
+  emptyMessage?: string;
+  page: number;
+  setPage: (page: number) => void;
+  limit: number;
+  setLimit: (limit: number) => void;
+  totalItems: number;
+}
+
+export function DataTable<T>({
+  title,
+  headerAction,
+  columns,
+  data,
+  isLoading,
+  loadingComponent,
+  emptyMessage = "Nenhum registro encontrado.",
+  page,
+  setPage,
+  limit,
+  setLimit,
+  totalItems,
+}: DataTableProps<T>) {
+  if (isLoading && loadingComponent) {
+    return <>{loadingComponent}</>;
+  }
+
+  return (
+    <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
+        <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
+          <h1 className="m-0 text-xl font-semibold text-[#3a3530]">{title}</h1>
+          {headerAction && <div>{headerAction}</div>}
+        </div>
+        <div className="flex-1 overflow-auto">
+          <table className="w-full border-separate border-spacing-0 text-sm">
+            <thead className="sticky top-0 z-10">
+              <tr>
+                {columns.map((col, index) => (
+                  <th
+                    key={index}
+                    className={`whitespace-nowrap border-y border-[#ece7db] bg-[#faf7f0] px-4 py-3 text-center font-bold text-[#4a4540] ${col.width || ""}`}
+                  >
+                    {col.label}
+                  </th>
+                ))}
+              </tr>
+
+              {columns.some((col) => col.renderFilter) && (
+                <tr>
+                  {columns.map((col, index) => (
+                    <td
+                      key={`filter-${index}`}
+                      className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2"
+                    >
+                      {col.renderFilter ? col.renderFilter() : null}
+                    </td>
+                  ))}
+                </tr>
+              )}
+            </thead>
+
+            <tbody>
+              {data.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    className="px-4 py-8 text-center text-[#a0a0a0]"
+                  >
+                    {emptyMessage}
+                  </td>
+                </tr>
+              ) : (
+                data.map((item, rowIdx) => {
+                  const isLast = rowIdx === data.length - 1;
+                  const borderClass = isLast ? "" : "border-b border-[#f0ebe0]";
+
+                  return (
+                    <tr
+                      key={rowIdx}
+                      className="transition-colors duration-150 bg-white hover:bg-[#fcfcfc]"
+                    >
+                      {columns.map((col, colIdx) => (
+                        <td
+                          key={colIdx}
+                          className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
+                        >
+                          {col.renderCell(item)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <TablePagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          lengthData={totalItems}
+        />
+      </div>
+    </main>
+  );
+}
