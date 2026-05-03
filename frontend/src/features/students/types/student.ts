@@ -30,8 +30,4 @@ export interface StudentFormData {
   difficulties: string;
 }
 
-export interface StudentInfo extends Student {
-  attendances: AttendanceSummary[];
-}
-
 export type FormErrors = Partial<Record<keyof StudentFormData, string>>;

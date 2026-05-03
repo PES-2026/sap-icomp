@@ -1,4 +1,4 @@
-import CommonButton from "../common-button/CommonButton";
+import CommonButton from "../ui/CommonButton";
 
 export type ConfirmVariant = "primary" | "warning" | "critical";
 

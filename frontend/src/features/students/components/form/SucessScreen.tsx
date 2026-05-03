@@ -1,4 +1,4 @@
-import CommonButton from "@/components/common-button/CommonButton";
+import CommonButton from "@/components/ui/CommonButton";
 import { useAppNavigation } from "@/utils/navigator";
 import { Check } from "lucide-react";
 

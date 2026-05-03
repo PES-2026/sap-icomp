@@ -1,17 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Filter, ChevronDown, Check } from "lucide-react";
-
-export interface Option {
-  value: string;
-  label: string;
-}
+import { SelectOption } from "@/types/selectOption";
+import { Check, ChevronDown, Filter } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface SelectInputProps {
   value: string;
   onChange: (v: string) => void;
-  options: Option[];
+  options: SelectOption[];
   placeholder?: string;
   width?: string;
   icon?: React.ElementType;

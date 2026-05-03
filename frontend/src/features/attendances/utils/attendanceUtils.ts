@@ -5,6 +5,14 @@ import {
   AttendanceFormErrors,
 } from "../types/attendance";
 
+export const EMPTY_FORM_ATTENDANCE: AttendanceFormData = {
+  studentId: "",
+  date: "",
+  type: "",
+  demand: "",
+  generalObservations: "",
+};
+
 export const validateAttendanceForm = (
   data: AttendanceFormData,
 ): AttendanceFormErrors => {

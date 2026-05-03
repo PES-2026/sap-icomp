@@ -1,5 +1,5 @@
-import { SelectInput } from "../select-input/FilterSelect";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SelectInput } from "./FilterSelect";
 
 const limitOptions = [
   { value: "10", label: "10 por página" },

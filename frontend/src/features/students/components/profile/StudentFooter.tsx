@@ -1,13 +1,13 @@
-import CommonButton from "@/components/common-button/CommonButton";
-import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
+import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { PATHS } from "@/constants/paths";
-import { Student } from "@/types/student";
 import { cn } from "@/utils/cn";
 import { useAppNavigation } from "@/utils/navigator";
 import { Plus, UserPen, UserRoundX } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { studentService } from "../../services/studentService";
+import { Student } from "../../types/student";
 
 interface StudentFooterProps {
   student: Student;

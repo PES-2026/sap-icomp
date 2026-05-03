@@ -1,10 +1,9 @@
 "use client";
 
-import CommonButton from "@/components/common-button/CommonButton";
-import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
-import { Field } from "@/components/field/Field";
-import { CustomSelect } from "@/components/select-input/CustomSelect";
-import { EMPTY_FORM } from "@/constants/student";
+import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Field } from "@/components/ui/Field";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { FormErrors, StudentFormData } from "@/features/students/types/student";
 import { maskDate, maskPhone, maskRegistration } from "@/utils/utils";
@@ -12,6 +11,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { studentService } from "../../services/studentService";
 import {
+  EMPTY_FORM_STUDENT,
   formatForBackend,
   validateStudentForm,
 } from "../../utils/studentUtils";
@@ -30,7 +30,7 @@ export default function StudentForm({
   const isEditMode = !!initialData;
 
   const [formData, setFormData] = useState<StudentFormData>(
-    initialData || EMPTY_FORM,
+    initialData || EMPTY_FORM_STUDENT,
   );
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -108,7 +108,7 @@ export default function StudentForm({
   };
 
   const handleReset = () => {
-    setFormData(EMPTY_FORM);
+    setFormData(EMPTY_FORM_STUDENT);
     setErrors({});
     setIsSubmitted(false);
   };

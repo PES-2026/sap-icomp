@@ -1,4 +1,4 @@
-import CommonButton from "@/components/common-button/CommonButton";
+import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
 import { cn } from "@/utils/cn";
 import { useAppNavigation } from "@/utils/navigator";

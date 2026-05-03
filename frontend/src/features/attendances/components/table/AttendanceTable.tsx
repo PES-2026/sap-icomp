@@ -1,8 +1,8 @@
 "use client";
 
-import { SearchInput } from "@/components/search-input/SearchInput";
-import { SelectInput } from "@/components/select-input/FilterSelect";
-import TablePagination from "@/components/table-pagination/TablePagination";
+import { SelectInput } from "@/components/ui/FilterSelect";
+import { SearchInput } from "@/components/ui/SearchInput";
+import TablePagination from "@/components/ui/TablePagination";
 import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { Edit, Eye } from "lucide-react";

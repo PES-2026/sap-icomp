@@ -1,4 +1,4 @@
-import { Breadcrumb } from "../breadcrumb/Breadcrumb";
+import { Breadcrumb } from "../ui/Breadcrumb";
 
 export default function Header() {
   return (

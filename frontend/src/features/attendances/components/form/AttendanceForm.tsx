@@ -1,10 +1,9 @@
 "use client";
 
-import CommonButton from "@/components/common-button/CommonButton";
-import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
-import { Field } from "@/components/field/Field";
-import { CustomSelect } from "@/components/select-input/CustomSelect";
-import { EMPTY_FORM_ATTENDANCE } from "@/constants/attendance";
+import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { CustomSelect } from "@/components/ui/CustomSelect";
+import { Field } from "@/components/ui/Field";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { maskDate } from "@/utils/utils";
 import { Loader2 } from "lucide-react";
@@ -19,6 +18,7 @@ import {
   AttendanceFormErrors,
 } from "../../types/attendance";
 import {
+  EMPTY_FORM_ATTENDANCE,
   formatAttendanceForBackend,
   validateAttendanceForm,
 } from "../../utils/attendanceUtils";

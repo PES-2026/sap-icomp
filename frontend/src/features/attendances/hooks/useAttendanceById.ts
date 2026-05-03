@@ -1,8 +1,10 @@
-import { EMPTY_FORM_ATTENDANCE } from "@/constants/attendance";
 import { useEffect, useState } from "react";
 import { attendanceService } from "../services/attendanceService";
 import { AttendanceFormData } from "../types/attendance";
-import { formatAttendanceForFrontend } from "../utils/attendanceUtils";
+import {
+  EMPTY_FORM_ATTENDANCE,
+  formatAttendanceForFrontend,
+} from "../utils/attendanceUtils";
 
 interface useAttendanceFormProps {
   attendanceId: string;

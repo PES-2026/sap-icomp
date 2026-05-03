@@ -1,6 +1,6 @@
-import CommonButton from "@/components/common-button/CommonButton";
-import { ConfirmModal } from "@/components/confirm-modal/ConfirmModal";
-import { SelectInput } from "@/components/select-input/FilterSelect";
+import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { SelectInput } from "@/components/ui/FilterSelect";
 import { PATHS } from "@/constants/paths";
 import { useAttendancesByStudent } from "@/features/attendances/hooks/useAttendancesByStudent";
 import { useAttendanceTypesOptions } from "@/features/attendances/hooks/useAttendanceTypesOptions";

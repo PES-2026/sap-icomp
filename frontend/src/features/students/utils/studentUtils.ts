@@ -1,6 +1,19 @@
 import { formatDate, maskPhone, maskRegistration } from "@/utils/utils";
 import { FormErrors, Student, StudentFormData } from "../types/student";
 
+export const EMPTY_FORM_STUDENT: StudentFormData = {
+  externalId: "",
+  enrollmentId: "",
+  name: "",
+  dtBirth: "",
+  email: "",
+  phoneNumber: "",
+  courseId: "",
+  diagnosis: "",
+  potential: "",
+  difficulties: "",
+};
+
 export const validateStudentForm = (data: StudentFormData): FormErrors => {
   const errs: FormErrors = {};
 
@@ -32,11 +45,9 @@ export const formatForBackend = (data: StudentFormData) => {
 };
 
 export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
-  const [year, month, day] = dataFromAPI.dtBirth.split("T")[0].split("-");
-
   return {
     ...dataFromAPI,
-    dtBirth: `${day}/${month}/${year}`,
+    dtBirth: formatDate(dataFromAPI.dtBirth),
     enrollmentId: maskRegistration(dataFromAPI.enrollmentId),
     phoneNumber: maskPhone(dataFromAPI.phoneNumber),
   };

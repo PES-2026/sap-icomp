@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Check } from "lucide-react";
-import { Field } from "@/components/field/Field";
+import { Field } from "@/components/ui/Field";
 import { SelectOption } from "@/types/selectOption";
+import { Check, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface SelectProps {
   options: SelectOption[];

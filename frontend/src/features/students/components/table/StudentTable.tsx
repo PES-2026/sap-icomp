@@ -1,10 +1,10 @@
 "use client";
 
-import CommonButton from "@/components/common-button/CommonButton";
-import { NeedBadge } from "@/components/need-badge/NeedBadge";
-import { SearchInput } from "@/components/search-input/SearchInput";
-import { SelectInput } from "@/components/select-input/FilterSelect";
-import TablePagination from "@/components/table-pagination/TablePagination";
+import CommonButton from "@/components/ui/CommonButton";
+import { SelectInput } from "@/components/ui/FilterSelect";
+import { NeedBadge } from "@/components/ui/NeedBadge";
+import { SearchInput } from "@/components/ui/SearchInput";
+import TablePagination from "@/components/ui/TablePagination";
 import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { useAppNavigation } from "@/utils/navigator";

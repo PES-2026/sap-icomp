@@ -1,21 +1,15 @@
 "use client";
 
-import { Users, CalendarFold } from "lucide-react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { PATHS } from "@/constants/paths";
+import { CalendarFold, Home, Users } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    // { label: "Início", icon: Home, id: "Início", href: "/admin" },
-    // {
-    //   label: "Agendamentos",
-    //   icon: Calendar,
-    //   id: "Calendário",
-    //   href: "/admin/agendamentos",
-    // },
+    { label: "Início", icon: Home, id: "Início", href: "/admin" },
     {
       label: "Alunos",
       icon: Users,
