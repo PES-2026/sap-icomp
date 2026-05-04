@@ -170,7 +170,7 @@ model Feedback {
 model Diagnosis {
   internalId Int     @id @default(autoincrement())
   name       String  @unique
-  acronym    String  @unique
+  acronym    String? @unique
   CID        String?
 
   students StudentDiagnosis[]
