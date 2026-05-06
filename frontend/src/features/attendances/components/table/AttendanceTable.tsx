@@ -16,10 +16,7 @@ export default function AttendanceTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { attendances, isLoadingAttendances, totalItems } = useAttendances(
-    page,
-    limit,
-  );
+  const { attendances, isLoadingAttendances } = useAttendances(page, limit);
   const { coursesOptions } = useCoursesOptions();
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
 

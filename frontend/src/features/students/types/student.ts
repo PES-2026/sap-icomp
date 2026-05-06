@@ -1,5 +1,3 @@
-import { AttendanceSummary } from "@/features/attendances/types/attendance";
-
 export interface Student {
   internalId: number;
   externalId: string;
