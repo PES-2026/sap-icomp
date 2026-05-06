@@ -1,28 +1,15 @@
 "use client";
 
-import { Edit, Eye, Plus } from "lucide-react";
-import { SearchInput } from "../search-input/SearchInput";
-import { useState } from "react";
-import { SelectInput } from "../select-input/FilterSelect";
-import CommonButton from "../common-button/CommonButton";
-import Link from "next/link";
-import { useAppNavigation } from "@/utils/navigator";
 import { PATHS } from "@/constants/paths";
-import { useCoursesOptions } from "@/hooks/useCoursesOptions";
 import { useAttendanceTypesOptions } from "@/hooks/useAttendanceTypesOptions";
 import { useAttendances } from "@/hooks/useAttendances";
+import { useCoursesOptions } from "@/hooks/useCoursesOptions";
+import { Edit, Eye } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { SearchInput } from "../search-input/SearchInput";
+import { SelectInput } from "../select-input/FilterSelect";
 import TablePagination from "../table-pagination/TablePagination";
-
-const periods = [
-  { value: "1", label: "1º" },
-  { value: "2", label: "2º" },
-  { value: "3", label: "3º" },
-  { value: "4", label: "4º" },
-  { value: "5", label: "5º" },
-  { value: "6", label: "6º" },
-  { value: "7", label: "7º" },
-  { value: "10", label: "8º" },
-];
 
 export default function AttendanceTable() {
   const [page, setPage] = useState(1);
@@ -38,7 +25,6 @@ export default function AttendanceTable() {
   // Filters
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
-  const [periodFilter, setPeriodFilter] = useState("Todos");
   const [attendanceDateFilter, setAttendanceDateFilter] = useState("");
   const [attendanceTypeIdFilter, setAttendanceTypeIdFilter] =
     useState<string>("");
@@ -59,7 +45,6 @@ export default function AttendanceTable() {
     { label: "Matrícula", width: "w-[120px]" },
     { label: "Nome Completo", width: "w-[500px]" },
     { label: "Curso", width: "w-[200px]" },
-    { label: "Período", width: "w-[70px]" },
     { label: "Tipo de Atendimento", width: "w-[140px]" },
     { label: "Data do Atendimento", width: "w-[160px]" },
     { label: "", width: "w-[50px]" },
@@ -104,14 +89,6 @@ export default function AttendanceTable() {
                       value={courseIdFilter}
                       onChange={setCourseIdFilter}
                       options={coursesOptions}
-                      placeholder="Todos"
-                    />
-                  </td>
-                  <td className="border-b border-[#ece7db] bg-[#faf7f0] px-4 py-2">
-                    <SelectInput
-                      value={periodFilter}
-                      onChange={setPeriodFilter}
-                      options={periods}
                       placeholder="Todos"
                     />
                   </td>
@@ -169,15 +146,6 @@ export default function AttendanceTable() {
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
                         >
                           {attendance.course}
-                        </td>
-                        <td
-                          className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
-                        >
-                          {attendance.period
-                            ? attendance.period === "Formado"
-                              ? "Formado(a)"
-                              : attendance.period + "º"
-                            : "-"}
                         </td>
                         <td
                           className={`px-4 py-3.5 text-center text-[#6a6560] ${borderClass}`}
