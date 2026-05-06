@@ -141,6 +141,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       student: {
         externalId: studentId,
       },
+      removed: false,
     };
 
     const [totalItems, results] = await Promise.all([
