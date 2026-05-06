@@ -4,6 +4,8 @@ import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { Field } from "@/components/ui/Field";
+import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
+import { PATHS } from "@/constants/paths";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { maskDate } from "@/utils/utils";
 import { Loader2 } from "lucide-react";
@@ -39,6 +41,7 @@ export default function AttendanceForm({
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [errors, setErrors] = useState<AttendanceFormErrors>({});
 
   const { formData, setFormData, isLoadingAttendances } = useAttendanceForm({
@@ -98,6 +101,8 @@ export default function AttendanceForm({
         await attendanceService.create(payload);
         toast.success("Atendimento registrado com sucesso!");
       }
+
+      setIsSubmitted(true);
     } catch (error: any) {
       isEditMode
         ? toast.error(
@@ -117,6 +122,7 @@ export default function AttendanceForm({
   const handleReset = () => {
     setFormData(EMPTY_FORM_ATTENDANCE);
     setErrors({});
+    setIsSubmitted(false);
   };
 
   if (isLoadingAttendances || isLoadingStudent) {
@@ -133,118 +139,135 @@ export default function AttendanceForm({
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0"
-        >
-          <div className="shrink-0 px-7 pt-7 pb-4">
-            <h1 className="m-0 text-2xl font-bold text-stone-800">
-              {isEditMode ? "Editar Atendimento" : "Cadastrar Novo Atendimento"}
-            </h1>
-          </div>
-
-          <div className="flex-1 px-7 pb-4 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_140px] gap-3.5 mb-3.5">
-              <Field label="Aluno (a):">
-                <input
-                  disabled
-                  type="text"
-                  placeholder="João Vitor Mesquita da Frota"
-                  value={student?.name || ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
-                />
-              </Field>
-              <Field label="Matrícula:">
-                <input
-                  disabled
-                  type="text"
-                  placeholder="12345678"
-                  value={student?.enrollmentId || ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
-                />
-              </Field>
-              <Field label="Data:" error={errors.date}>
-                <input
-                  type="text"
-                  placeholder="01/01/2001"
-                  value={formData.date}
-                  onChange={(e) =>
-                    handleFieldChange("date", maskDate(e.target.value))
-                  }
-                  className={getValidationClass("date")}
-                />
-              </Field>
+        {isSubmitted ? (
+          <SuccessScreenForm
+            title={`Atendimento ${isEditMode ? "atualizado" : "registrado"}!`}
+            message={`O atendimento foi ${isEditMode ? "atualizado" : "registrado"} com sucesso!`}
+            listPath={PATHS.visualize_student(studentId)}
+            listButtonLabel="Ir para o aluno"
+            newButtonLabel="Cadastrar Novamente"
+            isEditMode={isEditMode}
+            onAddNew={handleReset}
+          />
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0"
+          >
+            <div className="shrink-0 px-7 pt-7 pb-4">
+              <h1 className="m-0 text-2xl font-bold text-stone-800">
+                {isEditMode
+                  ? "Editar Atendimento"
+                  : "Cadastrar Novo Atendimento"}
+              </h1>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-3.5 mb-3.5">
-              <Field label="Diagnóstico:">
-                <input
-                  disabled
-                  type="text"
-                  placeholder="TDAH, TAG"
-                  value={student?.difficulties ?? ""}
-                  className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
+            <div className="flex-1 px-7 pb-4 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_140px] gap-3.5 mb-3.5">
+                <Field label="Aluno (a):" required>
+                  <input
+                    disabled
+                    type="text"
+                    placeholder="João Vitor Mesquita da Frota"
+                    value={student?.name || ""}
+                    className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
+                  />
+                </Field>
+                <Field label="Matrícula:" required>
+                  <input
+                    disabled
+                    type="text"
+                    placeholder="12345678"
+                    value={student?.enrollmentId || ""}
+                    className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
+                  />
+                </Field>
+                <Field label="Data:" error={errors.date} required>
+                  <input
+                    type="text"
+                    placeholder="01/01/2001"
+                    value={formData.date}
+                    onChange={(e) =>
+                      handleFieldChange("date", maskDate(e.target.value))
+                    }
+                    className={getValidationClass("date")}
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-3.5 mb-3.5">
+                <Field label="Diagnóstico:" required>
+                  <input
+                    disabled
+                    type="text"
+                    placeholder="TDAH, TAG"
+                    value={student?.difficulties ?? ""}
+                    className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
+                  />
+                </Field>
+                <CustomSelect
+                  value={formData.type}
+                  label="Tipo de Atendimento:"
+                  error={errors.type}
+                  onChange={(val) => handleFieldChange("type", val)}
+                  options={attendanceTypesOptions}
+                  isSetLabel={true}
+                  required
                 />
-              </Field>
-              <CustomSelect
-                value={formData.type}
-                label="Tipo de Atendimento:"
-                error={errors.type}
-                onChange={(val) => handleFieldChange("type", val)}
-                options={attendanceTypesOptions}
-                isSetLabel={true}
+              </div>
+
+              <div className="mb-3.5">
+                <Field label="Demanda Relatada:">
+                  <textarea
+                    placeholder="Realiza atividades em grupo..."
+                    value={formData.demand ?? ""}
+                    onChange={(e) =>
+                      handleFieldChange("demand", e.target.value)
+                    }
+                    rows={2}
+                    className={`${baseInputClass} resize-y leading-relaxed min-h-16 border-stone-300 focus:border-teal-400`}
+                  />
+                </Field>
+              </div>
+
+              <div className="mb-1.5">
+                <Field label="Observações gerais:">
+                  <textarea
+                    placeholder="Insira suas observações sobre o que foi relatado..."
+                    value={formData.generalObservations ?? ""}
+                    onChange={(e) =>
+                      handleFieldChange("generalObservations", e.target.value)
+                    }
+                    rows={5}
+                    className={`${baseInputClass} resize-y leading-relaxed min-h-30 bg-stone-50 border-stone-300 focus:bg-white focus:border-teal-400`}
+                  />
+                </Field>
+              </div>
+            </div>
+
+            <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
+              <CommonButton
+                label="Cancelar"
+                onClick={onCancel || handleReset}
+                type="button"
+                className="bg-[#f4a598] text-white hover:bg-[#f0a195]"
+              />
+              <CommonButton
+                label={
+                  isLoading
+                    ? "Salvando..."
+                    : isEditMode
+                      ? "Salvar Alterações"
+                      : "Confirmar Registro"
+                }
+                type="button"
+                onClick={validateSubmit}
+                disabled={isLoading}
               />
             </div>
-
-            <div className="mb-3.5">
-              <Field label="Demanda Relatada:">
-                <textarea
-                  placeholder="Realiza atividades em grupo..."
-                  value={formData.demand ?? ""}
-                  onChange={(e) => handleFieldChange("demand", e.target.value)}
-                  rows={2}
-                  className={`${baseInputClass} resize-y leading-relaxed min-h-16 border-stone-300 focus:border-teal-400`}
-                />
-              </Field>
-            </div>
-
-            <div className="mb-1.5">
-              <Field label="Observações gerais:">
-                <textarea
-                  placeholder="Insira suas observações sobre o que foi relatado..."
-                  value={formData.generalObservations ?? ""}
-                  onChange={(e) =>
-                    handleFieldChange("generalObservations", e.target.value)
-                  }
-                  rows={5}
-                  className={`${baseInputClass} resize-y leading-relaxed min-h-30 bg-stone-50 border-stone-300 focus:bg-white focus:border-teal-400`}
-                />
-              </Field>
-            </div>
-          </div>
-
-          <div className="shrink-0 p-4 px-7 flex justify-end gap-3 border-t border-stone-200 bg-stone-50/50">
-            <CommonButton
-              label="Cancelar"
-              onClick={onCancel || handleReset}
-              type="button"
-              className="bg-[#f4a598] text-white hover:bg-[#f0a195]"
-            />
-            <CommonButton
-              label={
-                isLoading
-                  ? "Salvando..."
-                  : isEditMode
-                    ? "Salvar Alterações"
-                    : "Confirmar Registro"
-              }
-              type="button"
-              onClick={validateSubmit}
-              disabled={isLoading}
-            />
-          </div>
-        </form>
+          </form>
+        )}
       </main>
 
       {/* ── Confirm Modal to Update/Create Attendance ── */}

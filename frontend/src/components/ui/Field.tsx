@@ -3,6 +3,7 @@ interface FieldProps {
   error?: string;
   children: React.ReactNode;
   className?: string;
+  required?: boolean;
 }
 
 export const Field = ({
@@ -10,6 +11,7 @@ export const Field = ({
   error,
   children,
   className = "",
+  required = false,
 }: FieldProps) => (
   <div className={`flex flex-col gap-1 ${className}`}>
     <label
@@ -18,6 +20,15 @@ export const Field = ({
       }`}
     >
       {label}
+      {required && (
+        <span
+          className="ml-1 text-red-500"
+          aria-hidden="true"
+          title="Campo obrigatório"
+        >
+          *
+        </span>
+      )}
     </label>
     {children}
     {error && <span className="ml-1.5 text-xs text-red-600">— {error}</span>}

@@ -4,6 +4,8 @@ import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { Field } from "@/components/ui/Field";
+import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
+import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { FormErrors, StudentFormData } from "@/features/students/types/student";
 import { maskDate, maskPhone, maskRegistration } from "@/utils/utils";
@@ -16,7 +18,6 @@ import {
   validateStudentForm,
 } from "../../utils/studentUtils";
 import { StudentSkeletonForm } from "./StudentSkeletonForm";
-import { SuccessScreen } from "./SucessScreen";
 
 interface StudentFormProps {
   initialData?: StudentFormData;
@@ -119,10 +120,14 @@ export default function StudentForm({
     <>
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
         {isSubmitted ? (
-          <SuccessScreen
-            studentName={formData.name}
+          <SuccessScreenForm
+            title={`Aluno(a) ${isEditMode ? "atualizado" : "registrado"}(a)!`}
+            message={`${formData.name} foi ${isEditMode ? "atualizado" : "registrado"}(a) com sucesso!`}
+            listPath={PATHS.students_list}
+            listButtonLabel="Ir para a lista"
+            newButtonLabel="Cadastrar Novamente"
             isEditMode={isEditMode}
-            onNew={handleReset}
+            onAddNew={handleReset}
           />
         ) : (
           <form
@@ -138,7 +143,7 @@ export default function StudentForm({
 
             <div className="flex-1 px-7 pb-4 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_140px] gap-3.5 mb-3.5">
-                <Field label="Aluno (a):" error={errors.name}>
+                <Field label="Aluno (a):" error={errors.name} required>
                   <input
                     type="text"
                     placeholder="João Vitor Mesquita da Frota"
@@ -147,7 +152,7 @@ export default function StudentForm({
                     className={getValidationClass("name")}
                   />
                 </Field>
-                <Field label="Matrícula:" error={errors.enrollmentId}>
+                <Field label="Matrícula:" error={errors.enrollmentId} required>
                   <input
                     type="text"
                     placeholder="12345678"
@@ -161,7 +166,7 @@ export default function StudentForm({
                     className={getValidationClass("enrollmentId")}
                   />
                 </Field>
-                <Field label="Nascimento:" error={errors.dtBirth}>
+                <Field label="Nascimento:" error={errors.dtBirth} required>
                   <input
                     type="text"
                     placeholder="01/01/2001"
@@ -175,7 +180,7 @@ export default function StudentForm({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-3.5 mb-3.5">
-                <Field label="Email:" error={errors.email}>
+                <Field label="Email:" error={errors.email} required>
                   <input
                     type="email"
                     placeholder="joao.frota@icomp.ufam.edu.br"
@@ -184,7 +189,7 @@ export default function StudentForm({
                     className={getValidationClass("email")}
                   />
                 </Field>
-                <Field label="Telefone:" error={errors.phoneNumber}>
+                <Field label="Telefone:" error={errors.phoneNumber} required>
                   <input
                     type="text"
                     placeholder="(99) 99999-9999"
@@ -204,6 +209,7 @@ export default function StudentForm({
                   error={errors.courseId}
                   onChange={(val) => handleFieldChange("courseId", val)}
                   options={coursesOptions}
+                  required
                 />
               </div>
 

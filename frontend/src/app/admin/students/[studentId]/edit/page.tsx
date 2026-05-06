@@ -34,7 +34,7 @@ export default function EditStudentPage() {
           setStudentData(formattedData);
         } else {
           console.error("Student not found.");
-          handleNavigation({ path: "/admin/students" });
+          handleNavigation({ path: PATHS.students_list });
         }
       } catch (error) {
         console.error("Error to fetch data student: ", error);

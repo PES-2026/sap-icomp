@@ -12,19 +12,6 @@ import { useAttendanceTypesOptions } from "../../hooks/useAttendanceTypesOptions
 import { useAttendances } from "../../hooks/useAttendances";
 import { Attendance } from "../../types/attendance";
 
-const periods = [
-  { value: "1", label: "1º" },
-  { value: "2", label: "2º" },
-  { value: "3", label: "3º" },
-  { value: "4", label: "4º" },
-  { value: "5", label: "5º" },
-  { value: "6", label: "6º" },
-  { value: "7", label: "7º" },
-  { value: "8", label: "8º" },
-  { value: "9", label: "9º" },
-  { value: "10", label: "10º" },
-];
-
 export default function AttendanceTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -39,7 +26,6 @@ export default function AttendanceTable() {
   // Filters
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
-  const [periodFilter, setPeriodFilter] = useState("Todos");
   const [attendanceDateFilter, setAttendanceDateFilter] = useState("");
   const [attendanceTypeIdFilter, setAttendanceTypeIdFilter] =
     useState<string>("");
@@ -93,19 +79,6 @@ export default function AttendanceTable() {
         />
       ),
       renderCell: (attendance) => attendance.course,
-    },
-    {
-      label: "Período",
-      width: "w-[70px]",
-      renderFilter: () => (
-        <SelectInput
-          value={periodFilter}
-          onChange={setPeriodFilter}
-          options={periods}
-          placeholder="Todos"
-        />
-      ),
-      renderCell: (attendance) => attendance.period || "-",
     },
     {
       label: "Tipo de Atendimento",

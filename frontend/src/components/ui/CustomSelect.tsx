@@ -12,6 +12,7 @@ interface SelectProps {
   onChange: (value: string) => void;
   onBlur?: () => void;
   isSetLabel?: boolean;
+  required?: boolean;
 }
 
 export function CustomSelect({
@@ -23,6 +24,7 @@ export function CustomSelect({
   onChange,
   onBlur,
   isSetLabel = false,
+  required = false,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,7 +57,7 @@ export function CustomSelect({
   }, [isOpen]);
 
   return (
-    <Field label={label} error={error}>
+    <Field label={label} error={error} required={required}>
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
