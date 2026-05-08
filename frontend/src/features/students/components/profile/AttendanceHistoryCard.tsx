@@ -41,10 +41,12 @@ export default function AttendanceHistoryCard({
       await attendanceService.removeAttendance(attendanceId);
       toast.success(`Atendimento desativado com sucesso: ${attendanceId}`);
       fetchAttendances();
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.error || "Erro ao comunicar com o servidor.",
-      );
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Ocorreu um erro desconhecido.");
+      }
     } finally {
       setShowDisableAttendance(false);
       setAttendanceId("");

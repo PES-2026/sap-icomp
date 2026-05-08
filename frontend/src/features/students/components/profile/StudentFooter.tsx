@@ -28,9 +28,11 @@ export default function StudentFooter({ student }: StudentFooterProps) {
       );
       handleNavigation({ path: PATHS.students_list });
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.error || "Erro ao comunicar com o servidor.",
-      );
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Ocorreu um erro desconhecido.");
+      }
     } finally {
       setShowDisableStudent(false);
     }

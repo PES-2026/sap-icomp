@@ -103,16 +103,12 @@ export default function AttendanceForm({
       }
 
       setIsSubmitted(true);
-    } catch (error: any) {
-      isEditMode
-        ? toast.error(
-            error.response?.data?.error ||
-              "Erro ao conectar com o servidor, não foi possível editar.",
-          )
-        : toast.error(
-            error.response?.data?.error ||
-              "Erro ao conectar com o servidor, não foi possível registrar.",
-          );
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Ocorreu um erro desconhecido.");
+      }
     } finally {
       setShowConfirmRegister(false);
       setIsLoading(false);
