@@ -1,21 +1,19 @@
-import { PrismaClient, Prisma } from "../../../prisma/src/infrastructure/database/generated/client";
+import { Attendance } from "@domain/entities/attendance";
 import {
+  AttendanceItemResult,
   AttendancesByStudentRequest,
   AttendancesByStudentResponse,
-} from "../../application/dtos/attendance/attendancesByStudent.dto";
-import {
-  AttendanceItemResponse,
+  IAttendanceRepository,
   ListAttendanceRequest,
   ListAttendanceResponse,
-} from "../../application/dtos/attendance/listAttendance.dto";
-import { Attendance } from "../../domain/entities/attendance";
-import { IAttendanceRepository } from "../../domain/repositories/attendanceRepository";
-import { AttendanceTypeVO } from "../../domain/valueObjects/attendance/attendanceType";
-import { DemandVO } from "../../domain/valueObjects/attendance/demand";
-import { GeneralObservationsVO } from "../../domain/valueObjects/attendance/generalObservations";
-import { DateVO } from "../../domain/valueObjects/shared/date";
-import { ExternalIdVO } from "../../domain/valueObjects/shared/externalId";
-import { StudentId } from "../../domain/valueObjects/student/studentId";
+} from "@domain/repositories/attendanceRepository";
+import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
+import { DemandVO } from "@domain/valueObjects/attendance/demand";
+import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
+import { DateVO } from "@domain/valueObjects/shared/date";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+import { StudentId } from "@domain/valueObjects/student/studentId";
+import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaAttendanceRepository implements IAttendanceRepository {
   constructor(private prisma: PrismaClient) {}
@@ -77,12 +75,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
     ]);
 
-    const items: AttendanceItemResponse[] = results.map((record) => ({
+    const items: AttendanceItemResult[] = results.map((record) => ({
       id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
-      course: record.student.courseId,
+      course: record.student.course.name,
       attendanceType: record.type,
       attendanceDate: record.date,
     }));
@@ -142,16 +140,16 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         skip: offset,
         take: limit,
         orderBy: { date: "desc" },
-        include: { student: true },
+        include: { student: { include: { course: true } } },
       }),
     ]);
 
-    const items: AttendanceItemResponse[] = results.map((record) => ({
+    const items: AttendanceItemResult[] = results.map((record) => ({
       id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
       enrollmentId: record.student.enrollmentId,
-      course: record.student.courseId,
+      course: record.student.course.name,
       attendanceType: record.type,
       attendanceDate: record.date,
     }));

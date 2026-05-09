@@ -1,5 +1,5 @@
-import { AttendanceType } from "../../../domain/enums/attendance/attendanceType.enum";
-import { validateStringField } from "../../../domain/utils/validation.utils";
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { validateStringField } from "@domain/utils/validationUtils";
 
 export interface AttendanceByIdResponse {
   id: string;

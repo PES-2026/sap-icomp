@@ -1,4 +1,4 @@
-import { validateStringField } from "../../../domain/utils/validation.utils";
+import { validateStringField } from "@domain/utils/validationUtils";
 
 export class RemoveAttendanceDTO {
   constructor(public readonly id: string) {}

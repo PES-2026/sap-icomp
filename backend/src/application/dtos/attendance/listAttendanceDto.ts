@@ -1,8 +1,9 @@
-import { AttendanceType } from "../../../domain/enums/attendance/attendanceType.enum";
-import { findValueInEnum } from "../../../domain/utils/enum.utils";
-import { validateDateField, validateNumberField, validateStringField } from "../../../domain/utils/validation.utils";
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { findValueInEnum } from "@domain/utils/enumUtils";
+import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
+
 import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
-import { validatePageLimitValues } from "../shared/paginationValidations";
+import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 export interface ListAttendanceFilters {
   studentName?: string;

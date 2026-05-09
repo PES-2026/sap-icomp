@@ -1,9 +1,10 @@
-import { IAttendanceRepository } from "../../../domain/repositories/attendanceRepository";
-import { AttendanceTypeVO } from "../../../domain/valueObjects/attendance/attendanceType";
-import { DemandVO } from "../../../domain/valueObjects/attendance/demand";
-import { GeneralObservationsVO } from "../../../domain/valueObjects/attendance/generalObservations";
-import { DateVO } from "../../../domain/valueObjects/shared/date";
-import { UpdateAttendanceDTO, UpdateAttendanceResponse } from "../../dtos/attendance/updateAttendance.dto";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
+import { DemandVO } from "@domain/valueObjects/attendance/demand";
+import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
+import { DateVO } from "@domain/valueObjects/shared/date";
+
+import { UpdateAttendanceDTO, UpdateAttendanceResponse } from "../../dtos/attendance/updateAttendanceDto";
 
 export class UpdateAttendance {
   constructor(private repository: IAttendanceRepository) {}
