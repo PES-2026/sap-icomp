@@ -15,9 +15,7 @@ export class DemandVO {
 
   static from(value: string): DemandVO {
     if (typeof value !== "string" || value.trim() === "") {
-      throw new Error(
-        `Invalid demand: must be a non-empty string. The input value was: ${value}`,
-      );
+      throw new Error(`Invalid demand: must be a non-empty string. The input value was: ${value}`);
     }
     return new DemandVO(value);
   }

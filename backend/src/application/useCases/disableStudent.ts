@@ -1,4 +1,4 @@
-import type { IStudentRepository } from "./interfaces/IStudentRepository.js";
+import type { IStudentRepository } from "../../domain/repositories/studentRepository";
 
 export class DisableStudent {
   private readonly studentRepository: IStudentRepository;

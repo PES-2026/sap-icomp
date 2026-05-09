@@ -1,23 +1,16 @@
 import { Attendance } from "../../../domain/entities/attendance";
 import { IAttendanceRepository } from "../../../domain/repositories/attendanceRepository";
-import {
-  CreateAttendanceDTO,
-  CreateAttendanceResponse,
-} from "../../dtos/attendance/createAttendance.dto";
+import { AttendanceByIdDTO, AttendanceByIdResponse } from "../../dtos/attendance/attendanceById.dto";
 
-export class CreateAttendance {
+export class AttendanceById {
   constructor(private repository: IAttendanceRepository) {}
 
-  async execute(dto: CreateAttendanceDTO): Promise<CreateAttendanceResponse> {
-    const attendance = Attendance.create(
-      dto.studentId,
-      dto.date,
-      dto.type,
-      dto.demand,
-      dto.generalObservations ? dto.generalObservations : undefined,
-    );
+  async execute(input: AttendanceByIdDTO): Promise<AttendanceByIdResponse> {
+    const attendance: Attendance | null = await this.repository.findById(input.id);
 
-    await this.repository.save(attendance);
+    if (!attendance) {
+      throw new Error(`Attendance not found: '${input.id}'`);
+    }
 
     return {
       id: attendance.id.value,

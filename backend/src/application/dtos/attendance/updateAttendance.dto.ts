@@ -1,9 +1,6 @@
 import { AttendanceType } from "../../../domain/enums/attendance/attendanceType.enum";
 import { findValueInEnum } from "../../../domain/utils/enum.utils";
-import {
-  validateDateField,
-  validateStringField,
-} from "../../../domain/utils/validation.utils";
+import { validateDateField, validateStringField } from "../../../domain/utils/validation.utils";
 
 export interface UpdateAttendanceResponse {
   id: string;
@@ -48,10 +45,7 @@ export class UpdateAttendanceDTO {
     }
     let generalObservations = null;
     if (raw.generalObservations) {
-      generalObservations = validateStringField(
-        raw.generalObservations,
-        "attendanceGeneralObservations",
-      );
+      generalObservations = validateStringField(raw.generalObservations, "attendanceGeneralObservations");
     }
 
     return new UpdateAttendanceDTO(

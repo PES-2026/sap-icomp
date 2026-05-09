@@ -18,9 +18,7 @@ export class DateVO {
     } else if (date instanceof Date) {
       dateObj = DateVO.fromDate(date);
     } else {
-      throw new Error(
-        "Invalid date input. Must be a string, Date object, or [day, month, year] array",
-      );
+      throw new Error("Invalid date input. Must be a string, Date object, or [day, month, year] array");
     }
     return dateObj;
   }
@@ -29,11 +27,7 @@ export class DateVO {
     return this._value;
   }
 
-  private static fromDayMonthYear(
-    day: number,
-    month: number,
-    year: number,
-  ): DateVO {
+  private static fromDayMonthYear(day: number, month: number, year: number): DateVO {
     DateVO.validateComponents(day, month, year);
     const date = new Date(year, month, day);
     DateVO.validateCoherence(date, day, month, year);
@@ -56,9 +50,7 @@ export class DateVO {
       return DateVO.fromDayMonthYear(day, month, year);
     }
 
-    throw new Error(
-      `Invalid date format: "${value}". Use "YYYY-MM-DD" or "MM/DD/YYYY"`,
-    );
+    throw new Error(`Invalid date format: "${value}". Use "YYYY-MM-DD" or "MM/DD/YYYY"`);
   }
 
   private static fromDate(date: Date): DateVO {
@@ -70,21 +62,11 @@ export class DateVO {
 
   static today(): DateVO {
     const now = new Date();
-    return new DateVO(
-      new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-    );
+    return new DateVO(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
   }
 
-  private static validateComponents(
-    day: number,
-    month: number,
-    year: number,
-  ): void {
-    if (
-      !Number.isInteger(day) ||
-      !Number.isInteger(month) ||
-      !Number.isInteger(year)
-    ) {
+  private static validateComponents(day: number, month: number, year: number): void {
+    if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) {
       throw new Error("Day, month and year must be integers");
     }
     if (year < 1900 || year > 2100) {
@@ -98,17 +80,8 @@ export class DateVO {
     }
   }
 
-  private static validateCoherence(
-    date: Date,
-    day: number,
-    month: number,
-    year: number,
-  ): void {
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month ||
-      date.getDate() !== day
-    ) {
+  private static validateCoherence(date: Date, day: number, month: number, year: number): void {
+    if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
       throw new Error(`Non-existent date: ${month}/${day}/${year}`);
     }
   }
