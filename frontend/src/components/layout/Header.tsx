@@ -3,7 +3,7 @@ import { Breadcrumb } from "../ui/Breadcrumb";
 export default function Header() {
   return (
     <header className="bg-[#faf7f0] border-b border-[#ece7db] px-4 py-4 flex items-center gap-4 shrink-0">
-      <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center gap-3 flex-1 ml-15 md:ml-0">
         <div className="w-12 h-12 rounded-full bg-[#6bc4a6] flex items-center justify-center shrink-0">
           <svg
             width="24"
