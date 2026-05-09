@@ -1,7 +1,4 @@
-import {
-  PrismaClient,
-  Prisma,
-} from "../../../prisma/src/infrastructure/database/generated/client";
+import { PrismaClient, Prisma } from "../../../prisma/src/infrastructure/database/generated/client";
 import {
   AttendancesByStudentRequest,
   AttendancesByStudentResponse,
@@ -36,9 +33,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async findAll(
-    params: ListAttendanceRequest,
-  ): Promise<ListAttendanceResponse> {
+  async findAll(params: ListAttendanceRequest): Promise<ListAttendanceResponse> {
     const { page, limit, filters } = params;
     const offset = (page - 1) * limit;
 
@@ -113,9 +108,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       DateVO.create(attendance.date),
       AttendanceTypeVO.create(attendance.type),
       DemandVO.create(attendance.demand),
-      attendance.generalObservations
-        ? GeneralObservationsVO.create(attendance.generalObservations)
-        : undefined,
+      attendance.generalObservations ? GeneralObservationsVO.create(attendance.generalObservations) : undefined,
     );
   }
 
@@ -131,9 +124,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async findByStudentId(
-    params: AttendancesByStudentRequest,
-  ): Promise<AttendancesByStudentResponse | null> {
+  async findByStudentId(params: AttendancesByStudentRequest): Promise<AttendancesByStudentResponse | null> {
     const { page, limit, studentId } = params;
     const offset = (page - 1) * limit;
 

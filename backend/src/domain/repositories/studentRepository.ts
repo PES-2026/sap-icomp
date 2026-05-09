@@ -1,4 +1,4 @@
-import { Student } from "../../../domain/entities/student.js";
+import { Student } from "../entities/student.js";
 
 export type SaveStudentParams = {
   student: Student;

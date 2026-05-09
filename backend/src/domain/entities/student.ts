@@ -9,7 +9,7 @@ import { Diagnosis } from "../valueObjects/student/diagnosis.js";
 import { Potential } from "../valueObjects/student/potential.js";
 import { Difficulties } from "../valueObjects/student/difficulties.js";
 
-import { StudentData } from "./student-data.js";
+import { StudentData } from "./studentData.js";
 
 export class Student {
   constructor(

@@ -8,9 +8,7 @@ import {
 export class AttendancesByStudent {
   constructor(private repository: IAttendanceRepository) {}
 
-  async execute(
-    dto: AttendancesByStudentDTO,
-  ): Promise<AttendancesByStudentResponse | null> {
+  async execute(dto: AttendancesByStudentDTO): Promise<AttendancesByStudentResponse | null> {
     const params: AttendancesByStudentRequest = {
       page: dto.page,
       limit: dto.limit,

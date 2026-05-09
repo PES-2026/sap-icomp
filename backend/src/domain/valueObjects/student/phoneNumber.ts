@@ -15,9 +15,7 @@ export class PhoneNumber {
     const onlyNumber = phoneNumber.replace(/\D/g, "");
 
     if (!this.validatePhoneNumber(onlyNumber)) {
-      throw new Error(
-        "Número de telefone inválido, insira o DDD e os noves dígitos",
-      );
+      throw new Error("Número de telefone inválido, insira o DDD e os noves dígitos");
     }
     return new PhoneNumber(onlyNumber);
   }

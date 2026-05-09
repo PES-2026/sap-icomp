@@ -1,14 +1,9 @@
-import {
-  Prisma,
-  PrismaClient,
-} from "../../../prisma/src/infrastructure/database/generated/client.js";
+import { Prisma, PrismaClient } from "../../../prisma/src/infrastructure/database/generated/client.js";
 import { Student } from "../../domain/entities/student.js";
-import {
-  type IStudentRepository,
-  type SaveStudentParams,
-} from "../../application/use-cases/interfaces/IStudentRepository.js";
-import { EmailAlreadyExistsError } from "../../application/use-cases/register-student.js";
-import { StudentMapper } from "./StudentMapper.js";
+import { type SaveStudentParams } from "../../domain/repositories/studentRepository.js";
+import { type IStudentRepository } from "../../domain/repositories/studentRepository.js";
+import { EmailAlreadyExistsError } from "../../application/useCases/registerStudent.js";
+import { StudentMapper } from "./studentMapper.js";
 
 export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -64,10 +59,7 @@ export class PrismaStudentRepository implements IStudentRepository {
 
       return student;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
         throw new EmailAlreadyExistsError();
       }
 

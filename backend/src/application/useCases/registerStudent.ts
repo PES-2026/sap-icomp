@@ -1,5 +1,5 @@
 import { Student } from "../../domain/entities/student.js";
-import { type IStudentRepository } from "./interfaces/IStudentRepository.js";
+import { type IStudentRepository } from "../../domain/repositories/studentRepository.js";
 
 type RegisterStudentInput = {
   name: string;

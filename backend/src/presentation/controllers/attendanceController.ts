@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { CreateAttendanceDTO } from "../../application/dtos/attendance/createAttendance.dto";
-import { CreateAttendance } from "../../application/use-cases/attendance/createAttendance";
-import { ListAttendances } from "../../application/use-cases/attendance/listAttendances";
+import { CreateAttendance } from "../../application/useCases/attendance/createAttendance";
+import { ListAttendances } from "../../application/useCases/attendance/listAttendances";
 import { ListAttendanceDTO } from "../../application/dtos/attendance/listAttendance.dto";
-import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAttedance.dto";
-import { UpdateAttendance } from "../../application/use-cases/attendance/updateAttendance";
+import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAttendance.dto";
+import { UpdateAttendance } from "../../application/useCases/attendance/updateAttendance";
 import { AttendancesByStudentDTO } from "../../application/dtos/attendance/attendancesByStudent.dto";
-import { AttendancesByStudent } from "../../application/use-cases/attendance/attendanceByStudent";
-import { RemoveAttendance } from "../../application/use-cases/attendance/removeAttendance";
-import { RemoveAttendanceDTO } from "../../application/dtos/attendance/removeAttendance";
+import { AttendancesByStudent } from "../../application/useCases/attendance/attendanceByStudent";
+import { RemoveAttendance } from "../../application/useCases/attendance/removeAttendance";
+import { RemoveAttendanceDTO } from "../../application/dtos/attendance/removeAttendance.dto";
 import { AttendanceByIdDTO } from "../../application/dtos/attendance/attendanceById.dto";
-import { AttendanceById } from "../../application/use-cases/attendance/attendanceById.dto";
+import { AttendanceById } from "../../application/useCases/attendance/attendanceById";
 
 export class AttendanceController {
   constructor(

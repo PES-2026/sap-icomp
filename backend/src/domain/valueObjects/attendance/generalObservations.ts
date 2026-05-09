@@ -12,9 +12,7 @@ export class GeneralObservationsVO {
 
   private static isValid(value: string) {
     if (typeof value !== "string" || value.trim() === "") {
-      throw new Error(
-        `Invalid general observations: must be a non-empty string. The input value was: ${value}`,
-      );
+      throw new Error(`Invalid general observations: must be a non-empty string. The input value was: ${value}`);
     }
   }
 
