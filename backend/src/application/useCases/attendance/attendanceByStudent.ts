@@ -1,9 +1,6 @@
-import { IAttendanceRepository } from "../../../domain/repositories/attendanceRepository";
-import {
-  AttendancesByStudentDTO,
-  AttendancesByStudentRequest,
-  AttendancesByStudentResponse,
-} from "../../dtos/attendance/attendancesByStudent.dto";
+import { IAttendanceRepository, AttendancesByStudentRequest } from "@domain/repositories/attendanceRepository";
+
+import { AttendancesByStudentDTO, AttendancesByStudentResponse } from "../../dtos/attendance/attendancesByStudentDto";
 
 export class AttendancesByStudent {
   constructor(private repository: IAttendanceRepository) {}
@@ -15,6 +12,23 @@ export class AttendancesByStudent {
       studentId: dto.studentId,
     };
 
-    return this.repository.findByStudentId(params);
+    const result = await this.repository.findByStudentId(params);
+
+    if (!result) return null;
+
+    return {
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      items: result.items.map((item) => ({
+        id: item.id,
+        studentId: item.studentId,
+        studentName: item.studentName,
+        enrollmentId: item.enrollmentId,
+        course: item.course,
+        attendanceType: item.attendanceType,
+        attendanceDate: item.attendanceDate,
+      })),
+    };
   }
 }

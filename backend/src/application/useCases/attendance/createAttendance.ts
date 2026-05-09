@@ -1,6 +1,7 @@
-import { Attendance } from "../../../domain/entities/attendance";
-import { IAttendanceRepository } from "../../../domain/repositories/attendanceRepository";
-import { CreateAttendanceDTO, CreateAttendanceResponse } from "../../dtos/attendance/createAttendance.dto";
+import { Attendance } from "@domain/entities/attendance";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+
+import { CreateAttendanceDTO, CreateAttendanceResponse } from "../../dtos/attendance/createAttendanceDto";
 
 export class CreateAttendance {
   constructor(private repository: IAttendanceRepository) {}

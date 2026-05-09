@@ -1,6 +1,6 @@
-import { AttendanceType } from "../../../domain/enums/attendance/attendanceType.enum";
-import { findValueInEnum } from "../../../domain/utils/enum.utils";
-import { validateDateField, validateStringField } from "../../../domain/utils/validation.utils";
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { findValueInEnum } from "@domain/utils/enumUtils";
+import { validateDateField, validateStringField } from "@domain/utils/validationUtils";
 
 export interface UpdateAttendanceResponse {
   id: string;

@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
-import { CreateAttendanceDTO } from "../../application/dtos/attendance/createAttendance.dto";
-import { CreateAttendance } from "../../application/useCases/attendance/createAttendance";
-import { ListAttendances } from "../../application/useCases/attendance/listAttendances";
-import { ListAttendanceDTO } from "../../application/dtos/attendance/listAttendance.dto";
-import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAttendance.dto";
-import { UpdateAttendance } from "../../application/useCases/attendance/updateAttendance";
-import { AttendancesByStudentDTO } from "../../application/dtos/attendance/attendancesByStudent.dto";
-import { AttendancesByStudent } from "../../application/useCases/attendance/attendanceByStudent";
-import { RemoveAttendance } from "../../application/useCases/attendance/removeAttendance";
-import { RemoveAttendanceDTO } from "../../application/dtos/attendance/removeAttendance.dto";
-import { AttendanceByIdDTO } from "../../application/dtos/attendance/attendanceById.dto";
-import { AttendanceById } from "../../application/useCases/attendance/attendanceById";
+
+import { AttendanceByIdDTO } from "@application/dtos/attendance/attendanceByIdDto";
+import { AttendancesByStudentDTO } from "@application/dtos/attendance/attendancesByStudentDto";
+import { CreateAttendanceDTO } from "@application/dtos/attendance/createAttendanceDto";
+import { ListAttendanceDTO } from "@application/dtos/attendance/listAttendanceDto";
+import { RemoveAttendanceDTO } from "@application/dtos/attendance/removeAttendanceDto";
+import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
+import { AttendanceById } from "@application/useCases/attendance/attendanceById";
+import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent";
+import { CreateAttendance } from "@application/useCases/attendance/createAttendance";
+import { ListAttendances } from "@application/useCases/attendance/listAttendances";
+import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
+import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
 
 export class AttendanceController {
   constructor(
@@ -83,7 +84,7 @@ export class AttendanceController {
     }
   }
 
-  handleError(error: unknown, res: Response, func: Function) {
+  handleError(error: unknown, res: Response, func: (...args: unknown[]) => unknown) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
       return;

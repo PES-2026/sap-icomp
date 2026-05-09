@@ -1,13 +1,13 @@
-import type { IStudentRepository } from "../../domain/repositories/studentRepository";
+import type { iStudentRepository } from "@domain/repositories/studentRepository";
 
 export class DisableStudent {
-  private readonly studentRepository: IStudentRepository;
+  private readonly studentRepository: iStudentRepository;
 
-  constructor(studentRepository: IStudentRepository) {
+  constructor(studentRepository: iStudentRepository) {
     this.studentRepository = studentRepository;
   }
 
-  async execute(externalId: string): Promise<Boolean> {
+  async execute(externalId: string): Promise<boolean> {
     const exists = await this.studentRepository.existsByUUID(externalId);
 
     if (!exists) {

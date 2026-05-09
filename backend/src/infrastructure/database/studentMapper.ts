@@ -1,7 +1,7 @@
-import type { StudentData } from "../../domain/entities/studentData";
-import type { PrismaStudent } from "../../infrastructure/database/prismaTypes.js";
-import { Student } from "../../domain/entities/student";
-export class StudentMapper {
+import { Student } from "@domain/entities/student";
+import type { StudentData } from "@domain/entities/studentData";
+import type { PrismaStudent } from "@infrastructure/database/prismaTypes.js";
+export class studentMapper {
   static toDomain(prismaStudent: PrismaStudent): Student {
     return Student.update({
       externalId: prismaStudent.externalId,

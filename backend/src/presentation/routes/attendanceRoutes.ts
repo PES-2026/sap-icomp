@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { AttendanceController } from "../controllers/attendanceController";
 
 export function attendanceRoutes(controller: AttendanceController): Router {

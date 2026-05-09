@@ -4,7 +4,7 @@ export type SaveStudentParams = {
   student: Student;
 };
 
-export interface IStudentRepository {
+export interface iStudentRepository {
   existsByEmail(email: string): Promise<boolean>;
   existsByEnrollmentId(enrollmentId: string): Promise<boolean>;
   save(params: SaveStudentParams): Promise<Student>;

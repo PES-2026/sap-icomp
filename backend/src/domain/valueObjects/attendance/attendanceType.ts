@@ -1,5 +1,5 @@
-import { AttendanceType } from "../../enums/attendance/attendanceType.enum";
-import { findValueInEnum } from "../../utils/enum.utils";
+import { AttendanceType } from "../../enums/attendance/attendanceTypeEnum";
+import { findValueInEnum } from "../../utils/enumUtils";
 
 export class AttendanceTypeVO {
   private readonly _value: AttendanceType;
