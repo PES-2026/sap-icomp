@@ -35,7 +35,7 @@ export function FormModal({
           {onBack && (
             <button
               onClick={onBack}
-              className="absolute left-0 flex items-center justify-center rounded-full p-2 text-[#a0998e] transition-colors hover:bg-[#ece7db] hover:text-[#3a3530]"
+              className="absolute left-0 flex items-center justify-center rounded-full p-2 cursor-pointer text-[#a0998e] transition-colors hover:bg-[#ece7db] hover:text-[#3a3530]"
               title="Voltar"
               type="button"
             >
