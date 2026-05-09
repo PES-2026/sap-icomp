@@ -1,6 +1,6 @@
 "use client";
 
-import AttendanceForm from "@/components/forms/AttendanceForm";
+import AttendanceForm from "@/features/attendances/components/form/AttendanceForm";
 import { useAppNavigation } from "@/utils/navigator";
 
 export default function RegisterAttendancePage() {
