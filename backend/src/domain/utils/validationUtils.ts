@@ -4,6 +4,20 @@ export function validateStringField(value: unknown, fieldName: string): string {
   }
   return value as string;
 }
+export function validateOptionalStringField(value: unknown, fieldName: string): string | undefined {
+  if (value === "" || value === undefined) {
+    return undefined;
+  } else if (typeof value !== "string") {
+    throw new Error(`${fieldName} must be a string. Please verify it!`);
+  }
+  const trimmed = value.trim();
+
+  if (trimmed === "") {
+    return undefined;
+  }
+
+  return trimmed;
+}
 
 export function validateDateField(value: unknown, fieldName: string): Date {
   if (typeof value !== "string" || !value.trim()) {
@@ -29,6 +43,32 @@ export function validateNumberField(value: unknown, fieldName: string): number {
     if (!isNaN(parsed)) return parsed;
   }
   throw new Error(`${fieldName} is required and must a number. Please verify it!`);
+}
+
+export function validateOptionalNumberField(value: unknown, fieldName: string): number | undefined {
+  if (value === undefined || value === "") {
+    return undefined;
+  }
+
+  if (typeof value === "number") {
+    if (isNaN(value)) {
+      throw new Error(`${fieldName} must be a valid number.`);
+    }
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") {
+      return undefined;
+    }
+
+    const parsed = Number(trimmed);
+    if (isNaN(parsed)) {
+      throw new Error(`${fieldName} must be a valid number. Please verify it!`);
+    }
+    return parsed;
+  }
+  throw new Error(`${fieldName} must be a valid number. Please verify it!`);
 }
 
 export function validateBooleanField(value: unknown, fieldName: string): boolean {
