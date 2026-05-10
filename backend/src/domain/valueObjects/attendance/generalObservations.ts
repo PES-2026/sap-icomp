@@ -1,3 +1,6 @@
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
+
 export class GeneralObservationsVO {
   private readonly _value: string;
 
@@ -5,18 +8,26 @@ export class GeneralObservationsVO {
     this._value = generalObservations;
   }
 
-  static create(generalObservations: string): GeneralObservationsVO {
-    GeneralObservationsVO.isValid(generalObservations);
-    return new GeneralObservationsVO(generalObservations);
+  static create(generalObservations: string): Result<GeneralObservationsVO, RequiredFieldError> {
+    const validationResult = GeneralObservationsVO.validate(generalObservations);
+    if (validationResult.isFailure) {
+      return Result.fail<GeneralObservationsVO>(validationResult.error!);
+    }
+    return Result.ok<GeneralObservationsVO>(new GeneralObservationsVO(generalObservations));
   }
 
-  private static isValid(value: string) {
-    if (typeof value !== "string" || value.trim() === "") {
-      throw new Error(`Invalid general observations: must be a non-empty string. The input value was: ${value}`);
-    }
+  static fromTrusted(generalObservations: string): GeneralObservationsVO {
+    return new GeneralObservationsVO(generalObservations);
   }
 
   get value(): string {
     return this._value;
+  }
+
+  private static validate(string: string): Result<void> {
+    if (typeof string !== "string" || string.trim() === "") {
+      return Result.fail<void>(new RequiredFieldError("general observations"));
+    }
+    return Result.ok<void>();
   }
 }

@@ -1,9 +1,9 @@
 import { DomainError } from "../errors/domainError";
 
-export class Result<T> {
+export class Result<T, Error extends DomainError = DomainError> {
   public isSuccess: boolean;
   public isFailure: boolean;
-  public error: DomainError | string | null;
+  public error: Error | DomainError | string | null;
   private _value: T | null;
 
   private constructor(isSuccess: boolean, error?: DomainError | string | null, value?: T | null) {
