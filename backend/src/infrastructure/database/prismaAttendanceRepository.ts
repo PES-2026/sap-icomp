@@ -12,7 +12,6 @@ import { DemandVO } from "@domain/valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
 import { DateVO } from "@domain/valueObjects/shared/date";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { StudentId } from "@domain/valueObjects/student/studentId";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaAttendanceRepository implements IAttendanceRepository {
@@ -102,7 +101,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
     return new Attendance(
       ExternalIdVO.from(attendance.externalId),
-      StudentId.reutilise(attendance.studentId),
+      ExternalIdVO.fromTrusted(attendance.studentId),
       DateVO.create(attendance.date),
       AttendanceTypeVO.create(attendance.type),
       DemandVO.create(attendance.demand),

@@ -1,5 +1,24 @@
+import { DateInputError } from "@domain/errors/date/dateInput";
+import { DateObjectError } from "@domain/errors/date/dateObject";
+import { DayMonthYearTypeError } from "@domain/errors/date/dayMonthYearType";
+import { InvalidDateFormat } from "@domain/errors/date/invalidDateFormat";
+import { InvalidDayError } from "@domain/errors/date/invalidDay";
+import { InvalidMonthError } from "@domain/errors/date/invalidMonth";
+import { InvalidYearError } from "@domain/errors/date/invalidYear";
+import { NonExistingDateError } from "@domain/errors/date/nonExistentDate";
+import { Result } from "@domain/shared/result";
+
 type DateNumber = [number, number, number]; // [day, month, year]
 export type DateInput = DateNumber | string | Date;
+type DateErrors =
+  | DateInputError
+  | DateObjectError
+  | DayMonthYearTypeError
+  | InvalidDateFormat
+  | InvalidDayError
+  | InvalidMonthError
+  | InvalidYearError
+  | NonExistingDateError;
 
 export class DateVO {
   private readonly _value: Date;
@@ -8,33 +27,39 @@ export class DateVO {
     this._value = date;
   }
 
-  static create(date: DateInput): DateVO {
-    let dateObj: DateVO;
+  static create(date: DateInput): Result<DateVO, DateErrors> {
     if (typeof date === "string") {
-      dateObj = DateVO.fromString(date);
+      return DateVO.fromString(date);
     } else if (Array.isArray(date) && date.length === 3) {
       const [day, month, year] = date;
-      dateObj = DateVO.fromDayMonthYear(day, month, year);
+      return DateVO.fromDayMonthYear(day, month, year);
     } else if (date instanceof Date) {
-      dateObj = DateVO.fromDate(date);
+      return DateVO.fromDate(date);
     } else {
-      throw new Error("Invalid date input. Must be a string, Date object, or [day, month, year] array");
+      return Result.fail<DateVO>(new DateInputError(date));
     }
-    return dateObj;
+  }
+
+  static fromTrusted(date: Date): DateVO {
+    return new DateVO(date);
   }
 
   get value(): Date {
     return this._value;
   }
 
-  private static fromDayMonthYear(day: number, month: number, year: number): DateVO {
-    DateVO.validateComponents(day, month, year);
+  private static fromDayMonthYear(day: number, month: number, year: number): Result<DateVO> {
+    const componentsResult = DateVO.validateComponents(day, month, year);
+    if (componentsResult.isFailure) return Result.fail<DateVO>(componentsResult.error!);
+
     const date = new Date(year, month, day);
-    DateVO.validateCoherence(date, day, month, year);
-    return new DateVO(date);
+    const coherenceResult = DateVO.validateCoherence(date, day, month, year);
+    if (coherenceResult.isFailure) return Result.fail<DateVO>(coherenceResult.error!);
+
+    return Result.ok<DateVO>(new DateVO(date));
   }
 
-  private static fromString(value: string): DateVO {
+  private static fromString(value: string): Result<DateVO, DateErrors> {
     const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
     const usRegex = /^\d{2}\/\d{2}\/\d{4}$/;
 
@@ -50,39 +75,46 @@ export class DateVO {
       return DateVO.fromDayMonthYear(day, month, year);
     }
 
-    throw new Error(`Invalid date format: "${value}". Use "YYYY-MM-DD" or "MM/DD/YYYY"`);
+    return Result.fail<DateVO>(new InvalidDateFormat(value));
   }
 
-  private static fromDate(date: Date): DateVO {
+  private static fromDate(date: Date): Result<DateVO, DateObjectError> {
     if (!(date instanceof Date) || isNaN(date.getTime())) {
-      throw new Error("Invalid Date object");
+      return Result.fail<DateVO>(new DateObjectError(date));
     }
-    return new DateVO(new Date(date));
+    return Result.ok<DateVO>(new DateVO(new Date(date)));
   }
 
-  static today(): DateVO {
+  static today(): Result<DateVO> {
     const now = new Date();
-    return new DateVO(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+    return Result.ok<DateVO>(new DateVO(new Date(now.getFullYear(), now.getMonth(), now.getDate())));
   }
 
-  private static validateComponents(day: number, month: number, year: number): void {
+  private static validateComponents(day: number, month: number, year: number): Result<void, DateErrors> {
     if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) {
-      throw new Error("Day, month and year must be integers");
+      return Result.fail<void>(new DayMonthYearTypeError(day, month, year));
     }
     if (year < 1900 || year > 2100) {
-      throw new Error(`Invalid year: ${year}`);
+      return Result.fail<void>(new InvalidYearError(year));
     }
     if (month < 1 || month > 12) {
-      throw new Error(`Invalid month: ${month}. Must be between 1 and 12`);
+      return Result.fail<void>(new InvalidMonthError(month));
     }
     if (day < 1 || day > 31) {
-      throw new Error(`Invalid day: ${day}`);
+      return Result.fail<void>(new InvalidDayError(day));
     }
+    return Result.ok<void>();
   }
 
-  private static validateCoherence(date: Date, day: number, month: number, year: number): void {
+  private static validateCoherence(
+    date: Date,
+    day: number,
+    month: number,
+    year: number,
+  ): Result<void, NonExistingDateError> {
     if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-      throw new Error(`Non-existent date: ${month}/${day}/${year}`);
+      return Result.fail<void>(new NonExistingDateError(day, month, year));
     }
+    return Result.ok<void>();
   }
 }

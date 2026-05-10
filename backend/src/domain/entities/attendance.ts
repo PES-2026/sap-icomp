@@ -3,12 +3,11 @@ import { DemandVO } from "../valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "../valueObjects/attendance/generalObservations";
 import { DateInput, DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
-import { StudentId } from "../valueObjects/student/studentId";
 
 export class Attendance {
   constructor(
     public readonly id: ExternalIdVO,
-    public readonly studentId: StudentId,
+    public readonly studentId: ExternalIdVO,
     public date: DateVO,
     public type: AttendanceTypeVO,
     public demand: DemandVO,
@@ -25,7 +24,7 @@ export class Attendance {
   ): Attendance {
     return new Attendance(
       ExternalIdVO.create(),
-      StudentId.reutilise(studentId),
+      ExternalIdVO.fromTrusted(studentId),
       DateVO.create(date),
       AttendanceTypeVO.create(type),
       DemandVO.create(demand),
