@@ -1,8 +1,17 @@
+import { Result } from "@domain/shared/result";
 import { AttendanceTypeVO } from "../valueObjects/attendance/attendanceType";
 import { DemandVO } from "../valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "../valueObjects/attendance/generalObservations";
 import { DateInput, DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
+
+type AttendanceProps = {
+  studentId: string;
+  date: DateInput;
+  type: string;
+  demand: string;
+  generalObservations?: string;
+};
 
 export class Attendance {
   constructor(
@@ -15,20 +24,45 @@ export class Attendance {
     private _removed: boolean = false,
   ) {}
 
-  static create(
-    studentId: string,
-    date: DateInput,
-    type: string,
-    demand: string,
-    generalObservations?: string,
-  ): Attendance {
+  static create(props: AttendanceProps): Result<Attendance> {
+    const externalId = ExternalIdVO.create();
+    const studentId = ExternalIdVO.from(props.studentId);
+    const date = DateVO.create(props.date);
+    const type = AttendanceTypeVO.create(props.type);
+    const demand = DemandVO.create(props.demand);
+    const generalObservations = props.generalObservations
+      ? GeneralObservationsVO.create(props.generalObservations)
+      : undefined;
+
+    const results = [externalId, studentId, date, type, demand, generalObservations];
+
+    for (let result of results) {
+      if (result?.isFailure) {
+        return Result.fail<Attendance>(result.error!);
+      }
+    }
+
+    return Result.ok<Attendance>(
+      new Attendance(
+        externalId.getValue(),
+        studentId.getValue(),
+        date.getValue(),
+        type.getValue(),
+        demand.getValue(),
+        generalObservations?.getValue() ?? undefined,
+      ),
+    );
+  }
+
+  static rehydrate(id: string, props: AttendanceProps, removed: boolean = false): Attendance {
     return new Attendance(
-      ExternalIdVO.create(),
-      ExternalIdVO.fromTrusted(studentId),
-      DateVO.create(date),
-      AttendanceTypeVO.create(type),
-      DemandVO.create(demand),
-      generalObservations ? GeneralObservationsVO.create(generalObservations) : undefined,
+      ExternalIdVO.fromTrusted(id),
+      ExternalIdVO.fromTrusted(props.studentId),
+      DateVO.fromTrusted(new Date(props.date as string | Date)),
+      AttendanceTypeVO.fromTrusted(props.type as any),
+      DemandVO.fromTrusted(props.demand),
+      props.generalObservations ? GeneralObservationsVO.fromTrusted(props.generalObservations) : undefined,
+      removed,
     );
   }
 
