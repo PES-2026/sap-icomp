@@ -3,11 +3,17 @@ import {
   validateOptionalStringField,
   validateOptionalNumberField,
 } from "../../../domain/utils/validation.utils";
-class CreateCourseDTO {
+export interface CreateCourseResponse {
+  externalId: string;
+  name: string;
+  acronym: string;
+  coordinatorId?: string;
+}
+export class CreateCourseDTO {
   constructor(
     public readonly name: string,
-    public readonly acronym: string | undefined,
-    public readonly cordinatirId: number | undefined,
+    public readonly acronym: string,
+    public readonly coordinatorId: string | undefined,
   ) {}
 
   static create(value: unknown): CreateCourseDTO {
@@ -18,12 +24,12 @@ class CreateCourseDTO {
     const raw = value as Record<string, unknown>;
 
     const name = validateStringField(raw.name, "name");
-    const acronym = validateOptionalStringField(raw.acronym, "acronym");
-    const cordinatirId = validateOptionalNumberField(
-      raw.cordinatirId,
-      "cordinatirId",
+    const acronym = validateStringField(raw.acronym, "acronym");
+    const coordinatorId = validateOptionalStringField(
+      raw.coordinatorId,
+      "coordinatorId",
     );
 
-    return new CreateCourseDTO(name, acronym, cordinatirId);
+    return new CreateCourseDTO(name, acronym, coordinatorId);
   }
 }
