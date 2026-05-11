@@ -1,4 +1,4 @@
 import { Course } from "../entities/course";
-export interface courseRository {
+export interface ICourseRepository {
   save(course: Course): Promise<void>;
 }
