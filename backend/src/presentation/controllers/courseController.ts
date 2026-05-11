@@ -7,8 +7,13 @@ export class CourseController {
   constructor(private createCourse: CreateCourse) {}
 
   async create(req: Request, res: Response): Promise<void> {
-    const dto = CreateCourseDTO.create(req.body);
-    const course = await this.createCourse.execute(dto);
+    try {
+      const dto = CreateCourseDTO.create(req.body);
+      const course = await this.createCourse.execute(dto);
+      res.status(201).json(course);
+    } catch (error) {
+      this.handleError(error, res, this.create);
+    }
   }
 
   handleError(error: unknown, res: Response, func: Function) {

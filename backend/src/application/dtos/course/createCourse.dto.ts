@@ -4,6 +4,7 @@ import {
   validateOptionalNumberField,
 } from "../../../domain/utils/validation.utils";
 export interface CreateCourseResponse {
+  externalId: string;
   name: string;
   acronym: string;
   coordinatorId?: string | undefined;
