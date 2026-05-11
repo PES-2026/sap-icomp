@@ -1,44 +1,16 @@
 import { Request, Response } from "express";
+
 import { CreateCourseDTO } from "../../application/dtos/course/createCourse.dto";
 import { CreateCourse } from "../../application/use-cases/course/createCourse";
-import { UpdateCourseDTO } from "../../application/dtos/course/updateCourse.dto";
-import { UpdateCourse } from "../../application/use-cases/course/updateCourse";
-import { ListCourseDTO } from "../../application/dtos/course/listCourse.dto";
-import { ListCourse } from "../../application/use-cases/course/listCourse";
+
 export class CourseController {
-  constructor(
-    private createCourse: CreateCourse,
-    private updateCourse: UpdateCourse,
-    private listCourse: ListCourse,
-  ) {}
+  constructor(private createCourse: CreateCourse) {}
 
   async create(req: Request, res: Response): Promise<void> {
-    try {
-      const dto = CreateCourseDTO.create(req.body);
-      const course = await this.createCourse.execute(dto);
-      res.status(201).json(course);
-    } catch (error) {
-      this.handleError(error, res, this.create);
-    }
+    const dto = CreateCourseDTO.create(req.body);
+    const course = await this.createCourse.execute(dto);
   }
-  async list(req: Request, res: Response): Promise<void> {
-    try {
-      const dto = ListCourseDTO.create(req.query);
-      const result = await this.listCourse.execute(dto);
-      res.status(200).json(result);
-    } catch (error) {
-      this.handleError(error, res, this.list);
-    }
-  }
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const dto = UpdateCourseDTO.create(req.params.id, req.body);
-      const updatedCourse = await this.updateCourse.execute(dto);
-      res.status(200).json(updatedCourse);
-    } catch (error) {
-      this.handleError(error, res, this.update);
-    }
-  }
+
   handleError(error: unknown, res: Response, func: Function) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
