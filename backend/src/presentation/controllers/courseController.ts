@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import { CreateCourseDTO } from "../../application/dtos/course/createCourse.dto";
 import { CreateCourse } from "../../application/use-cases/course/createCourse";
-
+import { UpdateCourseDTO } from "../../application/dtos/course/updateCourse.dto";
+import { UpdateCourse } from "../../application/use-cases/course/updateCourse";
 export class CourseController {
-  constructor(private createCourse: CreateCourse) {}
+  constructor(
+    private createCourse: CreateCourse,
+    private updateCourse: UpdateCourse,
+  ) {}
 
   async create(req: Request, res: Response): Promise<void> {
     try {
@@ -23,5 +27,14 @@ export class CourseController {
     res.status(500).json({
       message: `Internal server error to: ${CourseController.name}:${func.name}`,
     });
+  }
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = UpdateCourseDTO.create(req.params.id, req.body);
+      const updatedCourse = await this.updateCourse.execute(dto);
+      res.status(200).json(updatedCourse);
+    } catch (error) {
+      this.handleError(error, res, this.update);
+    }
   }
 }
