@@ -25,7 +25,6 @@ import { PrismaCourseRepository } from "../infrastructure/database/prismaCourseR
 import { CourseController } from "./controllers/courseController.js";
 import { CreateCourse } from "../application/use-cases/course/createCourse.js";
 import { UpdateCourse } from "../application/use-cases/course/updateCourse.js";
-import { ListCourse } from "../application/use-cases/course/listCourse.js";
 import { courseRoutes } from "./routes/courseRoutes.js";
 
 const app = express();
@@ -90,36 +89,20 @@ app.get("/students/:id", async (req, res) => {
 
 app.post("/student", async (req, res) => {
   try {
-    const {
-      name,
-      dtBirth,
-      email,
-      enrollmentId,
-      phoneNumber,
-      courseId,
-      diagnosis,
-      potential,
-      difficulties,
-    } = req.body as {
-      name?: string;
-      dtBirth?: string;
-      email?: string;
-      enrollmentId?: string;
-      phoneNumber?: string;
-      courseId?: string;
-      diagnosis?: string;
-      potential?: string;
-      difficulties?: string;
-    };
+    const { name, dtBirth, email, enrollmentId, phoneNumber, courseId, diagnosis, potential, difficulties } =
+      req.body as {
+        name?: string;
+        dtBirth?: string;
+        email?: string;
+        enrollmentId?: string;
+        phoneNumber?: string;
+        courseId?: string;
+        diagnosis?: string;
+        potential?: string;
+        difficulties?: string;
+      };
 
-    if (
-      !name ||
-      !dtBirth ||
-      !email ||
-      !enrollmentId ||
-      !phoneNumber ||
-      !courseId
-    ) {
+    if (!name || !dtBirth || !email || !enrollmentId || !phoneNumber || !courseId) {
       console.log("Missing required fields:", {
         name,
         dtBirth,
@@ -129,8 +112,7 @@ app.post("/student", async (req, res) => {
         courseId,
       });
       return res.status(400).json({
-        error:
-          "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
+        error: "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
       });
     }
 
@@ -152,10 +134,7 @@ app.post("/student", async (req, res) => {
       message: "Aluno cadastrado com sucesso",
     });
   } catch (error) {
-    if (
-      error instanceof EmailAlreadyExistsError ||
-      error instanceof EnrollmentAlreadyExistsError
-    ) {
+    if (error instanceof EmailAlreadyExistsError || error instanceof EnrollmentAlreadyExistsError) {
       console.log("Conflict error:", error.message);
       return res.status(409).json({ error: error.message });
     }
@@ -173,17 +152,7 @@ app.put("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;
 
-    const {
-      name,
-      enrollmentId,
-      dtBirth,
-      email,
-      phoneNumber,
-      courseId,
-      diagnosis,
-      potential,
-      difficulties,
-    } = req.body;
+    const { name, enrollmentId, dtBirth, email, phoneNumber, courseId, diagnosis, potential, difficulties } = req.body;
 
     const result = await editStudent.execute({
       externalId,
@@ -228,11 +197,7 @@ app.delete("/students/:id", async (req, res) => {
   }
 });
 
-const courseController = new CourseController(
-  new CreateCourse(courseRepository),
-  new UpdateCourse(courseRepository),
-  new ListCourse(courseRepository),
-);
+const courseController = new CourseController(new CreateCourse(courseRepository), new UpdateCourse(courseRepository));
 app.use(courseRoutes(courseController));
 
 const PORT = process.env.BACKEND_PORT;
