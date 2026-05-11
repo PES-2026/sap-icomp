@@ -85,23 +85,17 @@ export function validateBooleanField(value: unknown, fieldName: string): boolean
     `${fieldName} is required and must be a boolean, or a string being 'true' or 'false'. Please verify it!`,
   );
 }
+
 export function validateExternalId(value: unknown, fieldName: string): string {
   if (typeof value !== "string" || !value.trim()) {
-    throw new Error(
-      `${fieldName} is required and must be a non-empty string. Please verify it!`,
-    );
+    throw new Error(`${fieldName} is required and must be a non-empty string. Please verify it!`);
   }
 
   const trimmed = value.trim();
 
-  if (!isUUID(trimmed)) {
-    throw new Error(`${fieldName} has an invalid format. Please verify it!`);
-  }
-
-  return trimmed;
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 }
+
 function isUUID(value: string): boolean {
-  const UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);
 }
