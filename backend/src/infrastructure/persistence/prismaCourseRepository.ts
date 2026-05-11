@@ -29,6 +29,7 @@ export class PrismaCourseRepository implements ICourseRepository {
 
     await this.prisma.course.create({
       data: {
+        externalId: course.externalId.value,
         name: course.name.value,
         acronym: course.acronym.value,
         ...(coordinatorId !== undefined && { coordinatorId }),
