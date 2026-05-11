@@ -3,9 +3,9 @@ import { CourseName } from "../valueObjects/course/courseName";
 import { ProfessorId } from "../valueObjects/professor/professorId";
 export class Course {
   constructor(
-    private readonly name: CourseName,
-    private readonly acronym: Acronym,
-    private readonly coordenatorId?: ProfessorId,
+    readonly name: CourseName,
+    readonly acronym: Acronym,
+    readonly coordenatorId?: ProfessorId,
   ) {}
   static create(name: string, acronym: string, coordenatorId?: string): Course {
     const courseName = CourseName.create(name);
