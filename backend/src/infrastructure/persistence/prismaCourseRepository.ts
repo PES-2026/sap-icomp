@@ -36,4 +36,35 @@ export class PrismaCourseRepository implements ICourseRepository {
       },
     });
   }
+  async update(course: Course): Promise<void> {
+    let coordinatorId: number | null = null;
+
+    if (course.coordenatorId) {
+      const professor = await this.prisma.professor.findFirst({
+        where: {
+          externalId: course.coordenatorId.value,
+          removed: false,
+        },
+        select: {
+          internalId: true,
+        },
+      });
+      if (!professor) {
+        throw new Error("Professor not find");
+      }
+
+      coordinatorId = professor.internalId;
+    }
+
+    await this.prisma.course.update({
+      where: {
+        externalId: course.externalId.value,
+      },
+      data: {
+        name: course.name.value,
+        acronym: course.acronym.value,
+        ...(coordinatorId !== undefined && { coordinatorId }),
+      },
+    });
+  }
 }
