@@ -93,9 +93,13 @@ export function validateExternalId(value: unknown, fieldName: string): string {
 
   const trimmed = value.trim();
 
-  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-}
+  if (!isUUID(trimmed)) {
+    throw new Error(`${fieldName} has an invalid format. Please verify it!`);
+  }
 
+  return trimmed;
+}
 function isUUID(value: string): boolean {
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);
 }
