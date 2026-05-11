@@ -1,11 +1,10 @@
 import { Student } from "@domain/entities/student.js";
-import type { StudentData } from "@domain/entities/studentData.js";
-import type { iStudentRepository } from "@domain/repositories/studentRepository.js";
+import type { IStudentRepository } from "@domain/repositories/studentRepository.js";
 
-export class EditStudent {
-  private readonly studentRepository: iStudentRepository;
+export class UpdateStudent {
+  private readonly studentRepository: IStudentRepository;
 
-  constructor(studentRepository: iStudentRepository) {
+  constructor(studentRepository: IStudentRepository) {
     this.studentRepository = studentRepository;
   }
 

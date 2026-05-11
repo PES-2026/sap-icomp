@@ -1,21 +1,5 @@
-import { Student } from "@domain/entities/student.js";
-import { type iStudentRepository } from "@domain/repositories/studentRepository.js";
-
-type RegisterStudentInput = {
-  name: string;
-  dtBirth: string; // Converte pra o tipo Date dentro do domínio em vez de converter no controller
-  email: string;
-
-  // O Use case define somente o nome, data de nascimento e email como obrigatórios
-  // porém banco inclui matricula (enrollmentID), phone number e courseIde como obrigatório
-  enrollmentId: string;
-  phoneNumber: string;
-  courseId: string;
-
-  diagnosis?: string;
-  potential?: string;
-  difficulties?: string;
-};
+import { Student } from "@domain/entities/student";
+import { IStudentRepository } from "@domain/repositories/studentRepository";
 
 // Validação de email e número de matrícula (futuro)
 export class EmailAlreadyExistsError extends Error {
@@ -30,8 +14,8 @@ export class EnrollmentAlreadyExistsError extends Error {
   }
 }
 
-export class RegisterStudent {
-  constructor(private readonly studentRepository: iStudentRepository) {}
+export class CreateStudent {
+  constructor(private readonly studentRepository: IStudentRepository) {}
 
   async execute(data: RegisterStudentInput): Promise<Student> {
     if (await this.studentRepository.existsByEmail(data.email)) {

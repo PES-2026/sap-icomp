@@ -1,9 +1,9 @@
-import type { iStudentRepository } from "@domain/repositories/studentRepository";
+import type { IStudentRepository } from "@domain/repositories/studentRepository";
 
 export class DisableStudent {
-  private readonly studentRepository: iStudentRepository;
+  private readonly studentRepository: IStudentRepository;
 
-  constructor(studentRepository: iStudentRepository) {
+  constructor(studentRepository: IStudentRepository) {
     this.studentRepository = studentRepository;
   }
 
