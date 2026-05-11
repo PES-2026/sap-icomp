@@ -8,6 +8,7 @@ export class CreateCourse {
     const course = Course.create(dto.name, dto.acronym, dto.coordinatorId);
     await this.repository.save(course);
     return {
+      externalId: course.externalId.value,
       name: course.name.value,
       acronym: course.acronym.value,
       coordinatorId: course.coordenatorId?.value,
