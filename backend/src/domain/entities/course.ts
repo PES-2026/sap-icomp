@@ -16,4 +16,18 @@ export class Course {
     const c_coordenatorId = coordenatorId ? ProfessorId.reutilise(coordenatorId) : undefined;
     return new Course(externalId, courseName, c_acronym, c_coordenatorId);
   }
+  static update(
+    externalId: string,
+    name: string,
+    acronym: string,
+    coordenatorId?: string,
+  ): Course {
+    const courseExternalId = ExternalIdVO.from(externalId);
+    const courseName = CourseName.create(name);
+    const c_acronym = Acronym.create(acronym);
+    const c_coordenatorId = coordenatorId
+      ? ProfessorId.reutilise(coordenatorId)
+      : undefined;
+    return new Course(courseExternalId, courseName, c_acronym, c_coordenatorId);
+  }
 }
