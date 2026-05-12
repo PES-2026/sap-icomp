@@ -5,10 +5,12 @@ export interface Diagnostic {
   CID: string;
   createdAt: string;
   updatedAt: string;
+}
 
-  // critério pede esses dois campos
-  isDefault?: boolean;
-  studentsCount?: number;
+export interface DiagnosticPayload {
+  name: string;
+  acronym?: string;
+  CID?: string;
 }
 
 export interface DiagnosticsResponse {
@@ -16,12 +18,4 @@ export interface DiagnosticsResponse {
   totalPages: number;
   currentPage: number;
   items: Diagnostic[];
-}
-
-export interface DiagnosticsFilters {
-  page: number;
-  limit: number;
-  name?: string;
-  acronym?: string;
-  CID?: string;
 }
