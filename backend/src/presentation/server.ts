@@ -15,8 +15,8 @@ import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/database/prisma";
-import { PrismaAttendanceRepository } from "@infrastructure/database/prismaAttendanceRepository";
-import { PrismaStudentRepository } from "@infrastructure/database/prismaStudentRepository";
+import { PrismaAttendanceRepository } from "@infrastructure/persistence/prismaAttendanceRepository";
+import { PrismaStudentRepository } from "@infrastructure/persistence/prismaStudentRepository";
 
 import { AttendanceController } from "./controllers/attendanceController";
 import { StudentController } from "./controllers/studentController";
