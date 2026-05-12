@@ -1,36 +1,14 @@
-import { AttendanceTypeEnum } from "@domain/enums/attendance/attendanceTypeEnum";
-import { PaginatedRequest, PaginatedResult } from "@domain/shared/pagination";
-
 import { Attendance } from "../entities/attendance";
-
-export interface ListAttendanceFilters {
-  studentName?: string;
-  studentEnrollment?: string;
-  studentCourse?: string;
-  attendanceType?: AttendanceTypeEnum;
-  startDate?: Date;
-  endDate?: Date;
-}
-
-export interface AttendanceItemResult {
-  id: string;
-  studentId: string;
-  studentName: string;
-  enrollmentId: string;
-  course: string;
-  attendanceType: string;
-  attendanceDate: Date;
-}
-
-export type ListAttendanceRequest = PaginatedRequest<"filters", ListAttendanceFilters>;
-export type ListAttendanceResponse = PaginatedResult<AttendanceItemResult>;
-
-export type AttendancesByStudentResponse = PaginatedResult<AttendanceItemResult>;
-export type AttendancesByStudentRequest = PaginatedRequest<"studentId", string>;
+import {
+  AttendancesByStudentRequest,
+  AttendancesByStudentResponse,
+} from "@application/dtos/attendance/attendancesByStudentDto";
+import { AttendanceListParams } from "./filters/attendanceFilters";
+import { PaginatedResult } from "@domain/shared/pagination";
 
 export interface IAttendanceRepository {
   save(attendance: Attendance): Promise<void>;
-  findAll(params: ListAttendanceRequest): Promise<ListAttendanceResponse>;
+  findAll(params: AttendanceListParams): Promise<PaginatedResult<Attendance>>;
   findById(id: string): Promise<Attendance | null>;
   findByStudentId(params: AttendancesByStudentRequest): Promise<AttendancesByStudentResponse | null>;
   update(attendance: Attendance): Promise<void>;

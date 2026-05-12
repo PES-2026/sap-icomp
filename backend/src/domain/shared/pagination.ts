@@ -5,7 +5,7 @@ export interface PaginatedResult<T> {
   items: T[];
 }
 
-export type PaginatedRequest<K extends string, V> = {
+export type PaginationParams<K extends string, V> = {
   page: number;
   limit: number;
 } & {
