@@ -1,16 +1,24 @@
 import { Attendance } from "../entities/attendance";
-import {
-  AttendancesByStudentRequest,
-  AttendancesByStudentResponse,
-} from "@application/dtos/attendance/attendancesByStudentDto";
+
 import { AttendanceListParams } from "./filters/attendanceFilters";
-import { ListAttendanceResponse } from "@application/dtos/attendance/listAttendanceDto";
+
+// Domain representation of a paginated list of attendances
+export interface PaginatedAttendanceResult {
+  data: Attendance[];
+  total: number;
+}
+
+export interface FindByStudentParams {
+  studentId: string;
+  page?: number;
+  limit?: number;
+}
 
 export interface IAttendanceRepository {
   save(attendance: Attendance): Promise<void>;
-  findAll(params: AttendanceListParams): Promise<ListAttendanceResponse>;
+  findAll(params: AttendanceListParams): Promise<PaginatedAttendanceResult>;
   findById(id: string): Promise<Attendance | null>;
-  findByStudentId(params: AttendancesByStudentRequest): Promise<AttendancesByStudentResponse | null>;
+  findByStudentId(params: FindByStudentParams): Promise<PaginatedAttendanceResult | null>;
   update(attendance: Attendance): Promise<void>;
   remove(id: string): Promise<void>;
 }

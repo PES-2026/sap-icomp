@@ -2,15 +2,14 @@ import { Request, Response } from "express";
 
 import { CreateStudentDTO } from "@application/dtos/student/createStudentDto";
 import { ListStudentDTO } from "@application/dtos/student/listStudentsDto";
-import { UpdateStudentDTO } from "@application/dtos/student/updateStudentDto";
-import { StudentByIdDTO } from "@application/dtos/student/studentByIdDto";
 import { RemoveStudentDTO } from "@application/dtos/student/removeStudentDto";
-
+import { StudentByIdDTO } from "@application/dtos/student/studentByIdDto";
+import { UpdateStudentDTO } from "@application/dtos/student/updateStudentDto";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
-import { UpdateStudent } from "@application/useCases/student/updateStudent";
-import { StudentById } from "@application/useCases/student/studentById";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
+import { StudentById } from "@application/useCases/student/studentById";
+import { UpdateStudent } from "@application/useCases/student/updateStudent";
 
 import { BaseController } from "./baseController";
 

@@ -1,18 +1,18 @@
+import { ListStudentResponse, StudentItemResponse } from "@application/dtos/student/listStudentsDto";
 import { Student } from "@domain/entities/student";
+import { StudentListParams } from "@domain/repositories/filters/studentFilters";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
-import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { NameVO } from "@domain/valueObjects/shared/name";
-import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
+import { CourseVO } from "@domain/valueObjects/course/course";
 import { DateVO } from "@domain/valueObjects/shared/date";
 import { EmailVO } from "@domain/valueObjects/shared/email";
-import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
-import { CourseVO } from "@domain/valueObjects/course/course";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+import { NameVO } from "@domain/valueObjects/shared/name";
 import { DiagnosisVO } from "@domain/valueObjects/student/diagnosis";
-import { PotentialVO } from "@domain/valueObjects/student/potential";
 import { DifficultiesVO } from "@domain/valueObjects/student/difficulties";
-import { StudentListParams } from "@domain/repositories/filters/studentFilters";
-import { ListStudentResponse, StudentItemResponse } from "@application/dtos/student/listStudentsDto";
+import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
+import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
+import { PotentialVO } from "@domain/valueObjects/student/potential";
+import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}

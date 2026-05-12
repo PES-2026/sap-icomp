@@ -1,8 +1,8 @@
+import { ApplicationError } from "@application/errors/applicationError";
+import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
 import { Attendance } from "@domain/entities/attendance";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
-import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
-import { ApplicationError } from "@application/errors/applicationError";
 
 import { RemoveAttendanceDTO } from "../../dtos/attendance/removeAttendanceDto";
 

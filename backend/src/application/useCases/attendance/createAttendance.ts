@@ -1,10 +1,10 @@
+import { ApplicationError } from "@application/errors/applicationError";
 import { Attendance } from "@domain/entities/attendance";
+import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
 
 import { CreateAttendanceDTO, CreateAttendanceResponse } from "../../dtos/attendance/createAttendanceDto";
-import { ApplicationError } from "@application/errors/applicationError";
-import { DomainError } from "@domain/errors/domainError";
 
 export class CreateAttendance {
   constructor(private repository: IAttendanceRepository) {}

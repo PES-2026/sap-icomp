@@ -12,6 +12,7 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+
 import { BaseController } from "./baseController";
 
 export class AttendanceController extends BaseController {

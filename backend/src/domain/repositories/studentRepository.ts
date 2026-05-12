@@ -1,9 +1,15 @@
 import { Student } from "../entities/student";
+
 import { StudentListParams } from "./filters/studentFilters";
-import { ListStudentResponse } from "@application/dtos/student/listStudentsDto";
+
+// Domain representation of a paginated list of students
+export interface PaginatedStudentResult {
+  data: Student[];
+  total: number;
+}
 
 export interface IStudentRepository {
-  findAll(params: StudentListParams): Promise<ListStudentResponse>;
+  findAll(params: StudentListParams): Promise<PaginatedStudentResult>;
   existsByEmail(email: string): Promise<boolean>;
   existsByEnrollmentId(enrollmentId: string): Promise<boolean>;
   save(student: Student): Promise<void>;

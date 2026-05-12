@@ -1,21 +1,21 @@
 import { UpdateStudentDTO } from "@application/dtos/student/updateStudentDto";
-import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
+import { ApplicationError } from "@application/errors/applicationError";
 import { EmailAlreadyExistsError } from "@application/errors/student/emailAlreadyExistsError";
 import { EnrollmentAlreadyExistsError } from "@application/errors/student/enrollmentAlreadyExistsError";
+import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { Student, StudentVOProps } from "@domain/entities/student";
+import { DomainError } from "@domain/errors/domainError";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
-import { ApplicationError } from "@application/errors/applicationError";
-import { NameVO } from "@domain/valueObjects/shared/name";
-import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
+import { CourseVO } from "@domain/valueObjects/course/course";
 import { DateVO } from "@domain/valueObjects/shared/date";
 import { EmailVO } from "@domain/valueObjects/shared/email";
-import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
-import { CourseVO } from "@domain/valueObjects/course/course";
+import { NameVO } from "@domain/valueObjects/shared/name";
 import { DiagnosisVO } from "@domain/valueObjects/student/diagnosis";
-import { PotentialVO } from "@domain/valueObjects/student/potential";
 import { DifficultiesVO } from "@domain/valueObjects/student/difficulties";
-import { DomainError } from "@domain/errors/domainError";
+import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
+import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
+import { PotentialVO } from "@domain/valueObjects/student/potential";
 
 export class UpdateStudent {
   constructor(private readonly studentRepository: IStudentRepository) {}

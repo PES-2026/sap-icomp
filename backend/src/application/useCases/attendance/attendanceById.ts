@@ -1,10 +1,10 @@
+import { ApplicationError } from "@application/errors/applicationError";
+import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
 import { Attendance } from "@domain/entities/attendance";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
-import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
 
 import { AttendanceByIdDTO, AttendanceByIdResponse } from "../../dtos/attendance/attendanceByIdDto";
-import { ApplicationError } from "@application/errors/applicationError";
 
 export class AttendanceById {
   constructor(private repository: IAttendanceRepository) {}

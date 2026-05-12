@@ -1,7 +1,7 @@
 import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
-import { findValueInEnum } from "@domain/utils/enumUtils";
-import { Result } from "@domain/shared/result";
 import { InvalidAttendanceDataError } from "@domain/errors/attendance/invalidAttendanceData";
+import { Result } from "@domain/shared/result";
+import { findValueInEnum } from "@domain/utils/enumUtils";
 
 export class AttendanceTypeVO {
   private readonly _value: AttendanceType;

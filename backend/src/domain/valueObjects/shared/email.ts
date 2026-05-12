@@ -1,9 +1,10 @@
-import { Result } from "../../shared/result";
-import { EmailTooLongError } from "@domain/errors/email/emailTooLongError";
-import { InvalidEmailFormatError } from "@domain/errors/email/invalidEmailFormatError";
 import { EmailAccountTooLongError } from "@domain/errors/email/emailAccountTooLongError";
 import { EmailDomainPartTooLongError } from "@domain/errors/email/emailDomainPartTooLongError";
+import { EmailTooLongError } from "@domain/errors/email/emailTooLongError";
+import { InvalidEmailFormatError } from "@domain/errors/email/invalidEmailFormatError";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+
+import { Result } from "../../shared/result";
 
 type EmailErrors =
   | RequiredFieldError

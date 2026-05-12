@@ -1,6 +1,6 @@
-import { Result } from "@domain/shared/result";
 import { InvalidPhoneNumberFormatError } from "@domain/errors/phoneNumber/invalidPhoneNumberFormatError";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
 
 type PhoneNumberErrors = RequiredFieldError | InvalidPhoneNumberFormatError;
 

@@ -1,14 +1,14 @@
+import { ApplicationError } from "@application/errors/applicationError";
+import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
+import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { Result } from "@domain/shared/result";
 import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
 import { DemandVO } from "@domain/valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
 import { DateVO } from "@domain/valueObjects/shared/date";
 
 import { UpdateAttendanceDTO, UpdateAttendanceResponse } from "../../dtos/attendance/updateAttendanceDto";
-import { Result } from "@domain/shared/result";
-import { ApplicationError } from "@application/errors/applicationError";
-import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
-import { DomainError } from "@domain/errors/domainError";
 
 export class UpdateAttendance {
   constructor(private repository: IAttendanceRepository) {}

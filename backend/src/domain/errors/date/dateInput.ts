@@ -1,4 +1,5 @@
 import { DateInput } from "@domain/valueObjects/shared/date";
+
 import { DomainError, ErrorCategory } from "../domainError";
 
 export class DateInputError extends DomainError {

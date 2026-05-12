@@ -1,13 +1,14 @@
 import { Router } from "express";
 
-import { AttendanceController } from "../controllers/attendanceController";
+import { AttendancesByStudentDTO } from "@application/dtos/attendance/attendancesByStudentDto";
 import { CreateAttendanceDTO } from "@application/dtos/attendance/createAttendanceDto";
+import { ListAttendanceDTO } from "@application/dtos/attendance/listAttendanceDto";
+import { RemoveAttendanceDTO } from "@application/dtos/attendance/removeAttendanceDto";
+import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
 import { validateBody } from "@presentation/middlewares/validateBody";
 import { validateParams } from "@presentation/middlewares/validateParams";
-import { ListAttendanceDTO } from "@application/dtos/attendance/listAttendanceDto";
-import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
-import { AttendancesByStudentDTO } from "@application/dtos/attendance/attendancesByStudentDto";
-import { RemoveAttendanceDTO } from "@application/dtos/attendance/removeAttendanceDto";
+
+import { AttendanceController } from "../controllers/attendanceController";
 
 export function attendanceRoutes(controller: AttendanceController): Router {
   const router = Router();
