@@ -7,6 +7,7 @@ import { Field } from "@/components/ui/Field";
 import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
 import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
+import { DiagnosticSelectWithCreate } from "@/features/diagnostics/components/DiagnosticSelectWithCreate";
 import { FormErrors, StudentFormData } from "@/features/students/types/student";
 import { maskDate, maskPhone, maskRegistration } from "@/utils/utils";
 import { useState } from "react";
@@ -92,16 +93,19 @@ export default function StudentForm({
       }
 
       setIsSubmitted(true);
-    } catch (error: any) {
-      isEditMode
-        ? toast.error(
-            error.response?.data?.error ||
-              "Erro ao conectar com o servidor, não foi possível editar.",
-          )
-        : toast.error(
-            error.response?.data?.error ||
-              "Erro ao conectar com o servidor, não foi possível registrar.",
-          );
+    } catch (error: unknown) {
+      const apiError =
+        typeof error === "object" && error !== null && "response" in error
+          ? (error as { response?: { data?: { error?: string } } }).response
+              ?.data?.error
+          : undefined;
+
+      toast.error(
+        apiError ||
+          (isEditMode
+            ? "Erro ao conectar com o servidor, não foi possível editar."
+            : "Erro ao conectar com o servidor, não foi possível registrar."),
+      );
     } finally {
       setIsLoading(false);
       setShowConfirmRegister(false);
@@ -214,17 +218,10 @@ export default function StudentForm({
               </div>
 
               <div className="mb-3.5">
-                <Field label="Diagnóstico:">
-                  <input
-                    type="text"
-                    placeholder="TDAH, TAG"
-                    value={formData.diagnosis ?? ""}
-                    onChange={(e) =>
-                      handleFieldChange("diagnosis", e.target.value)
-                    }
-                    className={`${baseInputClass} border-stone-300 focus:border-teal-400`}
-                  />
-                </Field>
+                <DiagnosticSelectWithCreate
+                  value={formData.diagnosis ?? ""}
+                  onChange={(value) => handleFieldChange("diagnosis", value)}
+                />
               </div>
 
               <div className="mb-3.5">
