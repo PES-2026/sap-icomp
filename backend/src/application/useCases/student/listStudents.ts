@@ -1,8 +1,8 @@
+import { ListStudentDTO, ListStudentResponse } from "@application/dtos/student/listStudentsDto";
 import { ApplicationError } from "@application/errors/applicationError";
+import { StudentListParams } from "@domain/repositories/filters/studentFilters";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
-import { ListStudentDTO, ListStudentResponse } from "@application/dtos/student/listStudentsDto";
-import { StudentListParams } from "@domain/repositories/filters/studentFilters";
 
 export class ListStudents {
   constructor(private readonly studentRepository: IStudentRepository) {}

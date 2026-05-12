@@ -1,9 +1,9 @@
-import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
-import { Result } from "@domain/shared/result";
 import { ApplicationError } from "@application/errors/applicationError";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { AttendanceListParams } from "@domain/repositories/filters/attendanceFilters";
+import { Result } from "@domain/shared/result";
 
 import { ListAttendanceDTO, ListAttendanceResponse } from "../../dtos/attendance/listAttendanceDto";
-import { AttendanceListParams } from "@domain/repositories/filters/attendanceFilters";
 
 export class ListAttendances {
   constructor(private repository: IAttendanceRepository) {}

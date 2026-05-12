@@ -1,13 +1,14 @@
 import { Router } from "express";
 
-import { StudentController } from "../controllers/studentController";
-import { validateParams } from "@presentation/middlewares/validateParams";
-import { validateBody } from "@presentation/middlewares/validateBody";
+import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
 import { CreateStudentDTO } from "@application/dtos/student/createStudentDto";
 import { ListStudentDTO } from "@application/dtos/student/listStudentsDto";
-import { StudentByIdDTO } from "@application/dtos/student/studentByIdDto";
-import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
 import { RemoveStudentDTO } from "@application/dtos/student/removeStudentDto";
+import { StudentByIdDTO } from "@application/dtos/student/studentByIdDto";
+import { validateBody } from "@presentation/middlewares/validateBody";
+import { validateParams } from "@presentation/middlewares/validateParams";
+
+import { StudentController } from "../controllers/studentController";
 
 export function studentRoutes(controller: StudentController): Router {
   const router = Router();

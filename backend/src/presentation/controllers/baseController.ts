@@ -1,8 +1,10 @@
 import { Response } from "express";
-import { Result } from "@domain/shared/result";
-import { HttpErrorMapper } from "../mappers/httpErrorMapper";
-import { DomainError } from "@domain/errors/domainError";
+
 import { ApplicationError } from "@application/errors/applicationError";
+import { DomainError } from "@domain/errors/domainError";
+import { Result } from "@domain/shared/result";
+
+import { HttpErrorMapper } from "../mappers/httpErrorMapper";
 
 export abstract class BaseController {
   /**
@@ -54,7 +56,11 @@ export abstract class BaseController {
    * Handles the Result object form the Use Cases.
    * Maps the fails from Application and Domain into HTTP statuses
    */
-  public handleResult<T>(res: Response, result: Result<T, any>, successStatusCode: 200 | 201 = 200): void {
+  public handleResult<T>(
+    res: Response,
+    result: Result<T, DomainError | ApplicationError>,
+    successStatusCode: 200 | 201 = 200,
+  ): void {
     if (result.isSuccess) {
       if (successStatusCode === 201) {
         this.created(res, result.getValue());

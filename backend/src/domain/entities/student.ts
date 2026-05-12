@@ -1,14 +1,15 @@
+import { Result } from "@domain/shared/result";
 import { DateVO } from "@domain/valueObjects/shared/date";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+
 import { CourseVO } from "../valueObjects/course/course";
+import { EmailVO } from "../valueObjects/shared/email";
+import { NameVO } from "../valueObjects/shared/name";
 import { DiagnosisVO } from "../valueObjects/student/diagnosis";
 import { DifficultiesVO } from "../valueObjects/student/difficulties";
-import { EmailVO } from "../valueObjects/shared/email";
 import { EnrollmentVO } from "../valueObjects/student/enrollment";
-import { NameVO } from "../valueObjects/shared/name";
 import { PhoneNumberVO } from "../valueObjects/student/phoneNumber";
 import { PotentialVO } from "../valueObjects/student/potential";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { Result } from "@domain/shared/result";
 
 export type StudentProps = {
   studentId?: string;
@@ -74,7 +75,7 @@ export class Student {
       difficultiesStud,
     ];
 
-    for (let result of results) {
+    for (const result of results) {
       if (result.isFailure) {
         return Result.fail<Student>(result.error!);
       }
