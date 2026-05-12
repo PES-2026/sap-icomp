@@ -20,6 +20,7 @@ import { PrismaStudentRepository } from "@infrastructure/database/prismaStudentR
 
 import { AttendanceController } from "./controllers/attendanceController";
 import { StudentController } from "./controllers/studentController";
+import { errorHandler } from "./middlewares/errorHandler";
 import { attendanceRoutes } from "./routes/attendanceRoutes";
 import { studentRoutes } from "./routes/studentRoutes";
 
@@ -73,6 +74,9 @@ const studentController = new StudentController(
 );
 
 app.use(studentRoutes(studentController));
+
+// Global error handler should be the last middleware registered
+app.use(errorHandler);
 
 const PORT = process.env.BACKEND_PORT;
 
