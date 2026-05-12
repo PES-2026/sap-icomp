@@ -12,8 +12,9 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+import { BaseController } from "./baseController";
 
-export class AttendanceController {
+export class AttendanceController extends BaseController {
   constructor(
     private createAttendance: CreateAttendance,
     private listAttendances: ListAttendances,
@@ -21,16 +22,18 @@ export class AttendanceController {
     private attendancesByStudent: AttendancesByStudent,
     private removeAttendance: RemoveAttendance,
     private attendanceById: AttendanceById,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(req: Request, res: Response): Promise<void> {
     try {
       const dto = CreateAttendanceDTO.create(req.body);
-      const attendance = await this.createAttendance.execute(dto);
+      const result = await this.createAttendance.execute(dto);
 
-      res.status(201).json(attendance);
+      this.handleResult(res, result, 201);
     } catch (error) {
-      this.handleError(error, res, this.create);
+      this.handleError(error, res, `${AttendanceController.name}:create`);
     }
   }
 
@@ -38,9 +41,9 @@ export class AttendanceController {
     try {
       const dto = ListAttendanceDTO.create(req.query);
       const result = await this.listAttendances.execute(dto);
-      res.status(200).json(result);
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.list);
+      this.handleError(error, res, `${AttendanceController.name}:list`);
     }
   }
 
@@ -48,9 +51,10 @@ export class AttendanceController {
     try {
       const dto = UpdateAttendanceDTO.create(req.params.id, req.body);
       const result = await this.updateAttendance.execute(dto);
-      res.status(200).json(result);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.update);
+      this.handleError(error, res, `${AttendanceController.name}:update`);
     }
   }
 
@@ -58,19 +62,24 @@ export class AttendanceController {
     try {
       const dto = AttendancesByStudentDTO.create(req.params.id, req.query);
       const result = await this.attendancesByStudent.execute(dto);
-      res.status(200).json(result);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.listByStudent);
+      this.handleError(error, res, `${AttendanceController.name}:listByStudent`);
     }
   }
 
   async remove(req: Request, res: Response) {
     try {
       const dto = RemoveAttendanceDTO.create(req.params.id);
-      await this.removeAttendance.execute(dto);
-      res.status(200).json({ message: "Attendance removed successfully!" });
+      const result = await this.removeAttendance.execute(dto);
+
+      if (result.isFailure) {
+        return this.handleResult(res, result);
+      }
+      this.ok(res, { message: "Attendance removed successfully!" });
     } catch (error) {
-      this.handleError(error, res, this.remove);
+      this.handleError(error, res, `${AttendanceController.name}:remove`);
     }
   }
 
@@ -78,20 +87,10 @@ export class AttendanceController {
     try {
       const dto = AttendanceByIdDTO.create(req.params.id);
       const result = await this.attendanceById.execute(dto);
-      res.status(200).json(result);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.getById);
+      this.handleError(error, res, `${AttendanceController.name}:getById`);
     }
-  }
-
-  handleError(error: unknown, res: Response, func: (...args: unknown[]) => unknown) {
-    if (error instanceof Error) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
-
-    res.status(500).json({
-      message: `Internal server error to: ${AttendanceController.name}:${func.name}`,
-    });
   }
 }
