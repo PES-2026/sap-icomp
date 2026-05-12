@@ -3,8 +3,7 @@ export enum ErrorCategory {
   NOT_FOUND = "NOT_FOUND",
   UNAUTHORIZED = "UNAUTHORIZED",
   FORBIDDEN = "FORBIDDEN",
-  SERVER_ERROR = "SERVER_ERROR",
-  BUSSINESS_RULE = "BUSSINESS_RULE",
+  BUSINESS_RULE = "BUSINESS_RULE",
 }
 export abstract class DomainError {
   constructor(
