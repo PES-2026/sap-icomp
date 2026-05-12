@@ -10,7 +10,7 @@ import { PotentialVO } from "../valueObjects/student/potential";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { Result } from "@domain/shared/result";
 
-type StudentProps = {
+export type StudentProps = {
   studentId?: string;
   name: string;
   enrollmentId: string;

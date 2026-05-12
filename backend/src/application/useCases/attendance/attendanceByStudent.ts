@@ -1,9 +1,12 @@
-import { IAttendanceRepository, AttendancesByStudentRequest } from "@domain/repositories/attendanceRepository";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
 import { AttendancesNotFoundError } from "@application/errors/attendance/attendancesNotFoundError";
-
-import { AttendancesByStudentDTO, AttendancesByStudentResponse } from "../../dtos/attendance/attendancesByStudentDto";
 import { ApplicationError } from "@application/errors/applicationError";
+import {
+  AttendancesByStudentDTO,
+  AttendancesByStudentRequest,
+  AttendancesByStudentResponse,
+} from "@application/dtos/attendance/attendancesByStudentDto";
 
 export class AttendancesByStudent {
   constructor(private repository: IAttendanceRepository) {}

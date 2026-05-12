@@ -5,12 +5,18 @@ import { PaginatedResult } from "@domain/shared/pagination";
 
 export interface StudentItemResponse {
   id: string;
-  studentId: string;
   name: string;
+  dtBirth: Date;
   enrollmentId: string;
+  phoneNumber: string;
   course: string;
-  attendanceType: string;
-  attendanceDate: Date;
+  lastAttendance: Date | null;
+  email: string;
+  diagnosis: string;
+  potential: string;
+  difficulties: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type ListStudentResponse = PaginatedResult<StudentItemResponse>;
@@ -37,18 +43,32 @@ export class ListStudentDTO {
     if (raw.name) {
       filters.name = validateStringField(raw.name, "name");
     }
+    if (raw.dtBirth) {
+      filters.dtBirth = validateDateField(raw.dtBirth, "dtBirth");
+    }
     if (raw.enrollment) {
       filters.enrollment = validateStringField(raw.enrollment, "enrollment");
+    }
+    if (raw.phoneNumber) {
+      filters.phoneNumber = validateStringField(raw.phoneNumber, "phoneNumber");
     }
     if (raw.course) {
       filters.course = validateStringField(raw.course, "course");
     }
-    if (raw.diganosis) {
-      const diganosis: string = validateStringField(raw.attendanceType, "attendanceType");
-      filters.diganosis = diganosis;
-    }
     if (raw.lastAttendance) {
       filters.lastAttendance = validateDateField(raw.lastAttendance, "lastAttendance");
+    }
+    if (raw.email) {
+      filters.email = validateStringField(raw.email, "email");
+    }
+    if (raw.diagnosis) {
+      filters.diagnosis = validateStringField(raw.diagnosis, "diagnosis");
+    }
+    if (raw.potential) {
+      filters.potential = validateStringField(raw.potential, "potential");
+    }
+    if (raw.difficulties) {
+      filters.difficulties = validateStringField(raw.difficulties, "difficulties");
     }
 
     validatePageLimitValues(page, limit);

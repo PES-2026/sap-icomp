@@ -2,8 +2,9 @@ import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
-import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
+import { ListAttendanceFilters } from "@domain/repositories/filters/attendanceFilters";
+import { PaginatedResult } from "@domain/shared/pagination";
 
 export interface AttendanceItemResponse {
   id: string;
@@ -15,7 +16,6 @@ export interface AttendanceItemResponse {
   attendanceDate: Date;
 }
 
-export type ListAttendanceRequest = PaginatedRequest<"filters", ListAttendanceFilters>;
 export type ListAttendanceResponse = PaginatedResult<AttendanceItemResponse>;
 
 export class ListAttendanceDTO {

@@ -1,14 +1,15 @@
-import { IAttendanceRepository, ListAttendanceRequest } from "@domain/repositories/attendanceRepository";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
 import { ApplicationError } from "@application/errors/applicationError";
 
 import { ListAttendanceDTO, ListAttendanceResponse } from "../../dtos/attendance/listAttendanceDto";
+import { AttendanceListParams } from "@domain/repositories/filters/attendanceFilters";
 
 export class ListAttendances {
   constructor(private repository: IAttendanceRepository) {}
 
   async execute(dto: ListAttendanceDTO): Promise<Result<ListAttendanceResponse, ApplicationError>> {
-    const params: ListAttendanceRequest = {
+    const params: AttendanceListParams = {
       page: dto.page,
       limit: dto.limit,
       filters: dto.filters,
@@ -16,19 +17,6 @@ export class ListAttendances {
 
     const result = await this.repository.findAll(params);
 
-    return Result.ok<ListAttendanceResponse>({
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
-      items: result.items.map((item) => ({
-        id: item.id,
-        studentId: item.studentId,
-        studentName: item.studentName,
-        enrollmentId: item.enrollmentId,
-        course: item.course,
-        attendanceType: item.attendanceType,
-        attendanceDate: item.attendanceDate,
-      })),
-    });
+    return Result.ok<ListAttendanceResponse>(result);
   }
 }

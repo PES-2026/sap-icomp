@@ -1,11 +1,18 @@
-import { EmailAlreadyExistsError } from "@application/useCases/student/createStudent.js";
-import { Student } from "@domain/entities/student.js";
-import { type SaveStudentParams } from "@domain/repositories/studentRepository.js";
-import { type IStudentRepository } from "@domain/repositories/studentRepository.js";
-import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client.js";
-
-import { studentMapper } from "./studentMapper.js";
-import { ListStudentRequest, ListStudentResponse } from "@application/dtos/student/listStudentsDto.js";
+import { Student } from "@domain/entities/student";
+import { IStudentRepository } from "@domain/repositories/studentRepository";
+import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+import { NameVO } from "@domain/valueObjects/shared/name";
+import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
+import { DateVO } from "@domain/valueObjects/shared/date";
+import { EmailVO } from "@domain/valueObjects/shared/email";
+import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
+import { CourseVO } from "@domain/valueObjects/course/course";
+import { DiagnosisVO } from "@domain/valueObjects/student/diagnosis";
+import { PotentialVO } from "@domain/valueObjects/student/potential";
+import { DifficultiesVO } from "@domain/valueObjects/student/difficulties";
+import { StudentListParams } from "@domain/repositories/filters/studentFilters";
+import { ListStudentResponse, StudentItemResponse } from "@application/dtos/student/listStudentsDto";
 
 export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -26,47 +33,35 @@ export class PrismaStudentRepository implements IStudentRepository {
     return !!row;
   }
 
-  async save(params: SaveStudentParams): Promise<Student> {
-    const { student } = params;
-
-    try {
-      await this.prisma.student.upsert({
-        where: {
-          externalId: student.studentId.value,
-        },
-        update: {
-          enrollmentId: student.enrollmentId.value,
-          name: student.name.value,
-          dtBirth: student.dtBirth.value,
-          email: student.email.value,
-          phoneNumber: student.phoneNumber.value,
-          courseId: student.course.value,
-          diagnosis: student.diagnosis.value || null,
-          potential: student.potential.value || null,
-          difficulties: student.difficulties.value || null,
-        },
-        create: {
-          externalId: student.studentId.value,
-          enrollmentId: student.enrollmentId.value,
-          name: student.name.value,
-          dtBirth: student.dtBirth.value,
-          email: student.email.value,
-          phoneNumber: student.phoneNumber.value,
-          courseId: student.course.value,
-          diagnosis: student.diagnosis.value || null,
-          potential: student.potential.value || null,
-          difficulties: student.difficulties.value || null,
-        },
-      });
-
-      return student;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-        throw new EmailAlreadyExistsError();
-      }
-
-      throw error;
-    }
+  async save(student: Student): Promise<void> {
+    await this.prisma.student.upsert({
+      where: {
+        externalId: student.studentId.value,
+      },
+      update: {
+        enrollmentId: student.enrollmentId.value,
+        name: student.name.value,
+        dtBirth: student.dtBirth.value,
+        email: student.email.value,
+        phoneNumber: student.phoneNumber.value,
+        courseId: student.course.value,
+        diagnosis: student.diagnosis.value || null,
+        potential: student.potential.value || null,
+        difficulties: student.difficulties.value || null,
+      },
+      create: {
+        externalId: student.studentId.value,
+        enrollmentId: student.enrollmentId.value,
+        name: student.name.value,
+        dtBirth: student.dtBirth.value,
+        email: student.email.value,
+        phoneNumber: student.phoneNumber.value,
+        courseId: student.course.value,
+        diagnosis: student.diagnosis.value || null,
+        potential: student.potential.value || null,
+        difficulties: student.difficulties.value || null,
+      },
+    });
   }
 
   async findByUUID(externaID: string): Promise<Student | null> {
@@ -76,7 +71,18 @@ export class PrismaStudentRepository implements IStudentRepository {
 
     if (!raw) return null;
 
-    return studentMapper.toDomain(raw);
+    return new Student(
+      ExternalIdVO.fromTrusted(raw.externalId),
+      NameVO.fromTrusted(raw.name),
+      EnrollmentVO.fromTrusted(raw.enrollmentId),
+      DateVO.fromTrusted(raw.dtBirth),
+      EmailVO.fromTrusted(raw.email),
+      PhoneNumberVO.fromTrusted(raw.phoneNumber),
+      CourseVO.fromTrusted(raw.courseId),
+      DiagnosisVO.fromTrusted(raw.diagnosis ?? ""),
+      PotentialVO.fromTrusted(raw.potential ?? ""),
+      DifficultiesVO.fromTrusted(raw.difficulties ?? ""),
+    );
   }
 
   async existsByUUID(externalId: string): Promise<boolean> {
@@ -100,59 +106,60 @@ export class PrismaStudentRepository implements IStudentRepository {
     }
   }
 
-  async findAll(params: ListStudentRequest): Promise<ListStudentResponse> {
+  async findAll(params: StudentListParams): Promise<ListStudentResponse> {
     const { page, limit, filters } = params;
     const offset = (page - 1) * limit;
 
     const where: Prisma.StudentWhereInput = {
       removed: false,
-
-      ...(filters.studentName && {
-        student: {
-          name: { contains: filters.studentName, mode: "insensitive" },
-        },
+      ...(filters.name && {
+        name: { contains: filters.name, mode: "insensitive" },
       }),
-      ...(filters.studentCourse && {
-        student: {
-          course: {
-            name: { contains: filters.studentCourse, mode: "insensitive" },
+      ...(filters.enrollment && {
+        enrollmentId: { contains: filters.enrollment, mode: "insensitive" },
+      }),
+      ...(filters.course && {
+        courseId: { contains: filters.course, mode: "insensitive" },
+      }),
+      ...(filters.diagnosis && {
+        diagnosis: { contains: filters.diagnosis, mode: "insensitive" },
+      }),
+      ...(filters.lastAttendance && {
+        attendances: {
+          some: {
+            date: {
+              gte: filters.lastAttendance,
+            },
           },
         },
       }),
-      ...(filters.studentEnrollment && {
-        student: {
-          enrollmentId: { contains: filters.studentEnrollment },
-        },
-      }),
-      ...(filters.attendanceType && { type: filters.attendanceType }),
-      ...(filters.startDate &&
-        filters.endDate && {
-          date: {
-            ...(filters.startDate && { gte: filters.startDate }),
-            ...(filters.endDate && { lte: filters.endDate }),
-          },
-        }),
     };
 
     const [totalItems, results] = await Promise.all([
-      this.prisma.attendance.count({ where }),
-      this.prisma.attendance.findMany({
+      this.prisma.student.count({ where }),
+      this.prisma.student.findMany({
         where,
         skip: offset,
         take: limit,
-        orderBy: { date: "desc" },
-        include: { student: { include: { course: true } } },
+        orderBy: { updatedAt: "desc" },
+        include: { attendances: true },
       }),
     ]);
 
-    const items: AttendanceItemResult[] = results.map((record) => ({
+    const items: StudentItemResponse[] = results.map((record) => ({
       id: record.externalId,
-      studentId: record.student.externalId,
-      studentName: record.student.name,
-      enrollmentId: record.student.enrollmentId,
-      course: record.student.course.name,
-      attendanceType: record.type,
-      attendanceDate: record.date,
+      name: record.name,
+      enrollmentId: record.enrollmentId,
+      dtBirth: record.dtBirth,
+      course: record.courseId,
+      email: record.email,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      phoneNumber: record.phoneNumber,
+      potential: record.potential ?? "",
+      diagnosis: record.diagnosis ?? "",
+      difficulties: record.difficulties ?? "",
+      lastAttendance: record.attendances[0]?.date ?? null,
     }));
 
     return {

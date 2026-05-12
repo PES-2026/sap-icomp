@@ -92,7 +92,7 @@ export class UpdateStudent {
 
     student.update(props);
 
-    await this.studentRepository.save({ student });
+    await this.studentRepository.save(student);
 
     return Result.ok<Student>(student);
   }

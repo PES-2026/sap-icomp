@@ -1,12 +1,12 @@
 import { validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
-import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 import { AttendanceItemResponse } from "./listAttendanceDto";
+import { PaginatedResult, PaginationParams } from "@domain/shared/pagination";
 
 export type AttendancesByStudentResponse = PaginatedResult<AttendanceItemResponse>;
-export type AttendancesByStudentRequest = PaginatedRequest<"studentId", string>;
+export type AttendancesByStudentRequest = PaginationParams<"studentId", string>;
 
 export class AttendancesByStudentDTO {
   constructor(

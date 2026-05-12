@@ -1,12 +1,13 @@
-import { Attendance } from "@domain/entities/attendance";
 import {
-  AttendanceItemResult,
   AttendancesByStudentRequest,
   AttendancesByStudentResponse,
-  IAttendanceRepository,
-  ListAttendanceRequest,
-  ListAttendanceResponse,
-} from "@domain/repositories/attendanceRepository";
+} from "@application/dtos/attendance/attendancesByStudentDto";
+import { AttendanceItemResponse, ListAttendanceResponse } from "@application/dtos/attendance/listAttendanceDto";
+import { Attendance } from "@domain/entities/attendance";
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { AttendanceListParams } from "@domain/repositories/filters/attendanceFilters";
+import { findValueInEnum } from "@domain/utils/enumUtils";
 import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
 import { DemandVO } from "@domain/valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
@@ -30,7 +31,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async findAll(params: ListAttendanceRequest): Promise<ListAttendanceResponse> {
+  async findAll(params: AttendanceListParams): Promise<ListAttendanceResponse> {
     const { page, limit, filters } = params;
     const offset = (page - 1) * limit;
 
@@ -74,7 +75,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
     ]);
 
-    const items: AttendanceItemResult[] = results.map((record) => ({
+    const items: AttendanceItemResponse[] = results.map((record) => ({
       id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
@@ -100,12 +101,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     if (!attendance) return null;
 
     return new Attendance(
-      ExternalIdVO.from(attendance.externalId),
+      ExternalIdVO.fromTrusted(attendance.externalId),
       ExternalIdVO.fromTrusted(attendance.studentId),
-      DateVO.create(attendance.date),
-      AttendanceTypeVO.create(attendance.type),
-      DemandVO.create(attendance.demand),
-      attendance.generalObservations ? GeneralObservationsVO.create(attendance.generalObservations) : undefined,
+      DateVO.fromTrusted(attendance.date),
+      AttendanceTypeVO.fromTrusted(findValueInEnum(AttendanceType, attendance.type)),
+      DemandVO.fromTrusted(attendance.demand),
+      attendance.generalObservations ? GeneralObservationsVO.fromTrusted(attendance.generalObservations) : undefined,
     );
   }
 
@@ -143,7 +144,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
     ]);
 
-    const items: AttendanceItemResult[] = results.map((record) => ({
+    const items: AttendanceItemResponse[] = results.map((record) => ({
       id: record.externalId,
       studentId: record.student.externalId,
       studentName: record.student.name,
