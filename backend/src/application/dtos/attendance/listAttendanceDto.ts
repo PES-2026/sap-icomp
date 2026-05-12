@@ -5,15 +5,6 @@ import { validateDateField, validateNumberField, validateStringField } from "@do
 import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
-export interface ListAttendanceFilters {
-  studentName?: string;
-  studentEnrollment?: string;
-  studentCourse?: string;
-  attendanceType?: AttendanceType;
-  startDate?: Date;
-  endDate?: Date;
-}
-
 export interface AttendanceItemResponse {
   id: string;
   studentId: string;

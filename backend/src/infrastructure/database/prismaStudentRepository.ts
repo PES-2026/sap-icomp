@@ -1,12 +1,13 @@
-import { EmailAlreadyExistsError } from "@application/useCases/registerStudent.js";
+import { EmailAlreadyExistsError } from "@application/useCases/student/createStudent.js";
 import { Student } from "@domain/entities/student.js";
 import { type SaveStudentParams } from "@domain/repositories/studentRepository.js";
-import { type iStudentRepository } from "@domain/repositories/studentRepository.js";
+import { type IStudentRepository } from "@domain/repositories/studentRepository.js";
 import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client.js";
 
 import { studentMapper } from "./studentMapper.js";
+import { ListStudentRequest, ListStudentResponse } from "@application/dtos/student/listStudentsDto.js";
 
-export class PrismaStudentRepository implements iStudentRepository {
+export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async existsByEmail(email: string): Promise<boolean> {
@@ -97,5 +98,68 @@ export class PrismaStudentRepository implements iStudentRepository {
     } catch (_error) {
       return false;
     }
+  }
+
+  async findAll(params: ListStudentRequest): Promise<ListStudentResponse> {
+    const { page, limit, filters } = params;
+    const offset = (page - 1) * limit;
+
+    const where: Prisma.StudentWhereInput = {
+      removed: false,
+
+      ...(filters.studentName && {
+        student: {
+          name: { contains: filters.studentName, mode: "insensitive" },
+        },
+      }),
+      ...(filters.studentCourse && {
+        student: {
+          course: {
+            name: { contains: filters.studentCourse, mode: "insensitive" },
+          },
+        },
+      }),
+      ...(filters.studentEnrollment && {
+        student: {
+          enrollmentId: { contains: filters.studentEnrollment },
+        },
+      }),
+      ...(filters.attendanceType && { type: filters.attendanceType }),
+      ...(filters.startDate &&
+        filters.endDate && {
+          date: {
+            ...(filters.startDate && { gte: filters.startDate }),
+            ...(filters.endDate && { lte: filters.endDate }),
+          },
+        }),
+    };
+
+    const [totalItems, results] = await Promise.all([
+      this.prisma.attendance.count({ where }),
+      this.prisma.attendance.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { date: "desc" },
+        include: { student: { include: { course: true } } },
+      }),
+    ]);
+
+    const items: AttendanceItemResult[] = results.map((record) => ({
+      id: record.externalId,
+      studentId: record.student.externalId,
+      studentName: record.student.name,
+      enrollmentId: record.student.enrollmentId,
+      course: record.student.course.name,
+      attendanceType: record.type,
+      attendanceDate: record.date,
+    }));
+
+    return {
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      items,
+    };
   }
 }

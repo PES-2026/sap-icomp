@@ -1,47 +1,56 @@
+import { CreateStudentDTO, CreateStudentResponse } from "@application/dtos/student/createStudentDto";
+import { ApplicationError } from "@application/errors/applicationError";
+import { EmailAlreadyExistsError } from "@application/errors/student/emailAlreadyExistsError";
+import { EnrollmentAlreadyExistsError } from "@application/errors/student/enrollmentAlreadyExistsError";
 import { Student } from "@domain/entities/student";
+import { DomainError } from "@domain/errors/domainError";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
-
-// Validação de email e número de matrícula (futuro)
-export class EmailAlreadyExistsError extends Error {
-  constructor() {
-    super("Este e-mail já está cadastrado no sistema");
-  }
-}
-
-export class EnrollmentAlreadyExistsError extends Error {
-  constructor() {
-    super("Esta matrícula já está cadastrada no sistema");
-  }
-}
+import { Result } from "@domain/shared/result";
 
 export class CreateStudent {
   constructor(private readonly studentRepository: IStudentRepository) {}
 
-  async execute(data: RegisterStudentInput): Promise<Student> {
-    if (await this.studentRepository.existsByEmail(data.email)) {
-      throw new EmailAlreadyExistsError();
+  async execute(data: CreateStudentDTO): Promise<Result<CreateStudentResponse, ApplicationError | DomainError>> {
+    const emailExists = await this.studentRepository.existsByEmail(data.email);
+    const enrollmentExists = await this.studentRepository.existsByEnrollmentId(data.enrollmentId);
+
+    if (emailExists) {
+      return Result.fail<CreateStudentResponse>(new EmailAlreadyExistsError(data.email));
     }
 
-    if (await this.studentRepository.existsByEnrollmentId(data.enrollmentId)) {
-      throw new EnrollmentAlreadyExistsError();
+    if (enrollmentExists) {
+      return Result.fail<CreateStudentResponse>(new EnrollmentAlreadyExistsError(data.enrollmentId));
     }
 
-    const studentOrError = Student.create(
-      data.name,
-      data.enrollmentId,
-      data.dtBirth,
-      data.email,
-      data.phoneNumber,
-      data.courseId,
-      data.diagnosis ?? "",
-      data.potential ?? "",
-      data.difficulties ?? "",
-    ) as Student | Error;
+    const studentEntity = Student.create({
+      name: data.name,
+      enrollmentId: data.enrollmentId,
+      dtBirth: data.dtBirth,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+      course: data.courseId,
+      diagnosis: data.diagnosis ?? "",
+      potential: data.potential ?? "",
+      difficulties: data.difficulties ?? "",
+    });
 
-    if (studentOrError instanceof Error) {
-      throw studentOrError;
+    if (studentEntity.isFailure) {
+      return Result.fail<CreateStudentResponse>(studentEntity.error!);
     }
 
-    return this.studentRepository.save({ student: studentOrError });
+    await this.studentRepository.save(studentEntity.getValue());
+
+    return Result.ok<CreateStudentResponse>({
+      id: studentEntity.getValue().studentId.value,
+      name: studentEntity.getValue().name.value,
+      enrollmentId: studentEntity.getValue().enrollmentId.value,
+      dtBirth: studentEntity.getValue().dtBirth.value,
+      phoneNumber: studentEntity.getValue().phoneNumber.value,
+      email: studentEntity.getValue().email.value,
+      courseId: studentEntity.getValue().course.value,
+      diagnosis: studentEntity.getValue().diagnosis?.value ?? "",
+      potential: studentEntity.getValue().potential?.value ?? "",
+      difficulties: studentEntity.getValue().difficulties?.value ?? "",
+    });
   }
 }

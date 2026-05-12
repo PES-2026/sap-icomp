@@ -9,13 +9,13 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances.js";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance.js";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance.js";
-import { DisableStudent } from "@application/useCases/disableStudent.js";
-import { EditStudent } from "@application/useCases/editStudent.js";
+import { RemoveStudent } from "@application/useCases/student/removeStudent.js";
+import { UpdateStudent } from "@application/useCases/student/updateStudent.js";
 import {
   EmailAlreadyExistsError,
   EnrollmentAlreadyExistsError,
-  RegisterStudent,
-} from "@application/useCases/registerStudent.js";
+  CreateStudent,
+} from "@application/useCases/student/createStudent.js";
 import { prisma } from "@infrastructure/database/prisma.js";
 import { PrismaAttendanceRepository } from "@infrastructure/database/prismaAttendanceRepository.js";
 import { PrismaStudentRepository } from "@infrastructure/database/prismaStudentRepository.js";
@@ -50,10 +50,10 @@ app.use(
 );
 
 const studentRepository = new PrismaStudentRepository(prisma);
-const registerStudent = new RegisterStudent(studentRepository);
-const editStudent = new EditStudent(studentRepository);
+const registerStudent = new CreateStudent(studentRepository);
+const editStudent = new UpdateStudent(studentRepository);
 const attedanceRepository = new PrismaAttendanceRepository(prisma);
-const disableStudent = new DisableStudent(studentRepository);
+const disableStudent = new RemoveStudent(studentRepository);
 
 app.get("/students", async (_req, res) => {
   try {
