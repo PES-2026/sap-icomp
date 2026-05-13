@@ -1,26 +1,7 @@
 import { ListStudentFilters } from "@domain/repositories/filters/studentFilters";
-import { PaginatedResult } from "@domain/shared/pagination";
 import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
-
-export interface StudentItemResponse {
-  id: string;
-  name: string;
-  dtBirth: Date;
-  enrollmentId: string;
-  phoneNumber: string;
-  course: string;
-  lastAttendance: Date | null;
-  email: string;
-  diagnosis: string;
-  potential: string;
-  difficulties: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type ListStudentResponse = PaginatedResult<StudentItemResponse>;
 
 export class ListStudentDTO {
   constructor(

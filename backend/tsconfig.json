@@ -19,5 +19,5 @@
       "@prisma/*": ["./prisma/*"]
     }
   },
-  "include": ["src/**/*", "src/infrastructure/database/prismaSeed.ts"]
+  "include": ["src/**/*", "src/infrastructure/persistence/prismaSeed.ts"]
 }
