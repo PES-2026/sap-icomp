@@ -1,5 +1,6 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
+import { Attendance } from "@domain/entities/attendance";
 import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
@@ -20,6 +21,15 @@ export class UpdateAttendance {
       return Result.fail<UpdateAttendanceResponse>(new AttendanceNotFoundError(dto.id));
     }
 
+    const attendanceEntity = Attendance.rehydrate({
+      id: attendance.id!,
+      studentId: attendance.studentId,
+      type: attendance.type,
+      date: attendance.date,
+      demand: attendance.demand,
+      generalObservations: attendance.generalObservations,
+    });
+
     const typeResult = dto.type ? AttendanceTypeVO.create(dto.type) : undefined;
     const dateResult = dto.date ? DateVO.create(dto.date) : undefined;
     const demandResult = dto.demand ? DemandVO.create(dto.demand) : undefined;
@@ -30,17 +40,22 @@ export class UpdateAttendance {
     if (demandResult?.isFailure) return Result.fail<UpdateAttendanceResponse>(demandResult.error!);
     if (obsResult?.isFailure) return Result.fail<UpdateAttendanceResponse>(obsResult.error!);
 
-    attendance.update(typeResult?.getValue(), dateResult?.getValue(), demandResult?.getValue(), obsResult?.getValue());
+    attendanceEntity.update(
+      typeResult?.getValue(),
+      dateResult?.getValue(),
+      demandResult?.getValue(),
+      obsResult?.getValue(),
+    );
 
-    await this.repository.update(attendance);
+    await this.repository.update(attendanceEntity);
 
     return Result.ok<UpdateAttendanceResponse>({
-      id: attendance.id.value,
-      studentId: attendance.studentId.value,
-      type: attendance.type.value,
-      date: attendance.date.value,
-      demand: attendance.demand.value,
-      generalObservations: attendance.generalObservations?.value ?? "",
+      id: attendanceEntity.id.value,
+      studentId: attendanceEntity.studentId.value,
+      type: attendanceEntity.type.value,
+      date: attendanceEntity.date.value,
+      demand: attendanceEntity.demand.value,
+      generalObservations: attendanceEntity.generalObservations?.value ?? "",
     });
   }
 }

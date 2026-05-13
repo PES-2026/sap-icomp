@@ -24,12 +24,25 @@ export class UpdateStudent {
     const student = await this.studentRepository.findByUUID(input.id);
     if (!student) return Result.fail<Student>(new StudentNotFoundError(input.id));
 
-    if (input.email && input.email !== student.email.value) {
+    const studentEntity = Student.rehydrate({
+      studentId: student.id,
+      enrollmentId: student.enrollmentId,
+      name: student.name,
+      dtBirth: student.dtBirth,
+      email: student.email,
+      phoneNumber: student.phoneNumber,
+      course: student.course,
+      diagnosis: student.diagnosis,
+      potential: student.potential,
+      difficulties: student.difficulties,
+    });
+
+    if (input.email && input.email !== studentEntity.email.value) {
       const emailExists = await this.studentRepository.existsByEmail(input.email);
       if (emailExists) return Result.fail<Student>(new EmailAlreadyExistsError(input.email));
     }
 
-    if (input.enrollmentId && input.enrollmentId !== student.enrollmentId.value) {
+    if (input.enrollmentId && input.enrollmentId !== studentEntity.enrollmentId.value) {
       const enrollmentExists = await this.studentRepository.existsByEnrollmentId(input.enrollmentId);
       if (enrollmentExists) return Result.fail<Student>(new EnrollmentAlreadyExistsError(input.enrollmentId));
     }
@@ -90,10 +103,10 @@ export class UpdateStudent {
       props.difficulties = result.getValue();
     }
 
-    student.update(props);
+    studentEntity.update(props);
 
-    await this.studentRepository.save(student);
+    await this.studentRepository.save(studentEntity);
 
-    return Result.ok<Student>(student);
+    return Result.ok<Student>(studentEntity);
   }
 }

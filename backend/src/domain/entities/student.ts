@@ -15,7 +15,7 @@ export type StudentProps = {
   studentId?: string;
   name: string;
   enrollmentId: string;
-  dtBirth: string;
+  dtBirth: Date | string;
   email: string;
   phoneNumber: string;
   course: string;
