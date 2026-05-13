@@ -25,6 +25,7 @@ import { PrismaCourseRepository } from "../infrastructure/database/prismaCourseR
 import { CourseController } from "./controllers/courseController.js";
 import { CreateCourse } from "../application/use-cases/course/createCourse.js";
 import { UpdateCourse } from "../application/use-cases/course/updateCourse.js";
+import { ListCourse } from "../application/use-cases/course/listCourse.js";
 import { courseRoutes } from "./routes/courseRoutes.js";
 
 const app = express();
@@ -230,6 +231,7 @@ app.delete("/students/:id", async (req, res) => {
 const courseController = new CourseController(
   new CreateCourse(courseRepository),
   new UpdateCourse(courseRepository),
+  new ListCourse(courseRepository),
 );
 app.use(courseRoutes(courseController));
 
