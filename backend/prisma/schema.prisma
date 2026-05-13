@@ -85,6 +85,7 @@ model Attendance {
 
 model AttendanceType {
   internalId Int    @id @default(autoincrement())
+  externalid String @unique
   name       String
 
   attendances Attendance[]

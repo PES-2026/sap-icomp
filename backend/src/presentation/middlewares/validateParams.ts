@@ -1,13 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 
-type DTOWithParamsConstructor<T> = {
-  create(id: unknown, body: unknown): T;
-};
+interface DTOClassWithCreate {
+  create(idOrData: unknown, data?: unknown): unknown;
+}
 
-export function validateParams<T>(DTOClass: DTOWithParamsConstructor<T>) {
+export function validateParams(DTOClass: DTOClassWithCreate) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.dto = DTOClass.create(req.params.id, req.body);
+      const { id } = req.params;
+      const data = req.method === "GET" ? req.query : req.body;
+
+      if (id) {
+        req.dto = DTOClass.create(id, data);
+      } else {
+        req.dto = DTOClass.create(data);
+      }
       next();
     } catch (error) {
       if (error instanceof Error) {

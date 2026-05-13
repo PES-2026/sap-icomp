@@ -22,7 +22,7 @@ export class DifficultiesVO {
 
   private static validate(value: string): Result<void> {
     if (typeof value !== "string" || value.trim() === "") {
-      return Result.fail<void>(new RequiredFieldError("demand"));
+      return Result.fail<void>(new RequiredFieldError("difficulties"));
     }
     return Result.ok<void>();
   }

@@ -1,4 +1,4 @@
-import { validateStringField } from "@domain/utils/validationUtils";
+import { validateDateField, validateStringField } from "@domain/utils/validationUtils";
 
 export interface CreateStudentRequest {
   name: string;
@@ -28,7 +28,7 @@ export interface CreateStudentResponse {
 export class CreateStudentDTO {
   constructor(
     public readonly name: string,
-    public readonly dtBirth: string,
+    public readonly dtBirth: Date,
     public readonly email: string,
     public readonly enrollmentId: string,
     public readonly phoneNumber: string,
@@ -46,7 +46,7 @@ export class CreateStudentDTO {
     const raw = value as Record<string, unknown>;
 
     const name: string = validateStringField(raw.name, "name");
-    const dtBirth: string = validateStringField(raw.dtBirth, "dtBirth");
+    const dtBirth: Date = validateDateField(raw.dtBirth, "dtBirth");
     const email: string = validateStringField(raw.email, "email");
     const enrollmentId: string = validateStringField(raw.enrollmentId, "enrollmentId");
     const phoneNumber: string = validateStringField(raw.phoneNumber, "phoneNumber");

@@ -27,7 +27,7 @@ export class AttendanceController extends BaseController {
     super();
   }
 
-  async create(req: Request, res: Response): Promise<void> {
+  create = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = CreateAttendanceDTO.create(req.body);
       const result = await this.createAttendance.execute(dto);
@@ -36,9 +36,9 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:create`);
     }
-  }
+  };
 
-  async list(req: Request, res: Response): Promise<void> {
+  list = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = ListAttendanceDTO.create(req.query);
       const result = await this.listAttendances.execute(dto);
@@ -46,9 +46,9 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:list`);
     }
-  }
+  };
 
-  async update(req: Request, res: Response): Promise<void> {
+  update = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = UpdateAttendanceDTO.create(req.params.id, req.body);
       const result = await this.updateAttendance.execute(dto);
@@ -57,9 +57,9 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:update`);
     }
-  }
+  };
 
-  async listByStudent(req: Request, res: Response) {
+  listByStudent = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = AttendancesByStudentDTO.create(req.params.id, req.query);
       const result = await this.attendancesByStudent.execute(dto);
@@ -68,9 +68,9 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:listByStudent`);
     }
-  }
+  };
 
-  async remove(req: Request, res: Response) {
+  remove = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = RemoveAttendanceDTO.create(req.params.id);
       const result = await this.removeAttendance.execute(dto);
@@ -82,9 +82,9 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:remove`);
     }
-  }
+  };
 
-  async getById(req: Request, res: Response) {
+  getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = AttendanceByIdDTO.create(req.params.id);
       const result = await this.attendanceById.execute(dto);
@@ -93,5 +93,5 @@ export class AttendanceController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${AttendanceController.name}:getById`);
     }
-  }
+  };
 }
