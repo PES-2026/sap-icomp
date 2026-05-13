@@ -1,31 +1,14 @@
-import { validateStringField } from "@domain/utils/validationUtils";
+import { validateDateField, validateStringField } from "@domain/utils/validationUtils";
 
-export interface UpdateStudentRequest {
-  name?: string;
-  dtBirth?: string;
-  email?: string;
-  enrollmentId?: string;
-  phoneNumber?: string;
-  courseId?: string;
-  diagnosis?: string;
-  potential?: string;
-  difficulties?: string;
-}
+import { CreateStudentResponse } from "./createStudentDto";
 
-export interface UpdateStudentResponse {
-  id: string;
-  studentId: string;
-  type?: string;
-  date?: Date;
-  demand?: string;
-  generalObservations?: string;
-}
+export type UpdateStudentResponse = CreateStudentResponse;
 
 export class UpdateStudentDTO {
   constructor(
     public readonly id: string,
     public readonly name?: string,
-    public readonly dtBirth?: string,
+    public readonly dtBirth?: Date,
     public readonly email?: string,
     public readonly enrollmentId?: string,
     public readonly phoneNumber?: string,
@@ -52,7 +35,7 @@ export class UpdateStudentDTO {
     }
     let dtBirth = undefined;
     if (raw.dtBirth) {
-      dtBirth = validateStringField(raw.dtBirth, "dtBirth");
+      dtBirth = validateDateField(raw.dtBirth, "dtBirth");
     }
     let email = undefined;
     if (raw.email) {

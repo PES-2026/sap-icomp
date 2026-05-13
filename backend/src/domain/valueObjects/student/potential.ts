@@ -26,7 +26,7 @@ export class PotentialVO {
 
   private static validate(value: string): Result<void> {
     if (typeof value !== "string" || value.trim() === "") {
-      return Result.fail<void>(new RequiredFieldError("demand"));
+      return Result.fail<void>(new RequiredFieldError("potential"));
     }
     return Result.ok<void>();
   }

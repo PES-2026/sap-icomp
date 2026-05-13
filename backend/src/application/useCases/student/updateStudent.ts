@@ -1,4 +1,4 @@
-import { UpdateStudentDTO } from "@application/dtos/student/updateStudentDto";
+import { UpdateStudentDTO, UpdateStudentResponse } from "@application/dtos/student/updateStudentDto";
 import { ApplicationError } from "@application/errors/applicationError";
 import { EmailAlreadyExistsError } from "@application/errors/student/emailAlreadyExistsError";
 import { EnrollmentAlreadyExistsError } from "@application/errors/student/enrollmentAlreadyExistsError";
@@ -20,9 +20,9 @@ import { PotentialVO } from "@domain/valueObjects/student/potential";
 export class UpdateStudent {
   constructor(private readonly studentRepository: IStudentRepository) {}
 
-  async execute(input: UpdateStudentDTO): Promise<Result<Student, DomainError | ApplicationError>> {
+  async execute(input: UpdateStudentDTO): Promise<Result<UpdateStudentResponse, DomainError | ApplicationError>> {
     const student = await this.studentRepository.findByUUID(input.id);
-    if (!student) return Result.fail<Student>(new StudentNotFoundError(input.id));
+    if (!student) return Result.fail<UpdateStudentResponse>(new StudentNotFoundError(input.id));
 
     const studentEntity = Student.rehydrate({
       studentId: student.id,
@@ -39,67 +39,68 @@ export class UpdateStudent {
 
     if (input.email && input.email !== studentEntity.email.value) {
       const emailExists = await this.studentRepository.existsByEmail(input.email);
-      if (emailExists) return Result.fail<Student>(new EmailAlreadyExistsError(input.email));
+      if (emailExists) return Result.fail<UpdateStudentResponse>(new EmailAlreadyExistsError(input.email));
     }
 
     if (input.enrollmentId && input.enrollmentId !== studentEntity.enrollmentId.value) {
       const enrollmentExists = await this.studentRepository.existsByEnrollmentId(input.enrollmentId);
-      if (enrollmentExists) return Result.fail<Student>(new EnrollmentAlreadyExistsError(input.enrollmentId));
+      if (enrollmentExists)
+        return Result.fail<UpdateStudentResponse>(new EnrollmentAlreadyExistsError(input.enrollmentId));
     }
 
     const props: Partial<StudentVOProps> = {};
 
     if (input.name !== undefined) {
       const result = NameVO.create(input.name);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.name = result.getValue();
     }
 
     if (input.enrollmentId !== undefined) {
       const result = EnrollmentVO.create(input.enrollmentId);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.enrollmentId = result.getValue();
     }
 
     if (input.dtBirth !== undefined) {
       const result = DateVO.create(input.dtBirth);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.dtBirth = result.getValue();
     }
 
     if (input.email !== undefined) {
       const result = EmailVO.create(input.email);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.email = result.getValue();
     }
 
     if (input.phoneNumber !== undefined) {
       const result = PhoneNumberVO.create(input.phoneNumber);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.phoneNumber = result.getValue();
     }
 
     if (input.courseId !== undefined) {
       const result = CourseVO.create(input.courseId);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.course = result.getValue();
     }
 
     if (input.diagnosis !== undefined) {
       const result = DiagnosisVO.create(input.diagnosis);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.diagnosis = result.getValue();
     }
 
     if (input.potential !== undefined) {
       const result = PotentialVO.create(input.potential);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.potential = result.getValue();
     }
 
     if (input.difficulties !== undefined) {
       const result = DifficultiesVO.create(input.difficulties);
-      if (result.isFailure) return Result.fail<Student>(result.error!);
+      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
       props.difficulties = result.getValue();
     }
 
@@ -107,6 +108,17 @@ export class UpdateStudent {
 
     await this.studentRepository.save(studentEntity);
 
-    return Result.ok<Student>(studentEntity);
+    return Result.ok<UpdateStudentResponse>({
+      id: studentEntity.studentId.value,
+      name: studentEntity.name.value,
+      enrollmentId: studentEntity.enrollmentId.value,
+      dtBirth: studentEntity.dtBirth.value,
+      phoneNumber: studentEntity.phoneNumber.value,
+      email: studentEntity.email.value,
+      courseId: studentEntity.course.value,
+      diagnosis: studentEntity.diagnosis?.value ?? "",
+      potential: studentEntity.potential?.value ?? "",
+      difficulties: studentEntity.difficulties?.value ?? "",
+    });
   }
 }

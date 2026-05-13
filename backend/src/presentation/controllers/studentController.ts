@@ -24,7 +24,7 @@ export class StudentController extends BaseController {
     super();
   }
 
-  async create(req: Request, res: Response): Promise<void> {
+  create = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = CreateStudentDTO.create(req.body);
       const result = await this.createStudent.execute(dto);
@@ -33,9 +33,9 @@ export class StudentController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${StudentController.name}:create`);
     }
-  }
+  };
 
-  async list(req: Request, res: Response): Promise<void> {
+  list = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = ListStudentDTO.create(req.query);
       const result = await this.listStudents.execute(dto);
@@ -44,9 +44,9 @@ export class StudentController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${StudentController.name}:list`);
     }
-  }
+  };
 
-  async getById(req: Request, res: Response): Promise<void> {
+  getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = StudentByIdDTO.create(req.params.id);
       const result = await this.studentById.execute(dto);
@@ -55,9 +55,9 @@ export class StudentController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${StudentController.name}:getById`);
     }
-  }
+  };
 
-  async update(req: Request, res: Response): Promise<void> {
+  update = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = UpdateStudentDTO.create(req.params.id, req.body);
       const result = await this.updateStudent.execute(dto);
@@ -66,9 +66,9 @@ export class StudentController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${StudentController.name}:update`);
     }
-  }
+  };
 
-  async remove(req: Request, res: Response): Promise<void> {
+  remove = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = RemoveStudentDTO.create(req.params.id);
       const result = await this.removeStudent.execute(dto);
@@ -81,5 +81,5 @@ export class StudentController extends BaseController {
     } catch (error) {
       this.handleError(error, res, `${StudentController.name}:remove`);
     }
-  }
+  };
 }

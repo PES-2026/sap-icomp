@@ -24,32 +24,26 @@ export class PrismaStudentRepository implements IStudentRepository {
   }
 
   async save(student: Student): Promise<void> {
+    const studentData = {
+      enrollmentId: student.enrollmentId.value,
+      name: student.name.value,
+      dtBirth: student.dtBirth.value,
+      email: student.email.value,
+      phoneNumber: student.phoneNumber.value,
+      courseId: student.course.value,
+      diagnosis: student.diagnosis?.value ?? "",
+      potential: student.potential?.value ?? "",
+      difficulties: student.difficulties?.value ?? "",
+    };
+
     await this.prisma.student.upsert({
       where: {
         externalId: student.studentId.value,
       },
-      update: {
-        enrollmentId: student.enrollmentId.value,
-        name: student.name.value,
-        dtBirth: student.dtBirth.value,
-        email: student.email.value,
-        phoneNumber: student.phoneNumber.value,
-        courseId: student.course.value,
-        diagnosis: student.diagnosis.value || null,
-        potential: student.potential.value || null,
-        difficulties: student.difficulties.value || null,
-      },
+      update: studentData,
       create: {
+        ...studentData,
         externalId: student.studentId.value,
-        enrollmentId: student.enrollmentId.value,
-        name: student.name.value,
-        dtBirth: student.dtBirth.value,
-        email: student.email.value,
-        phoneNumber: student.phoneNumber.value,
-        courseId: student.course.value,
-        diagnosis: student.diagnosis.value || null,
-        potential: student.potential.value || null,
-        difficulties: student.difficulties.value || null,
       },
     });
   }
