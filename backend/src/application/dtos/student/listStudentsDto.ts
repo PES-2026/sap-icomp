@@ -31,9 +31,6 @@ export class ListStudentDTO {
     if (raw.enrollment) {
       filters.enrollment = validateStringField(raw.enrollment, "enrollment");
     }
-    if (raw.phoneNumber) {
-      filters.phoneNumber = validateStringField(raw.phoneNumber, "phoneNumber");
-    }
     if (raw.course) {
       filters.course = validateStringField(raw.course, "course");
     }
