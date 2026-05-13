@@ -2,15 +2,15 @@ export interface Diagnostic {
   externalId: string;
   name: string;
   acronym: string;
-  CID: string; // cid
+  cid: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface DiagnosticPayload {
-  name: string;
+  name?: string;
   acronym?: string;
-  CID?: string; // cid
+  cid?: string;
 }
 
 export interface DiagnosticsResponse {

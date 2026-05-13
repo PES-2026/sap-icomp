@@ -3,129 +3,140 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { FormModal } from "@/components/ui/FormModal";
-import { useState } from "react";
-import { Diagnostic, DiagnosticPayload } from "../types/diagnostic";
+import { Eye } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDiagnostics } from "../hooks/useDiagnostics";
+import { Diagnostic } from "../types/diagnostic";
 
 interface DiagnosticModalProps {
   isOpen: boolean;
   onClose: () => void;
-  diagnostic: Diagnostic | null; // mudar para string --> diagnosticId
-  diagnostics: Diagnostic[]; // remover
-  onCreate: (data: DiagnosticPayload) => Promise<Diagnostic | null>; // remover
-  onUpdate: (id: string, data: DiagnosticPayload) => Promise<boolean>; // remover
+  diagnosticId: string | null;
+  onSuccess: () => void;
 }
 
 export function DiagnosticModal({
   isOpen,
   onClose,
-  diagnostic,
-  diagnostics,
-  onCreate,
-  onUpdate,
+  diagnosticId,
+  onSuccess,
 }: DiagnosticModalProps) {
+  const {
+    getDiagnosticsById,
+    createDiagnostic,
+    updateDiagnostic,
+    removeDiagnostic,
+  } = useDiagnostics();
 
-  // Trazer os hooks de create, update e remove para cá
-  const [name, setName] = useState(diagnostic?.name ?? "");
-  const [acronym, setAcronym] = useState(diagnostic?.acronym ?? "");
+  const [mode, setMode] = useState<"create" | "view" | "edit">(
+    diagnosticId ? "view" : "create",
+  );
+  const [name, setName] = useState("");
 
-  // Renomear para camelCase --> cid, setCid
-  const [CID, setCID] = useState(diagnostic?.CID ?? "");
-  const [nameError, setNameError] = useState("");
+  const [acronym, setAcronym] = useState("");
+  const [cid, setCid] = useState("");
 
-  const isEditMode = !!diagnostic;
+  const [diagnosticData, setDiagnosticData] = useState<Diagnostic | null>(null);
 
-  // Remover o parâmetro **diagnostics** desse componente
-  // Remover essa validação, ela será feita no backend
-  const validateName = () => {
-    const normalizedName = name.trim().toLowerCase();
-
-    if (normalizedName.length < 3) {
-      setNameError("O nome do diagnóstico deve ser preenchido corretamente");
-      return false;
+  useEffect(() => {
+    if (isOpen && diagnosticId) {
+      getDiagnosticsById(diagnosticId).then((data) => {
+        if (data) {
+          setName(data.name);
+          setAcronym(data.acronym ?? "");
+          setCid(data.cid ?? "");
+          setDiagnosticData(data);
+        }
+      });
     }
+  }, [isOpen, diagnosticId, getDiagnosticsById]);
 
-    const alreadyExists = diagnostics.some((item) => {
-      const sameName = item.name.trim().toLowerCase() === normalizedName;
-      const differentDiagnostic = item.externalId !== diagnostic?.externalId;
-
-      return sameName && differentDiagnostic;
-    });
-
-    if (alreadyExists) {
-      setNameError("Este diagnóstico já existe. Selecione o item da lista.");
-      return false;
+  const handleSecondaryAction = async () => {
+    if (mode === "view" && diagnosticId) {
+      const success = await removeDiagnostic(diagnosticId);
+      if (success) {
+        onSuccess();
+        onClose();
+      }
+    } else {
+      onClose();
     }
-
-    setNameError("");
-    return true;
   };
 
-  /* A lógica do handleConfirm deve seguir a mesma lógica do attendanceTypes
-
-  // O mode controla o estado do modal, ele define se será a visualização de criar,
-  // atualizar ou de visualizar.
-  const [mode, setMode] = useState<"create" | "view" | "edit">("create");
-  
-  // Conterá o nosso elemento exibido no modal.
-  // Ou seja, o componente receberá apenas o id e fará a pesquisa por esse id. 
-  const [attendanceTypeData, setAttendanceTypeData] =
-      useState<AttendanceType | null>(null);
-   
-  falar das outras funções...
-  */
   const handleConfirm = async () => {
-    if (!validateName()) return; // remover essa validação
-
-    const payload: DiagnosticPayload = {
+    const payload = {
       name: name.trim(),
       acronym: acronym.trim() || undefined,
-      CID: CID.trim() || undefined, // renomear para "cid"
+      cid: cid.trim() || undefined,
     };
 
-    const result =
-      isEditMode && diagnostic
-        ? await onUpdate(diagnostic.externalId, payload)
-        : await onCreate(payload);
-
-    if (result) onClose();
+    if (mode === "create") {
+      const success = await createDiagnostic(payload);
+      if (success) {
+        onSuccess();
+        onClose();
+      }
+    } else if (mode === "view") {
+      setMode("edit");
+    } else if (mode === "edit" && diagnosticId) {
+      const success = await updateDiagnostic(diagnosticId, payload);
+      if (success) {
+        onSuccess();
+        onClose();
+      }
+    }
   };
 
+  const modalTitle =
+    mode === "view" ? "Visualizar" : mode === "create" ? "Cadastrar" : "Editar";
+
+  const isViewMode = mode === "view";
+
   const inputClass =
-    "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400";
+    "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed";
 
   return (
     <FormModal
       isOpen={isOpen}
       onClose={onClose}
       onBack={onClose}
-      title={`${isEditMode ? "Editar" : "Cadastrar"} Diagnóstico`}
+      title={`${modalTitle} Diagnóstico`}
       footerActions={
         <>
+          {mode === "edit" && (
+            <CommonButton
+              label="Visualizar"
+              onClick={() => setMode("view")}
+              startIcon={Eye}
+            />
+          )}
+          <div className="flex-1" />
           <CommonButton
-            label="Cancelar"
-            onClick={onClose}
+            label={mode === "view" ? "Remover Diagnóstico" : "Cancelar"}
+            onClick={handleSecondaryAction}
             className="bg-[#f4a598] hover:bg-[#f0a195] border-[#f0a195] text-white"
           />
-          <CommonButton label="Confirmar" onClick={handleConfirm} />
+          <CommonButton
+            label={mode === "view" ? "Editar" : "Confirmar"}
+            onClick={handleConfirm}
+          />
         </>
       }
     >
-      <Field label="Nome do Diagnóstico:" error={nameError} required>
+      <Field label="Nome do Diagnóstico:" required>
         <input
+          disabled={isViewMode}
           type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Insira o nome do diagnóstico"
-          className={
-            nameError
-              ? `${inputClass} border-red-300 bg-red-50 focus:border-red-400`
-              : inputClass
-          }
+          className={inputClass}
         />
       </Field>
 
       <Field label="Sigla:">
         <input
+          disabled={isViewMode}
           type="text"
           value={acronym}
           onChange={(event) => setAcronym(event.target.value)}
@@ -136,13 +147,25 @@ export function DiagnosticModal({
 
       <Field label="CID:">
         <input
+          disabled={isViewMode}
           type="text"
-          value={CID}
-          onChange={(event) => setCID(event.target.value)}
+          value={cid}
+          onChange={(event) => setCid(event.target.value)}
           placeholder="Insira o CID"
           className={inputClass}
         />
       </Field>
+
+      {mode === "view" && diagnosticData && (
+        <div className="flex gap-4 text-xs text-stone-500">
+          <span>
+            <strong>Criado em:</strong> {diagnosticData.createdAt}
+          </span>
+          <span>
+            <strong>Atualizado em:</strong> {diagnosticData.updatedAt}
+          </span>
+        </div>
+      )}
     </FormModal>
   );
 }

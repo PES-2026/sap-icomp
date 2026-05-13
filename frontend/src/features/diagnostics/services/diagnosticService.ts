@@ -1,15 +1,23 @@
 import api from "@/services/api";
 import {
   Diagnostic,
-  DiagnosticsResponse,
   DiagnosticPayload,
+  DiagnosticsResponse,
 } from "../types/diagnostic";
 
 export const diagnosticService = {
-  async getDiagnostics(page = 1, limit = 20): Promise<DiagnosticsResponse> {
+  async getAllDiagnostics(page = 1, limit = 20): Promise<DiagnosticsResponse> {
     const response = await api.get<DiagnosticsResponse>("/diagnoses", {
       params: { page, limit },
       fallbackMsg: "Não foi possível carregar os diagnósticos.",
+    });
+
+    return response.data;
+  },
+
+  async getById(id: string): Promise<Diagnostic> {
+    const response = await api.get<Diagnostic>(`/diagnoses/${id}`, {
+      fallbackMsg: "Não foi possível carregar os detalhes do diagnóstico.",
     });
 
     return response.data;
@@ -32,5 +40,11 @@ export const diagnosticService = {
     });
 
     return response.data;
+  },
+
+  async removeDiagnostic(id: string): Promise<void> {
+    await api.delete(`/diagnoses/${id}`, {
+      fallbackMsg: "Não foi possível remover o diagnóstico.",
+    });
   },
 };
