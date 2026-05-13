@@ -20,6 +20,12 @@ import { AttendancesByStudent } from "../application/use-cases/attendance/attend
 import { RemoveAttendance } from "../application/use-cases/attendance/removeAttendance.js";
 import { AttendanceById } from "../application/use-cases/attendance/attendanceById.dto.js";
 
+// TypeAttendance
+import { CreateTypeAttendance } from "../application/use-cases/typeAttendance/createTypeAttendance.js";
+import { TypeAttendanceController } from "./controllers/typeAttendanceController.js";
+import { typeAttendanceRoutes } from "./routes/typeAttendanceRoutes.js";
+import { PrismaTypeAttendanceRepository } from "../infrastructure/database/prismaTypeAttendanceRepository.js";
+
 const app = express();
 app.use(express.json());
 
@@ -51,6 +57,8 @@ const registerStudent = new RegisterStudent(studentRepository);
 const editStudent = new EditStudent(studentRepository);
 const attedanceRepository = new PrismaAttendanceRepository(prisma);
 const disableStudent = new DisableStudent(studentRepository);
+
+const typeAttendanceRepository = new PrismaTypeAttendanceRepository(prisma);
 
 app.get("/students", async (req, res) => {
   try {
@@ -218,6 +226,12 @@ app.delete("/students/:id", async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 });
+
+//TypeAttendance Controller e Routes
+const TypeAttendanceControler = new TypeAttendanceController(
+  new CreateTypeAttendance(typeAttendanceRepository),
+);
+app.use(typeAttendanceRoutes(TypeAttendanceControler));
 
 const PORT = process.env.BACKEND_PORT;
 
