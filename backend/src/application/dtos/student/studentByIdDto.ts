@@ -1,17 +1,5 @@
 import { validateStringField } from "@domain/utils/validationUtils";
 
-export interface StudentByIdResponse {
-  name: string;
-  dtBirth: string;
-  email: string;
-  enrollmentId: string;
-  phoneNumber: string;
-  courseId: string;
-  diagnosis?: string;
-  potential?: string;
-  difficulties?: string;
-}
-
 export class StudentByIdDTO {
   constructor(public readonly id: string) {}
 

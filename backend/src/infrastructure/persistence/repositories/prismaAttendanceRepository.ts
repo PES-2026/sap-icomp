@@ -1,17 +1,11 @@
 import { Attendance } from "@domain/entities/attendance";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { AttendanceListParams } from "@domain/repositories/filters/attendanceFilters";
 import {
-  AttendanceItemResult,
-  AttendancesByStudentRequest,
-  AttendancesByStudentResponse,
-  IAttendanceRepository,
-  ListAttendanceRequest,
-  ListAttendanceResponse,
-} from "@domain/repositories/attendanceRepository";
-import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
-import { DemandVO } from "@domain/valueObjects/attendance/demand";
-import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
-import { DateVO } from "@domain/valueObjects/shared/date";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+  AttendanceResult,
+  FindByStudentParams,
+  PaginatedAttendanceResult,
+} from "@domain/repositories/results/attendanceResult";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaAttendanceRepository implements IAttendanceRepository {
@@ -30,7 +24,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async findAll(params: ListAttendanceRequest): Promise<ListAttendanceResponse> {
+  async findAll(params: AttendanceListParams): Promise<PaginatedAttendanceResult> {
     const { page, limit, filters } = params;
     const offset = (page - 1) * limit;
 
@@ -74,14 +68,15 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
     ]);
 
-    const items: AttendanceItemResult[] = results.map((record) => ({
-      id: record.externalId,
-      studentId: record.student.externalId,
-      studentName: record.student.name,
-      enrollmentId: record.student.enrollmentId,
-      course: record.student.course.name,
-      attendanceType: record.type,
-      attendanceDate: record.date,
+    const items: AttendanceResult[] = results.map((result) => ({
+      id: result.externalId,
+      studentId: result.studentId,
+      date: result.date,
+      type: result.type,
+      demand: result.demand,
+      generalObservations: result.generalObservations,
+      updatedAt: result.updatedAt,
+      createdAt: result.createdAt,
     }));
 
     return {
@@ -92,21 +87,23 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     };
   }
 
-  async findById(id: string): Promise<Attendance | null> {
+  async findById(id: string): Promise<AttendanceResult | null> {
     const attendance = await this.prisma.attendance.findFirst({
       where: { externalId: id, removed: false },
     });
 
     if (!attendance) return null;
 
-    return new Attendance(
-      ExternalIdVO.from(attendance.externalId),
-      ExternalIdVO.fromTrusted(attendance.studentId),
-      DateVO.create(attendance.date),
-      AttendanceTypeVO.create(attendance.type),
-      DemandVO.create(attendance.demand),
-      attendance.generalObservations ? GeneralObservationsVO.create(attendance.generalObservations) : undefined,
-    );
+    return {
+      id: attendance.externalId,
+      studentId: attendance.studentId,
+      date: attendance.date,
+      type: attendance.type,
+      demand: attendance.demand,
+      generalObservations: attendance.generalObservations,
+      updatedAt: attendance.updatedAt,
+      createdAt: attendance.createdAt,
+    };
   }
 
   async update(attendance: Attendance): Promise<void> {
@@ -121,7 +118,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async findByStudentId(params: AttendancesByStudentRequest): Promise<AttendancesByStudentResponse | null> {
+  async findByStudentId(params: FindByStudentParams): Promise<PaginatedAttendanceResult> {
     const { page, limit, studentId } = params;
     const offset = (page - 1) * limit;
 
@@ -143,14 +140,15 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       }),
     ]);
 
-    const items: AttendanceItemResult[] = results.map((record) => ({
-      id: record.externalId,
-      studentId: record.student.externalId,
-      studentName: record.student.name,
-      enrollmentId: record.student.enrollmentId,
-      course: record.student.course.name,
-      attendanceType: record.type,
-      attendanceDate: record.date,
+    const items: AttendanceResult[] = results.map((result) => ({
+      id: result.externalId,
+      studentId: result.studentId,
+      date: result.date,
+      type: result.type,
+      demand: result.demand,
+      generalObservations: result.generalObservations,
+      updatedAt: result.updatedAt,
+      createdAt: result.createdAt,
     }));
 
     return {

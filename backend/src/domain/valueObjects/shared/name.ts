@@ -1,7 +1,7 @@
-import { Result } from "@domain/shared/result";
-import { NameTooShortError } from "@domain/errors/name/nameTooShortError";
 import { NameTooLongError } from "@domain/errors/name/nameTooLongError";
+import { NameTooShortError } from "@domain/errors/name/nameTooShortError";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
 
 type NameErrors = RequiredFieldError | NameTooShortError | NameTooLongError;
 

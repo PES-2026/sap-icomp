@@ -1,22 +1,9 @@
 import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { ListAttendanceFilters } from "@domain/repositories/filters/attendanceFilters";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
-import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
-
-export interface AttendanceItemResponse {
-  id: string;
-  studentId: string;
-  studentName: string;
-  enrollmentId: string;
-  course: string;
-  attendanceType: string;
-  attendanceDate: Date;
-}
-
-export type ListAttendanceRequest = PaginatedRequest<"filters", ListAttendanceFilters>;
-export type ListAttendanceResponse = PaginatedResult<AttendanceItemResponse>;
 
 export class ListAttendanceDTO {
   constructor(

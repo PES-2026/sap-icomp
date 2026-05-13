@@ -1,19 +1,7 @@
-import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
-import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 import { ListStudentFilters } from "@domain/repositories/filters/studentFilters";
-import { PaginatedResult } from "@domain/shared/pagination";
+import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
-export interface StudentItemResponse {
-  id: string;
-  studentId: string;
-  name: string;
-  enrollmentId: string;
-  course: string;
-  attendanceType: string;
-  attendanceDate: Date;
-}
-
-export type ListStudentResponse = PaginatedResult<StudentItemResponse>;
+import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 export class ListStudentDTO {
   constructor(
@@ -37,18 +25,29 @@ export class ListStudentDTO {
     if (raw.name) {
       filters.name = validateStringField(raw.name, "name");
     }
+    if (raw.dtBirth) {
+      filters.dtBirth = validateDateField(raw.dtBirth, "dtBirth");
+    }
     if (raw.enrollment) {
       filters.enrollment = validateStringField(raw.enrollment, "enrollment");
     }
     if (raw.course) {
       filters.course = validateStringField(raw.course, "course");
     }
-    if (raw.diganosis) {
-      const diganosis: string = validateStringField(raw.attendanceType, "attendanceType");
-      filters.diganosis = diganosis;
-    }
     if (raw.lastAttendance) {
       filters.lastAttendance = validateDateField(raw.lastAttendance, "lastAttendance");
+    }
+    if (raw.email) {
+      filters.email = validateStringField(raw.email, "email");
+    }
+    if (raw.diagnosis) {
+      filters.diagnosis = validateStringField(raw.diagnosis, "diagnosis");
+    }
+    if (raw.potential) {
+      filters.potential = validateStringField(raw.potential, "potential");
+    }
+    if (raw.difficulties) {
+      filters.difficulties = validateStringField(raw.difficulties, "difficulties");
     }
 
     validatePageLimitValues(page, limit);

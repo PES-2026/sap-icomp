@@ -3,6 +3,6 @@ import { ErrorCategory } from "@domain/errors/domainError";
 
 export class AttendancesNotFoundError extends ApplicationError {
   constructor(studentId: string) {
-    super(`Attendances not found for student: '${studentId}'`, ErrorCategory.BUSSINESS_RULE);
+    super(`Attendances not found for student: '${studentId}'`, ErrorCategory.BUSINESS_RULE);
   }
 }

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { Result } from "@domain/shared/result";
+
 import { InvalidExternalIdError } from "@domain/errors/externalId/invalidExternalIdError";
+import { Result } from "@domain/shared/result";
 
 export class ExternalIdVO {
   private readonly _value: string;

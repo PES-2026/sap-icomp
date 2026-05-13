@@ -1,20 +1,21 @@
+import { Result } from "@domain/shared/result";
 import { DateVO } from "@domain/valueObjects/shared/date";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+
 import { CourseVO } from "../valueObjects/course/course";
+import { EmailVO } from "../valueObjects/shared/email";
+import { NameVO } from "../valueObjects/shared/name";
 import { DiagnosisVO } from "../valueObjects/student/diagnosis";
 import { DifficultiesVO } from "../valueObjects/student/difficulties";
-import { EmailVO } from "../valueObjects/shared/email";
 import { EnrollmentVO } from "../valueObjects/student/enrollment";
-import { NameVO } from "../valueObjects/shared/name";
 import { PhoneNumberVO } from "../valueObjects/student/phoneNumber";
 import { PotentialVO } from "../valueObjects/student/potential";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { Result } from "@domain/shared/result";
 
-type StudentProps = {
+export type StudentProps = {
   studentId?: string;
   name: string;
   enrollmentId: string;
-  dtBirth: string;
+  dtBirth: Date | string;
   email: string;
   phoneNumber: string;
   course: string;
@@ -44,9 +45,9 @@ export class Student {
     public email: EmailVO,
     public phoneNumber: PhoneNumberVO,
     public course: CourseVO,
-    public diagnosis: DiagnosisVO,
-    public potential: PotentialVO,
-    public difficulties: DifficultiesVO,
+    public diagnosis?: DiagnosisVO,
+    public potential?: PotentialVO,
+    public difficulties?: DifficultiesVO,
   ) {}
 
   static create(props: StudentProps): Result<Student> {
@@ -57,9 +58,9 @@ export class Student {
     const emailStud = EmailVO.create(props.email);
     const phoneNumberStud = PhoneNumberVO.create(props.phoneNumber);
     const courseStud = CourseVO.create(props.course);
-    const diagnosisStud = DiagnosisVO.create(props.diagnosis);
-    const potentialStud = PotentialVO.create(props.potential);
-    const difficultiesStud = DifficultiesVO.create(props.difficulties);
+    const diagnosisStud = props.diagnosis ? DiagnosisVO.create(props.diagnosis) : undefined;
+    const potentialStud = props.potential ? PotentialVO.create(props.potential) : undefined;
+    const difficultiesStud = props.difficulties ? DifficultiesVO.create(props.difficulties) : undefined;
 
     const results = [
       studentId,
@@ -74,8 +75,8 @@ export class Student {
       difficultiesStud,
     ];
 
-    for (let result of results) {
-      if (result.isFailure) {
+    for (const result of results) {
+      if (result?.isFailure) {
         return Result.fail<Student>(result.error!);
       }
     }
@@ -89,9 +90,9 @@ export class Student {
         emailStud.getValue(),
         phoneNumberStud.getValue(),
         courseStud.getValue(),
-        diagnosisStud.getValue(),
-        potentialStud.getValue(),
-        difficultiesStud.getValue(),
+        diagnosisStud ? diagnosisStud.getValue() : undefined,
+        potentialStud ? potentialStud.getValue() : undefined,
+        difficultiesStud ? difficultiesStud.getValue() : undefined,
       ),
     );
   }
@@ -105,9 +106,9 @@ export class Student {
       EmailVO.fromTrusted(props.email),
       PhoneNumberVO.fromTrusted(props.phoneNumber),
       CourseVO.fromTrusted(props.course),
-      DiagnosisVO.fromTrusted(props.diagnosis),
-      PotentialVO.fromTrusted(props.potential),
-      DifficultiesVO.fromTrusted(props.difficulties),
+      props.diagnosis ? DiagnosisVO.fromTrusted(props.diagnosis) : undefined,
+      props.potential ? PotentialVO.fromTrusted(props.potential) : undefined,
+      props.difficulties ? DifficultiesVO.fromTrusted(props.difficulties) : undefined,
     );
   }
 

@@ -1,4 +1,7 @@
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
 import { Result } from "@domain/shared/result";
+import { findValueInEnum } from "@domain/utils/enumUtils";
+
 import { AttendanceTypeVO } from "../valueObjects/attendance/attendanceType";
 import { DemandVO } from "../valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "../valueObjects/attendance/generalObservations";
@@ -6,11 +9,13 @@ import { DateInput, DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
 type AttendanceProps = {
+  id?: string;
   studentId: string;
   date: DateInput;
   type: string;
   demand: string;
   generalObservations?: string;
+  removed?: boolean;
 };
 
 export class Attendance {
@@ -36,7 +41,7 @@ export class Attendance {
 
     const results = [externalId, studentId, date, type, demand, generalObservations];
 
-    for (let result of results) {
+    for (const result of results) {
       if (result?.isFailure) {
         return Result.fail<Attendance>(result.error!);
       }
@@ -54,15 +59,15 @@ export class Attendance {
     );
   }
 
-  static rehydrate(id: string, props: AttendanceProps, removed: boolean = false): Attendance {
+  static rehydrate(props: AttendanceProps): Attendance {
     return new Attendance(
-      ExternalIdVO.fromTrusted(id),
+      ExternalIdVO.fromTrusted(props.id!),
       ExternalIdVO.fromTrusted(props.studentId),
       DateVO.fromTrusted(new Date(props.date as string | Date)),
-      AttendanceTypeVO.fromTrusted(props.type as any),
+      AttendanceTypeVO.fromTrusted(findValueInEnum(AttendanceType, props.type)),
       DemandVO.fromTrusted(props.demand),
       props.generalObservations ? GeneralObservationsVO.fromTrusted(props.generalObservations) : undefined,
-      removed,
+      props.removed ?? false,
     );
   }
 
