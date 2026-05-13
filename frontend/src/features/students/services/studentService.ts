@@ -18,7 +18,7 @@ export const studentService = {
   },
 
   async createStudent(data: StudentFormData): Promise<StudentFormData> {
-    const response = await api.post<StudentFormData>("/student", data, {
+    const response = await api.post<StudentFormData>("/students", data, {
       fallbackMsg: "Não foi possível criar o aluno.",
     });
     return response.data;
