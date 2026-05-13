@@ -7,7 +7,6 @@ import { Field } from "@/components/ui/Field";
 import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
 import { PATHS } from "@/constants/paths";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
-import { DiagnosticSelectWithCreate } from "@/features/diagnostics/components/DiagnosticSelectWithCreate";
 import { FormErrors, StudentFormData } from "@/features/students/types/student";
 import { maskDate, maskPhone, maskRegistration } from "@/utils/utils";
 import { useState } from "react";
