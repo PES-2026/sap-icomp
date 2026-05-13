@@ -218,10 +218,17 @@ export default function StudentForm({
               </div>
 
               <div className="mb-3.5">
-                <DiagnosticSelectWithCreate
-                  value={formData.diagnosis ?? ""}
-                  onChange={(value) => handleFieldChange("diagnosis", value)}
-                />
+                <Field label="Diagnóstico:">
+                  <input
+                    type="text"
+                    placeholder="TDAH, TAG"
+                    value={formData.diagnosis ?? ""}
+                    onChange={(e) =>
+                      handleFieldChange("diagnosis", e.target.value)
+                    }
+                    className={`${baseInputClass} border-stone-300 focus:border-teal-400`}
+                  />
+                </Field>
               </div>
 
               <div className="mb-3.5">

@@ -11,15 +11,19 @@ import { Diagnostic } from "../types/diagnostic";
 import { DiagnosticModal } from "./DiagnosticModal";
 
 export default function DiagnosticSection() {
+  // Deixar aqui apenas o get dos diagnósticos, filtros e a lógica de abrir o Modal
   const [nameFilter, setNameFilter] = useState("");
   const [acronymFilter, setAcronymFilter] = useState("");
   const [cidFilter, setCidFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDiagnostic, setSelectedDiagnostic] =
     useState<Diagnostic | null>(null);
+
+  // Mandar lógica de create e update para o Modal
   const { diagnostics, isLoading, createDiagnostic, updateDiagnostic } =
     useDiagnostics();
 
+  // Lógica de filtros no lugar certo
   const filteredDiagnostics = useMemo(() => {
     return diagnostics.filter((diagnostic) => {
       const nameMatch = diagnostic.name
@@ -30,6 +34,7 @@ export default function DiagnosticSection() {
         .toLowerCase()
         .includes(acronymFilter.toLowerCase());
 
+      // Alterar o nome do atributo "CID" para "cid", padronizar tudo em camelCase
       const cidMatch = (diagnostic.CID ?? "")
         .toLowerCase()
         .includes(cidFilter.toLowerCase());
@@ -43,6 +48,7 @@ export default function DiagnosticSection() {
     setIsModalOpen(true);
   };
 
+  // Renomear handleOpenView
   const handleOpenEdit = (diagnostic: Diagnostic) => {
     setSelectedDiagnostic(diagnostic);
     setIsModalOpen(true);
@@ -76,6 +82,7 @@ export default function DiagnosticSection() {
             label="Adicionar Diagnóstico"
             endIcon={Plus}
             onClick={handleOpenCreate}
+            className="min-w-70 justify-center"
           />
         }
       >
@@ -98,20 +105,21 @@ export default function DiagnosticSection() {
               ]
                 .filter(Boolean)
                 .join(" ")}
-              onClick={() => handleOpenEdit(diagnostic)}
+              onClick={() => handleOpenEdit(diagnostic)} // handleOpenView(diagnose.externalId)
             />
           ))
         )}
       </ManageSectionCard>
 
       {isModalOpen && (
+        // Remover onCreate e onUpdate pois a lógica deve ficar no DiagnosticModal
         <DiagnosticModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           diagnostic={selectedDiagnostic}
-          diagnostics={diagnostics}
-          onCreate={createDiagnostic}
-          onUpdate={updateDiagnostic}
+          diagnostics={diagnostics} // remover - no DiagnosticModal explicarei o motivo
+          onCreate={createDiagnostic} // remover
+          onUpdate={updateDiagnostic} // remover
         />
       )}
     </>

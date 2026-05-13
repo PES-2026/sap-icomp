@@ -1,3 +1,5 @@
+// REMOVER ESSE ARQUIVO
+
 "use client";
 
 import CommonButton from "@/components/ui/CommonButton";

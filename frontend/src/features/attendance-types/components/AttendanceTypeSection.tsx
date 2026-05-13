@@ -71,6 +71,7 @@ export default function AttendanceTypeSection() {
             label="Adicionar Tipo de Atendimento"
             endIcon={Plus}
             onClick={handleOpenCreate}
+            className="min-w-70 justify-center"
           />
         }
       >

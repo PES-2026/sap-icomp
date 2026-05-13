@@ -9,10 +9,10 @@ import { Diagnostic, DiagnosticPayload } from "../types/diagnostic";
 interface DiagnosticModalProps {
   isOpen: boolean;
   onClose: () => void;
-  diagnostic: Diagnostic | null;
-  diagnostics: Diagnostic[];
-  onCreate: (data: DiagnosticPayload) => Promise<Diagnostic | null>;
-  onUpdate: (id: string, data: DiagnosticPayload) => Promise<boolean>;
+  diagnostic: Diagnostic | null; // mudar para string --> diagnosticId
+  diagnostics: Diagnostic[]; // remover
+  onCreate: (data: DiagnosticPayload) => Promise<Diagnostic | null>; // remover
+  onUpdate: (id: string, data: DiagnosticPayload) => Promise<boolean>; // remover
 }
 
 export function DiagnosticModal({
@@ -23,13 +23,19 @@ export function DiagnosticModal({
   onCreate,
   onUpdate,
 }: DiagnosticModalProps) {
+
+  // Trazer os hooks de create, update e remove para cá
   const [name, setName] = useState(diagnostic?.name ?? "");
   const [acronym, setAcronym] = useState(diagnostic?.acronym ?? "");
+
+  // Renomear para camelCase --> cid, setCid
   const [CID, setCID] = useState(diagnostic?.CID ?? "");
   const [nameError, setNameError] = useState("");
 
   const isEditMode = !!diagnostic;
 
+  // Remover o parâmetro **diagnostics** desse componente
+  // Remover essa validação, ela será feita no backend
   const validateName = () => {
     const normalizedName = name.trim().toLowerCase();
 
@@ -54,13 +60,26 @@ export function DiagnosticModal({
     return true;
   };
 
+  /* A lógica do handleConfirm deve seguir a mesma lógica do attendanceTypes
+
+  // O mode controla o estado do modal, ele define se será a visualização de criar,
+  // atualizar ou de visualizar.
+  const [mode, setMode] = useState<"create" | "view" | "edit">("create");
+  
+  // Conterá o nosso elemento exibido no modal.
+  // Ou seja, o componente receberá apenas o id e fará a pesquisa por esse id. 
+  const [attendanceTypeData, setAttendanceTypeData] =
+      useState<AttendanceType | null>(null);
+   
+  falar das outras funções...
+  */
   const handleConfirm = async () => {
-    if (!validateName()) return;
+    if (!validateName()) return; // remover essa validação
 
     const payload: DiagnosticPayload = {
       name: name.trim(),
       acronym: acronym.trim() || undefined,
-      CID: CID.trim() || undefined,
+      CID: CID.trim() || undefined, // renomear para "cid"
     };
 
     const result =
