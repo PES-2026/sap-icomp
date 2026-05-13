@@ -1,12 +1,9 @@
-import { AttendanceType } from "../../../domain/enums/attendance/attendanceType.enum";
-import { findValueInEnum } from "../../../domain/utils/enum.utils";
-import {
-  validateDateField,
-  validateNumberField,
-  validateStringField,
-} from "../../../domain/utils/validation.utils";
+import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
+import { findValueInEnum } from "@domain/utils/enumUtils";
+import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
+
 import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
-import { validatePageLimitValues } from "../shared/paginationValidations";
+import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 export interface ListAttendanceFilters {
   studentName?: string;
@@ -27,10 +24,7 @@ export interface AttendanceItemResponse {
   attendanceDate: Date;
 }
 
-export type ListAttendanceRequest = PaginatedRequest<
-  "filters",
-  ListAttendanceFilters
->;
+export type ListAttendanceRequest = PaginatedRequest<"filters", ListAttendanceFilters>;
 export type ListAttendanceResponse = PaginatedResult<AttendanceItemResponse>;
 
 export class ListAttendanceDTO {
@@ -66,33 +60,17 @@ export class ListAttendanceDTO {
 
     const filters: ListAttendanceFilters = {};
 
-    if (raw.studentName)
-      filters.studentName = validateStringField(raw.studentName, "studentName");
+    if (raw.studentName) filters.studentName = validateStringField(raw.studentName, "studentName");
     if (raw.studentEnrollment)
-      filters.studentEnrollment = validateStringField(
-        raw.studentEnrollment,
-        "studentEnrollment",
-      );
-    if (raw.studentCourse)
-      filters.studentCourse = validateStringField(
-        raw.studentCourse,
-        "studentCourse",
-      );
+      filters.studentEnrollment = validateStringField(raw.studentEnrollment, "studentEnrollment");
+    if (raw.studentCourse) filters.studentCourse = validateStringField(raw.studentCourse, "studentCourse");
     if (raw.attendanceType) {
-      const attendanceType: string = validateStringField(
-        raw.attendanceType,
-        "attendanceType",
-      );
-      const attendanceValueEnum: AttendanceType = findValueInEnum(
-        AttendanceType,
-        attendanceType,
-      );
+      const attendanceType: string = validateStringField(raw.attendanceType, "attendanceType");
+      const attendanceValueEnum: AttendanceType = findValueInEnum(AttendanceType, attendanceType);
       filters.attendanceType = attendanceValueEnum;
     }
-    if (raw.startDate)
-      filters.startDate = validateDateField(raw.startDate, "startDate");
-    if (raw.endDate)
-      filters.endDate = validateDateField(raw.endDate, "endDate");
+    if (raw.startDate) filters.startDate = validateDateField(raw.startDate, "startDate");
+    if (raw.endDate) filters.endDate = validateDateField(raw.endDate, "endDate");
 
     validatePageLimitValues(page, limit);
     ListAttendanceDTO.validateStartEndDate(filters.startDate, filters.endDate);

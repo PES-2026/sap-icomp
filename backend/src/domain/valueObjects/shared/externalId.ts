@@ -17,7 +17,7 @@ export class ExternalIdVO {
   }
 
   static from(value: string): ExternalIdVO {
-    let isValiUuid: boolean = ExternalIdVO.isValid(value);
+    const isValiUuid: boolean = ExternalIdVO.isValid(value);
     if (!isValiUuid) {
       throw new Error(`Invalid ExternalId format for: ${value}`);
     }
@@ -25,9 +25,8 @@ export class ExternalIdVO {
   }
 
   static isValid(value: string): boolean {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    let result: boolean = uuidRegex.test(value);
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const result: boolean = uuidRegex.test(value);
     return result;
   }
 }

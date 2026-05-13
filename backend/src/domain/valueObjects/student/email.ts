@@ -18,7 +18,7 @@ export class Email {
   }
 
   static validate(email: string): boolean {
-    var tester =
+    const tester =
       /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     if (!email) {
       return false;
@@ -35,12 +35,12 @@ export class Email {
       return false;
     }
 
-    var [account, address] = parts;
+    const [account, address] = parts;
 
     if (account!.length > 64) {
       return false;
     }
-    var domainParts = address!.split(".");
+    const domainParts = address!.split(".");
     if (
       domainParts.some(function (part) {
         return part.length > 63;

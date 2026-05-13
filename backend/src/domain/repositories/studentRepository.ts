@@ -1,10 +1,10 @@
-import { Student } from "../../../domain/entities/student.js";
+import { Student } from "../entities/student.js";
 
 export type SaveStudentParams = {
   student: Student;
 };
 
-export interface IStudentRepository {
+export interface iStudentRepository {
   existsByEmail(email: string): Promise<boolean>;
   existsByEnrollmentId(enrollmentId: string): Promise<boolean>;
   save(params: SaveStudentParams): Promise<Student>;

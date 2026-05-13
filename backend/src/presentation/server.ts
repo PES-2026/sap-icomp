@@ -1,24 +1,27 @@
 import "dotenv/config";
+
+import cors from "cors";
 import express from "express";
-import { prisma } from "../infrastructure/database/prisma.js";
-import { PrismaStudentRepository } from "../infrastructure/database/prismaStudentRepository.js";
+
+import { AttendanceById } from "@application/useCases/attendance/attendanceById.js";
+import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent.js";
+import { CreateAttendance } from "@application/useCases/attendance/createAttendance.js";
+import { ListAttendances } from "@application/useCases/attendance/listAttendances.js";
+import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance.js";
+import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance.js";
+import { DisableStudent } from "@application/useCases/disableStudent.js";
+import { EditStudent } from "@application/useCases/editStudent.js";
 import {
   EmailAlreadyExistsError,
   EnrollmentAlreadyExistsError,
   RegisterStudent,
-} from "../application/use-cases/register-student.js";
-import { EditStudent } from "../application/use-cases/edit-student.js";
-import cors from "cors";
-import { attendanceRoutes } from "./routes/attendanceRoutes.js";
+} from "@application/useCases/registerStudent.js";
+import { prisma } from "@infrastructure/database/prisma.js";
+import { PrismaAttendanceRepository } from "@infrastructure/database/prismaAttendanceRepository.js";
+import { PrismaStudentRepository } from "@infrastructure/database/prismaStudentRepository.js";
+
 import { AttendanceController } from "./controllers/attendanceController.js";
-import { CreateAttendance } from "../application/use-cases/attendance/createAttendance.js";
-import { PrismaAttendanceRepository } from "../infrastructure/database/prismaAttendanceRepository.js";
-import { DisableStudent } from "../application/use-cases/disable-student.js";
-import { ListAttendances } from "../application/use-cases/attendance/listAttendances.js";
-import { UpdateAttendance } from "../application/use-cases/attendance/updateAttendance.js";
-import { AttendancesByStudent } from "../application/use-cases/attendance/attendanceByStudent.js";
-import { RemoveAttendance } from "../application/use-cases/attendance/removeAttendance.js";
-import { AttendanceById } from "../application/use-cases/attendance/attendanceById.dto.js";
+import { attendanceRoutes } from "./routes/attendanceRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -52,7 +55,7 @@ const editStudent = new EditStudent(studentRepository);
 const attedanceRepository = new PrismaAttendanceRepository(prisma);
 const disableStudent = new DisableStudent(studentRepository);
 
-app.get("/students", async (req, res) => {
+app.get("/students", async (_req, res) => {
   try {
     const students = await prisma.student.findMany({
       where: { removed: false },
@@ -74,43 +77,27 @@ app.get("/students/:id", async (req, res) => {
       throw new Error("Student not found");
     }
     res.status(200).json(student);
-  } catch (error) {
-    res.json(500).json({ message: "Student not found" });
+  } catch (_error) {
+    res.status(500).json({ message: "Student not found" });
   }
 });
 
 app.post("/student", async (req, res) => {
   try {
-    const {
-      name,
-      dtBirth,
-      email,
-      enrollmentId,
-      phoneNumber,
-      courseId,
-      diagnosis,
-      potential,
-      difficulties,
-    } = req.body as {
-      name?: string;
-      dtBirth?: string;
-      email?: string;
-      enrollmentId?: string;
-      phoneNumber?: string;
-      courseId?: string;
-      diagnosis?: string;
-      potential?: string;
-      difficulties?: string;
-    };
+    const { name, dtBirth, email, enrollmentId, phoneNumber, courseId, diagnosis, potential, difficulties } =
+      req.body as {
+        name?: string;
+        dtBirth?: string;
+        email?: string;
+        enrollmentId?: string;
+        phoneNumber?: string;
+        courseId?: string;
+        diagnosis?: string;
+        potential?: string;
+        difficulties?: string;
+      };
 
-    if (
-      !name ||
-      !dtBirth ||
-      !email ||
-      !enrollmentId ||
-      !phoneNumber ||
-      !courseId
-    ) {
+    if (!name || !dtBirth || !email || !enrollmentId || !phoneNumber || !courseId) {
       console.log("Missing required fields:", {
         name,
         dtBirth,
@@ -120,8 +107,7 @@ app.post("/student", async (req, res) => {
         courseId,
       });
       return res.status(400).json({
-        error:
-          "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
+        error: "Nome, Data de Nascimento, Email, Matrícula, Número de Telefone e Curso são obrigatórios",
       });
     }
 
@@ -143,10 +129,7 @@ app.post("/student", async (req, res) => {
       message: "Aluno cadastrado com sucesso",
     });
   } catch (error) {
-    if (
-      error instanceof EmailAlreadyExistsError ||
-      error instanceof EnrollmentAlreadyExistsError
-    ) {
+    if (error instanceof EmailAlreadyExistsError || error instanceof EnrollmentAlreadyExistsError) {
       console.log("Conflict error:", error.message);
       return res.status(409).json({ error: error.message });
     }
@@ -164,17 +147,7 @@ app.put("/students/:id", async (req, res) => {
   try {
     const externalId = req.params.id;
 
-    const {
-      name,
-      enrollmentId,
-      dtBirth,
-      email,
-      phoneNumber,
-      courseId,
-      diagnosis,
-      potential,
-      difficulties,
-    } = req.body;
+    const { name, enrollmentId, dtBirth, email, phoneNumber, courseId, diagnosis, potential, difficulties } = req.body;
 
     const result = await editStudent.execute({
       externalId,
@@ -190,9 +163,9 @@ app.put("/students/:id", async (req, res) => {
     });
     console.log("Student updated successfully:", result);
     return res.status(200).json(result);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.log("Error updating student:", err);
-    return res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 
@@ -213,9 +186,9 @@ app.delete("/students/:id", async (req, res) => {
     const result = await disableStudent.execute(externalId);
     console.log("Student successfully deactivated.");
     return res.status(200).json(result);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.log("Error deactivating student: ", err);
-    return res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err instanceof Error ? err.message : "Unknown error" });
   }
 });
 

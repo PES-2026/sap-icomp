@@ -1,16 +1,12 @@
-import {
-  Prisma,
-  PrismaClient,
-} from "../../../prisma/src/infrastructure/database/generated/client.js";
-import { Student } from "../../domain/entities/student.js";
-import {
-  type IStudentRepository,
-  type SaveStudentParams,
-} from "../../application/use-cases/interfaces/IStudentRepository.js";
-import { EmailAlreadyExistsError } from "../../application/use-cases/register-student.js";
-import { StudentMapper } from "./StudentMapper.js";
+import { EmailAlreadyExistsError } from "@application/useCases/registerStudent.js";
+import { Student } from "@domain/entities/student.js";
+import { type SaveStudentParams } from "@domain/repositories/studentRepository.js";
+import { type iStudentRepository } from "@domain/repositories/studentRepository.js";
+import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client.js";
 
-export class PrismaStudentRepository implements IStudentRepository {
+import { studentMapper } from "./studentMapper.js";
+
+export class PrismaStudentRepository implements iStudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async existsByEmail(email: string): Promise<boolean> {
@@ -64,10 +60,7 @@ export class PrismaStudentRepository implements IStudentRepository {
 
       return student;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
         throw new EmailAlreadyExistsError();
       }
 
@@ -82,7 +75,7 @@ export class PrismaStudentRepository implements IStudentRepository {
 
     if (!raw) return null;
 
-    return StudentMapper.toDomain(raw);
+    return studentMapper.toDomain(raw);
   }
 
   async existsByUUID(externalId: string): Promise<boolean> {
@@ -101,7 +94,7 @@ export class PrismaStudentRepository implements IStudentRepository {
         data: { removed: true },
       });
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

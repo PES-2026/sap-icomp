@@ -14,9 +14,7 @@ export class Enrollment {
     if (!this.isNumeric(enrollment)) {
       throw new Error("Matrícula inválida, insira apenas caracteres numéricos");
     } else if (enrollment.length < 8) {
-      throw new Error(
-        "Matrícula inválida, quantidade de caracteres menor que oito",
-      );
+      throw new Error("Matrícula inválida, quantidade de caracteres menor que oito");
     }
     return new Enrollment(enrollment);
   }

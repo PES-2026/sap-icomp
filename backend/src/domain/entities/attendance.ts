@@ -29,9 +29,7 @@ export class Attendance {
       DateVO.create(date),
       AttendanceTypeVO.create(type),
       DemandVO.create(demand),
-      generalObservations
-        ? GeneralObservationsVO.create(generalObservations)
-        : undefined,
+      generalObservations ? GeneralObservationsVO.create(generalObservations) : undefined,
     );
   }
 
@@ -41,12 +39,10 @@ export class Attendance {
     demand?: DemandVO,
     generalObservations?: GeneralObservationsVO,
   ): void {
-    type?.value ? (this.type = type) : undefined;
-    date?.value ? (this.date = date) : undefined;
-    demand?.value ? (this.demand = demand) : undefined;
-    generalObservations?.value
-      ? (this.generalObservations = generalObservations)
-      : undefined;
+    if (type?.value) this.type = type;
+    if (date?.value) this.date = date;
+    if (demand?.value) this.demand = demand;
+    if (generalObservations?.value) this.generalObservations = generalObservations;
   }
 
   remove(): void {

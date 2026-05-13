@@ -1,13 +1,11 @@
-import {
-  validateNumberField,
-  validateStringField,
-} from "../../../domain/utils/validation.utils";
-import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
-import { validatePageLimitValues } from "../shared/paginationValidations";
-import { AttendanceItemResponse } from "./listAttendance.dto";
+import { validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
-export type AttendancesByStudentResponse =
-  PaginatedResult<AttendanceItemResponse>;
+import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
+import { validatePageLimitValues } from "../shared/paginationValidationsDto";
+
+import { AttendanceItemResponse } from "./listAttendanceDto";
+
+export type AttendancesByStudentResponse = PaginatedResult<AttendanceItemResponse>;
 export type AttendancesByStudentRequest = PaginatedRequest<"studentId", string>;
 
 export class AttendancesByStudentDTO {

@@ -1,12 +1,10 @@
-import { IAttendanceRepository } from "../../../domain/repositories/attendanceRepository";
-import { AttendanceTypeVO } from "../../../domain/valueObjects/attendance/attendanceType";
-import { DemandVO } from "../../../domain/valueObjects/attendance/demand";
-import { GeneralObservationsVO } from "../../../domain/valueObjects/attendance/generalObservations";
-import { DateVO } from "../../../domain/valueObjects/shared/date";
-import {
-  UpdateAttendanceDTO,
-  UpdateAttendanceResponse,
-} from "../../dtos/attendance/updateAttedance.dto";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
+import { DemandVO } from "@domain/valueObjects/attendance/demand";
+import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
+import { DateVO } from "@domain/valueObjects/shared/date";
+
+import { UpdateAttendanceDTO, UpdateAttendanceResponse } from "../../dtos/attendance/updateAttendanceDto";
 
 export class UpdateAttendance {
   constructor(private repository: IAttendanceRepository) {}
@@ -22,9 +20,7 @@ export class UpdateAttendance {
       dto.type ? AttendanceTypeVO.create(dto.type) : undefined,
       dto.date ? DateVO.create(dto.date) : undefined,
       dto.demand ? DemandVO.create(dto.demand) : undefined,
-      dto.generalObservations
-        ? GeneralObservationsVO.create(dto.generalObservations)
-        : undefined,
+      dto.generalObservations ? GeneralObservationsVO.create(dto.generalObservations) : undefined,
     );
 
     await this.repository.update(attendance);

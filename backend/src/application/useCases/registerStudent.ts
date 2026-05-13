@@ -1,5 +1,5 @@
-import { Student } from "../../domain/entities/student.js";
-import { type IStudentRepository } from "./interfaces/IStudentRepository.js";
+import { Student } from "@domain/entities/student.js";
+import { type iStudentRepository } from "@domain/repositories/studentRepository.js";
 
 type RegisterStudentInput = {
   name: string;
@@ -31,7 +31,7 @@ export class EnrollmentAlreadyExistsError extends Error {
 }
 
 export class RegisterStudent {
-  constructor(private readonly studentRepository: IStudentRepository) {}
+  constructor(private readonly studentRepository: iStudentRepository) {}
 
   async execute(data: RegisterStudentInput): Promise<Student> {
     if (await this.studentRepository.existsByEmail(data.email)) {
