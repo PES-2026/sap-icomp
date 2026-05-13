@@ -1,52 +1,55 @@
-import { Course } from "../valueObjects/course/course.js";
-import { Diagnosis } from "../valueObjects/student/diagnosis.js";
-import { Difficulties } from "../valueObjects/student/difficulties.js";
-import { DtBirth } from "../valueObjects/student/dtBirth.js";
-import { Email } from "../valueObjects/student/email.js";
-import { Enrollment } from "../valueObjects/student/enrollment.js";
-import { Name } from "../valueObjects/student/name.js";
-import { PhoneNumber } from "../valueObjects/student/phoneNumber.js";
-import { Potential } from "../valueObjects/student/potential.js";
-import { StudentId } from "../valueObjects/student/studentId.js";
+import { DateVO } from "@domain/valueObjects/shared/date";
+import { CourseVO } from "../valueObjects/course/course";
+import { DiagnosisVO } from "../valueObjects/student/diagnosis";
+import { DifficultiesVO } from "../valueObjects/student/difficulties";
+import { EmailVO } from "../valueObjects/shared/email";
+import { EnrollmentVO } from "../valueObjects/student/enrollment";
+import { NameVO } from "../valueObjects/shared/name";
+import { PhoneNumberVO } from "../valueObjects/student/phoneNumber";
+import { PotentialVO } from "../valueObjects/student/potential";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
+import { Result } from "@domain/shared/result";
 
-import { StudentData } from "./studentData.js";
+type StudentProps = {
+  externalId?: string;
+  name: string;
+  enrollmentId: string;
+  dtBirth: string;
+  email: string;
+  phoneNumber: string;
+  course: string;
+  diagnosis: string;
+  potential: string;
+  difficulties: string;
+};
 
 export class Student {
   constructor(
-    public readonly studentId: StudentId,
-    public name: Name,
-    public enrollmentId: Enrollment,
-    public dtBirth: DtBirth,
-    public email: Email,
-    public phoneNumber: PhoneNumber,
-    public course: Course,
-    public diagnosis: Diagnosis,
-    public potential: Potential,
-    public difficulties: Difficulties,
+    public readonly studentId: ExternalIdVO,
+    public name: NameVO,
+    public enrollmentId: EnrollmentVO,
+    public dtBirth: DateVO,
+    public email: EmailVO,
+    public phoneNumber: PhoneNumberVO,
+    public course: CourseVO,
+    public diagnosis: DiagnosisVO,
+    public potential: PotentialVO,
+    public difficulties: DifficultiesVO,
   ) {}
-  static create(
-    name: string,
-    enrollmentId: string,
-    dtBirth: string,
-    email: string,
-    phoneNumber: string,
-    course: string,
-    diagnosis: string,
-    potential: string,
-    difficulties: string,
-  ) {
-    const studentId = StudentId.create();
-    const nameStud = Name.create(name);
-    const enrollmentStud = Enrollment.create(enrollmentId);
-    const dtBirthStud = DtBirth.create(dtBirth);
-    const emailStud = Email.create(email);
-    const phoneNumberStud = PhoneNumber.create(phoneNumber);
-    const courseStud = Course.create(course);
-    const diagnosisStud = Diagnosis.create(diagnosis);
-    const potentialStud = Potential.create(potential);
-    const difficultiesStud = Difficulties.create(difficulties);
 
-    return new Student(
+  static create(props: StudentProps): Result<Student> {
+    const studentId = ExternalIdVO.create();
+    const nameStud = NameVO.create(props.name);
+    const enrollmentStud = EnrollmentVO.create(props.enrollmentId);
+    const dtBirthStud = DateVO.create(props.dtBirth);
+    const emailStud = EmailVO.create(props.email);
+    const phoneNumberStud = PhoneNumberVO.create(props.phoneNumber);
+    const courseStud = CourseVO.create(props.course);
+    const diagnosisStud = DiagnosisVO.create(props.diagnosis);
+    const potentialStud = PotentialVO.create(props.potential);
+    const difficultiesStud = DifficultiesVO.create(props.difficulties);
+
+    const results = [
       studentId,
       nameStud,
       enrollmentStud,
@@ -57,22 +60,42 @@ export class Student {
       diagnosisStud,
       potentialStud,
       difficultiesStud,
+    ];
+
+    for (let result of results) {
+      if (result.isFailure) {
+        return Result.fail<Student>(result.error!);
+      }
+    }
+
+    return Result.ok<Student>(
+      new Student(
+        studentId.getValue(),
+        nameStud.getValue(),
+        enrollmentStud.getValue(),
+        dtBirthStud.getValue(),
+        emailStud.getValue(),
+        phoneNumberStud.getValue(),
+        courseStud.getValue(),
+        diagnosisStud.getValue(),
+        potentialStud.getValue(),
+        difficultiesStud.getValue(),
+      ),
     );
   }
-  static update(student: StudentData) {
-    const studentId = StudentId.reutilise(student.externalId);
 
+  static rehydrate(props: StudentProps): Student {
     return new Student(
-      studentId,
-      Name.create(student.name),
-      Enrollment.create(student.enrollmentId),
-      DtBirth.create(student.dtBirth),
-      Email.create(student.email),
-      PhoneNumber.create(student.phoneNumber),
-      Course.create(student.courseId),
-      Diagnosis.create(student.diagnosis),
-      Potential.create(student.potential),
-      Difficulties.create(student.difficulties),
+      ExternalIdVO.fromTrusted(props.externalId!),
+      NameVO.fromTrusted(props.name),
+      EnrollmentVO.fromTrusted(props.enrollmentId),
+      DateVO.fromTrusted(new Date(props.dtBirth)),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      CourseVO.fromTrusted(props.course),
+      DiagnosisVO.fromTrusted(props.diagnosis),
+      PotentialVO.fromTrusted(props.potential),
+      DifficultiesVO.fromTrusted(props.difficulties),
     );
   }
 }
