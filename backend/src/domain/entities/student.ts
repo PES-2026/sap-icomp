@@ -11,7 +11,7 @@ import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { Result } from "@domain/shared/result";
 
 type StudentProps = {
-  externalId?: string;
+  studentId?: string;
   name: string;
   enrollmentId: string;
   dtBirth: string;
@@ -21,6 +21,18 @@ type StudentProps = {
   diagnosis: string;
   potential: string;
   difficulties: string;
+};
+
+export type StudentVOProps = {
+  name: NameVO;
+  enrollmentId: EnrollmentVO;
+  dtBirth: DateVO;
+  email: EmailVO;
+  phoneNumber: PhoneNumberVO;
+  course: CourseVO;
+  diagnosis: DiagnosisVO;
+  potential: PotentialVO;
+  difficulties: DifficultiesVO;
 };
 
 export class Student {
@@ -86,7 +98,7 @@ export class Student {
 
   static rehydrate(props: StudentProps): Student {
     return new Student(
-      ExternalIdVO.fromTrusted(props.externalId!),
+      ExternalIdVO.fromTrusted(props.studentId!),
       NameVO.fromTrusted(props.name),
       EnrollmentVO.fromTrusted(props.enrollmentId),
       DateVO.fromTrusted(new Date(props.dtBirth)),
@@ -97,5 +109,17 @@ export class Student {
       PotentialVO.fromTrusted(props.potential),
       DifficultiesVO.fromTrusted(props.difficulties),
     );
+  }
+
+  update(props: Partial<StudentVOProps>): void {
+    if (props.name !== undefined) this.name = props.name;
+    if (props.enrollmentId !== undefined) this.enrollmentId = props.enrollmentId;
+    if (props.dtBirth !== undefined) this.dtBirth = props.dtBirth;
+    if (props.email !== undefined) this.email = props.email;
+    if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
+    if (props.course !== undefined) this.course = props.course;
+    if (props.diagnosis !== undefined) this.diagnosis = props.diagnosis;
+    if (props.potential !== undefined) this.potential = props.potential;
+    if (props.difficulties !== undefined) this.difficulties = props.difficulties;
   }
 }

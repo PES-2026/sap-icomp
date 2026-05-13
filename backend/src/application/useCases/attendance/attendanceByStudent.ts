@@ -1,11 +1,14 @@
 import { IAttendanceRepository, AttendancesByStudentRequest } from "@domain/repositories/attendanceRepository";
+import { Result } from "@domain/shared/result";
+import { AttendancesNotFoundError } from "@application/errors/attendance/attendancesNotFoundError";
 
 import { AttendancesByStudentDTO, AttendancesByStudentResponse } from "../../dtos/attendance/attendancesByStudentDto";
+import { ApplicationError } from "@application/errors/applicationError";
 
 export class AttendancesByStudent {
   constructor(private repository: IAttendanceRepository) {}
 
-  async execute(dto: AttendancesByStudentDTO): Promise<AttendancesByStudentResponse | null> {
+  async execute(dto: AttendancesByStudentDTO): Promise<Result<AttendancesByStudentResponse, ApplicationError>> {
     const params: AttendancesByStudentRequest = {
       page: dto.page,
       limit: dto.limit,
@@ -14,9 +17,11 @@ export class AttendancesByStudent {
 
     const result = await this.repository.findByStudentId(params);
 
-    if (!result) return null;
+    if (!result) {
+      return Result.fail<AttendancesByStudentResponse>(new AttendancesNotFoundError(dto.studentId));
+    }
 
-    return {
+    return Result.ok<AttendancesByStudentResponse>({
       totalItems: result.totalItems,
       totalPages: result.totalPages,
       currentPage: result.currentPage,
@@ -29,6 +34,6 @@ export class AttendancesByStudent {
         attendanceType: item.attendanceType,
         attendanceDate: item.attendanceDate,
       })),
-    };
+    });
   }
 }
