@@ -2,6 +2,11 @@ import { Prisma, PrismaClient } from "../../../prisma/src/infrastructure/databas
 import { Course } from "../../domain/entities/course";
 import { ICourseRepository } from "../../domain/repositories/courseRepository";
 import { ProfessorId } from "../../domain/valueObjects/professor/professorId";
+import {
+  CourseItemResponse,
+  ListCourseRequest,
+  ListCourseResponse,
+} from "../../application/dtos/course/listCourse.dto";
 
 export class PrismaCourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -66,5 +71,47 @@ export class PrismaCourseRepository implements ICourseRepository {
         ...(coordinatorId !== undefined && { coordinatorId }),
       },
     });
+  }
+  async findAll(params: ListCourseRequest): Promise<ListCourseResponse> {
+    const { page, limit, filters } = params;
+    const offset = (page - 1) * limit;
+
+    const where: Prisma.CourseWhereInput = {};
+
+    if (filters.nameOrAcronym) {
+      where.OR = [
+        { name: { contains: filters.nameOrAcronym, mode: "insensitive" } },
+        { acronym: { contains: filters.nameOrAcronym, mode: "insensitive" } },
+      ];
+    }
+    const [totalItems, results] = await Promise.all([
+      this.prisma.course.count({ where }),
+      this.prisma.course.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { name: "asc" },
+        include: { coordinator: { select: { name: true, externalId: true } } },
+      }),
+    ]);
+    const itens: CourseItemResponse[] = results.map((course) => ({
+      externalId: course.externalId,
+      name: course.name,
+      acronym: course.acronym,
+      coordinatorId: course.coordinator?.externalId
+        ? course.coordinator.externalId
+        : undefined,
+      coordinatorName: course.coordinator?.name
+        ? course.coordinator.name
+        : undefined,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+    }));
+    return {
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      items: itens,
+    };
   }
 }
