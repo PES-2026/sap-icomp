@@ -66,7 +66,7 @@ export function useDiagnostics() {
   const removeDiagnostic = useCallback(async (id: string) => {
     try {
       await diagnosticService.removeDiagnostic(id);
-      toast.success("Diagnóstico removido.");
+      toast.success("Diagnóstico removido com sucesso");
       await fetchDiagnostics();
       return true;
     } catch (error) {
