@@ -9,6 +9,7 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -16,11 +17,14 @@ import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
+import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
+import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
+import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 
 const app = express();
@@ -73,6 +77,12 @@ const studentController = new StudentController(
 );
 
 app.use(studentRoutes(studentController));
+
+const diagnosesRepository = new PrismaDiagnosesRepository(prisma);
+
+const diagnosesController = new DiagnosesController(new CreateDiagnosis(diagnosesRepository));
+
+app.use(diagnosesRoutes(diagnosesController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
