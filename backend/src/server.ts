@@ -14,15 +14,14 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
-import { prisma } from "@infrastructure/database/prisma";
-import { PrismaAttendanceRepository } from "@infrastructure/persistence/prismaAttendanceRepository";
-import { PrismaStudentRepository } from "@infrastructure/persistence/prismaStudentRepository";
-
-import { AttendanceController } from "./controllers/attendanceController";
-import { StudentController } from "./controllers/studentController";
-import { errorHandler } from "./middlewares/errorHandler";
-import { attendanceRoutes } from "./routes/attendanceRoutes";
-import { studentRoutes } from "./routes/studentRoutes";
+import { prisma } from "@infrastructure/persistence/prisma";
+import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
+import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
+import { AttendanceController } from "@presentation/controllers/attendanceController";
+import { StudentController } from "@presentation/controllers/studentController";
+import { errorHandler } from "@presentation/middlewares/errorHandler";
+import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
+import { studentRoutes } from "@presentation/routes/studentRoutes";
 
 const app = express();
 app.use(express.json());

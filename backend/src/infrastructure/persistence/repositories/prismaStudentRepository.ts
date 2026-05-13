@@ -1,17 +1,7 @@
-import { ListStudentResponse, StudentItemResponse } from "@application/dtos/student/listStudentsDto";
 import { Student } from "@domain/entities/student";
 import { StudentListParams } from "@domain/repositories/filters/studentFilters";
+import { PaginatedStudentResult, StudentResult } from "@domain/repositories/results/studentResult";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
-import { CourseVO } from "@domain/valueObjects/course/course";
-import { DateVO } from "@domain/valueObjects/shared/date";
-import { EmailVO } from "@domain/valueObjects/shared/email";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { NameVO } from "@domain/valueObjects/shared/name";
-import { DiagnosisVO } from "@domain/valueObjects/student/diagnosis";
-import { DifficultiesVO } from "@domain/valueObjects/student/difficulties";
-import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
-import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
-import { PotentialVO } from "@domain/valueObjects/student/potential";
 import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaStudentRepository implements IStudentRepository {
@@ -64,25 +54,28 @@ export class PrismaStudentRepository implements IStudentRepository {
     });
   }
 
-  async findByUUID(externaID: string): Promise<Student | null> {
+  async findByUUID(externaID: string): Promise<StudentResult | null> {
     const raw = await this.prisma.student.findUnique({
       where: { externalId: externaID },
     });
 
     if (!raw) return null;
 
-    return new Student(
-      ExternalIdVO.fromTrusted(raw.externalId),
-      NameVO.fromTrusted(raw.name),
-      EnrollmentVO.fromTrusted(raw.enrollmentId),
-      DateVO.fromTrusted(raw.dtBirth),
-      EmailVO.fromTrusted(raw.email),
-      PhoneNumberVO.fromTrusted(raw.phoneNumber),
-      CourseVO.fromTrusted(raw.courseId),
-      DiagnosisVO.fromTrusted(raw.diagnosis ?? ""),
-      PotentialVO.fromTrusted(raw.potential ?? ""),
-      DifficultiesVO.fromTrusted(raw.difficulties ?? ""),
-    );
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      enrollmentId: raw.enrollmentId,
+      dtBirth: raw.dtBirth,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber,
+      course: raw.courseId,
+      diagnosis: raw.diagnosis ?? "",
+      potential: raw.potential ?? "",
+      difficulties: raw.difficulties ?? "",
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      lastAttendance: null,
+    };
   }
 
   async existsByUUID(externalId: string): Promise<boolean> {
@@ -106,7 +99,7 @@ export class PrismaStudentRepository implements IStudentRepository {
     }
   }
 
-  async findAll(params: StudentListParams): Promise<ListStudentResponse> {
+  async findAll(params: StudentListParams): Promise<PaginatedStudentResult> {
     const { page, limit, filters } = params;
     const offset = (page - 1) * limit;
 
@@ -146,7 +139,7 @@ export class PrismaStudentRepository implements IStudentRepository {
       }),
     ]);
 
-    const items: StudentItemResponse[] = results.map((record) => ({
+    const items: StudentResult[] = results.map((record) => ({
       id: record.externalId,
       name: record.name,
       enrollmentId: record.enrollmentId,

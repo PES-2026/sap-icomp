@@ -9,11 +9,13 @@ import { DateInput, DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
 type AttendanceProps = {
+  id?: string;
   studentId: string;
   date: DateInput;
   type: string;
   demand: string;
   generalObservations?: string;
+  removed?: boolean;
 };
 
 export class Attendance {
@@ -57,15 +59,15 @@ export class Attendance {
     );
   }
 
-  static rehydrate(id: string, props: AttendanceProps, removed: boolean = false): Attendance {
+  static rehydrate(props: AttendanceProps): Attendance {
     return new Attendance(
-      ExternalIdVO.fromTrusted(id),
+      ExternalIdVO.fromTrusted(props.id!),
       ExternalIdVO.fromTrusted(props.studentId),
       DateVO.fromTrusted(new Date(props.date as string | Date)),
       AttendanceTypeVO.fromTrusted(findValueInEnum(AttendanceType, props.type)),
       DemandVO.fromTrusted(props.demand),
       props.generalObservations ? GeneralObservationsVO.fromTrusted(props.generalObservations) : undefined,
-      removed,
+      props.removed ?? false,
     );
   }
 

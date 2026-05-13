@@ -1,14 +1,14 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
+  "name": "sap-icomp-backend",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx --watch ./src/presentation/server.ts",
+    "dev": "tsx --watch ./src/server.ts",
     "build": "tsc",
-    "start": "node dist/presentation/server.js",
+    "start": "node dist/server.js",
     "test": "jest",
-    "prisma:seed": "tsx src/infrastructure/database/prismaSeed.ts",
-    "prisma:seed:prod": "node dist/infrastructure/database/prismaSeed.js",
+    "prisma:seed": "tsx src/infrastructure/persistence/prismaSeed.ts",
+    "prisma:seed:prod": "node dist/infrastructure/persistence/prismaSeed.js",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
     "lint": "eslint ."
   },

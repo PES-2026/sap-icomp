@@ -1,14 +1,4 @@
-import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
 import { validateStringField } from "@domain/utils/validationUtils";
-
-export interface AttendanceByIdResponse {
-  id: string;
-  studentId: string;
-  date: Date;
-  type: AttendanceType;
-  demand: string;
-  generalObservations?: string;
-}
 
 export class AttendanceByIdDTO {
   constructor(public readonly id: string) {}
