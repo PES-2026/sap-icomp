@@ -1,9 +1,6 @@
 import { UpdateTypeAttendanceResponse } from "../../application/dtos/typeAttendance/updateTypeAttendance.dto";
 import { ITypeAttendanceRepository } from "../../domain/repositories/typeAttendanceRepository";
-import {
-  PrismaClient,
-  Prisma,
-} from "../../../prisma/src/infrastructure/database/generated/client";
+import { PrismaClient } from "../../../prisma/src/infrastructure/database/generated/client";
 import { TypeAttendance } from "../../domain/entities/typeAttendance";
 import { UpdateTypeAttendance } from "../../application/use-cases/typeAttendance/updateTypeAttendance";
 
