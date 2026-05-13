@@ -1,7 +1,6 @@
 import {
   validateStringField,
   validateOptionalStringField,
-  validateOptionalNumberField,
 } from "../../../domain/utils/validation.utils";
 export interface CreateCourseResponse {
   externalId: string;
