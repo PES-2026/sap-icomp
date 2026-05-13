@@ -1,12 +1,12 @@
 import { Prisma, PrismaClient } from "../../../prisma/src/infrastructure/database/generated/client";
-import { Course } from "../../domain/entities/course";
-import { ICourseRepository } from "../../domain/repositories/courseRepository";
-import { ProfessorId } from "../../domain/valueObjects/professor/professorId";
 import {
   CourseItemResponse,
   ListCourseRequest,
   ListCourseResponse,
 } from "../../application/dtos/course/listCourse.dto";
+import { Course } from "../../domain/entities/course";
+import { ICourseRepository } from "../../domain/repositories/courseRepository";
+import { ProfessorId } from "../../domain/valueObjects/professor/professorId";
 
 export class PrismaCourseRepository implements ICourseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -98,12 +98,8 @@ export class PrismaCourseRepository implements ICourseRepository {
       externalId: course.externalId,
       name: course.name,
       acronym: course.acronym,
-      coordinatorId: course.coordinator?.externalId
-        ? course.coordinator.externalId
-        : undefined,
-      coordinatorName: course.coordinator?.name
-        ? course.coordinator.name
-        : undefined,
+      coordinatorId: course.coordinator?.externalId ? course.coordinator.externalId : undefined,
+      coordinatorName: course.coordinator?.name ? course.coordinator.name : undefined,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
     }));
