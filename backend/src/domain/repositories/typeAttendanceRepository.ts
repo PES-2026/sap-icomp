@@ -1,5 +1,5 @@
-import { CreateTypeAttendanceDto } from "../../application/dtos/typeAttendance/createTypeAttendance.dto";
+import { TypeAttendance } from "../entities/typeAttendance";
 
 export interface ITypeAttendanceRepository {
-  save(typeAttendance: CreateTypeAttendanceDto): Promise<void>;
+  save(typeAttendance: TypeAttendance): Promise<void>;
 }
