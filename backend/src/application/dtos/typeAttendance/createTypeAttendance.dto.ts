@@ -4,9 +4,9 @@ export interface CreateTypeAttendanceResponse {
   externalId: string;
   name: string;
 }
-export class CreateTypeAttendanceDto {
+export class CreateTypeAttendanceDTO {
   constructor(public name: string) {}
-  static create(value: unknown): CreateTypeAttendanceDto {
+  static create(value: unknown): CreateTypeAttendanceDTO {
     if (typeof value !== "object" || value === null) {
       throw new Error("Invalid input: expected an object");
     }
@@ -15,6 +15,6 @@ export class CreateTypeAttendanceDto {
 
     const name = validateStringField(raw.name, "name");
 
-    return new CreateTypeAttendanceDto(name);
+    return new CreateTypeAttendanceDTO(name);
   }
 }
