@@ -1,9 +1,12 @@
 import api from "@/services/api";
-import { Student, StudentFormData } from "../types/student";
+import { Student, StudentFormData, StudentResponse } from "../types/student";
 
 export const studentService = {
-  async getStudents(page: number = 1, limit: number = 10): Promise<Student[]> {
-    const response = await api.get<Student[]>("/students", {
+  async getStudents(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<StudentResponse> {
+    const response = await api.get<StudentResponse>("/students", {
       params: { page, limit },
       fallbackMsg: "Não foi possível obter os alunos.",
     });

@@ -28,4 +28,11 @@ export interface StudentFormData {
   difficulties: string;
 }
 
+export interface StudentResponse {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  items: Student[];
+}
+
 export type FormErrors = Partial<Record<keyof StudentFormData, string>>;
