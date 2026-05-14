@@ -6,6 +6,9 @@ export class TypeAttendance {
   constructor(
     public readonly name: Name,
     public readonly externalId: ExternalIdVO,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date,
+    public _removed: boolean = false,
   ) {}
   static create(dto: CreateTypeAttendanceDTO): TypeAttendance {
     const nameVO = Name.create(dto.name);
@@ -16,5 +19,8 @@ export class TypeAttendance {
     const nameVO = Name.create(dto.name);
     const externalIdVO = ExternalIdVO.from(dto.externalId);
     return new TypeAttendance(nameVO, externalIdVO);
+  }
+  remove(): void {
+    this._removed = true;
   }
 }
