@@ -9,6 +9,11 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+import { CourseById } from "@application/useCases/course/courseById";
+import { CreateCourse } from "@application/useCases/course/createCourse";
+import { ListCourse } from "@application/useCases/course/listCourse";
+import { RemoveCourse } from "@application/useCases/course/removeCourse";
+import { UpdateCourse } from "@application/useCases/course/updateCourse";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
 import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
@@ -21,13 +26,16 @@ import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
+import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
+import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
+import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 
@@ -93,6 +101,18 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const courseRepository = new PrismaCourseRepository(prisma);
+
+const courseController = new CourseController(
+  new CreateCourse(courseRepository),
+  new UpdateCourse(courseRepository),
+  new ListCourse(courseRepository),
+  new CourseById(courseRepository),
+  new RemoveCourse(courseRepository),
+);
+
+app.use(courseRoutes(courseController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
