@@ -13,11 +13,11 @@ import { CourseController } from "../controllers/courseController";
 export function courseRoutes(controller: CourseController): Router {
   const router = Router();
 
-  router.post("courses", validateBody(CreateCourseDTO), controller.create);
-  router.put("courses/:id", validateParams(UpdateCourseDTO), controller.update);
-  router.get("courses", validateParams(ListCourseDTO), controller.list);
-  router.get("courses/:id", validateParams(CourseByIdDTO), controller.findById);
-  router.delete("courses/:id", validateParams(RemoveCourseDTO), controller.remove);
+  router.post("/courses", validateBody(CreateCourseDTO), controller.create);
+  router.put("/courses/:id", validateParams(UpdateCourseDTO), controller.update);
+  router.get("/courses", validateParams(ListCourseDTO), controller.list);
+  router.get("/courses/:id", validateParams(CourseByIdDTO), controller.findById);
+  router.delete("/courses/:id", validateParams(RemoveCourseDTO), controller.remove);
 
   return router;
 }
