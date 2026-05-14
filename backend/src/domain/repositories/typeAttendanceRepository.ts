@@ -1,6 +1,5 @@
 import { TypeAttendance } from "../entities/typeAttendance";
 import { UpdateTypeAttendanceResponse } from "../../application/dtos/typeAttendance/updateTypeAttendance.dto";
-import { PaginatedResult } from "../../application/dtos/shared/paginationDto";
 import {
   ListTypeAttendanceRequest,
   ListTypeAttendanceResponse,
