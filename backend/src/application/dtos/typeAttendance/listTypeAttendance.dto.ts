@@ -4,7 +4,6 @@ import {
 } from "../../../domain/utils/validation.utils";
 import { PaginatedRequest, PaginatedResult } from "../shared/paginationDto";
 import { validatePageLimitValues } from "../shared/paginationValidations";
-import { TypeAttendance } from "../../../domain/entities/typeAttendance";
 
 export interface ListTypeAttendanceFilters {
   name?: string;
