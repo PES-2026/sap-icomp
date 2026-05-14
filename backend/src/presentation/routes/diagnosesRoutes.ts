@@ -11,6 +11,7 @@ export function diagnosesRoutes(controller: DiagnosesController): Router {
 
   router.post("/diagnoses", validateBody(CreateDiagnosisDTO), controller.create);
   router.put("/diagnoses/:id", validateParams(UpdateDiagnosisDTO), controller.update);
+  router.get("/diagnoses", controller.list);
 
   return router;
 }
