@@ -40,7 +40,7 @@ export class AcronymVO {
       return Result.fail<void>(new AcronymTooLongError(trimmed.length));
     }
 
-    const acronymRegex = /^[A-Z0-9]+$/i;
+    const acronymRegex = /^[A-Z0-9.\-/]+$/i;
     if (!acronymRegex.test(trimmed)) {
       return Result.fail<void>(new InvalidAcronymFormatError(trimmed));
     }
