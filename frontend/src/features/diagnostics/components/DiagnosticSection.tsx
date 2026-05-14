@@ -69,7 +69,9 @@ export default function DiagnosticSection() {
   const handleConfirmDelete = async () => {
     if (!selectedDiagnosticToDelete) return;
 
-    const success = await removeDiagnostic(selectedDiagnosticToDelete.externalId);
+    const success = await removeDiagnostic(
+      selectedDiagnosticToDelete.externalId,
+    );
 
     if (success) {
       handleCancelDelete();
