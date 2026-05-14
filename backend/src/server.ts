@@ -10,6 +10,7 @@ import { ListAttendances } from "@application/useCases/attendance/listAttendance
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
+import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
@@ -88,6 +89,7 @@ const diagnosesController = new DiagnosesController(
   new UpdateDiagnosis(diagnosesRepository),
   new ListDiagnoses(diagnosesRepository),
   new RemoveDiagnosis(diagnosesRepository),
+  new DiagnosisById(diagnosesRepository),
 );
 
 app.use(diagnosesRoutes(diagnosesController));

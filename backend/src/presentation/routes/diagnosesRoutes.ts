@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { CreateDiagnosisDTO } from "@application/dtos/diagnoses/createDiagnosisDto";
+import { DiagnosisByIdDTO } from "@application/dtos/diagnoses/diagnosisByIdDto";
 import { ListDiagnosisDTO } from "@application/dtos/diagnoses/listDiagnosisDto";
 import { RemoveDiagnosisDTO } from "@application/dtos/diagnoses/removeDiagnosisDto";
 import { UpdateDiagnosisDTO } from "@application/dtos/diagnoses/updateDiagnosisDto";
@@ -15,6 +16,7 @@ export function diagnosesRoutes(controller: DiagnosesController): Router {
   router.put("/diagnoses/:id", validateParams(UpdateDiagnosisDTO), controller.update);
   router.get("/diagnoses", validateParams(ListDiagnosisDTO), controller.list);
   router.delete("/diagnoses/:id", validateParams(RemoveDiagnosisDTO), controller.remove);
+  router.get("/diagnoses/:id", validateParams(DiagnosisByIdDTO), controller.getById);
 
   return router;
 }
