@@ -3,15 +3,17 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 
-import { CreateCourse } from "@application/use-cases/course/createCourse";
-import { ListCourse } from "@application/use-cases/course/listCourse";
-import { UpdateCourse } from "@application/use-cases/course/updateCourse";
 import { AttendanceById } from "@application/useCases/attendance/attendanceById";
 import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent";
 import { CreateAttendance } from "@application/useCases/attendance/createAttendance";
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+import { CourseById } from "@application/useCases/course/courseById";
+import { CreateCourse } from "@application/useCases/course/createCourse";
+import { ListCourse } from "@application/useCases/course/listCourse";
+import { RemoveCourse } from "@application/useCases/course/removeCourse";
+import { UpdateCourse } from "@application/useCases/course/updateCourse";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
 import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
@@ -23,8 +25,8 @@ import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/persistence/prisma";
-import { PrismaCourseRepository } from "@infrastructure/persistence/prismaCourseRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
+import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
@@ -106,6 +108,8 @@ const courseController = new CourseController(
   new CreateCourse(courseRepository),
   new UpdateCourse(courseRepository),
   new ListCourse(courseRepository),
+  new CourseById(courseRepository),
+  new RemoveCourse(courseRepository),
 );
 
 app.use(courseRoutes(courseController));

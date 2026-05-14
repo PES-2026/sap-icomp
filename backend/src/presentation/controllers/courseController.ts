@@ -1,53 +1,76 @@
 import { Request, Response } from "express";
 
-import { CreateCourseDTO } from "../../application/dtos/course/createCourse.dto";
-import { ListCourseDTO } from "../../application/dtos/course/listCourse.dto";
-import { UpdateCourseDTO } from "../../application/dtos/course/updateCourse.dto";
-import { CreateCourse } from "../../application/use-cases/course/createCourse";
-import { ListCourse } from "../../application/use-cases/course/listCourse";
-import { UpdateCourse } from "../../application/use-cases/course/updateCourse";
-export class CourseController {
-  constructor(
-    private createCourse: CreateCourse,
-    private updateCourse: UpdateCourse,
-    private listCourse: ListCourse,
-  ) {}
+import { CourseByIdDTO } from "../../application/dtos/course/courseByIdDto";
+import { CreateCourseDTO } from "../../application/dtos/course/createCourseDto";
+import { ListCourseDTO } from "../../application/dtos/course/listCourseDto";
+import { RemoveCourseDTO } from "../../application/dtos/course/removeCourseDto";
+import { UpdateCourseDTO } from "../../application/dtos/course/updateCourseDto";
+import { CourseById } from "../../application/useCases/course/courseById";
+import { CreateCourse } from "../../application/useCases/course/createCourse";
+import { ListCourse } from "../../application/useCases/course/listCourse";
+import { RemoveCourse } from "../../application/useCases/course/removeCourse";
+import { UpdateCourse } from "../../application/useCases/course/updateCourse";
 
-  async create(req: Request, res: Response): Promise<void> {
+import { BaseController } from "./baseController";
+
+export class CourseController extends BaseController {
+  constructor(
+    private readonly createCourseUseCase: CreateCourse,
+    private readonly updateCourseUseCase: UpdateCourse,
+    private readonly listCourseUseCase: ListCourse,
+    private readonly courseByIdUseCase: CourseById,
+    private readonly removeCourseUseCase: RemoveCourse,
+  ) {
+    super();
+  }
+
+  create = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = CreateCourseDTO.create(req.body);
-      const course = await this.createCourse.execute(dto);
-      res.status(201).json(course);
+      const result = await this.createCourseUseCase.execute(dto);
+      this.handleResult(res, result, 201);
     } catch (error) {
-      this.handleError(error, res, this.create);
+      this.handleError(error, res, "CourseController:create");
     }
-  }
-  async list(req: Request, res: Response): Promise<void> {
+  };
+
+  list = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = ListCourseDTO.create(req.query);
-      const result = await this.listCourse.execute(dto);
-      res.status(200).json(result);
+      const result = await this.listCourseUseCase.execute(dto);
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.list);
+      this.handleError(error, res, "CourseController:list");
     }
-  }
-  async update(req: Request, res: Response): Promise<void> {
+  };
+
+  update = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = UpdateCourseDTO.create(req.params.id, req.body);
-      const updatedCourse = await this.updateCourse.execute(dto);
-      res.status(200).json(updatedCourse);
+      const result = await this.updateCourseUseCase.execute(dto);
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.update);
+      this.handleError(error, res, "CourseController:update");
     }
-  }
-  handleError(error: unknown, res: Response, func: Function) {
-    if (error instanceof Error) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
+  };
 
-    res.status(500).json({
-      message: `Internal server error to: ${CourseController.name}:${func.name}`,
-    });
-  }
+  findById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = CourseByIdDTO.create(req.params.id);
+      const result = await this.courseByIdUseCase.execute(dto);
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, "CourseController:findById");
+    }
+  };
+
+  remove = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RemoveCourseDTO.create(req.params.id);
+      const result = await this.removeCourseUseCase.execute(dto);
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, "CourseController:remove");
+    }
+  };
 }
