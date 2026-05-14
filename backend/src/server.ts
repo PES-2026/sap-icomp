@@ -3,6 +3,9 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 
+import { CreateCourse } from "@application/use-cases/course/createCourse";
+import { ListCourse } from "@application/use-cases/course/listCourse";
+import { UpdateCourse } from "@application/use-cases/course/updateCourse";
 import { AttendanceById } from "@application/useCases/attendance/attendanceById";
 import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent";
 import { CreateAttendance } from "@application/useCases/attendance/createAttendance";
@@ -20,14 +23,17 @@ import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/persistence/prisma";
+import { PrismaCourseRepository } from "@infrastructure/persistence/prismaCourseRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
+import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
+import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 
@@ -93,6 +99,16 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const courseRepository = new PrismaCourseRepository(prisma);
+
+const courseController = new CourseController(
+  new CreateCourse(courseRepository),
+  new UpdateCourse(courseRepository),
+  new ListCourse(courseRepository),
+);
+
+app.use(courseRoutes(courseController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

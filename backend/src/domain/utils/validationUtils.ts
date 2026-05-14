@@ -4,6 +4,7 @@ export function validateStringField(value: unknown, fieldName: string): string {
   }
   return value as string;
 }
+
 export function validateOptionalStringField(value: unknown, fieldName: string): string | undefined {
   if (value === "" || value === undefined) {
     return undefined;
@@ -99,6 +100,7 @@ export function validateExternalId(value: unknown, fieldName: string): string {
 
   return trimmed;
 }
+
 function isUUID(value: string): boolean {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);

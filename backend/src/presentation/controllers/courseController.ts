@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
 import { CreateCourseDTO } from "../../application/dtos/course/createCourse.dto";
-import { CreateCourse } from "../../application/useCases/course/createCourse";
-import { UpdateCourseDTO } from "../../application/dtos/course/updateCourse.dto";
-import { UpdateCourse } from "../../application/useCases/course/updateCourse";
 import { ListCourseDTO } from "../../application/dtos/course/listCourse.dto";
-import { ListCourse } from "../../application/useCases/course/listCourse";
+import { UpdateCourseDTO } from "../../application/dtos/course/updateCourse.dto";
+import { CreateCourse } from "../../application/use-cases/course/createCourse";
+import { ListCourse } from "../../application/use-cases/course/listCourse";
+import { UpdateCourse } from "../../application/use-cases/course/updateCourse";
 export class CourseController {
   constructor(
     private createCourse: CreateCourse,
