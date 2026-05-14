@@ -1,19 +1,60 @@
 import api from "@/services/api";
-import { CourseFromBackend } from "../types/course";
+import {
+  Course,
+  CoursePayload,
+  CoursesResponse,
+  CreateCourseResponse,
+  UpdateCourseResponse,
+} from "../types/course";
 
 export const coursesService = {
-  async get(): Promise<CourseFromBackend[]> {
-    try {
-      const response = await api.get<CourseFromBackend[]>("/courses");
-      return response.data;
-    } catch {
-      return [
-        { id: "Engenharia de Software", name: "Engenharia de Software" },
-        { id: "Engenharia de Computação", name: "Engenharia de Computação" },
-        { id: "Ciência da Computação", name: "Ciência da Computação" },
-        { id: "ABI", name: "ABI" },
-        { id: "Outros", name: "Outros" },
-      ];
-    }
+  async getAllCourses(
+    page = 1,
+    limit = 20,
+    nameOrAcronym?: string,
+  ): Promise<CoursesResponse> {
+    const response = await api.get<CoursesResponse>("/courses", {
+      params: { page, limit, nameOrAcronym },
+      fallbackMsg: "Não foi possível carregar os cursos.",
+    });
+
+    return response.data;
+  },
+
+  async getById(id: string): Promise<Course> {
+    const response = await api.get<Course>(`/courses/${id}`, {
+      fallbackMsg: "Não foi possível carregar os detalhes do curso.",
+    });
+
+    return response.data;
+  },
+
+  async createCourse(data: CoursePayload): Promise<CreateCourseResponse> {
+    const response = await api.post<CreateCourseResponse>("/courses", data, {
+      fallbackMsg: "Não foi possível criar o curso.",
+    });
+
+    return response.data;
+  },
+
+  async updateCourse(
+    id: string,
+    data: CoursePayload,
+  ): Promise<UpdateCourseResponse> {
+    const response = await api.put<UpdateCourseResponse>(
+      `/courses/${id}`,
+      data,
+      {
+        fallbackMsg: "Não foi possível atualizar o curso.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async removeCourse(id: string): Promise<void> {
+    await api.delete(`/courses/${id}`, {
+      fallbackMsg: "Não foi possível excluir o curso.",
+    });
   },
 };
