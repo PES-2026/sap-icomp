@@ -66,9 +66,10 @@ app.use(
 );
 
 const attedanceRepository = new PrismaAttendanceRepository(prisma);
+const studentRepository = new PrismaStudentRepository(prisma);
 
 const attendanceControler = new AttendanceController(
-  new CreateAttendance(attedanceRepository),
+  new CreateAttendance(attedanceRepository, studentRepository),
   new ListAttendances(attedanceRepository),
   new UpdateAttendance(attedanceRepository),
   new AttendancesByStudent(attedanceRepository),
@@ -77,8 +78,6 @@ const attendanceControler = new AttendanceController(
 );
 
 app.use(attendanceRoutes(attendanceControler));
-
-const studentRepository = new PrismaStudentRepository(prisma);
 
 const studentController = new StudentController(
   new CreateStudent(studentRepository),

@@ -1,5 +1,6 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { AttendanceNotFoundError } from "@application/errors/attendance/attendanceNotFoundError";
+import { AttendanceTypeNotFoundError } from "@application/errors/attendance/attendanceTypeNotFoundError";
 import { Attendance } from "@domain/entities/attendance";
 import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
@@ -19,6 +20,13 @@ export class UpdateAttendance {
 
     if (!attendance) {
       return Result.fail<UpdateAttendanceResponse>(new AttendanceNotFoundError(dto.id));
+    }
+
+    if (dto.type) {
+      const typeExists = await this.repository.existsTypeByName(dto.type);
+      if (!typeExists) {
+        return Result.fail<UpdateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.type));
+      }
     }
 
     const attendanceEntity = Attendance.rehydrate({

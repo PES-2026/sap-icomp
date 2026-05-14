@@ -1,15 +1,37 @@
 import { ApplicationError } from "@application/errors/applicationError";
+import { AttendanceTypeNotFoundError } from "@application/errors/attendance/attendanceTypeNotFoundError";
+import { PedagogueNotFoundError } from "@application/errors/pedagogue/pedagogueNotFoundError";
+import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { Attendance } from "@domain/entities/attendance";
 import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
 
 import { CreateAttendanceDTO, CreateAttendanceResponse } from "../../dtos/attendance/createAttendanceDto";
 
 export class CreateAttendance {
-  constructor(private repository: IAttendanceRepository) {}
+  constructor(
+    private repository: IAttendanceRepository,
+    private studentRepository: IStudentRepository,
+  ) {}
 
   async execute(dto: CreateAttendanceDTO): Promise<Result<CreateAttendanceResponse, ApplicationError | DomainError>> {
+    const studentExists = await this.studentRepository.existsByUUID(dto.studentId);
+    if (!studentExists) {
+      return Result.fail<CreateAttendanceResponse>(new StudentNotFoundError(dto.studentId));
+    }
+
+    const typeExists = await this.repository.existsTypeByName(dto.type);
+    if (!typeExists) {
+      return Result.fail<CreateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.type));
+    }
+
+    const pedagogueExists = await this.repository.existsAnyPedagogue();
+    if (!pedagogueExists) {
+      return Result.fail<CreateAttendanceResponse>(new PedagogueNotFoundError());
+    }
+
     const attendanceEntity = Attendance.create({
       studentId: dto.studentId,
       date: dto.date,

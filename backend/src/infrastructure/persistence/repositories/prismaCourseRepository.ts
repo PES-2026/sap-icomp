@@ -198,4 +198,12 @@ export class PrismaCourseRepository implements ICourseRepository {
 
     return !!professor;
   }
+
+  async existsByExternalId(id: string): Promise<boolean> {
+    const course = await this.prisma.course.findFirst({
+      where: { externalId: id, removed: false },
+      select: { internalId: true },
+    });
+    return !!course;
+  }
 }
