@@ -1,31 +1,20 @@
-import { ICourseRepository } from "../../../domain/repositories/courseRepository";
-import { ListCourseDTO, ListCourseResponse, ListCourseRequest } from "../../dtos/course/listCourse.dto";
+import { ListCourseDTO } from "@application/dtos/course/listCourseDto";
+import { ICourseRepository } from "@domain/repositories/courseRepository";
+import { ListCourseRequest, ListCourseResponse } from "@domain/repositories/filters/courseFilters";
+import { Result } from "@domain/shared/result";
 
 export class ListCourse {
-  constructor(private repository: ICourseRepository) {}
-  async execute(dto: ListCourseDTO): Promise<ListCourseResponse> {
+  constructor(private readonly repository: ICourseRepository) {}
+
+  async execute(dto: ListCourseDTO): Promise<Result<ListCourseResponse>> {
     const params: ListCourseRequest = {
       page: dto.page,
       limit: dto.limit,
       filters: dto.filters,
     };
 
-    return this.repository.findAll(params);
-  }
-}
+    const courses = await this.repository.findAll(params);
 
-import { ICourseRepository } from "../../../domain/repositories/courseRepository";
-import { ListCourseDTO, ListCourseResponse, ListCourseRequest } from "../../dtos/course/listCourse.dto";
-
-export class ListCourse {
-  constructor(private repository: ICourseRepository) {}
-  async execute(dto: ListCourseDTO): Promise<ListCourseResponse> {
-    const params: ListCourseRequest = {
-      page: dto.page,
-      limit: dto.limit,
-      filters: dto.filters,
-    };
-
-    return this.repository.findAll(params);
+    return Result.ok<ListCourseResponse>(courses);
   }
 }
