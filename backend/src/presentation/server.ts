@@ -23,6 +23,9 @@ import { AttendanceById } from "../application/use-cases/attendance/attendanceBy
 // TypeAttendance
 import { CreateTypeAttendance } from "../application/use-cases/typeAttendance/createTypeAttendance.js";
 import { UpdateTypeAttendance } from "../application/use-cases/typeAttendance/updateTypeAttendance.js";
+import { ListTypeAttendance } from "../application/use-cases/typeAttendance/listTypeAttendances.js";
+import { TypeAttendanceById } from "../application/use-cases/typeAttendance/typeAttendanceById.js";
+import { RemoveTypeAttendance } from "../application/use-cases/typeAttendance/removeTypeAttendance.js";
 import { TypeAttendanceController } from "./controllers/typeAttendanceController.js";
 import { typeAttendanceRoutes } from "./routes/typeAttendanceRoutes.js";
 import { PrismaTypeAttendanceRepository } from "../infrastructure/database/prismaTypeAttendanceRepository.js";
@@ -232,6 +235,9 @@ app.delete("/students/:id", async (req, res) => {
 const TypeAttendanceControler = new TypeAttendanceController(
   new CreateTypeAttendance(typeAttendanceRepository),
   new UpdateTypeAttendance(typeAttendanceRepository),
+  new ListTypeAttendance(typeAttendanceRepository),
+  new TypeAttendanceById(typeAttendanceRepository),
+  new RemoveTypeAttendance(typeAttendanceRepository),
 );
 app.use(typeAttendanceRoutes(TypeAttendanceControler));
 
