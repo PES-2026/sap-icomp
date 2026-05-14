@@ -11,4 +11,5 @@ export interface ICourseRepository {
   findByAcronym(acronym: string): Promise<CourseItem | null>;
   remove(id: string): Promise<void>;
   existsProfessorById(id: string): Promise<boolean>;
+  existsByExternalId(id: string): Promise<boolean>;
 }
