@@ -23,9 +23,9 @@ import { AttendanceById } from "../application/use-cases/attendance/attendanceBy
 //course imports
 import { PrismaCourseRepository } from "../infrastructure/database/prismaCourseRepository.js";
 import { CourseController } from "./controllers/courseController.js";
-import { CreateCourse } from "../application/use-cases/course/createCourse.js";
-import { UpdateCourse } from "../application/use-cases/course/updateCourse.js";
-import { ListCourse } from "../application/use-cases/course/listCourse.js";
+import { CreateCourse } from "../application/useCases/course/createCourse.js";
+import { UpdateCourse } from "../application/useCases/course/updateCourse.js";
+import { ListCourse } from "../application/useCases/course/listCourse.js";
 import { courseRoutes } from "./routes/courseRoutes.js";
 
 const app = express();
