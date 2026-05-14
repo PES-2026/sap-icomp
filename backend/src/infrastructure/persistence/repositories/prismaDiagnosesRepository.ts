@@ -1,7 +1,12 @@
 import { Diagnosis } from "@domain/entities/diagnosis";
 import { IDiagnosesRepository } from "@domain/repositories/diagnosesRepository";
-import { DiagnosisResult } from "@domain/repositories/results/diagnosisResult";
-import { PrismaClient, Diagnosis as PrismaDiagnosis } from "@prisma/src/infrastructure/database/generated/client";
+import { DiagnosisListParams } from "@domain/repositories/filters/diagnosisFilters";
+import { DiagnosisResult, PaginatedDiagnosisResult } from "@domain/repositories/results/diagnosisResult";
+import {
+  PrismaClient,
+  Diagnosis as PrismaDiagnosis,
+  Prisma,
+} from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaDiagnosesRepository implements IDiagnosesRepository {
   constructor(private prisma: PrismaClient) {}
@@ -38,6 +43,34 @@ export class PrismaDiagnosesRepository implements IDiagnosesRepository {
     const diagnosisResult = this.mapToDiagnosisResult(diagnosis);
 
     return diagnosisResult;
+  }
+
+  async findAll(params: DiagnosisListParams): Promise<PaginatedDiagnosisResult> {
+    const { page, limit, filters } = params;
+
+    const where: Prisma.DiagnosisWhereInput = {
+      removed: false,
+      ...(filters.name && { name: { contains: filters.name, mode: "insensitive" } }),
+      ...(filters.acronym && { acronym: { contains: filters.acronym, mode: "insensitive" } }),
+      ...(filters.cid && { CID: { contains: filters.cid, mode: "insensitive" } }),
+    };
+
+    const [totalItems, diagnoses] = await Promise.all([
+      this.prisma.diagnosis.count({ where }),
+      this.prisma.diagnosis.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { name: "asc" },
+      }),
+    ]);
+
+    return {
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      items: diagnoses.map((d) => this.mapToDiagnosisResult(d)),
+    };
   }
 
   async update(diagnosis: Diagnosis): Promise<void> {
