@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 
 import { CreateDiagnosisDTO } from "@application/dtos/diagnoses/createDiagnosisDto";
 import { ListDiagnosisDTO } from "@application/dtos/diagnoses/listDiagnosisDto";
+import { RemoveDiagnosisDTO } from "@application/dtos/diagnoses/removeDiagnosisDto";
 import { UpdateDiagnosisDTO } from "@application/dtos/diagnoses/updateDiagnosisDto";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
+import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
 
 import { BaseController } from "./baseController";
@@ -14,6 +16,7 @@ export class DiagnosesController extends BaseController {
     private createDiagnosis: CreateDiagnosis,
     private updateDiagnosis: UpdateDiagnosis,
     private listDiagnoses: ListDiagnoses,
+    private removeDiagnosis: RemoveDiagnosis,
   ) {
     super();
   }
@@ -48,6 +51,17 @@ export class DiagnosesController extends BaseController {
       this.handleResult(res, result);
     } catch (error) {
       this.handleError(error, res, `${DiagnosesController.name}:list`);
+    }
+  };
+
+  remove = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RemoveDiagnosisDTO.create(req.params.id);
+      const result = await this.removeDiagnosis.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${DiagnosesController.name}:remove`);
     }
   };
 }
