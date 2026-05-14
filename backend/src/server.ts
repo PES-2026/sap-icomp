@@ -10,6 +10,7 @@ import { ListAttendances } from "@application/useCases/attendance/listAttendance
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
+import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -80,7 +81,10 @@ app.use(studentRoutes(studentController));
 
 const diagnosesRepository = new PrismaDiagnosesRepository(prisma);
 
-const diagnosesController = new DiagnosesController(new CreateDiagnosis(diagnosesRepository));
+const diagnosesController = new DiagnosesController(
+  new CreateDiagnosis(diagnosesRepository),
+  new UpdateDiagnosis(diagnosesRepository),
+);
 
 app.use(diagnosesRoutes(diagnosesController));
 

@@ -11,7 +11,7 @@ export type DiagnosisProps = {
   cid?: string;
 };
 
-type DiagnosisPropsVO = {
+export type DiagnosisPropsVO = {
   name: NameVO;
   acronym: AcronymVO;
   cid: CidVO;
