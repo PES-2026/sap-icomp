@@ -84,6 +84,13 @@ export class PrismaDiagnosesRepository implements IDiagnosesRepository {
     });
   }
 
+  async remove(id: string): Promise<void> {
+    await this.prisma.diagnosis.update({
+      where: { externalId: id },
+      data: { removed: true },
+    });
+  }
+
   async findByName(name: string): Promise<DiagnosisResult | null> {
     const diagnosis = await this.prisma.diagnosis.findFirst({
       where: { name, removed: false },

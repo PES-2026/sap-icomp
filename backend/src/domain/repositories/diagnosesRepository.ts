@@ -11,4 +11,5 @@ export interface IDiagnosesRepository {
   findByCid(cid: string): Promise<DiagnosisResult | null>;
   findAll(params: DiagnosisListParams): Promise<PaginatedDiagnosisResult>;
   update(diagnosis: Diagnosis): Promise<void>;
+  remove(id: string): Promise<void>;
 }
