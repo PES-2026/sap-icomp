@@ -1,19 +1,29 @@
-export class Acronym {
-  constructor(private readonly name: string) {}
+import { AcronymTooLongError } from "@domain/errors/course/acronymTooLongError";
+import { AcronymTooShortError } from "@domain/errors/course/acronymTooShortError";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
 
-  static create(value: string): Acronym {
+export class Acronym {
+  private readonly _value: string;
+
+  constructor(name: string) {
+    this._value = name;
+  }
+
+  static create(value: string): Result<Acronym> {
     if (!value) {
-      throw new Error("The acronym is required for registration.");
+      return Result.fail<Acronym>(new RequiredFieldError("acronym"));
     }
     const trimmed = value.trim();
-    if (trimmed.length < 5) {
-      throw new Error("The acronym must be longer than one characters.");
+    if (trimmed.length < 1) {
+      return Result.fail<Acronym>(new AcronymTooShortError(trimmed.length));
     } else if (trimmed.length > 15) {
-      throw new Error("Acronym too long, over 15 characters.");
+      return Result.fail<Acronym>(new AcronymTooLongError(trimmed.length));
     }
-    return new Acronym(trimmed);
+    return Result.ok<Acronym>(new Acronym(trimmed));
   }
+
   get value(): string {
-    return this.name;
+    return this._value;
   }
 }
