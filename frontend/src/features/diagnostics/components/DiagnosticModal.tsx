@@ -1,7 +1,7 @@
 "use client";
 
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Field } from "@/components/ui/Field";
 import { FormModal } from "@/components/ui/FormModal";
 import { Eye } from "lucide-react";
@@ -29,11 +29,10 @@ export function DiagnosticModal({
     removeDiagnostic,
   } = useDiagnostics();
 
-  const [mode, setMode] = useState<"create" | "view" | "edit">(
-    diagnosticId ? "view" : "create",
-  );
-  const [name, setName] = useState("");
+  const [mode, setMode] = useState<"create" | "view" | "edit">("create");
 
+  // Forms
+  const [name, setName] = useState("");
   const [acronym, setAcronym] = useState("");
   const [cid, setCid] = useState("");
 
@@ -41,17 +40,26 @@ export function DiagnosticModal({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    if (isOpen && diagnosticId) {
-      getDiagnosticsById(diagnosticId).then((data) => {
-        if (data) {
-          setName(data.name);
-          setAcronym(data.acronym ?? "");
-          setCid(data.cid ?? "");
-          setDiagnosticData(data);
-        }
-      });
+    if (isOpen) {
+      if (diagnosticId) {
+        setMode("view");
+        getDiagnosticsById(diagnosticId).then((data) => {
+          if (data) {
+            setName(data.name);
+            setAcronym(data.acronym ?? "");
+            setCid(data.cid ?? "");
+            setDiagnosticData(data);
+          }
+        });
+      } else {
+        setMode("create");
+        setName("");
+        setAcronym("");
+        setCid("");
+        setDiagnosticData(null);
+      }
     }
-  }, [isOpen, diagnosticId, getDiagnosticsById]);
+  }, [isOpen, diagnosticId]);
 
   const handleSecondaryAction = async () => {
     if (mode === "view" && diagnosticId) {
@@ -78,6 +86,11 @@ export function DiagnosticModal({
   };
 
   const handleConfirm = async () => {
+    if (mode === "view") {
+      setMode("edit");
+      return;
+    }
+
     const payload = {
       name: name.trim(),
       acronym: acronym.trim() || undefined,
@@ -90,8 +103,6 @@ export function DiagnosticModal({
         onSuccess();
         onClose();
       }
-    } else if (mode === "view") {
-      setMode("edit");
     } else if (mode === "edit" && diagnosticId) {
       const success = await updateDiagnostic(diagnosticId, payload);
       if (success) {

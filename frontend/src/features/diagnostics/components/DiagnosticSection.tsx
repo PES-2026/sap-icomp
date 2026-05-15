@@ -1,6 +1,5 @@
 "use client";
 
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import CommonButton from "@/components/ui/CommonButton";
 import { InfoBadge } from "@/components/ui/InfoBadge";
 import { ManageSectionCard } from "@/components/ui/ManageSectionCard";
@@ -8,13 +7,10 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { Loader2, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDiagnostics } from "../hooks/useDiagnostics";
-import { Diagnostic } from "../types/diagnostic";
 import { DiagnosticModal } from "./DiagnosticModal";
 
 export default function DiagnosticSection() {
-  // Deixar aqui apenas o get dos diagnósticos, filtros e a lógica de abrir o Modal
-  const { diagnostics, fetchDiagnostics, isLoading, removeDiagnostic } =
-    useDiagnostics();
+  const { diagnostics, fetchDiagnostics, isLoading } = useDiagnostics();
 
   const [nameFilter, setNameFilter] = useState("");
   const [acronymFilter, setAcronymFilter] = useState("");
@@ -22,11 +18,7 @@ export default function DiagnosticSection() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedDiagnosticToDelete, setSelectedDiagnosticToDelete] =
-    useState<Diagnostic | null>(null);
 
-  // Lógica de filtros no lugar certo
   const filteredDiagnostics = useMemo(() => {
     return diagnostics.filter((diagnostic) => {
       const nameMatch = diagnostic.name
@@ -50,27 +42,9 @@ export default function DiagnosticSection() {
     setIsModalOpen(true);
   };
 
-  // Renomear handleOpenView
   const handleOpenView = (externalId: string) => {
     setSelectedId(externalId);
     setIsModalOpen(true);
-  };
-
-  const handleCancelDelete = () => {
-    setSelectedDiagnosticToDelete(null);
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedDiagnosticToDelete) return;
-
-    const success = await removeDiagnostic(
-      selectedDiagnosticToDelete.externalId,
-    );
-
-    if (success) {
-      handleCancelDelete();
-    }
   };
 
   if (isLoading) {
@@ -174,16 +148,6 @@ export default function DiagnosticSection() {
         onClose={() => setIsModalOpen(false)}
         diagnosticId={selectedId}
         onSuccess={fetchDiagnostics}
-      />
-
-      <ConfirmModal
-        open={isDeleteModalOpen}
-        title="Excluir Diagnóstico"
-        message={`Tem certeza que deseja excluir o diagnóstico ${selectedDiagnosticToDelete?.name}? Esta ação não poderá ser desfeita.`}
-        confirmLabel="Excluir"
-        confirmColor="critical"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
       />
     </>
   );
