@@ -12,4 +12,5 @@ export const PATHS = {
     `/admin/students/${studentId}/attendance/${attendanceId}`,
   edit_attendance: (studentId: string, attendanceId: string) =>
     `/admin/students/${studentId}/attendance/${attendanceId}/edit`,
+  visualize_settings: "/admin/settings",
 };

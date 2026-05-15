@@ -19,7 +19,7 @@ export function useCoursesSettings(autoFetch = true) {
         nameOrAcronym.trim() || undefined,
       );
 
-      setCourses(response.data);
+      setCourses(response.items || []);
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
     } finally {

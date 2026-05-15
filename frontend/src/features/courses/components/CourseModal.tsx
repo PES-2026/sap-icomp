@@ -1,9 +1,10 @@
 "use client";
 
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Field } from "@/components/ui/Field";
 import { FormModal } from "@/components/ui/FormModal";
+import { formatDate } from "@/utils/utils";
 import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCoursesSettings } from "../hooks/useCoursesSettings";
@@ -14,35 +15,22 @@ interface CourseModalProps {
   onClose: () => void;
   courseId: string | null;
   onSuccess: () => void;
-  courses?: Course[];
 }
 
 const inputClass =
   "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed";
-
-const formatDate = (value: string) => {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("pt-BR").format(date);
-};
 
 export function CourseModal({
   isOpen,
   onClose,
   courseId,
   onSuccess,
-  courses = [],
 }: CourseModalProps) {
   const { getCourseById, createCourse, updateCourse, removeCourse } =
     useCoursesSettings(false);
 
-  const [mode, setMode] = useState<"create" | "view" | "edit">(
-    courseId ? "view" : "create",
-  );
+  const [mode, setMode] = useState<"create" | "view" | "edit">("create");
+
   const [name, setName] = useState("");
   const [acronym, setAcronym] = useState("");
   const [coordinatorId, setCoordinatorId] = useState("");
@@ -52,39 +40,31 @@ export function CourseModal({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!isOpen || !courseId) return;
-
-    getCourseById(courseId).then((data) => {
-      if (data) {
-        setName(data.name);
-        setAcronym(data.acronym);
-        setCoordinatorId(data.coordinatorId ?? "");
-        setCourseData(data);
+    if (isOpen) {
+      if (courseId) {
+        setMode("view");
+        getCourseById(courseId).then((data) => {
+          if (data) {
+            setName(data.name);
+            setAcronym(data.acronym);
+            setCoordinatorId(data.coordinatorId ?? "");
+            setCourseData(data);
+          }
+        });
+      } else {
+        setMode("create");
+        setName("");
+        setAcronym("");
+        setCoordinatorId("");
+        setCourseData(null);
       }
-    });
-  }, [courseId, isOpen]);
+    }
+  }, [isOpen, courseId]);
 
   const handleSecondaryAction = () => {
     if (mode === "view" && courseId) {
       setIsDeleteModalOpen(true);
-      return;
-    }
-
-    onClose();
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!courseId) return;
-
-    const success = await removeCourse(courseId);
-
-    if (success) {
-      setIsDeleteModalOpen(false);
-      onSuccess();
+    } else {
       onClose();
     }
   };
@@ -104,33 +84,13 @@ export function CourseModal({
       coordinatorId: coordinatorId.trim() || undefined,
     };
 
-    if (!payload.name) {
-      setNameError(
-        mode === "edit"
-          ? "O nome do curso não pode ficar vazio"
-          : "O nome do curso é obrigatório",
-      );
+    if (!name) {
+      setNameError("O nome do curso é obrigatório.");
       return;
     }
 
-    if (!payload.acronym) {
-      setAcronymError("A sigla do curso é obrigatória");
-      return;
-    }
-
-    const hasDuplicatedName = courses.some(
-      (course) =>
-        course.externalId !== courseId &&
-        course.name.trim().toLowerCase() === payload.name.toLowerCase(),
-    );
-
-    if (mode === "create" && hasDuplicatedName) {
-      setNameError("Este curso já está cadastrado no sistema");
-      return;
-    }
-
-    if (mode === "edit" && hasDuplicatedName) {
-      setNameError("Já existe um curso cadastrado com este nome");
+    if (!acronym) {
+      setAcronymError("A sigla do curso é obrigatória.");
       return;
     }
 
@@ -149,10 +109,28 @@ export function CourseModal({
     }
   };
 
+  // Confirm Modal to Delete
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!courseId) return;
+
+    const success = await removeCourse(courseId);
+
+    if (success) {
+      setIsDeleteModalOpen(false);
+      onSuccess();
+      onClose();
+    }
+  };
+
   const modalTitle =
     mode === "view" ? "Visualizar" : mode === "create" ? "Cadastrar" : "Editar";
 
   const isViewMode = mode === "view";
+
   const coordinatorDisplayValue =
     isViewMode && courseData?.coordinatorName
       ? courseData.coordinatorName
@@ -173,7 +151,12 @@ export function CourseModal({
             {mode === "edit" && (
               <CommonButton
                 label="Visualizar"
-                onClick={() => setMode("view")}
+                onClick={() => {
+                  setMode("view");
+                  setName(courseData?.name || "");
+                  setAcronym(courseData?.acronym || "");
+                  setCoordinatorId(courseData?.coordinatorId || "");
+                }}
                 startIcon={Eye}
               />
             )}
@@ -224,7 +207,7 @@ export function CourseModal({
           />
         </Field>
 
-        <Field label="Coordenador(a) do Curso:">
+        {/* <Field label="Coordenador(a) do Curso:">
           <input
             disabled={isViewMode}
             type="text"
@@ -233,12 +216,16 @@ export function CourseModal({
             placeholder="Insira o ID do coordenador"
             className={inputClass}
           />
-        </Field>
+        </Field> */}
 
-        {mode !== "create" && courseData && (
+        {mode === "view" && courseData && (
           <div className="flex gap-4 text-xs text-stone-500">
-            <span>Criado em {formatDate(courseData.createdAt)}</span>
-            <span>Editado em {formatDate(courseData.updatedAt)}</span>
+            <span>
+              <strong>Criado em:</strong> {formatDate(courseData.createdAt)}
+            </span>
+            <span>
+              <strong>Atualizado em:</strong> {formatDate(courseData.updatedAt)}
+            </span>
           </div>
         )}
       </FormModal>

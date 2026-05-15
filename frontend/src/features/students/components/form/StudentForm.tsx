@@ -83,8 +83,8 @@ export default function StudentForm({
 
       const payload = formatForBackend(formData);
 
-      if (isEditMode && initialData?.externalId) {
-        await studentService.updateStudent(initialData.externalId, payload);
+      if (isEditMode && initialData?.id) {
+        await studentService.updateStudent(initialData.id, payload);
         toast.success("Estudante atualizado com sucesso!");
       } else {
         await studentService.createStudent(payload as StudentFormData);

@@ -2,7 +2,7 @@ import { formatDate, maskPhone, maskRegistration } from "@/utils/utils";
 import { FormErrors, Student, StudentFormData } from "../types/student";
 
 export const EMPTY_FORM_STUDENT: StudentFormData = {
-  externalId: "",
+  id: "",
   enrollmentId: "",
   name: "",
   dtBirth: "",
@@ -34,7 +34,7 @@ export const validateStudentForm = (data: StudentFormData): FormErrors => {
 export const formatForBackend = (data: StudentFormData) => {
   const [day, month, year] = data.dtBirth.split("/");
 
-  const { externalId, ...restData } = data;
+  const { id: externalId, ...restData } = data;
 
   return {
     ...restData,

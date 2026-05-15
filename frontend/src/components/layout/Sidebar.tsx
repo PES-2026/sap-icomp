@@ -7,6 +7,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Settings,
   Users,
   X,
 } from "lucide-react";
@@ -38,6 +39,12 @@ export default function Sidebar() {
       icon: CalendarFold,
       id: "Envio",
       href: PATHS.attendances_list,
+    },
+    {
+      label: "Cadastros Gerais",
+      icon: Settings,
+      id: "Configuração",
+      href: PATHS.visualize_settings,
     },
   ];
 

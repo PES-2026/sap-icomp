@@ -1,26 +1,20 @@
 "use client";
 
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import CommonButton from "@/components/ui/CommonButton";
 import { InfoBadge } from "@/components/ui/InfoBadge";
 import { ManageSectionCard } from "@/components/ui/ManageSectionCard";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCoursesSettings } from "../hooks/useCoursesSettings";
-import { Course } from "../types/course";
 import { CourseModal } from "./CourseModal";
 
 export default function CourseSection() {
-  const { courses, fetchCourses, isLoading, removeCourse } =
-    useCoursesSettings();
+  const { courses, fetchCourses, isLoading } = useCoursesSettings();
 
   const [searchFilter, setSearchFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedCourseToDelete, setSelectedCourseToDelete] =
-    useState<Course | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -38,26 +32,6 @@ export default function CourseSection() {
   const handleOpenView = (externalId: string) => {
     setSelectedId(externalId);
     setIsModalOpen(true);
-  };
-
-  const handleOpenDeleteModal = (course: Course) => {
-    setSelectedCourseToDelete(course);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCancelDelete = () => {
-    setSelectedCourseToDelete(null);
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedCourseToDelete) return;
-
-    const success = await removeCourse(selectedCourseToDelete.externalId);
-
-    if (success) {
-      handleCancelDelete();
-    }
   };
 
   const isSearching = searchFilter.trim().length > 0;
@@ -93,21 +67,12 @@ export default function CourseSection() {
             Nenhum curso encontrado.
           </span>
         ) : (
-          courses.map((course) => (
-            <div key={course.externalId} className="flex items-center gap-1">
+          courses.map((course, idx) => (
+            <div key={idx} className="flex items-center gap-1">
               <InfoBadge
                 label={`${course.name} (${course.acronym})`}
-                onClick={() => handleOpenView(course.externalId)}
+                onClick={() => handleOpenView(course.id)}
               />
-
-              <button
-                type="button"
-                title="Excluir curso"
-                onClick={() => handleOpenDeleteModal(course)}
-                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-red-400 transition-colors hover:bg-red-100 hover:text-red-500"
-              >
-                <Trash2 size={16} />
-              </button>
             </div>
           ))
         )}
@@ -117,21 +82,10 @@ export default function CourseSection() {
         <CourseModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          courseId={selectedId}
           onSuccess={() => fetchCourses(searchFilter)}
-          courses={courses}
+          courseId={selectedId}
         />
       )}
-
-      <ConfirmModal
-        open={isDeleteModalOpen}
-        title="Excluir Curso"
-        message={`Tem certeza que deseja excluir o curso ${selectedCourseToDelete?.name}? Esta ação removerá o curso permanentemente do catálogo.`}
-        confirmLabel="Excluir"
-        confirmColor="critical"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      />
     </>
   );
 }

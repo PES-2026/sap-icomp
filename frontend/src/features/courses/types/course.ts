@@ -1,5 +1,5 @@
 export interface Course {
-  externalId: string;
+  id: string;
   name: string;
   acronym: string;
   coordinatorId?: string;
@@ -14,7 +14,6 @@ export interface CoursePayload {
   coordinatorId?: string;
 }
 
-// Rever no futuro essas duas interfaces Create e Update
 export interface CreateCourseResponse {
   externalId: string;
   name: string;
@@ -30,8 +29,8 @@ export interface UpdateCourseResponse {
 }
 
 export interface CoursesResponse {
-  data: Course[];
-  page: number;
-  limit: number;
-  total: number;
+  totalPages: number;
+  currentPage: number;
+  totalItems: number;
+  items: Course[];
 }

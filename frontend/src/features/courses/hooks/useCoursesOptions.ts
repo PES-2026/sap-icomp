@@ -11,8 +11,8 @@ export const useCoursesOptions = () => {
       try {
         const response = await coursesService.getAllCourses(1, 100);
 
-        const mappedOptions: SelectOption[] = response.data.map((course) => ({
-          value: course.externalId,
+        const mappedOptions: SelectOption[] = response.items.map((course) => ({
+          value: course.id,
           label: course.name,
         }));
 
