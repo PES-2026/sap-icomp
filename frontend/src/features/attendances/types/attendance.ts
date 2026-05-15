@@ -8,6 +8,8 @@ export interface Attendance {
   attendanceType: string;
   attendanceDate: string;
   generalObservations: string;
+  updatedAt: Date;
+  createdAt: Date;
 }
 
 export interface AttendanceFormData {

@@ -47,12 +47,10 @@ export const formatAttendanceForFrontend = (data: any): AttendanceFormData => {
 
 export const formatGetAttendancesForFrontend = (data: any[]): Attendance[] => {
   return data.map((item) => {
-    const { id, attendanceDate, ...rest } = item;
-
     return {
-      ...rest,
-      attendanceId: id,
-      attendanceDate: formatDate(item.attendanceDate),
+      ...item,
+      attendanceId: item.id,
+      attendanceDate: item.date ? formatDate(item.date) : "",
     };
   });
 };

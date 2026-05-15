@@ -78,9 +78,9 @@ model Attendance {
   observation String?
   removed     Boolean @default(false)
 
-  student   Student         @relation(fields: [studentId], references: [internalId])
-  pedagogue Pedagogue?      @relation(fields: [pedagogueId], references: [internalId])
-  type      AttendanceType  @relation(fields: [typeId], references: [internalId])
+  student   Student        @relation(fields: [studentId], references: [internalId])
+  pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
+  type      AttendanceType @relation(fields: [typeId], references: [internalId])
 }
 
 model AttendanceType {
