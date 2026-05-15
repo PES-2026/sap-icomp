@@ -92,19 +92,16 @@ export default function StudentForm({
       }
 
       setIsSubmitted(true);
-    } catch (error: unknown) {
-      const apiError =
-        typeof error === "object" && error !== null && "response" in error
-          ? (error as { response?: { data?: { error?: string } } }).response
-              ?.data?.error
-          : undefined;
-
-      toast.error(
-        apiError ||
-          (isEditMode
-            ? "Erro ao conectar com o servidor, não foi possível editar."
-            : "Erro ao conectar com o servidor, não foi possível registrar."),
-      );
+    } catch (error: any) {
+      isEditMode
+        ? toast.error(
+            error.response?.data?.error ||
+              "Erro ao conectar com o servidor, não foi possível editar.",
+          )
+        : toast.error(
+            error.response?.data?.error ||
+              "Erro ao conectar com o servidor, não foi possível registrar.",
+          );
     } finally {
       setIsLoading(false);
       setShowConfirmRegister(false);

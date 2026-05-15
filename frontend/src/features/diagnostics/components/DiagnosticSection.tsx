@@ -5,7 +5,7 @@ import CommonButton from "@/components/ui/CommonButton";
 import { InfoBadge } from "@/components/ui/InfoBadge";
 import { ManageSectionCard } from "@/components/ui/ManageSectionCard";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDiagnostics } from "../hooks/useDiagnostics";
 import { Diagnostic } from "../types/diagnostic";
@@ -69,12 +69,49 @@ export default function DiagnosticSection() {
   const handleConfirmDelete = async () => {
     if (!selectedDiagnosticToDelete) return;
 
-    const success = await removeDiagnostic(selectedDiagnosticToDelete.externalId);
+    const success = await removeDiagnostic(
+      selectedDiagnosticToDelete.externalId,
+    );
 
     if (success) {
       handleCancelDelete();
     }
   };
+
+  if (isLoading) {
+    <ManageSectionCard
+      title="Gerenciar Diagnósticos"
+      searchInputs={
+        <>
+          <SearchInput
+            placeholder="Buscar por Diagnóstico"
+            value={nameFilter}
+            onChange={setNameFilter}
+          />
+          <SearchInput
+            placeholder="Buscar por Sigla"
+            value={acronymFilter}
+            onChange={setAcronymFilter}
+          />
+          <SearchInput
+            placeholder="Buscar por CID"
+            value={cidFilter}
+            onChange={setCidFilter}
+          />
+        </>
+      }
+      actionButton={
+        <CommonButton
+          label="Adicionar Diagnóstico"
+          endIcon={Plus}
+          onClick={handleOpenCreate}
+          className="min-w-70 justify-center"
+        />
+      }
+    >
+      <Loader2 size={40} />
+    </ManageSectionCard>;
+  }
 
   return (
     <>
@@ -132,28 +169,17 @@ export default function DiagnosticSection() {
                   .join(" ")}
                 onClick={() => handleOpenView(diagnostic.externalId)}
               />
-
-              <button
-                type="button"
-                title="Excluir diagnóstico"
-                onClick={() => handleOpenDeleteModal(diagnostic)}
-                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-red-400 transition-colors hover:bg-red-100 hover:text-red-500"
-              >
-                <Trash2 size={16} />
-              </button>
             </div>
           ))
         )}
       </ManageSectionCard>
 
-      {isModalOpen && (
-        <DiagnosticModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          diagnosticId={selectedId}
-          onSuccess={fetchDiagnostics}
-        />
-      )}
+      <DiagnosticModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        diagnosticId={selectedId}
+        onSuccess={fetchDiagnostics}
+      />
 
       <ConfirmModal
         open={isDeleteModalOpen}

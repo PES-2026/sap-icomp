@@ -7,7 +7,6 @@ import { Field } from "@/components/ui/Field";
 import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
 import { PATHS } from "@/constants/paths";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
-import { studentService } from "@/features/students/services/studentService";
 import { maskDate } from "@/utils/utils";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -54,9 +53,6 @@ export default function AttendanceForm({
   const { attendanceTypesOptions } = useAttendanceTypesOptions();
 
   const [showConfirmRegister, setShowConfirmRegister] = useState(false);
-  const [selectedDiagnosis, setSelectedDiagnosis] = useState("");
-
-  const currentDiagnosis = selectedDiagnosis || student?.diagnosis || "";
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
@@ -97,15 +93,6 @@ export default function AttendanceForm({
     try {
       setIsLoading(true);
       const payload = formatAttendanceForBackend(formData, studentId);
-      const shouldUpdateDiagnosis =
-        currentDiagnosis.trim() &&
-        currentDiagnosis.trim() !== (student?.diagnosis ?? "").trim();
-
-      if (shouldUpdateDiagnosis) {
-        await studentService.updateStudent(studentId, {
-          diagnosis: currentDiagnosis.trim(),
-        });
-      }
 
       if (isEditMode) {
         await attendanceService.update(attendanceId, payload);
@@ -131,7 +118,6 @@ export default function AttendanceForm({
   const handleReset = () => {
     setFormData(EMPTY_FORM_ATTENDANCE);
     setErrors({});
-    setSelectedDiagnosis("");
     setIsSubmitted(false);
   };
 
