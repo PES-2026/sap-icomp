@@ -7,7 +7,7 @@ import { Diagnosis, DiagnosisPropsVO } from "@domain/entities/diagnosis";
 import { DomainError } from "@domain/errors/domainError";
 import { IDiagnosesRepository } from "@domain/repositories/diagnosesRepository";
 import { Result } from "@domain/shared/result";
-import { AcronymVO } from "@domain/valueObjects/diagnoses/acronym";
+import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 import { CidVO } from "@domain/valueObjects/diagnoses/cid";
 import { NameVO } from "@domain/valueObjects/shared/name";
 

@@ -17,7 +17,7 @@ export function courseRoutes(controller: CourseController): Router {
   router.put("/courses/:id", validateParams(UpdateCourseDTO), controller.update);
   router.get("/courses", validateParams(ListCourseDTO), controller.list);
   router.get("/courses/:id", validateParams(CourseByIdDTO), controller.findById);
-  router.post("/courses/:id", validateParams(RemoveCourseDTO), controller.remove);
+  router.post("/courses/:id/remove", validateParams(RemoveCourseDTO), controller.remove);
 
   return router;
 }

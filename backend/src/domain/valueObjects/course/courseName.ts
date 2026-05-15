@@ -11,19 +11,32 @@ export class CourseName {
   }
 
   static create(name: string): Result<CourseName> {
+    const result = CourseName.validate(name);
+    if (result.isFailure) {
+      return Result.fail<CourseName>(result.error!);
+    }
+    return Result.ok<CourseName>(new CourseName(name.trim()));
+  }
+
+  static fromTrusted(name: string): CourseName {
+    return new CourseName(name.trim());
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  private static validate(name: string): Result<CourseName> {
     if (!name) {
       return Result.fail<CourseName>(new RequiredFieldError("course name"));
     }
+
     const trimmed = name.trim();
     if (trimmed.length < 3) {
       return Result.fail<CourseName>(new CourseNameTooShortError(trimmed.length));
     } else if (trimmed.length > 140) {
       return Result.fail<CourseName>(new CourseNameTooLongError(trimmed.length));
     }
-    return Result.ok<CourseName>(new CourseName(trimmed));
-  }
-
-  get value(): string {
-    return this._value;
+    return Result.ok<CourseName>();
   }
 }
