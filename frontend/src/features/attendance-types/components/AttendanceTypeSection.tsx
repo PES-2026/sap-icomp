@@ -86,9 +86,9 @@ export default function AttendanceTypeSection() {
         ) : (
           filteredTypes.map((type) => (
             <InfoBadge
-              key={type.externalId}
+              key={type.id}
               label={type.name}
-              onClick={() => handleOpenView(type.externalId)}
+              onClick={() => handleOpenView(type.id)}
             />
           ))
         )}

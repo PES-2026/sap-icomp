@@ -11,14 +11,16 @@ export const useAttendanceTypesOptions = () => {
   useEffect(() => {
     const fetchAttendanceTypes = async () => {
       try {
-        const response = await attendanceTypeService.get();
+        const response = await attendanceTypeService.getAll();
 
-        const mappedOptions: SelectOption[] = response.map((course) => ({
-          value: String(course.id),
-          label: course.name,
-        }));
+        const mappedOptions: SelectOption[] = response.items.map(
+          (attendanceType) => ({
+            value: String(attendanceType.id),
+            label: attendanceType.name,
+          }),
+        );
 
-        setAttendanceTypesOptions(mappedOptions);
+        setAttendanceTypesOptions(mappedOptions || []);
       } catch (err) {
         console.error("Error to fetch attendance types options: ", err);
         toast.error(
