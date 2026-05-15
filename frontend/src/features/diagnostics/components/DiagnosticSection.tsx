@@ -124,10 +124,7 @@ export default function DiagnosticSection() {
           </span>
         ) : (
           filteredDiagnostics.map((diagnostic) => (
-            <div
-              key={diagnostic.externalId}
-              className="flex items-center gap-1"
-            >
+            <div key={diagnostic.id} className="flex items-center gap-1">
               <InfoBadge
                 label={[
                   diagnostic.name,
@@ -136,7 +133,7 @@ export default function DiagnosticSection() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                onClick={() => handleOpenView(diagnostic.externalId)}
+                onClick={() => handleOpenView(diagnostic.id)}
               />
             </div>
           ))

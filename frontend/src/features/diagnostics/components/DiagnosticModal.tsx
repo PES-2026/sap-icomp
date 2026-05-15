@@ -4,6 +4,7 @@ import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Field } from "@/components/ui/Field";
 import { FormModal } from "@/components/ui/FormModal";
+import { formatDate } from "@/utils/utils";
 import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDiagnostics } from "../hooks/useDiagnostics";
@@ -132,7 +133,12 @@ export function DiagnosticModal({
             {mode === "edit" && (
               <CommonButton
                 label="Visualizar"
-                onClick={() => setMode("view")}
+                onClick={() => {
+                  setMode("view");
+                  setName(diagnosticData?.name || "");
+                  setAcronym(diagnosticData?.acronym || "");
+                  setCid(diagnosticData?.cid || "");
+                }}
                 startIcon={Eye}
               />
             )}
@@ -185,10 +191,11 @@ export function DiagnosticModal({
         {mode === "view" && diagnosticData && (
           <div className="flex gap-4 text-xs text-stone-500">
             <span>
-              <strong>Criado em:</strong> {diagnosticData.createdAt}
+              <strong>Criado em:</strong> {formatDate(diagnosticData.createdAt)}
             </span>
             <span>
-              <strong>Atualizado em:</strong> {diagnosticData.updatedAt}
+              <strong>Atualizado em:</strong>{" "}
+              {formatDate(diagnosticData.updatedAt)}
             </span>
           </div>
         )}

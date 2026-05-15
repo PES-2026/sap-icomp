@@ -1,5 +1,5 @@
 export interface Diagnostic {
-  externalId: string;
+  id: string;
   name: string;
   acronym: string;
   cid: string;
@@ -8,7 +8,7 @@ export interface Diagnostic {
 }
 
 export interface DiagnosticPayload {
-  name?: string;
+  name: string;
   acronym?: string;
   cid?: string;
 }
