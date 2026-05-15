@@ -1,18 +1,21 @@
 import { Request, Response } from "express";
-import { CreateAttendanceDTO } from "../../application/dtos/attendance/createAttendance.dto";
-import { CreateAttendance } from "../../application/use-cases/attendance/createAttendance";
-import { ListAttendances } from "../../application/use-cases/attendance/listAttendances";
-import { ListAttendanceDTO } from "../../application/dtos/attendance/listAttendance.dto";
-import { UpdateAttendanceDTO } from "../../application/dtos/attendance/updateAttedance.dto";
-import { UpdateAttendance } from "../../application/use-cases/attendance/updateAttendance";
-import { AttendancesByStudentDTO } from "../../application/dtos/attendance/attendancesByStudent.dto";
-import { AttendancesByStudent } from "../../application/use-cases/attendance/attendanceByStudent";
-import { RemoveAttendance } from "../../application/use-cases/attendance/removeAttendance";
-import { RemoveAttendanceDTO } from "../../application/dtos/attendance/removeAttendance";
-import { AttendanceByIdDTO } from "../../application/dtos/attendance/attendanceById.dto";
-import { AttendanceById } from "../../application/use-cases/attendance/attendanceById.dto";
 
-export class AttendanceController {
+import { AttendanceByIdDTO } from "@application/dtos/attendance/attendanceByIdDto";
+import { AttendancesByStudentDTO } from "@application/dtos/attendance/attendancesByStudentDto";
+import { CreateAttendanceDTO } from "@application/dtos/attendance/createAttendanceDto";
+import { ListAttendanceDTO } from "@application/dtos/attendance/listAttendanceDto";
+import { RemoveAttendanceDTO } from "@application/dtos/attendance/removeAttendanceDto";
+import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
+import { AttendanceById } from "@application/useCases/attendance/attendanceById";
+import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent";
+import { CreateAttendance } from "@application/useCases/attendance/createAttendance";
+import { ListAttendances } from "@application/useCases/attendance/listAttendances";
+import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
+import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+
+import { BaseController } from "./baseController";
+
+export class AttendanceController extends BaseController {
   constructor(
     private createAttendance: CreateAttendance,
     private listAttendances: ListAttendances,
@@ -20,77 +23,75 @@ export class AttendanceController {
     private attendancesByStudent: AttendancesByStudent,
     private removeAttendance: RemoveAttendance,
     private attendanceById: AttendanceById,
-  ) {}
-
-  async create(req: Request, res: Response): Promise<void> {
-    try {
-      const dto = CreateAttendanceDTO.create(req.body);
-      const attendance = await this.createAttendance.execute(dto);
-
-      res.status(201).json(attendance);
-    } catch (error) {
-      this.handleError(error, res, this.create);
-    }
+  ) {
+    super();
   }
 
-  async list(req: Request, res: Response): Promise<void> {
+  create = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = CreateAttendanceDTO.create(req.body);
+      const result = await this.createAttendance.execute(dto);
+
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${AttendanceController.name}:create`);
+    }
+  };
+
+  list = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = ListAttendanceDTO.create(req.query);
       const result = await this.listAttendances.execute(dto);
-      res.status(200).json(result);
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.list);
+      this.handleError(error, res, `${AttendanceController.name}:list`);
     }
-  }
+  };
 
-  async update(req: Request, res: Response): Promise<void> {
+  update = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = UpdateAttendanceDTO.create(req.params.id, req.body);
       const result = await this.updateAttendance.execute(dto);
-      res.status(200).json(result);
-    } catch (error) {
-      this.handleError(error, res, this.update);
-    }
-  }
 
-  async listByStudent(req: Request, res: Response) {
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${AttendanceController.name}:update`);
+    }
+  };
+
+  listByStudent = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = AttendancesByStudentDTO.create(req.params.id, req.query);
       const result = await this.attendancesByStudent.execute(dto);
-      res.status(200).json(result);
-    } catch (error) {
-      this.handleError(error, res, this.listByStudent);
-    }
-  }
 
-  async remove(req: Request, res: Response) {
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${AttendanceController.name}:listByStudent`);
+    }
+  };
+
+  remove = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = RemoveAttendanceDTO.create(req.params.id);
-      await this.removeAttendance.execute(dto);
-      res.status(200).json({ message: "Attendance removed successfully!" });
-    } catch (error) {
-      this.handleError(error, res, this.remove);
-    }
-  }
+      const result = await this.removeAttendance.execute(dto);
 
-  async getById(req: Request, res: Response) {
+      if (result.isFailure) {
+        return this.handleResult(res, result);
+      }
+      this.ok(res, { message: "Attendance removed successfully!" });
+    } catch (error) {
+      this.handleError(error, res, `${AttendanceController.name}:remove`);
+    }
+  };
+
+  getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = AttendanceByIdDTO.create(req.params.id);
       const result = await this.attendanceById.execute(dto);
-      res.status(200).json(result);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.getById);
+      this.handleError(error, res, `${AttendanceController.name}:getById`);
     }
-  }
-
-  handleError(error: unknown, res: Response, func: Function) {
-    if (error instanceof Error) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
-
-    res.status(500).json({
-      message: `Internal server error to: ${AttendanceController.name}:${func.name}`,
-    });
-  }
+  };
 }

@@ -12,7 +12,9 @@ export const useStudents = (page: number, limit: number) => {
     try {
       setIsLoading(true);
       const data = await studentService.getStudents(page, limit);
-      const formattedStudents = data.map((d) => formatGetStudentForFrontend(d));
+      const formattedStudents = data.items.map((d) =>
+        formatGetStudentForFrontend(d),
+      );
       setStudents(formattedStudents ?? []);
     } catch (error) {
       console.error("Error loading students list:", error);

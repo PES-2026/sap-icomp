@@ -85,7 +85,13 @@ model Attendance {
 
 model AttendanceType {
   internalId Int    @id @default(autoincrement())
-  name       String
+  externalid String @unique
+
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
 
   attendances Attendance[]
 }
@@ -108,6 +114,7 @@ model Course {
   acronym    String   @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  removed    Boolean  @default(false)
 
   coordinatorId Int?
   coordinator   Professor? @relation("Coordinator", fields: [coordinatorId], references: [internalId])
@@ -168,10 +175,16 @@ model Feedback {
 }
 
 model Diagnosis {
-  internalId Int     @id @default(autoincrement())
-  name       String  @unique
-  acronym    String? @unique
-  CID        String?
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  name    String  @unique
+  acronym String? @unique
+  CID     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
 
   students StudentDiagnosis[]
 }
