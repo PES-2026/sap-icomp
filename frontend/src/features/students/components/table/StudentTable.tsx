@@ -107,13 +107,13 @@ export default function StudentTable() {
       renderCell: (student) => (
         <div className="flex justify-center gap-0.5">
           <Link
-            href={PATHS.visualize_student(student.externalId)}
+            href={PATHS.visualize_student(student.id)}
             className="flex items-center rounded-md p-1 text-[#6bc4a6] hover:bg-[#e8f7f2]"
           >
             <Eye size={20} />
           </Link>
           <Link
-            href={PATHS.edit_student(student.externalId)}
+            href={PATHS.edit_student(student.id)}
             className="flex items-center rounded-md p-1 text-[#b0a898] hover:bg-[#f0ebe0]"
           >
             <Edit size={20} />

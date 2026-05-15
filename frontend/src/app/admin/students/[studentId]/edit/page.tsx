@@ -25,12 +25,10 @@ export default function EditStudentPage() {
       try {
         setIsLoading(true);
 
-        const allStudents = await studentService.getStudents();
+        const student = await studentService.getStudentById(id);
 
-        const foundStudent = allStudents.find((s) => s.externalId === id);
-
-        if (foundStudent) {
-          const formattedData = formatForFrontend(foundStudent);
+        if (student) {
+          const formattedData = formatForFrontend(student);
           setStudentData(formattedData);
         } else {
           console.error("Student not found.");
