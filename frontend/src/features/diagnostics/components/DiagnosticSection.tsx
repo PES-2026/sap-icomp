@@ -56,11 +56,6 @@ export default function DiagnosticSection() {
     setIsModalOpen(true);
   };
 
-  const handleOpenDeleteModal = (diagnostic: Diagnostic) => {
-    setSelectedDiagnosticToDelete(diagnostic);
-    setIsDeleteModalOpen(true);
-  };
-
   const handleCancelDelete = () => {
     setSelectedDiagnosticToDelete(null);
     setIsDeleteModalOpen(false);
