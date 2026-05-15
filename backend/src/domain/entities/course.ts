@@ -1,53 +1,66 @@
 import { Result } from "@domain/shared/result";
+import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 
-import { Acronym } from "../valueObjects/course/acronym";
 import { CourseName } from "../valueObjects/course/courseName";
-import { ProfessorId } from "../valueObjects/professor/professorId";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
-export class Course {
+export type CourseProps = {
+  courseId?: string;
+  name: string;
+  acronym: string;
+  coordinatorId: string;
+};
+
+export type CoursePropsVO = {
+  name: CourseName;
+  acronym: AcronymVO;
+  coordinatorId?: ExternalIdVO;
+};
+
+export class CourseVO {
   constructor(
-    readonly externalId: ExternalIdVO,
-    readonly name: CourseName,
-    readonly acronym: Acronym,
-    readonly coordinatorId?: ProfessorId,
+    public readonly externalId: ExternalIdVO,
+    public name: CourseName,
+    public acronym: AcronymVO,
+    public coordinatorId?: ExternalIdVO,
   ) {}
 
-  static create(name: string, acronym: string, coordinatorId?: string): Result<Course> {
+  static create(props: CourseProps): Result<CourseVO> {
     const externalId = ExternalIdVO.create();
-    const courseName = CourseName.create(name);
-    const courseAcronym = Acronym.create(acronym);
-    const courseCoordinatorId = coordinatorId ? ProfessorId.reutilise(coordinatorId) : undefined;
+    const courseName = CourseName.create(props.name);
+    const courseAcronym = AcronymVO.create(props.acronym);
+    const courseCoordinatorId = props.coordinatorId ? ExternalIdVO.from(props.coordinatorId) : undefined;
 
-    const results = [externalId, courseName, courseAcronym];
+    const results = [externalId, courseName, courseAcronym, courseCoordinatorId];
 
     for (const result of results) {
-      if (result.isFailure) {
-        return Result.fail<Course>(result.error!);
+      if (result?.isFailure) {
+        return Result.fail<CourseVO>(result.error!);
       }
     }
 
-    return Result.ok<Course>(
-      new Course(externalId.getValue(), courseName.getValue(), courseAcronym.getValue(), courseCoordinatorId),
+    return Result.ok<CourseVO>(
+      new CourseVO(
+        externalId.getValue(),
+        courseName.getValue(),
+        courseAcronym.getValue(),
+        courseCoordinatorId?.getValue() ?? undefined,
+      ),
     );
   }
 
-  static update(externalId: string, name: string, acronym: string, coordinatorId?: string): Result<Course> {
-    const courseExternalId = ExternalIdVO.from(externalId);
-    const courseName = CourseName.create(name);
-    const courseAcronym = Acronym.create(acronym);
-    const courseCoordinatorId = coordinatorId ? ProfessorId.reutilise(coordinatorId) : undefined;
-
-    const results = [courseExternalId, courseName, courseAcronym];
-
-    for (const result of results) {
-      if (result.isFailure) {
-        return Result.fail<Course>(result.error!);
-      }
-    }
-
-    return Result.ok<Course>(
-      new Course(courseExternalId.getValue(), courseName.getValue(), courseAcronym.getValue(), courseCoordinatorId),
+  static rehydrate(props: CourseProps): CourseVO {
+    return new CourseVO(
+      ExternalIdVO.fromTrusted(props.courseId!),
+      CourseName.fromTrusted(props.name),
+      AcronymVO.fromTrusted(props.acronym),
+      ExternalIdVO.fromTrusted(props.coordinatorId),
     );
+  }
+
+  update(props: Partial<CoursePropsVO>): void {
+    if (props.name !== undefined) this.name = props.name;
+    if (props.acronym !== undefined) this.acronym = props.acronym;
+    if (props.coordinatorId !== undefined) this.coordinatorId = props.coordinatorId;
   }
 }

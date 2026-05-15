@@ -1,4 +1,4 @@
-import { Course } from "@domain/entities/course";
+import { CourseVO } from "@domain/entities/course";
 import { ICourseRepository } from "@domain/repositories/courseRepository";
 import { ListCourseRequest } from "@domain/repositories/filters/courseFilters";
 import { CourseItem, PaginatedCourseResult } from "@domain/repositories/results/courseResult";
@@ -7,7 +7,7 @@ import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/genera
 export class PrismaCourseRepository implements ICourseRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async save(course: Course): Promise<void> {
+  async save(course: CourseVO): Promise<void> {
     let coordinatorId: number | undefined;
 
     if (course.coordinatorId) {
@@ -34,7 +34,7 @@ export class PrismaCourseRepository implements ICourseRepository {
     });
   }
 
-  async update(course: Course): Promise<void> {
+  async update(course: CourseVO): Promise<void> {
     let coordinatorId: number | null = null;
 
     if (course.coordinatorId) {

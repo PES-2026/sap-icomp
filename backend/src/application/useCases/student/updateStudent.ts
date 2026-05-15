@@ -10,8 +10,8 @@ import { Result } from "@domain/shared/result";
 import { CourseVO } from "@domain/valueObjects/course/course";
 import { DateVO } from "@domain/valueObjects/shared/date";
 import { EmailVO } from "@domain/valueObjects/shared/email";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
-import { DiagnosisVO } from "@domain/valueObjects/student/diagnosis";
 import { DifficultiesVO } from "@domain/valueObjects/student/difficulties";
 import { EnrollmentVO } from "@domain/valueObjects/student/enrollment";
 import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
@@ -32,7 +32,7 @@ export class UpdateStudent {
       email: student.email,
       phoneNumber: student.phoneNumber,
       course: student.course,
-      diagnosis: student.diagnosis,
+      diagnoses: student.diagnoses,
       potential: student.potential,
       difficulties: student.difficulties,
     });
@@ -86,10 +86,11 @@ export class UpdateStudent {
       props.course = result.getValue();
     }
 
-    if (input.diagnosis !== undefined) {
-      const result = DiagnosisVO.create(input.diagnosis);
-      if (result.isFailure) return Result.fail<UpdateStudentResponse>(result.error!);
-      props.diagnosis = result.getValue();
+    if (input.diagnoses !== undefined) {
+      const diagnosesResults = input.diagnoses.map((id) => ExternalIdVO.from(id));
+      const failure = diagnosesResults.find((r) => r.isFailure);
+      if (failure) return Result.fail<UpdateStudentResponse>(failure.error!);
+      props.diagnoses = diagnosesResults.map((r) => r.getValue() as ExternalIdVO);
     }
 
     if (input.potential !== undefined) {
@@ -106,7 +107,7 @@ export class UpdateStudent {
 
     studentEntity.update(props);
 
-    await this.studentRepository.save(studentEntity);
+    await this.studentRepository.update(studentEntity);
 
     return Result.ok<UpdateStudentResponse>({
       id: studentEntity.studentId.value,
@@ -116,7 +117,7 @@ export class UpdateStudent {
       phoneNumber: studentEntity.phoneNumber.value,
       email: studentEntity.email.value,
       courseId: studentEntity.course.value,
-      diagnosis: studentEntity.diagnosis?.value ?? "",
+      diagnoses: studentEntity.diagnoses.map((vo) => vo.value),
       potential: studentEntity.potential?.value ?? "",
       difficulties: studentEntity.difficulties?.value ?? "",
     });

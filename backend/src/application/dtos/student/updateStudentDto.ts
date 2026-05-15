@@ -13,7 +13,7 @@ export class UpdateStudentDTO {
     public readonly enrollmentId?: string,
     public readonly phoneNumber?: string,
     public readonly courseId?: string,
-    public readonly diagnosis?: string,
+    public readonly diagnoses?: string[],
     public readonly potential?: string,
     public readonly difficulties?: string,
   ) {}
@@ -53,10 +53,13 @@ export class UpdateStudentDTO {
     if (raw.courseId) {
       courseId = validateStringField(raw.courseId, "courseId");
     }
-    let diagnosis = undefined;
-    if (raw.diagnosis) {
-      diagnosis = validateStringField(raw.diagnosis, "diagnosis");
+    let diagnoses = undefined;
+    if (Array.isArray(raw.diagnoses)) {
+      diagnoses = raw.diagnoses.map((d, index) => validateStringField(d, `diagnoses[${index}]`));
+    } else if (typeof raw.diagnosis === "string" && raw.diagnosis.trim() !== "") {
+      diagnoses = [raw.diagnosis.trim()];
     }
+
     let potential = undefined;
     if (raw.potential) {
       potential = validateStringField(raw.potential, "potential");
@@ -74,7 +77,7 @@ export class UpdateStudentDTO {
       enrollmentId,
       phoneNumber,
       courseId,
-      diagnosis,
+      diagnoses,
       potential,
       difficulties,
     );

@@ -29,7 +29,7 @@ export class CreateStudent {
       email: data.email,
       phoneNumber: data.phoneNumber,
       course: data.courseId,
-      diagnosis: data.diagnosis ?? "",
+      diagnoses: data.diagnoses,
       potential: data.potential ?? "",
       difficulties: data.difficulties ?? "",
     });
@@ -48,7 +48,7 @@ export class CreateStudent {
       phoneNumber: studentEntity.getValue().phoneNumber.value,
       email: studentEntity.getValue().email.value,
       courseId: studentEntity.getValue().course.value,
-      diagnosis: studentEntity.getValue().diagnosis?.value ?? "",
+      diagnoses: studentEntity.getValue().diagnoses.map((vo) => vo.value),
       potential: studentEntity.getValue().potential?.value ?? "",
       difficulties: studentEntity.getValue().difficulties?.value ?? "",
     });

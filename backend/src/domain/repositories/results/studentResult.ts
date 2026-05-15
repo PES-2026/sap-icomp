@@ -8,7 +8,7 @@ export interface StudentResult extends BaseItem {
   email: string;
   phoneNumber: string;
   course: string;
-  diagnosis: string;
+  diagnoses: string[];
   potential: string;
   difficulties: string;
   lastAttendance: Date | null;

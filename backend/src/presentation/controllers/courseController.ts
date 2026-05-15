@@ -30,7 +30,7 @@ export class CourseController extends BaseController {
       const result = await this.createCourseUseCase.execute(dto);
       this.handleResult(res, result, 201);
     } catch (error) {
-      this.handleError(error, res, "CourseController:create");
+      this.handleError(error, res, `${CourseController.name}:create`);
     }
   };
 
@@ -40,7 +40,7 @@ export class CourseController extends BaseController {
       const result = await this.listCourseUseCase.execute(dto);
       this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, "CourseController:list");
+      this.handleError(error, res, `${CourseController.name}:list`);
     }
   };
 
@@ -50,7 +50,7 @@ export class CourseController extends BaseController {
       const result = await this.updateCourseUseCase.execute(dto);
       this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, "CourseController:update");
+      this.handleError(error, res, `${CourseController.name}:update`);
     }
   };
 
@@ -60,7 +60,7 @@ export class CourseController extends BaseController {
       const result = await this.courseByIdUseCase.execute(dto);
       this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, "CourseController:findById");
+      this.handleError(error, res, `${CourseController.name}:findById`);
     }
   };
 
@@ -70,7 +70,7 @@ export class CourseController extends BaseController {
       const result = await this.removeCourseUseCase.execute(dto);
       this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, "CourseController:remove");
+      this.handleError(error, res, `${CourseController.name}:remove`);
     }
   };
 }

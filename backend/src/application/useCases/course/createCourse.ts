@@ -1,7 +1,7 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { CourseAlreadyExistsError } from "@application/errors/course/courseAlreadyExistsError";
 import { ProfessorNotFoundError } from "@application/errors/professor/professorNotFoundError";
-import { Course } from "@domain/entities/course";
+import { CourseVO } from "@domain/entities/course";
 import { DomainError } from "@domain/errors/domainError";
 import { ICourseRepository } from "@domain/repositories/courseRepository";
 import { Result } from "@domain/shared/result";
@@ -29,20 +29,23 @@ export class CreateCourse {
       }
     }
 
-    const courseEntityOrError = Course.create(dto.name, dto.acronym, dto.coordinatorId);
+    const courseEntity = CourseVO.create({
+      name: dto.name,
+      acronym: dto.acronym,
+      coordinatorId: dto.coordinatorId ?? "",
+    });
 
-    if (courseEntityOrError.isFailure) {
-      return Result.fail<CreateCourseResponse>(courseEntityOrError.error!);
+    if (courseEntity.isFailure) {
+      return Result.fail<CreateCourseResponse>(courseEntity.error!);
     }
 
-    const courseEntity = courseEntityOrError.getValue();
-    await this.repository.save(courseEntity);
+    await this.repository.save(courseEntity.getValue());
 
     return Result.ok<CreateCourseResponse>({
-      id: courseEntity.externalId.value,
-      name: courseEntity.name.value,
-      acronym: courseEntity.acronym.value,
-      coordinatorId: courseEntity.coordinatorId?.value ?? "",
+      id: courseEntity.getValue().externalId.value,
+      name: courseEntity.getValue().name.value,
+      acronym: courseEntity.getValue().acronym.value,
+      coordinatorId: courseEntity.getValue().coordinatorId?.value ?? "",
     });
   }
 }

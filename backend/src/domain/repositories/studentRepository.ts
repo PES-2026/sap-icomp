@@ -8,6 +8,7 @@ export interface IStudentRepository {
   existsByEmail(email: string): Promise<boolean>;
   existsByEnrollmentId(enrollmentId: string): Promise<boolean>;
   save(student: Student): Promise<void>;
+  update(student: Student): Promise<void>;
   existsByUUID(externaID: string): Promise<boolean>;
   findByUUID(externaID: string): Promise<StudentResult | null>;
   disableByUUID(externalId: string): Promise<boolean>;
