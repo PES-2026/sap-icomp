@@ -5,7 +5,6 @@ import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { CourseVO } from "../valueObjects/course/course";
 import { EmailVO } from "../valueObjects/shared/email";
 import { NameVO } from "../valueObjects/shared/name";
-import { DiagnosisVO } from "../valueObjects/student/diagnosis";
 import { DifficultiesVO } from "../valueObjects/student/difficulties";
 import { EnrollmentVO } from "../valueObjects/student/enrollment";
 import { PhoneNumberVO } from "../valueObjects/student/phoneNumber";
@@ -19,7 +18,7 @@ export type StudentProps = {
   email: string;
   phoneNumber: string;
   course: string;
-  diagnosis: string;
+  diagnoses: string[];
   potential: string;
   difficulties: string;
 };
@@ -31,7 +30,7 @@ export type StudentVOProps = {
   email: EmailVO;
   phoneNumber: PhoneNumberVO;
   course: CourseVO;
-  diagnosis: DiagnosisVO;
+  diagnoses: ExternalIdVO[];
   potential: PotentialVO;
   difficulties: DifficultiesVO;
 };
@@ -45,7 +44,7 @@ export class Student {
     public email: EmailVO,
     public phoneNumber: PhoneNumberVO,
     public course: CourseVO,
-    public diagnosis?: DiagnosisVO,
+    public diagnoses: ExternalIdVO[],
     public potential?: PotentialVO,
     public difficulties?: DifficultiesVO,
   ) {}
@@ -58,7 +57,11 @@ export class Student {
     const emailStud = EmailVO.create(props.email);
     const phoneNumberStud = PhoneNumberVO.create(props.phoneNumber);
     const courseStud = CourseVO.create(props.course);
-    const diagnosisStud = props.diagnosis ? DiagnosisVO.create(props.diagnosis) : undefined;
+
+    const diagnosesResults = props.diagnoses ? props.diagnoses.map((id) => ExternalIdVO.from(id)) : [];
+    const diagnosisFailure = diagnosesResults.find((r) => r.isFailure);
+    if (diagnosisFailure) return Result.fail<Student>(diagnosisFailure.error!);
+
     const potentialStud = props.potential ? PotentialVO.create(props.potential) : undefined;
     const difficultiesStud = props.difficulties ? DifficultiesVO.create(props.difficulties) : undefined;
 
@@ -70,7 +73,6 @@ export class Student {
       emailStud,
       phoneNumberStud,
       courseStud,
-      diagnosisStud,
       potentialStud,
       difficultiesStud,
     ];
@@ -90,7 +92,7 @@ export class Student {
         emailStud.getValue(),
         phoneNumberStud.getValue(),
         courseStud.getValue(),
-        diagnosisStud ? diagnosisStud.getValue() : undefined,
+        diagnosesResults.map((r) => r.getValue() as ExternalIdVO),
         potentialStud ? potentialStud.getValue() : undefined,
         difficultiesStud ? difficultiesStud.getValue() : undefined,
       ),
@@ -106,7 +108,7 @@ export class Student {
       EmailVO.fromTrusted(props.email),
       PhoneNumberVO.fromTrusted(props.phoneNumber),
       CourseVO.fromTrusted(props.course),
-      props.diagnosis ? DiagnosisVO.fromTrusted(props.diagnosis) : undefined,
+      props.diagnoses ? props.diagnoses.map((id) => ExternalIdVO.fromTrusted(id)) : [],
       props.potential ? PotentialVO.fromTrusted(props.potential) : undefined,
       props.difficulties ? DifficultiesVO.fromTrusted(props.difficulties) : undefined,
     );
@@ -119,7 +121,7 @@ export class Student {
     if (props.email !== undefined) this.email = props.email;
     if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
     if (props.course !== undefined) this.course = props.course;
-    if (props.diagnosis !== undefined) this.diagnosis = props.diagnosis;
+    if (props.diagnoses !== undefined) this.diagnoses = props.diagnoses;
     if (props.potential !== undefined) this.potential = props.potential;
     if (props.difficulties !== undefined) this.difficulties = props.difficulties;
   }

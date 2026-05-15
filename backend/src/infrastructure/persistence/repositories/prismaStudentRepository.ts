@@ -25,7 +25,6 @@ export class PrismaStudentRepository implements IStudentRepository {
 
   async save(student: Student): Promise<void> {
     const externalId = student.studentId.value;
-    const exists = await this.existsByUUID(externalId);
 
     const baseData = {
       enrollmentId: student.enrollmentId.value,
@@ -38,48 +37,49 @@ export class PrismaStudentRepository implements IStudentRepository {
       difficulties: student.difficulties?.value ?? "",
     };
 
-    if (exists) {
-      const diagnosesUpdate = student.diagnosis?.value
-        ? {
-            deleteMany: {},
-            create: [
-              {
-                diagnosis: {
-                  connect: { name: student.diagnosis.value },
-                },
-              },
-            ],
-          }
-        : { deleteMany: {} };
+    const diagnosesConnect = student.diagnoses.map((diag) => ({
+      diagnosis: { connect: { externalId: diag.value } },
+    }));
 
-      await this.prisma.student.update({
-        where: { externalId },
-        data: {
-          ...baseData,
-          diagnoses: diagnosesUpdate,
+    await this.prisma.student.create({
+      data: {
+        ...baseData,
+        externalId,
+        diagnoses: {
+          create: diagnosesConnect,
         },
-      });
-    } else {
-      const diagnosesCreate = student.diagnosis?.value
-        ? {
-            create: [
-              {
-                diagnosis: {
-                  connect: { name: student.diagnosis.value },
-                },
-              },
-            ],
-          }
-        : undefined;
+      },
+    });
+  }
 
-      await this.prisma.student.create({
-        data: {
-          ...baseData,
-          externalId,
-          ...(diagnosesCreate && { diagnoses: diagnosesCreate }),
-        },
-      });
-    }
+  async update(student: Student): Promise<void> {
+    const externalId = student.studentId.value;
+
+    const baseData = {
+      enrollmentId: student.enrollmentId.value,
+      name: student.name.value,
+      dtBirth: student.dtBirth.value,
+      email: student.email.value,
+      phoneNumber: student.phoneNumber.value,
+      course: { connect: { externalId: student.course.value } },
+      potential: student.potential?.value ?? "",
+      difficulties: student.difficulties?.value ?? "",
+    };
+
+    const diagnosesUpdate = {
+      deleteMany: {},
+      create: student.diagnoses.map((vo) => ({
+        diagnosis: { connect: { externalId: vo.value } },
+      })),
+    };
+
+    await this.prisma.student.update({
+      where: { externalId },
+      data: {
+        ...baseData,
+        diagnoses: diagnosesUpdate,
+      },
+    });
   }
 
   async findByUUID(externalId: string): Promise<StudentResult | null> {
@@ -102,7 +102,7 @@ export class PrismaStudentRepository implements IStudentRepository {
       email: raw.email,
       phoneNumber: raw.phoneNumber,
       course: raw.course.externalId,
-      diagnosis: raw.diagnoses[0]?.diagnosis.name ?? "",
+      diagnoses: raw.diagnoses.map((d) => d.diagnosis.externalId),
       potential: raw.potential ?? "",
       difficulties: raw.difficulties ?? "",
       createdAt: raw.createdAt,
@@ -198,7 +198,7 @@ export class PrismaStudentRepository implements IStudentRepository {
       updatedAt: record.updatedAt,
       phoneNumber: record.phoneNumber,
       potential: record.potential ?? "",
-      diagnosis: record.diagnoses[0]?.diagnosis.name ?? "",
+      diagnoses: record.diagnoses.map((d) => d.diagnosis.externalId),
       difficulties: record.difficulties ?? "",
       lastAttendance: record.attendances[0]?.attendedAt ?? null,
     }));
