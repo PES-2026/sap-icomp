@@ -1,21 +1,15 @@
-import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
-import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateDateField, validateStringField } from "@domain/utils/validationUtils";
 
-export interface UpdateAttendanceResponse {
-  id: string;
-  studentId: string;
-  type?: string;
-  date?: Date;
-  demand?: string;
-  generalObservations?: string;
-}
+import { CreateAttendanceResponse } from "./createAttendanceDto";
+
+export type UpdateAttendanceResponse = CreateAttendanceResponse;
 
 export class UpdateAttendanceDTO {
   constructor(
     public readonly id: string,
-    public readonly type?: AttendanceType,
+    public readonly studentId?: string,
     public readonly date?: Date,
+    public readonly typeId?: string,
     public readonly demand?: string,
     public readonly generalObservations?: string,
   ) {}
@@ -31,29 +25,31 @@ export class UpdateAttendanceDTO {
 
     const raw = body as Record<string, unknown>;
 
-    let type = null;
-    if (raw.type) {
-      type = validateStringField(raw.type, "attendanceType");
-    }
-    let date = null;
-    if (raw.date) {
-      date = validateDateField(raw.date, "attendanceDate");
-    }
-    let demand = null;
-    if (raw.demand) {
-      demand = validateStringField(raw.demand, "attendanceDemand");
-    }
-    let generalObservations = null;
-    if (raw.generalObservations) {
-      generalObservations = validateStringField(raw.generalObservations, "attendanceGeneralObservations");
+    let studentId = undefined;
+    if (raw.studentId) {
+      studentId = validateStringField(raw.studentId, "studentId");
     }
 
-    return new UpdateAttendanceDTO(
-      id.trim(),
-      type ? findValueInEnum(AttendanceType, type) : undefined,
-      date ?? undefined,
-      demand ?? "",
-      generalObservations ?? "",
-    );
+    let date = undefined;
+    if (raw.date) {
+      date = validateDateField(raw.date, "date");
+    }
+
+    let typeId = undefined;
+    if (raw.typeId) {
+      typeId = validateStringField(raw.typeId, "typeId");
+    }
+
+    let demand = undefined;
+    if (raw.demand) {
+      demand = validateStringField(raw.demand, "demand");
+    }
+
+    let generalObservations = undefined;
+    if (raw.generalObservations) {
+      generalObservations = validateStringField(raw.generalObservations, "generalObservations");
+    }
+
+    return new UpdateAttendanceDTO(id.trim(), studentId, date, typeId, demand, generalObservations);
   }
 }

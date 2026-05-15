@@ -1,6 +1,5 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { AttendanceTypeNotFoundError } from "@application/errors/attendance/attendanceTypeNotFoundError";
-import { PedagogueNotFoundError } from "@application/errors/pedagogue/pedagogueNotFoundError";
 import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { Attendance } from "@domain/entities/attendance";
 import { DomainError } from "@domain/errors/domainError";
@@ -22,20 +21,15 @@ export class CreateAttendance {
       return Result.fail<CreateAttendanceResponse>(new StudentNotFoundError(dto.studentId));
     }
 
-    const typeExists = await this.repository.existsTypeByName(dto.type);
+    const typeExists = await this.repository.existsTypeById(dto.typeId);
     if (!typeExists) {
-      return Result.fail<CreateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.type));
-    }
-
-    const pedagogueExists = await this.repository.existsAnyPedagogue();
-    if (!pedagogueExists) {
-      return Result.fail<CreateAttendanceResponse>(new PedagogueNotFoundError());
+      return Result.fail<CreateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.typeId));
     }
 
     const attendanceEntity = Attendance.create({
       studentId: dto.studentId,
       date: dto.date,
-      type: dto.type,
+      typeId: dto.typeId,
       demand: dto.demand,
       generalObservations: dto.generalObservations ?? "",
     });
@@ -50,7 +44,7 @@ export class CreateAttendance {
       id: attendanceEntity.getValue().id.value,
       studentId: attendanceEntity.getValue().studentId.value,
       date: attendanceEntity.getValue().date.value,
-      type: attendanceEntity.getValue().type.value,
+      typeId: attendanceEntity.getValue().typeId.value,
       demand: attendanceEntity.getValue().demand.value,
       generalObservations: attendanceEntity.getValue().generalObservations?.value ?? "",
     });

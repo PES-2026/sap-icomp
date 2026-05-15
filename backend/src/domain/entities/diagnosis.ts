@@ -1,6 +1,6 @@
 import { Result } from "@domain/shared/result";
-import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 import { CidVO } from "@domain/valueObjects/diagnoses/cid";
+import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
 

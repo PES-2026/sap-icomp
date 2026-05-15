@@ -1,8 +1,5 @@
-import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
 import { Result } from "@domain/shared/result";
-import { findValueInEnum } from "@domain/utils/enumUtils";
 
-import { AttendanceTypeVO } from "../valueObjects/attendance/attendanceType";
 import { DemandVO } from "../valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "../valueObjects/attendance/generalObservations";
 import { DateInput, DateVO } from "../valueObjects/shared/date";
@@ -12,7 +9,7 @@ type AttendanceProps = {
   id?: string;
   studentId: string;
   date: DateInput;
-  type: string;
+  typeId: string;
   demand: string;
   generalObservations?: string;
   removed?: boolean;
@@ -23,7 +20,7 @@ export class Attendance {
     public readonly id: ExternalIdVO,
     public readonly studentId: ExternalIdVO,
     public date: DateVO,
-    public type: AttendanceTypeVO,
+    public typeId: ExternalIdVO,
     public demand: DemandVO,
     public generalObservations?: GeneralObservationsVO,
     private _removed: boolean = false,
@@ -33,13 +30,13 @@ export class Attendance {
     const externalId = ExternalIdVO.create();
     const studentId = ExternalIdVO.from(props.studentId);
     const date = DateVO.create(props.date);
-    const type = AttendanceTypeVO.create(props.type);
+    const typeId = ExternalIdVO.from(props.typeId);
     const demand = DemandVO.create(props.demand);
     const generalObservations = props.generalObservations
       ? GeneralObservationsVO.create(props.generalObservations)
       : undefined;
 
-    const results = [externalId, studentId, date, type, demand, generalObservations];
+    const results = [externalId, studentId, date, typeId, demand, generalObservations];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -52,7 +49,7 @@ export class Attendance {
         externalId.getValue(),
         studentId.getValue(),
         date.getValue(),
-        type.getValue(),
+        typeId.getValue() as ExternalIdVO,
         demand.getValue(),
         generalObservations?.getValue() ?? undefined,
       ),
@@ -64,20 +61,15 @@ export class Attendance {
       ExternalIdVO.fromTrusted(props.id!),
       ExternalIdVO.fromTrusted(props.studentId),
       DateVO.fromTrusted(new Date(props.date as string | Date)),
-      AttendanceTypeVO.fromTrusted(findValueInEnum(AttendanceType, props.type)),
+      ExternalIdVO.fromTrusted(props.typeId),
       DemandVO.fromTrusted(props.demand),
       props.generalObservations ? GeneralObservationsVO.fromTrusted(props.generalObservations) : undefined,
       props.removed ?? false,
     );
   }
 
-  update(
-    type?: AttendanceTypeVO,
-    date?: DateVO,
-    demand?: DemandVO,
-    generalObservations?: GeneralObservationsVO,
-  ): void {
-    if (type?.value) this.type = type;
+  update(typeId?: ExternalIdVO, date?: DateVO, demand?: DemandVO, generalObservations?: GeneralObservationsVO): void {
+    if (typeId?.value) this.typeId = typeId;
     if (date?.value) this.date = date;
     if (demand?.value) this.demand = demand;
     if (generalObservations?.value) this.generalObservations = generalObservations;
