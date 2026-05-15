@@ -114,6 +114,7 @@ model Course {
   acronym    String   @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  removed    Boolean  @default(false)
 
   coordinatorId Int?
   coordinator   Professor? @relation("Coordinator", fields: [coordinatorId], references: [internalId])

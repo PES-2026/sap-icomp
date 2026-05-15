@@ -24,33 +24,72 @@ export class PrismaStudentRepository implements IStudentRepository {
   }
 
   async save(student: Student): Promise<void> {
-    const studentData = {
+    const externalId = student.studentId.value;
+    const exists = await this.existsByUUID(externalId);
+
+    const baseData = {
       enrollmentId: student.enrollmentId.value,
       name: student.name.value,
       dtBirth: student.dtBirth.value,
       email: student.email.value,
       phoneNumber: student.phoneNumber.value,
-      courseId: student.course.value,
-      diagnosis: student.diagnosis?.value ?? "",
+      course: { connect: { externalId: student.course.value } },
       potential: student.potential?.value ?? "",
       difficulties: student.difficulties?.value ?? "",
     };
 
-    await this.prisma.student.upsert({
-      where: {
-        externalId: student.studentId.value,
-      },
-      update: studentData,
-      create: {
-        ...studentData,
-        externalId: student.studentId.value,
-      },
-    });
+    if (exists) {
+      const diagnosesUpdate = student.diagnosis?.value
+        ? {
+            deleteMany: {},
+            create: [
+              {
+                diagnosis: {
+                  connect: { name: student.diagnosis.value },
+                },
+              },
+            ],
+          }
+        : { deleteMany: {} };
+
+      await this.prisma.student.update({
+        where: { externalId },
+        data: {
+          ...baseData,
+          diagnoses: diagnosesUpdate,
+        },
+      });
+    } else {
+      const diagnosesCreate = student.diagnosis?.value
+        ? {
+            create: [
+              {
+                diagnosis: {
+                  connect: { name: student.diagnosis.value },
+                },
+              },
+            ],
+          }
+        : undefined;
+
+      await this.prisma.student.create({
+        data: {
+          ...baseData,
+          externalId,
+          ...(diagnosesCreate && { diagnoses: diagnosesCreate }),
+        },
+      });
+    }
   }
 
-  async findByUUID(externaID: string): Promise<StudentResult | null> {
+  async findByUUID(externalId: string): Promise<StudentResult | null> {
     const raw = await this.prisma.student.findUnique({
-      where: { externalId: externaID },
+      where: { externalId },
+      include: {
+        course: true,
+        diagnoses: { include: { diagnosis: true } },
+        attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+      },
     });
 
     if (!raw) return null;
@@ -62,13 +101,13 @@ export class PrismaStudentRepository implements IStudentRepository {
       dtBirth: raw.dtBirth,
       email: raw.email,
       phoneNumber: raw.phoneNumber,
-      course: raw.courseId,
-      diagnosis: raw.diagnosis ?? "",
+      course: raw.course.externalId,
+      diagnosis: raw.diagnoses[0]?.diagnosis.name ?? "",
       potential: raw.potential ?? "",
       difficulties: raw.difficulties ?? "",
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      lastAttendance: null,
+      lastAttendance: raw.attendances[0]?.attendedAt ?? null,
     };
   }
 
@@ -106,15 +145,26 @@ export class PrismaStudentRepository implements IStudentRepository {
         enrollmentId: { contains: filters.enrollment, mode: "insensitive" },
       }),
       ...(filters.course && {
-        courseId: { contains: filters.course, mode: "insensitive" },
+        course: {
+          OR: [
+            { name: { contains: filters.course, mode: "insensitive" } },
+            { acronym: { contains: filters.course, mode: "insensitive" } },
+          ],
+        },
       }),
       ...(filters.diagnosis && {
-        diagnosis: { contains: filters.diagnosis, mode: "insensitive" },
+        diagnoses: {
+          some: {
+            diagnosis: {
+              name: { contains: filters.diagnosis, mode: "insensitive" },
+            },
+          },
+        },
       }),
       ...(filters.lastAttendance && {
         attendances: {
           some: {
-            date: {
+            attendedAt: {
               gte: filters.lastAttendance,
             },
           },
@@ -129,7 +179,11 @@ export class PrismaStudentRepository implements IStudentRepository {
         skip: offset,
         take: limit,
         orderBy: { updatedAt: "desc" },
-        include: { attendances: true },
+        include: {
+          course: true,
+          diagnoses: { include: { diagnosis: true } },
+          attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+        },
       }),
     ]);
 
@@ -138,15 +192,15 @@ export class PrismaStudentRepository implements IStudentRepository {
       name: record.name,
       enrollmentId: record.enrollmentId,
       dtBirth: record.dtBirth,
-      course: record.courseId,
+      course: record.course.externalId,
       email: record.email,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       phoneNumber: record.phoneNumber,
       potential: record.potential ?? "",
-      diagnosis: record.diagnosis ?? "",
+      diagnosis: record.diagnoses[0]?.diagnosis.name ?? "",
       difficulties: record.difficulties ?? "",
-      lastAttendance: record.attendances[0]?.date ?? null,
+      lastAttendance: record.attendances[0]?.attendedAt ?? null,
     }));
 
     return {
