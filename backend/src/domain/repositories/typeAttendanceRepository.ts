@@ -1,17 +1,13 @@
-import { TypeAttendance } from "../entities/typeAttendance";
-import { UpdateTypeAttendanceResponse } from "../../application/dtos/typeAttendance/updateTypeAttendance.dto";
-import {
-  ListTypeAttendanceRequest,
-  ListTypeAttendanceResponse,
-} from "../../application/dtos/typeAttendance/listTypeAttendance.dto";
-import { TypeAttendanceByIdResponse } from "../../application/dtos/typeAttendance/typeAttendanceById.dto";
+import { TypeAttendance } from "@domain/entities/typeAttendance";
+
+import { ListTypeAttendanceFilters } from "./filters/typeAttendanceFilters";
+import { PaginatedTypeAttendanceResult, TypeAttendanceResult } from "./results/typeAttendanceResult";
+
 export interface ITypeAttendanceRepository {
   save(typeAttendance: TypeAttendance): Promise<void>;
-  update(typeAttendance: TypeAttendance): Promise<UpdateTypeAttendanceResponse>;
-
-  findAll(
-    params: ListTypeAttendanceRequest,
-  ): Promise<ListTypeAttendanceResponse>;
-  findById(externalId: string): Promise<TypeAttendanceByIdResponse | null>;
-  remove(externalId: string): Promise<void>;
+  findById(id: string): Promise<TypeAttendanceResult | null>;
+  findByName(name: string): Promise<TypeAttendanceResult | null>;
+  findAll(params: ListTypeAttendanceFilters): Promise<PaginatedTypeAttendanceResult>;
+  update(typeAttendance: TypeAttendance): Promise<void>;
+  remove(id: string): Promise<void>;
 }

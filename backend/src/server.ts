@@ -24,20 +24,28 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { CreateTypeAttendance } from "@application/useCases/typeAttendance/createTypeAttendance";
+import { ListTypeAttendances } from "@application/useCases/typeAttendance/listTypeAttendances";
+import { RemoveTypeAttendance } from "@application/useCases/typeAttendance/removeTypeAttendance";
+import { TypeAttendanceById } from "@application/useCases/typeAttendance/typeAttendanceById";
+import { UpdateTypeAttendance } from "@application/useCases/typeAttendance/updateTypeAttendance";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
+import { PrismaTypeAttendanceRepository } from "@infrastructure/persistence/repositories/prismaTypeAttendanceRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
+import { TypeAttendanceController } from "@presentation/controllers/typeAttendanceController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { typeAttendanceRoutes } from "@presentation/routes/typeAttendanceRoutes";
 
 const app = express();
 app.use(express.json());
@@ -112,6 +120,18 @@ const courseController = new CourseController(
 );
 
 app.use(courseRoutes(courseController));
+
+const typeAttendanceRepository = new PrismaTypeAttendanceRepository(prisma);
+
+const typeAttendanceControler = new TypeAttendanceController(
+  new CreateTypeAttendance(typeAttendanceRepository),
+  new UpdateTypeAttendance(typeAttendanceRepository),
+  new ListTypeAttendances(typeAttendanceRepository),
+  new RemoveTypeAttendance(typeAttendanceRepository),
+  new TypeAttendanceById(typeAttendanceRepository),
+);
+
+app.use(typeAttendanceRoutes(typeAttendanceControler));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

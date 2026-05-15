@@ -1,77 +1,81 @@
 import { Request, Response } from "express";
-import { CreateTypeAttendanceDTO } from "../../application/dtos/typeAttendance/createTypeAttendance.dto";
-import { CreateTypeAttendance } from "../../application/use-cases/typeAttendance/createTypeAttendance";
-import { UpdateTypeAttendanceDTO } from "../../application/dtos/typeAttendance/updateTypeAttendance.dto";
-import { UpdateTypeAttendance } from "../../application/use-cases/typeAttendance/updateTypeAttendance";
-import { ListTypeAttendanceDTO } from "../../application/dtos/typeAttendance/listTypeAttendance.dto";
-import { ListTypeAttendance } from "../../application/use-cases/typeAttendance/listTypeAttendances";
-import { TypeAttendanceById } from "../../application/use-cases/typeAttendance/typeAttendanceById";
-import { RemoveTypeAttendance } from "../../application/use-cases/typeAttendance/removeTypeAttendance";
-import { RemoveTypeAttendanceDTO } from "../../application/dtos/typeAttendance/removeTypeAttendance.dto";
-import { TypeAttendanceByIdDTO } from "../../application/dtos/typeAttendance/typeAttendanceById.dto";
 
-export class TypeAttendanceController {
+import { CreateTypeAttendanceDTO } from "@application/dtos/typeAttendance/createTypeAttendanceDto";
+import { ListTypeAttendanceDTO } from "@application/dtos/typeAttendance/listTypeAttendanceDto";
+import { RemoveTypeAttendanceDTO } from "@application/dtos/typeAttendance/removeTypeAttendanceDto";
+import { TypeAttendanceByIdDTO } from "@application/dtos/typeAttendance/typeAttendanceByIdDto";
+import { UpdateTypeAttendanceDTO } from "@application/dtos/typeAttendance/updateTypeAttendanceDto";
+import { CreateTypeAttendance } from "@application/useCases/typeAttendance/createTypeAttendance";
+import { ListTypeAttendances } from "@application/useCases/typeAttendance/listTypeAttendances";
+import { RemoveTypeAttendance } from "@application/useCases/typeAttendance/removeTypeAttendance";
+import { TypeAttendanceById } from "@application/useCases/typeAttendance/typeAttendanceById";
+import { UpdateTypeAttendance } from "@application/useCases/typeAttendance/updateTypeAttendance";
+
+import { BaseController } from "./baseController";
+
+export class TypeAttendanceController extends BaseController {
   constructor(
     private createTypeAttendance: CreateTypeAttendance,
     private updateTypeAttendance: UpdateTypeAttendance,
-    private listTypeAttendances: ListTypeAttendance,
-    private typeAttendanceById: TypeAttendanceById,
+    private listTypeAttendances: ListTypeAttendances,
     private removeTypeAttendance: RemoveTypeAttendance,
-  ) {}
+    private typeAttendanceById: TypeAttendanceById,
+  ) {
+    super();
+  }
 
-  async create(req: Request, res: Response): Promise<void> {
+  create = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = CreateTypeAttendanceDTO.create(req.body);
-      const typeAttendance = await this.createTypeAttendance.execute(dto);
-      res.status(201).json(typeAttendance);
-    } catch (error) {
-      this.handleError(error, res, this.create);
-    }
-  }
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const dto = UpdateTypeAttendanceDTO.update(req.body);
-      const typeAttendance = await this.updateTypeAttendance.execute(dto);
-      res.status(200).json(typeAttendance);
-    } catch (error) {
-      this.handleError(error, res, this.update);
-    }
-  }
-  handleError(error: unknown, res: Response, func: Function) {
-    if (error instanceof Error) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
+      const result = await this.createTypeAttendance.execute(dto);
 
-    res.status(500).json({
-      message: `Internal server error to: ${TypeAttendanceController.name}:${func.name}`,
-    });
-  }
-  async list(req: Request, res: Response): Promise<void> {
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${TypeAttendanceController.name}:create`);
+    }
+  };
+
+  update = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = UpdateTypeAttendanceDTO.create(req.params.id, req.body);
+      const result = await this.updateTypeAttendance.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${TypeAttendanceController.name}:update`);
+    }
+  };
+
+  list = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = ListTypeAttendanceDTO.create(req.query);
       const result = await this.listTypeAttendances.execute(dto);
-      res.status(200).json(result);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.list);
+      this.handleError(error, res, `${TypeAttendanceController.name}:list`);
     }
-  }
-  async getById(req: Request, res: Response): Promise<void> {
-    try {
-      const externalId = TypeAttendanceByIdDTO.create(req.params.id);
-      const result = await this.typeAttendanceById.execute(externalId);
-      res.status(200).json(result);
-    } catch (error) {
-      this.handleError(error, res, this.getById);
-    }
-  }
-  async remove(req: Request, res: Response): Promise<void> {
+  };
+
+  remove = async (req: Request, res: Response): Promise<void> => {
     try {
       const dto = RemoveTypeAttendanceDTO.create(req.params.id);
-      await this.removeTypeAttendance.execute(dto);
-      res.status(200).json({ message: "TypeAttendance removed successfully!" });
+      const result = await this.removeTypeAttendance.execute(dto);
+
+      this.handleResult(res, result);
     } catch (error) {
-      this.handleError(error, res, this.remove);
+      this.handleError(error, res, `${TypeAttendanceController.name}:remove`);
     }
-  }
+  };
+
+  getById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = TypeAttendanceByIdDTO.create(req.params.id);
+      const result = await this.typeAttendanceById.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${TypeAttendanceController.name}:getById`);
+    }
+  };
 }
