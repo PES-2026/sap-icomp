@@ -9,6 +9,11 @@ import { CreateAttendance } from "@application/useCases/attendance/createAttenda
 import { ListAttendances } from "@application/useCases/attendance/listAttendances";
 import { RemoveAttendance } from "@application/useCases/attendance/removeAttendance";
 import { UpdateAttendance } from "@application/useCases/attendance/updateAttendance";
+import { AttendanceTypeById } from "@application/useCases/attendanceType/attendanceTypeById";
+import { CreateAttendanceType } from "@application/useCases/attendanceType/createAttendanceType";
+import { ListAttendanceTypes } from "@application/useCases/attendanceType/listAttendanceType";
+import { RemoveAttendanceType } from "@application/useCases/attendanceType/removeAttendanceType";
+import { UpdateAttendanceType } from "@application/useCases/attendanceType/updateAttendanceType";
 import { CourseById } from "@application/useCases/course/courseById";
 import { CreateCourse } from "@application/useCases/course/createCourse";
 import { ListCourse } from "@application/useCases/course/listCourse";
@@ -24,28 +29,23 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
-import { CreateTypeAttendance } from "@application/useCases/typeAttendance/createTypeAttendance";
-import { ListTypeAttendances } from "@application/useCases/typeAttendance/listTypeAttendances";
-import { RemoveTypeAttendance } from "@application/useCases/typeAttendance/removeTypeAttendance";
-import { TypeAttendanceById } from "@application/useCases/typeAttendance/typeAttendanceById";
-import { UpdateTypeAttendance } from "@application/useCases/typeAttendance/updateTypeAttendance";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
+import { PrismaAttendanceTypeRepository } from "@infrastructure/persistence/repositories/prismaAttendanceTypeRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
-import { PrismaTypeAttendanceRepository } from "@infrastructure/persistence/repositories/prismaTypeAttendanceRepository";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
+import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
-import { TypeAttendanceController } from "@presentation/controllers/typeAttendanceController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
+import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
-import { typeAttendanceRoutes } from "@presentation/routes/typeAttendanceRoutes";
 
 const app = express();
 app.use(express.json());
@@ -121,17 +121,17 @@ const courseController = new CourseController(
 
 app.use(courseRoutes(courseController));
 
-const typeAttendanceRepository = new PrismaTypeAttendanceRepository(prisma);
+const attendanceTypeRepository = new PrismaAttendanceTypeRepository(prisma);
 
-const typeAttendanceControler = new TypeAttendanceController(
-  new CreateTypeAttendance(typeAttendanceRepository),
-  new UpdateTypeAttendance(typeAttendanceRepository),
-  new ListTypeAttendances(typeAttendanceRepository),
-  new RemoveTypeAttendance(typeAttendanceRepository),
-  new TypeAttendanceById(typeAttendanceRepository),
+const attendanceTypeController = new AttendanceTypeController(
+  new CreateAttendanceType(attendanceTypeRepository),
+  new UpdateAttendanceType(attendanceTypeRepository),
+  new ListAttendanceTypes(attendanceTypeRepository),
+  new RemoveAttendanceType(attendanceTypeRepository),
+  new AttendanceTypeById(attendanceTypeRepository),
 );
 
-app.use(typeAttendanceRoutes(typeAttendanceControler));
+app.use(attendanceTypeRoutes(attendanceTypeController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

@@ -1,10 +1,10 @@
-import { validateExternalId } from "@domain/utils/validationUtils";
+import { validateExternalIdField } from "@domain/utils/validationUtils";
 
 export class RemoveCourseDTO {
   constructor(public readonly id: string) {}
 
   static create(id: unknown): RemoveCourseDTO {
-    const externalId = validateExternalId(id, "id");
+    const externalId = validateExternalIdField(id, "id");
     return new RemoveCourseDTO(externalId);
   }
 }

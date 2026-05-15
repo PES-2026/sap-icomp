@@ -87,7 +87,7 @@ export function validateBooleanField(value: unknown, fieldName: string): boolean
   );
 }
 
-export function validateExternalId(value: unknown, fieldName: string): string {
+export function validateExternalIdField(value: unknown, fieldName: string): string {
   if (typeof value !== "string" || !value.trim()) {
     throw new Error(`${fieldName} is required and must be a non-empty string. Please verify it!`);
   }

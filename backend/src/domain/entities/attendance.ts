@@ -68,8 +68,8 @@ export class Attendance {
     );
   }
 
-  update(typeId?: ExternalIdVO, date?: DateVO, demand?: DemandVO, generalObservations?: GeneralObservationsVO): void {
-    if (typeId?.value) this.typeId = typeId;
+  update(type?: ExternalIdVO, date?: DateVO, demand?: DemandVO, generalObservations?: GeneralObservationsVO): void {
+    if (type?.value) this.typeId = type;
     if (date?.value) this.date = date;
     if (demand?.value) this.demand = demand;
     if (generalObservations?.value) this.generalObservations = generalObservations;
