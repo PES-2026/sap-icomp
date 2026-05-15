@@ -131,11 +131,6 @@ export function CourseModal({
 
   const isViewMode = mode === "view";
 
-  const coordinatorDisplayValue =
-    isViewMode && courseData?.coordinatorName
-      ? courseData.coordinatorName
-      : coordinatorId;
-
   const getInputClass = (error?: string) =>
     `${inputClass} ${error ? "border-red-400 hover:border-red-400 focus:border-red-500" : ""}`;
 
