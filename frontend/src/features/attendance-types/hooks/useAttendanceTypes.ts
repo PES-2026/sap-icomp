@@ -13,7 +13,7 @@ export function useAttendanceTypes() {
     setIsLoading(true);
     try {
       const response = await attendanceTypeService.getAll(1, 100);
-      setAttendanceTypes(response.items);
+      setAttendanceTypes(response.items || []);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);

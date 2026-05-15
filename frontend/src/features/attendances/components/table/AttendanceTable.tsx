@@ -4,11 +4,11 @@ import { Column, DataTable } from "@/components/ui/DataTable";
 import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { PATHS } from "@/constants/paths";
+import { useAttendanceTypesOptions } from "@/features/attendance-types/hooks/useAttendanceTypesOptions";
 import { useCoursesOptions } from "@/features/courses/hooks/useCoursesOptions";
 import { Edit, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useAttendanceTypesOptions } from "../../hooks/useAttendanceTypesOptions";
 import { useAttendances } from "../../hooks/useAttendances";
 import { Attendance } from "../../types/attendance";
 

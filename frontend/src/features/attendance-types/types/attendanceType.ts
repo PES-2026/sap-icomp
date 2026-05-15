@@ -1,5 +1,5 @@
 export interface AttendanceType {
-  externalId: string;
+  id: string;
   name: string;
   createdAt: string;
   updatedAt: string;

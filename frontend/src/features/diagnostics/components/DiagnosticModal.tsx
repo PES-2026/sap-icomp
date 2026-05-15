@@ -37,6 +37,8 @@ export function DiagnosticModal({
   const [acronym, setAcronym] = useState("");
   const [cid, setCid] = useState("");
 
+  const [nameError, setNameError] = useState("");
+
   const [diagnosticData, setDiagnosticData] = useState<Diagnostic | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -92,6 +94,13 @@ export function DiagnosticModal({
       return;
     }
 
+    setNameError("");
+
+    if (!name) {
+      setNameError("O nome do curso é obrigatório.");
+      return;
+    }
+
     const payload = {
       name: name.trim(),
       acronym: acronym.trim() || undefined,
@@ -120,6 +129,9 @@ export function DiagnosticModal({
 
   const inputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed";
+
+  const getInputClass = (error?: string) =>
+    `${inputClass} ${error ? "border-red-400 hover:border-red-400 focus:border-red-500" : ""}`;
 
   return (
     <>
@@ -155,14 +167,14 @@ export function DiagnosticModal({
           </>
         }
       >
-        <Field label="Nome do Diagnóstico:" required>
+        <Field label="Nome do Diagnóstico:" required error={nameError}>
           <input
             disabled={isViewMode}
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Insira o nome do diagnóstico"
-            className={inputClass}
+            className={getInputClass(nameError)}
           />
         </Field>
 

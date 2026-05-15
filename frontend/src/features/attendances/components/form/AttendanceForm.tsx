@@ -6,6 +6,7 @@ import { CustomSelect } from "@/components/ui/CustomSelect";
 import { Field } from "@/components/ui/Field";
 import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
 import { PATHS } from "@/constants/paths";
+import { useAttendanceTypesOptions } from "@/features/attendance-types/hooks/useAttendanceTypesOptions";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { maskDate } from "@/utils/utils";
 import { Loader2 } from "lucide-react";
@@ -13,7 +14,6 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAttendanceForm } from "../../hooks/useAttendanceById";
-import { useAttendanceTypesOptions } from "../../hooks/useAttendanceTypesOptions";
 import { attendanceService } from "../../services/attendanceService";
 import {
   AttendanceFormData,
