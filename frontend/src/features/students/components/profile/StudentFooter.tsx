@@ -20,7 +20,7 @@ export default function StudentFooter({ student }: StudentFooterProps) {
 
   const handleDisableStudent = async () => {
     try {
-      await studentService.deleteStudent(student.externalId);
+      await studentService.deleteStudent(student.id);
       toast.success(
         !student.removed
           ? "Aluno inativado com sucesso."
@@ -58,7 +58,7 @@ export default function StudentFooter({ student }: StudentFooterProps) {
           <CommonButton
             label="Editar Aluno"
             onClick={() =>
-              handleNavigation({ path: PATHS.edit_student(student.externalId) })
+              handleNavigation({ path: PATHS.edit_student(student.id) })
             }
             endIcon={UserPen}
             sizeIcon={20}
@@ -87,7 +87,7 @@ export default function StudentFooter({ student }: StudentFooterProps) {
               endIcon={Plus}
               onClick={() =>
                 handleNavigation({
-                  path: PATHS.register_attendance(student.externalId),
+                  path: PATHS.register_attendance(student.id),
                 })
               }
               className="bg-[#6bc4a6] text-white hover:bg-[#52b594] text-sm font-semibold"

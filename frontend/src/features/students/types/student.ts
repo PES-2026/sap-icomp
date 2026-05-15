@@ -1,6 +1,7 @@
+import { Attendance } from "@/features/attendances/types/attendance";
+
 export interface Student {
-  internalId: number;
-  externalId: string;
+  id: string;
   enrollmentId: string;
   name: string;
   email: string;
@@ -13,10 +14,11 @@ export interface Student {
   updatedAt: string;
   removed: boolean;
   course: string;
+  lastAttendance: Attendance;
 }
 
 export interface StudentFormData {
-  externalId: string;
+  id: string;
   enrollmentId: string;
   name: string;
   dtBirth: string;

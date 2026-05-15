@@ -9,10 +9,10 @@ export const useCoursesOptions = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await coursesService.get();
+        const response = await coursesService.getAllCourses(1, 100);
 
-        const mappedOptions: SelectOption[] = response.map((course) => ({
-          value: String(course.id),
+        const mappedOptions: SelectOption[] = response.items.map((course) => ({
+          value: course.id,
           label: course.name,
         }));
 
