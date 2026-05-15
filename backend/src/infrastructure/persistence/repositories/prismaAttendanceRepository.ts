@@ -197,6 +197,14 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     return !!type;
   }
 
+  async existsTypeByUUID(uuid: string): Promise<boolean> {
+    const type = await this.prisma.attendanceType.findUnique({
+      where: { externalid: uuid },
+      select: { internalId: true },
+    });
+    return !!type;
+  }
+
   async existsAnyPedagogue(): Promise<boolean> {
     const pedagogue = await this.prisma.pedagogue.findFirst({
       select: { internalId: true },

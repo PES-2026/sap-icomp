@@ -1,4 +1,8 @@
-import { validateExternalId, validateOptionalStringField, validateStringField } from "@domain/utils/validationUtils";
+import {
+  validateExternalIdField,
+  validateOptionalStringField,
+  validateStringField,
+} from "@domain/utils/validationUtils";
 
 export interface UpdateCourseResponse {
   externalId: string;
@@ -21,7 +25,7 @@ export class UpdateCourseDTO {
     }
     const raw = value as Record<string, unknown>;
 
-    const externalId = validateExternalId(id, "externalId");
+    const externalId = validateExternalIdField(id, "externalId");
     const name = validateStringField(raw.name, "name");
     const acronym = validateStringField(raw.acronym, "acronym");
     const coordinatorId = validateOptionalStringField(raw.coordinatorId, "coordinatorId");

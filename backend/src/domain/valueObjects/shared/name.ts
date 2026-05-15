@@ -33,7 +33,7 @@ export class NameVO {
       return Result.fail<void>(new RequiredFieldError("name"));
     }
     const trimmed = name.trim();
-    if (trimmed.length < 5) {
+    if (trimmed.length < 2) {
       return Result.fail<void>(new NameTooShortError(trimmed.length));
     } else if (trimmed.length > 255) {
       return Result.fail<void>(new NameTooLongError(trimmed.length));

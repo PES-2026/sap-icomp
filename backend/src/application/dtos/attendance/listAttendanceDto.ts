@@ -1,7 +1,10 @@
-import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
 import { ListAttendanceFilters } from "@domain/repositories/filters/attendanceFilters";
-import { findValueInEnum } from "@domain/utils/enumUtils";
-import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
+import {
+  validateDateField,
+  validateExternalIdField,
+  validateNumberField,
+  validateStringField,
+} from "@domain/utils/validationUtils";
 
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
@@ -43,9 +46,8 @@ export class ListAttendanceDTO {
       filters.studentEnrollment = validateStringField(raw.studentEnrollment, "studentEnrollment");
     if (raw.studentCourse) filters.studentCourse = validateStringField(raw.studentCourse, "studentCourse");
     if (raw.attendanceType) {
-      const attendanceType: string = validateStringField(raw.attendanceType, "attendanceType");
-      const attendanceValueEnum: AttendanceType = findValueInEnum(AttendanceType, attendanceType);
-      filters.attendanceType = attendanceValueEnum;
+      const attendanceType: string = validateExternalIdField(raw.attendanceType, "attendanceType");
+      filters.attendanceType = attendanceType;
     }
     if (raw.startDate) filters.startDate = validateDateField(raw.startDate, "startDate");
     if (raw.endDate) filters.endDate = validateDateField(raw.endDate, "endDate");

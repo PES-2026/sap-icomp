@@ -208,7 +208,6 @@ export default function AttendanceForm({
                   error={errors.type}
                   onChange={(val) => handleFieldChange("type", val)}
                   options={attendanceTypesOptions}
-                  isSetLabel={true}
                   required
                 />
               </div>
