@@ -18,8 +18,8 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       data: {
         externalId: attendance.id.value,
         student: { connect: { externalId: attendance.studentId.value } },
-        pedagogue: { connect: { internalId: pedagogue!.internalId } },
-        type: { connect: { name: attendance.type.value } },
+        ...(pedagogue && { pedagogue: { connect: { internalId: pedagogue.internalId } } }),
+        type: { connect: { externalid: attendance.typeId.value } },
         attendedAt: attendance.date.value,
         demand: attendance.demand.value,
         observation: attendance.generalObservations?.value ?? "",
@@ -82,7 +82,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: result.externalId,
       studentId: result.student.externalId,
       date: result.attendedAt,
-      type: result.type.name,
+      typeId: result.type.externalid,
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
       updatedAt: result.updatedAt,
@@ -112,7 +112,7 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: attendance.externalId,
       studentId: attendance.student.externalId,
       date: attendance.attendedAt,
-      type: attendance.type.name,
+      typeId: attendance.type.externalid,
       demand: attendance.demand ?? "",
       generalObservations: attendance.observation ?? "",
       updatedAt: attendance.updatedAt,
@@ -122,10 +122,10 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
   async update(attendance: Attendance): Promise<void> {
     const attendanceType = await this.prisma.attendanceType.findUnique({
-      where: { name: attendance.type.value },
+      where: { externalid: attendance.typeId.value },
     });
 
-    if (!attendanceType) throw new Error(`Attendance type ${attendance.type.value} not found`);
+    if (!attendanceType) throw new Error(`Attendance type ID ${attendance.typeId.value} not found`);
 
     await this.prisma.attendance.update({
       where: { externalId: attendance.id.value },
@@ -167,10 +167,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: result.externalId,
       studentId: result.student.externalId,
       date: result.attendedAt,
-      type: result.type.name,
+      typeId: result.type.externalid,
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
-
       updatedAt: result.updatedAt,
       createdAt: result.createdAt,
     }));
@@ -190,9 +189,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async existsTypeByName(name: string): Promise<boolean> {
+  async existsTypeById(id: string): Promise<boolean> {
     const type = await this.prisma.attendanceType.findUnique({
-      where: { name },
+      where: { externalid: id },
       select: { internalId: true },
     });
     return !!type;

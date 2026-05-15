@@ -1,8 +1,8 @@
 import { DiagnosisByIdDTO } from "@application/dtos/diagnoses/diagnosisByIdDto";
 import { ApplicationError } from "@application/errors/applicationError";
 import { DiagnosisNotFoundError } from "@application/errors/diagnoses/diagnosisNotFoundError";
-import { DiagnosisResult } from "@domain/repositories/results/diagnosisResult";
 import { IDiagnosesRepository } from "@domain/repositories/diagnosesRepository";
+import { DiagnosisResult } from "@domain/repositories/results/diagnosisResult";
 import { Result } from "@domain/shared/result";
 
 export class DiagnosisById {

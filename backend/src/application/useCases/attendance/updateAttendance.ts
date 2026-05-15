@@ -5,10 +5,10 @@ import { Attendance } from "@domain/entities/attendance";
 import { DomainError } from "@domain/errors/domainError";
 import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
 import { Result } from "@domain/shared/result";
-import { AttendanceTypeVO } from "@domain/valueObjects/attendance/attendanceType";
 import { DemandVO } from "@domain/valueObjects/attendance/demand";
 import { GeneralObservationsVO } from "@domain/valueObjects/attendance/generalObservations";
 import { DateVO } from "@domain/valueObjects/shared/date";
+import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 
 import { UpdateAttendanceDTO, UpdateAttendanceResponse } from "../../dtos/attendance/updateAttendanceDto";
 
@@ -22,23 +22,23 @@ export class UpdateAttendance {
       return Result.fail<UpdateAttendanceResponse>(new AttendanceNotFoundError(dto.id));
     }
 
-    if (dto.type) {
-      const typeExists = await this.repository.existsTypeByName(dto.type);
+    if (dto.typeId) {
+      const typeExists = await this.repository.existsTypeById(dto.typeId);
       if (!typeExists) {
-        return Result.fail<UpdateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.type));
+        return Result.fail<UpdateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.typeId));
       }
     }
 
     const attendanceEntity = Attendance.rehydrate({
       id: attendance.id!,
       studentId: attendance.studentId,
-      type: attendance.type,
+      typeId: attendance.typeId,
       date: attendance.date,
       demand: attendance.demand,
       generalObservations: attendance.generalObservations,
     });
 
-    const typeResult = dto.type ? AttendanceTypeVO.create(dto.type) : undefined;
+    const typeResult = dto.typeId ? ExternalIdVO.from(dto.typeId) : undefined;
     const dateResult = dto.date ? DateVO.create(dto.date) : undefined;
     const demandResult = dto.demand ? DemandVO.create(dto.demand) : undefined;
     const obsResult = dto.generalObservations ? GeneralObservationsVO.create(dto.generalObservations) : undefined;
@@ -49,7 +49,7 @@ export class UpdateAttendance {
     if (obsResult?.isFailure) return Result.fail<UpdateAttendanceResponse>(obsResult.error!);
 
     attendanceEntity.update(
-      typeResult?.getValue(),
+      typeResult?.getValue() as ExternalIdVO | undefined,
       dateResult?.getValue(),
       demandResult?.getValue(),
       obsResult?.getValue(),
@@ -60,7 +60,7 @@ export class UpdateAttendance {
     return Result.ok<UpdateAttendanceResponse>({
       id: attendanceEntity.id.value,
       studentId: attendanceEntity.studentId.value,
-      type: attendanceEntity.type.value,
+      typeId: attendanceEntity.typeId.value,
       date: attendanceEntity.date.value,
       demand: attendanceEntity.demand.value,
       generalObservations: attendanceEntity.generalObservations?.value ?? "",

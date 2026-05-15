@@ -7,8 +7,8 @@ import { Diagnosis, DiagnosisPropsVO } from "@domain/entities/diagnosis";
 import { DomainError } from "@domain/errors/domainError";
 import { IDiagnosesRepository } from "@domain/repositories/diagnosesRepository";
 import { Result } from "@domain/shared/result";
-import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 import { CidVO } from "@domain/valueObjects/diagnoses/cid";
+import { AcronymVO } from "@domain/valueObjects/shared/acronym";
 import { NameVO } from "@domain/valueObjects/shared/name";
 
 import { UpdateDiagnosisDTO, UpdateDiagnosisResponse } from "../../dtos/diagnoses/updateDiagnosisDto";

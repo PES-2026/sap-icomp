@@ -1,21 +1,27 @@
-import { AttendanceType } from "@domain/enums/attendance/attendanceTypeEnum";
-import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateDateField, validateStringField } from "@domain/utils/validationUtils";
+
+export interface CreateAttendanceRequest {
+  studentId: string;
+  date: string;
+  typeId: string;
+  demand: string;
+  generalObservations?: string;
+}
 
 export interface CreateAttendanceResponse {
   id: string;
   studentId: string;
-  type: string;
   date: Date;
+  typeId: string;
   demand: string;
-  generalObservations?: string;
+  generalObservations: string;
 }
 
 export class CreateAttendanceDTO {
   constructor(
     public readonly studentId: string,
     public readonly date: Date,
-    public readonly type: AttendanceType,
+    public readonly typeId: string,
     public readonly demand: string,
     public readonly generalObservations?: string,
   ) {}
@@ -27,21 +33,16 @@ export class CreateAttendanceDTO {
 
     const raw = value as Record<string, unknown>;
 
-    const studentId = validateStringField(raw.studentId, "studentId");
-    const date = validateDateField(raw.date, "date");
-    const type = validateStringField(raw.type, "type");
-    const demand = validateStringField(raw.demand, "demand");
+    const studentId: string = validateStringField(raw.studentId, "studentId");
+    const date: Date = validateDateField(raw.date, "date");
+    const typeId: string = validateStringField(raw.typeId, "typeId");
+    const demand: string = validateStringField(raw.demand, "demand");
+
     let generalObservations = undefined;
     if (raw.generalObservations) {
       generalObservations = validateStringField(raw.generalObservations, "generalObservations");
     }
 
-    return new CreateAttendanceDTO(
-      studentId,
-      date,
-      findValueInEnum(AttendanceType, type),
-      demand,
-      generalObservations ? generalObservations : undefined,
-    );
+    return new CreateAttendanceDTO(studentId, date, typeId, demand, generalObservations);
   }
 }

@@ -4,7 +4,7 @@ import { PaginatedResult, PaginationParams } from "@domain/shared/pagination";
 export interface AttendanceResult extends BaseItem {
   studentId: string;
   date: Date;
-  type: string;
+  typeId: string;
   demand: string;
   generalObservations: string;
 }
