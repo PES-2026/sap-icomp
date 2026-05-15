@@ -39,7 +39,7 @@ Contains the pure business logic and rules of the application. This layer is fra
   - Rules: Should contain only pure logic, no framework dependencies
 
 - **`use-cases/`** - Orchestrate business workflows
-  - Example: `register-student.ts`
+  - Example: `registerStudent.ts`
   - Purpose: Define application use cases that coordinate between entities and repositories
   - Rules: Should be independent of UI, HTTP, or database implementation details
 
@@ -50,7 +50,7 @@ Implements the technical details required by the core layer. This is where datab
 #### Subdirectories:
 
 - **`database/`** - Database implementations
-  - Example: `prisma-student-repository.ts`
+  - Example: `prismaStudentRepository.ts`
   - Purpose: Implement repository interfaces for data persistence
   - Rules: Should only interact with the database ORM/driver
 
@@ -68,7 +68,7 @@ Defines contracts and abstractions that decouple the core layer from infrastruct
 
 #### Purpose:
 
-- `IStudentRepository.ts` - Abstract interface for data access
+- `iStudentRepository.ts` - Abstract interface for data access
 - Create abstractions for any dependency that could have multiple implementations
 - Ensures the core layer depends on abstractions, not concrete implementations
 

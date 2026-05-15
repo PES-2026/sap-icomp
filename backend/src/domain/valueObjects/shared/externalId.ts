@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
 
+import { InvalidExternalIdError } from "@domain/errors/externalId/invalidExternalIdError";
+import { Result } from "@domain/shared/result";
+
 export class ExternalIdVO {
   private readonly _value: string;
 
@@ -7,27 +10,32 @@ export class ExternalIdVO {
     this._value = externalId;
   }
 
-  static create(): ExternalIdVO {
+  static create(): Result<ExternalIdVO> {
     const externalId: string = randomUUID();
-    return new ExternalIdVO(externalId);
+    return Result.ok<ExternalIdVO>(new ExternalIdVO(externalId));
+  }
+
+  static fromTrusted(value: string): ExternalIdVO {
+    return new ExternalIdVO(value);
   }
 
   get value(): string {
     return this._value;
   }
 
-  static from(value: string): ExternalIdVO {
-    let isValiUuid: boolean = ExternalIdVO.isValid(value);
-    if (!isValiUuid) {
-      throw new Error(`Invalid ExternalId format for: ${value}`);
+  static from(value: string): Result<ExternalIdVO, InvalidExternalIdError> {
+    const isValid: boolean = ExternalIdVO.validate(value);
+
+    if (!isValid) {
+      return Result.fail<ExternalIdVO>(new InvalidExternalIdError(value));
     }
-    return new ExternalIdVO(value);
+
+    return Result.ok<ExternalIdVO>(new ExternalIdVO(value));
   }
 
-  static isValid(value: string): boolean {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    let result: boolean = uuidRegex.test(value);
+  private static validate(value: string): boolean {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const result: boolean = uuidRegex.test(value);
     return result;
   }
 }
