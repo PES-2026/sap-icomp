@@ -9,7 +9,7 @@ export const EMPTY_FORM_STUDENT: StudentFormData = {
   email: "",
   phoneNumber: "",
   courseId: "",
-  diagnosis: "",
+  diagnoses: [],
   potential: "",
   difficulties: "",
 };
@@ -56,7 +56,6 @@ export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
 export const formatGetStudentForFrontend = (data: any): Student => {
   return {
     ...data,
-    course: data.courseId,
     dtBirth: formatDate(data.dtBirth),
     createdAt: formatDate(data.createdAt),
     updatedAt: formatDate(data.updatedAt),
