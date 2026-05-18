@@ -1,10 +1,12 @@
 import { BaseItem } from "@domain/shared/item";
 import { PaginatedResult, PaginationParams } from "@domain/shared/pagination";
 
+import { AttendanceTypeResult } from "./attendanceTypeResult";
+
 export interface AttendanceResult extends BaseItem {
   studentId: string;
   date: Date;
-  typeId: string;
+  type: AttendanceTypeResult;
   demand: string;
   generalObservations: string;
 }

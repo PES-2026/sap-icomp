@@ -82,7 +82,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: result.externalId,
       studentId: result.student.externalId,
       date: result.attendedAt,
-      typeId: result.type.externalid,
+      type: {
+        id: result.type.externalid,
+        name: result.type.name,
+        createdAt: result.type.createdAt,
+        updatedAt: result.type.updatedAt,
+      },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
       updatedAt: result.updatedAt,
@@ -112,7 +117,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: attendance.externalId,
       studentId: attendance.student.externalId,
       date: attendance.attendedAt,
-      typeId: attendance.type.externalid,
+      type: {
+        id: attendance.type.externalid,
+        name: attendance.type.name,
+        createdAt: attendance.type.createdAt,
+        updatedAt: attendance.type.updatedAt,
+      },
       demand: attendance.demand ?? "",
       generalObservations: attendance.observation ?? "",
       updatedAt: attendance.updatedAt,
@@ -167,7 +177,12 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       id: result.externalId,
       studentId: result.student.externalId,
       date: result.attendedAt,
-      typeId: result.type.externalid,
+      type: {
+        id: result.type.externalid,
+        name: result.type.name,
+        createdAt: result.type.createdAt,
+        updatedAt: result.type.updatedAt,
+      },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
       updatedAt: result.updatedAt,
@@ -189,18 +204,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async existsTypeById(id: string): Promise<boolean> {
-    const type = await this.prisma.attendanceType.findUnique({
-      where: { externalid: id },
-      select: { internalId: true },
-    });
-    return !!type;
-  }
-
   async existsTypeByUUID(uuid: string): Promise<boolean> {
     const type = await this.prisma.attendanceType.findUnique({
       where: { externalid: uuid },
-      select: { internalId: true },
     });
     return !!type;
   }
