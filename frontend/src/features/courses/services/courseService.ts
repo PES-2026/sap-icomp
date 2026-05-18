@@ -53,7 +53,7 @@ export const coursesService = {
   },
 
   async removeCourse(id: string): Promise<void> {
-    await api.delete(`/courses/${id}`, {
+    await api.post(`/courses/${id}/remove`, {
       fallbackMsg: "Não foi possível excluir o curso.",
     });
   },

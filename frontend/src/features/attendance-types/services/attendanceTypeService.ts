@@ -48,7 +48,7 @@ export const attendanceTypeService = {
   },
 
   async remove(id: string): Promise<void> {
-    await api.delete(`/attendance-types/${id}`, {
+    await api.post(`/attendance-types/${id}/remove`, {
       fallbackMsg: "Ocorreu um erro ao tentar remover o tipo de atendimento.",
     });
   },
