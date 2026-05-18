@@ -31,8 +31,8 @@ export class UpdateStudent {
       dtBirth: student.dtBirth,
       email: student.email,
       phoneNumber: student.phoneNumber,
-      course: student.course,
-      diagnoses: student.diagnoses,
+      course: student.course.id,
+      diagnoses: student.diagnoses.map((d) => d.id),
       potential: student.potential,
       difficulties: student.difficulties,
     });

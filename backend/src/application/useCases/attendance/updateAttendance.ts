@@ -23,7 +23,7 @@ export class UpdateAttendance {
     }
 
     if (dto.typeId) {
-      const typeExists = await this.repository.existsTypeById(dto.typeId);
+      const typeExists = await this.repository.existsTypeByUUID(dto.typeId);
       if (!typeExists) {
         return Result.fail<UpdateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.typeId));
       }
@@ -31,8 +31,8 @@ export class UpdateAttendance {
 
     const attendanceEntity = Attendance.rehydrate({
       id: attendance.id!,
-      studentId: attendance.studentId,
-      typeId: attendance.typeId,
+      studentId: attendance.student.id,
+      typeId: attendance.type.id,
       date: attendance.date,
       demand: attendance.demand,
       generalObservations: attendance.generalObservations,
