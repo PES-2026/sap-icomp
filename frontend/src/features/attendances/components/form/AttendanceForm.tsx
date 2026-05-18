@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useAttendanceForm } from "../../hooks/useAttendanceById";
+import { useAttendanceForm } from "../../hooks/useAttendanceForm";
 import { attendanceService } from "../../services/attendanceService";
 import {
   AttendanceFormData,
@@ -198,15 +198,20 @@ export default function AttendanceForm({
                     disabled
                     type="text"
                     placeholder="TDAH, TAG"
-                    value={student?.difficulties ?? ""}
+                    value={
+                      student?.diagnoses
+                        ?.map((diag) => diag.acronym)
+                        .filter(Boolean)
+                        .join(", ") || ""
+                    }
                     className="w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans border-stone-300 hover:border-stone-400 focus:border-teal-400 disabled:text-stone-500 disabled:cursor-not-allowed"
                   />
                 </Field>
                 <CustomSelect
-                  value={formData.type}
+                  value={formData.typeId}
                   label="Tipo de Atendimento:"
-                  error={errors.type}
-                  onChange={(val) => handleFieldChange("type", val)}
+                  error={errors.typeId}
+                  onChange={(val) => handleFieldChange("typeId", val)}
                   options={attendanceTypesOptions}
                   required
                 />

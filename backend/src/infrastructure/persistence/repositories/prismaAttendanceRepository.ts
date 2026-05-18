@@ -72,7 +72,13 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         take: limit,
         orderBy: { attendedAt: "desc" },
         include: {
-          student: { include: { course: true } },
+          student: {
+            include: {
+              course: { include: { coordinator: true } },
+              diagnoses: { include: { diagnosis: true } },
+              attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+            },
+          },
           type: true,
         },
       }),
@@ -80,9 +86,43 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
     const items: AttendanceResult[] = results.map((result) => ({
       id: result.externalId,
-      studentId: result.student.externalId,
+      student: {
+        id: result.student.externalId,
+        name: result.student.name,
+        enrollmentId: result.student.enrollmentId,
+        dtBirth: result.student.dtBirth,
+        email: result.student.email,
+        phoneNumber: result.student.phoneNumber,
+        course: {
+          id: result.student.course.externalId,
+          name: result.student.course.name,
+          acronym: result.student.course.acronym,
+          coordinatorId: result.student.course.coordinator?.externalId ?? "",
+          coordinatorName: result.student.course.coordinator?.name ?? "",
+          createdAt: result.student.course.createdAt,
+          updatedAt: result.student.course.updatedAt,
+        },
+        diagnoses: result.student.diagnoses.map((d) => ({
+          id: d.diagnosis.externalId,
+          name: d.diagnosis.name,
+          acronym: d.diagnosis.acronym ?? "",
+          cid: d.diagnosis.CID ?? "",
+          createdAt: d.diagnosis.createdAt,
+          updatedAt: d.diagnosis.updatedAt,
+        })),
+        potential: result.student.potential ?? "",
+        difficulties: result.student.difficulties ?? "",
+        createdAt: result.student.createdAt,
+        updatedAt: result.student.updatedAt,
+        lastAttendance: result.student.attendances[0]?.attendedAt ?? null,
+      },
       date: result.attendedAt,
-      typeId: result.type.externalid,
+      type: {
+        id: result.type.externalid,
+        name: result.type.name,
+        createdAt: result.type.createdAt,
+        updatedAt: result.type.updatedAt,
+      },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
       updatedAt: result.updatedAt,
@@ -101,7 +141,13 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     const attendance = await this.prisma.attendance.findFirst({
       where: { externalId: id, removed: false },
       include: {
-        student: true,
+        student: {
+          include: {
+            course: { include: { coordinator: true } },
+            diagnoses: { include: { diagnosis: true } },
+            attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+          },
+        },
         type: true,
       },
     });
@@ -110,9 +156,43 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
     return {
       id: attendance.externalId,
-      studentId: attendance.student.externalId,
+      student: {
+        id: attendance.student.externalId,
+        name: attendance.student.name,
+        enrollmentId: attendance.student.enrollmentId,
+        dtBirth: attendance.student.dtBirth,
+        email: attendance.student.email,
+        phoneNumber: attendance.student.phoneNumber,
+        course: {
+          id: attendance.student.course.externalId,
+          name: attendance.student.course.name,
+          acronym: attendance.student.course.acronym,
+          coordinatorId: attendance.student.course.coordinator?.externalId ?? "",
+          coordinatorName: attendance.student.course.coordinator?.name ?? "",
+          createdAt: attendance.student.course.createdAt,
+          updatedAt: attendance.student.course.updatedAt,
+        },
+        diagnoses: attendance.student.diagnoses.map((d) => ({
+          id: d.diagnosis.externalId,
+          name: d.diagnosis.name,
+          acronym: d.diagnosis.acronym ?? "",
+          cid: d.diagnosis.CID ?? "",
+          createdAt: d.diagnosis.createdAt,
+          updatedAt: d.diagnosis.updatedAt,
+        })),
+        potential: attendance.student.potential ?? "",
+        difficulties: attendance.student.difficulties ?? "",
+        createdAt: attendance.student.createdAt,
+        updatedAt: attendance.student.updatedAt,
+        lastAttendance: attendance.student.attendances[0]?.attendedAt ?? null,
+      },
       date: attendance.attendedAt,
-      typeId: attendance.type.externalid,
+      type: {
+        id: attendance.type.externalid,
+        name: attendance.type.name,
+        createdAt: attendance.type.createdAt,
+        updatedAt: attendance.type.updatedAt,
+      },
       demand: attendance.demand ?? "",
       generalObservations: attendance.observation ?? "",
       updatedAt: attendance.updatedAt,
@@ -157,7 +237,13 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         take: limit,
         orderBy: { attendedAt: "desc" },
         include: {
-          student: { include: { course: true } },
+          student: {
+            include: {
+              course: { include: { coordinator: true } },
+              diagnoses: { include: { diagnosis: true } },
+              attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+            },
+          },
           type: true,
         },
       }),
@@ -165,9 +251,43 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
 
     const items: AttendanceResult[] = results.map((result) => ({
       id: result.externalId,
-      studentId: result.student.externalId,
+      student: {
+        id: result.student.externalId,
+        name: result.student.name,
+        enrollmentId: result.student.enrollmentId,
+        dtBirth: result.student.dtBirth,
+        email: result.student.email,
+        phoneNumber: result.student.phoneNumber,
+        course: {
+          id: result.student.course.externalId,
+          name: result.student.course.name,
+          acronym: result.student.course.acronym,
+          coordinatorId: result.student.course.coordinator?.externalId ?? "",
+          coordinatorName: result.student.course.coordinator?.name ?? "",
+          createdAt: result.student.course.createdAt,
+          updatedAt: result.student.course.updatedAt,
+        },
+        diagnoses: result.student.diagnoses.map((d) => ({
+          id: d.diagnosis.externalId,
+          name: d.diagnosis.name,
+          acronym: d.diagnosis.acronym ?? "",
+          cid: d.diagnosis.CID ?? "",
+          createdAt: d.diagnosis.createdAt,
+          updatedAt: d.diagnosis.updatedAt,
+        })),
+        potential: result.student.potential ?? "",
+        difficulties: result.student.difficulties ?? "",
+        createdAt: result.student.createdAt,
+        updatedAt: result.student.updatedAt,
+        lastAttendance: result.student.attendances[0]?.attendedAt ?? null,
+      },
       date: result.attendedAt,
-      typeId: result.type.externalid,
+      type: {
+        id: result.type.externalid,
+        name: result.type.name,
+        createdAt: result.type.createdAt,
+        updatedAt: result.type.updatedAt,
+      },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
       updatedAt: result.updatedAt,
@@ -189,18 +309,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
     });
   }
 
-  async existsTypeById(id: string): Promise<boolean> {
-    const type = await this.prisma.attendanceType.findUnique({
-      where: { externalid: id },
-      select: { internalId: true },
-    });
-    return !!type;
-  }
-
   async existsTypeByUUID(uuid: string): Promise<boolean> {
     const type = await this.prisma.attendanceType.findUnique({
       where: { externalid: uuid },
-      select: { internalId: true },
     });
     return !!type;
   }

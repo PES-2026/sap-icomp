@@ -43,7 +43,7 @@ export const diagnosticService = {
   },
 
   async removeDiagnostic(id: string): Promise<void> {
-    await api.delete(`/diagnoses/${id}`, {
+    await api.post(`/diagnoses/${id}/remove`, {
       fallbackMsg: "Não foi possível remover o diagnóstico.",
     });
   },

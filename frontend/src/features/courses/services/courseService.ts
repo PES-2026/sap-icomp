@@ -8,13 +8,9 @@ import {
 } from "../types/course";
 
 export const coursesService = {
-  async getAllCourses(
-    page = 1,
-    limit = 20,
-    nameOrAcronym?: string,
-  ): Promise<CoursesResponse> {
+  async getAllCourses(page = 1, limit = 100): Promise<CoursesResponse> {
     const response = await api.get<CoursesResponse>("/courses", {
-      params: { page, limit, nameOrAcronym },
+      params: { page, limit },
       fallbackMsg: "Não foi possível carregar os cursos.",
     });
 
@@ -53,7 +49,7 @@ export const coursesService = {
   },
 
   async removeCourse(id: string): Promise<void> {
-    await api.delete(`/courses/${id}`, {
+    await api.post(`/courses/${id}/remove`, {
       fallbackMsg: "Não foi possível excluir o curso.",
     });
   },

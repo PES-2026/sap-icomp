@@ -1,7 +1,7 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { CourseAlreadyExistsError } from "@application/errors/course/courseAlreadyExistsError";
 import { ProfessorNotFoundError } from "@application/errors/professor/professorNotFoundError";
-import { CourseVO } from "@domain/entities/course";
+import { Course } from "@domain/entities/course";
 import { DomainError } from "@domain/errors/domainError";
 import { ICourseRepository } from "@domain/repositories/courseRepository";
 import { Result } from "@domain/shared/result";
@@ -29,7 +29,7 @@ export class CreateCourse {
       }
     }
 
-    const courseEntity = CourseVO.create({
+    const courseEntity = Course.create({
       name: dto.name,
       acronym: dto.acronym,
       coordinatorId: dto.coordinatorId ?? "",

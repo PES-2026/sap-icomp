@@ -4,7 +4,7 @@ import { PATHS } from "@/constants/paths";
 import StudentForm from "@/features/students/components/form/StudentForm";
 import { studentService } from "@/features/students/services/studentService";
 import { StudentFormData } from "@/features/students/types/student";
-import { formatForFrontend } from "@/features/students/utils/studentUtils";
+import { formatFormForFrontend } from "@/features/students/utils/studentUtils";
 import { useAppNavigation } from "@/utils/navigator";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -28,7 +28,7 @@ export default function EditStudentPage() {
         const student = await studentService.getStudentById(id);
 
         if (student) {
-          const formattedData = formatForFrontend(student);
+          const formattedData = formatFormForFrontend(student);
           setStudentData(formattedData);
         } else {
           console.error("Student not found.");

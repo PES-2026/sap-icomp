@@ -1,4 +1,6 @@
 import { Attendance } from "@/features/attendances/types/attendance";
+import { Course } from "@/features/courses/types/course";
+import { Diagnostic } from "@/features/diagnostics/types/diagnostic";
 
 export interface Student {
   id: string;
@@ -7,13 +9,13 @@ export interface Student {
   email: string;
   phoneNumber: string;
   dtBirth: string;
-  diagnosis: string;
+  diagnoses: Diagnostic[];
   potential: string;
   difficulties: string;
   createdAt: string;
   updatedAt: string;
   removed: boolean;
-  course: string;
+  course: Course;
   lastAttendance: Attendance;
 }
 
@@ -25,7 +27,7 @@ export interface StudentFormData {
   email: string;
   phoneNumber: string;
   courseId: string;
-  diagnosis: string;
+  diagnoses: string[];
   potential: string;
   difficulties: string;
 }

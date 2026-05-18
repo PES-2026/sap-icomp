@@ -17,7 +17,7 @@ interface AttendanceHistoryCardProps {
 export default function AttendanceHistoryCard({
   studentId,
 }: AttendanceHistoryCardProps) {
-  const [filterType, setFilterType] = useState<string>("Todos os tipos");
+  const [filterType, setFilterType] = useState<string>("");
   const [attendanceId, setAttendanceId] = useState<string>("");
   const [showDisableAttendance, setShowDisableAttendance] =
     useState<boolean>(false);
@@ -31,8 +31,7 @@ export default function AttendanceHistoryCard({
 
   const filteredAttendances = studentId
     ? attendancesByStudent.filter(
-        (a) =>
-          filterType === "Todos os tipos" || a.attendanceType === filterType,
+        (a) => filterType === "" || a.type?.id === filterType,
       )
     : [];
 
@@ -73,7 +72,7 @@ export default function AttendanceHistoryCard({
             options={attendanceTypesOptions}
             placeholder="Todos os tipos"
             width="w-55"
-            isSetLabel={true}
+            // isSetLabel={true}
           />
         </div>
 
@@ -109,11 +108,11 @@ export default function AttendanceHistoryCard({
                       <div className="flex items-center gap-4">
                         <div>
                           <p className="text-sm font-semibold text-[#2a2520]">
-                            {attendance.attendanceType}
+                            {attendance.type?.name || "Sem tipo informado"}
                           </p>
                           <p className="mt-0.5 flex items-center gap-1 text-xs text-[#1a6e4e]">
                             <Calendar size={11} />
-                            {attendance.attendanceDate}
+                            {attendance.date}
                           </p>
                         </div>
                       </div>
@@ -122,7 +121,7 @@ export default function AttendanceHistoryCard({
                         <Link
                           href={PATHS.visualize_attendance(
                             studentId,
-                            attendance.attendanceId,
+                            attendance.id,
                           )}
                           title="Visualizar"
                           className="flex items-center rounded-md p-1 text-[#53bb98] transition-colors duration-150 hover:bg-[#a5e1cd]"
@@ -130,10 +129,7 @@ export default function AttendanceHistoryCard({
                           <Eye size={20} />
                         </Link>
                         <Link
-                          href={PATHS.edit_attendance(
-                            studentId,
-                            attendance.attendanceId,
-                          )}
+                          href={PATHS.edit_attendance(studentId, attendance.id)}
                           title="Editar"
                           className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#d0d0d0]"
                         >
@@ -143,7 +139,7 @@ export default function AttendanceHistoryCard({
                           label=""
                           title="Inativar"
                           onClick={() => {
-                            setAttendanceId(attendance.attendanceId);
+                            setAttendanceId(attendance.id);
                             setShowDisableAttendance(true);
                           }}
                           startIcon={FileX}

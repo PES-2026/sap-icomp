@@ -9,15 +9,11 @@ export function useCoursesSettings(autoFetch = true) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchCourses = async (nameOrAcronym = "") => {
+  const fetchCourses = async () => {
     setIsLoading(true);
 
     try {
-      const response = await coursesService.getAllCourses(
-        1,
-        100,
-        nameOrAcronym.trim() || undefined,
-      );
+      const response = await coursesService.getAllCourses(1, 100);
 
       setCourses(response.items || []);
     } catch (error) {

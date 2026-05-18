@@ -2,6 +2,7 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { CustomMultiSelect } from "@/components/ui/CustomMultiSelect";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { Field } from "@/components/ui/Field";
 import { SuccessScreenForm } from "@/components/ui/SuccessScreenForm";
@@ -52,7 +53,10 @@ export default function StudentForm({
       ? `${baseInputClass} border-red-300 bg-red-50 focus:border-red-400`
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
-  const handleFieldChange = (key: keyof StudentFormData, value: string) => {
+  const handleFieldChange = <K extends keyof StudentFormData>(
+    key: K,
+    value: StudentFormData[K],
+  ) => {
     setFormData((prev) => {
       const updated = {
         ...prev,
@@ -216,11 +220,11 @@ export default function StudentForm({
               </div>
 
               <div className="mb-3.5">
-                <CustomSelect
-                  value={formData.diagnosis}
+                <CustomMultiSelect
+                  value={formData.diagnoses}
                   label="Diagnóstico:"
-                  error={errors.diagnosis}
-                  onChange={(val) => handleFieldChange("diagnosis", val)}
+                  error={errors.diagnoses}
+                  onChange={(val) => handleFieldChange("diagnoses", val)}
                   options={diagnosticsOptions}
                 />
               </div>

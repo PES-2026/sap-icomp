@@ -6,11 +6,7 @@ import type { IStudentRepository } from "@domain/repositories/studentRepository"
 import { Result } from "@domain/shared/result";
 
 export class StudentById {
-  private readonly studentRepository: IStudentRepository;
-
-  constructor(studentRepository: IStudentRepository) {
-    this.studentRepository = studentRepository;
-  }
+  constructor(private readonly studentRepository: IStudentRepository) {}
 
   async execute(input: StudentByIdDTO): Promise<Result<StudentResult, ApplicationError>> {
     const student = await this.studentRepository.findByUUID(input.id);

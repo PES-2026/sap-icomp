@@ -8,7 +8,7 @@ import {
 export const EMPTY_FORM_ATTENDANCE: AttendanceFormData = {
   studentId: "",
   date: "",
-  type: "",
+  typeId: "",
   demand: "",
   generalObservations: "",
 };
@@ -18,7 +18,7 @@ export const validateAttendanceForm = (
 ): AttendanceFormErrors => {
   const errs: AttendanceFormErrors = {};
 
-  if (!data.type) errs.type = "Selecione o tipo";
+  if (!data.typeId) errs.typeId = "Selecione o tipo";
   if (!data.demand) errs.demand = "A demanda é obrigatória";
   if (!data.date) errs.date = "A data é obrigátoria";
 
@@ -45,12 +45,19 @@ export const formatAttendanceForFrontend = (data: any): AttendanceFormData => {
   };
 };
 
-export const formatGetAttendancesForFrontend = (data: any[]): Attendance[] => {
+export const formatGetAttendanceForFrontend = (
+  data: Attendance,
+): Attendance => {
+  return {
+    ...data,
+    date: formatDate(data.date),
+  };
+};
+
+export const formatGetAttendancesForFrontend = (
+  data: Attendance[],
+): Attendance[] => {
   return data.map((item) => {
-    return {
-      ...item,
-      attendanceId: item.id,
-      attendanceDate: item.date ? formatDate(item.date) : "",
-    };
+    return formatGetAttendanceForFrontend(item);
   });
 };

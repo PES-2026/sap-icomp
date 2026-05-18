@@ -1,9 +1,8 @@
 "use client";
 
-import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useAttendanceForm } from "../../hooks/useAttendanceById";
+import { useAttendanceById } from "../../hooks/useAttendanceById";
 
 export default function AttendanceCard() {
   const params = useParams();
@@ -12,13 +11,11 @@ export default function AttendanceCard() {
     (params?.attendanceId as string) ?? "",
   );
 
-  const { student } = useStudentById(studentId);
-  const { formData } = useAttendanceForm({
+  const { attendance } = useAttendanceById({
     attendanceId,
-    isEditMode: true,
   });
 
-  if (!student || !formData) {
+  if (!attendance) {
     return (
       <div className="flex h-full w-full items-center justify-center p-7">
         <div className="flex flex-col items-center gap-3 text-[#6a6560]">
@@ -39,13 +36,13 @@ export default function AttendanceCard() {
                 Detalhes do Atendimento
               </p>
               <h1 className="text-2xl font-bold text-stone-800">
-                {formData.type || "Tipo não informado"}
+                {attendance.type?.name || "Tipo não informado"}
               </h1>
             </div>
 
             <div className="bg-white px-4 py-2 rounded-lg w-fit flex items-center gap-2">
               <span className="text-sm font-medium text-emerald-700">
-                Data: {formData.date || "--/--/----"}
+                Data: {attendance.date || "--/--/----"}
               </span>
             </div>
           </div>
@@ -60,16 +57,16 @@ export default function AttendanceCard() {
               <div>
                 <p className="text-xs text-stone-500 mb-0.5">Nome</p>
                 <p className="text-sm font-medium text-stone-800">
-                  {student.name}
+                  {attendance.student?.name || "Sem nome do aluno"}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-stone-500 mb-0.5">E-mail</p>
                 <p
                   className="text-sm font-medium text-stone-800 truncate"
-                  title={student.email}
+                  title={attendance.student?.email}
                 >
-                  {student.email}
+                  {attendance.student?.email}
                 </p>
               </div>
               <div className="sm:col-span-2 pt-2 border-t border-stone-200/60">
@@ -77,8 +74,9 @@ export default function AttendanceCard() {
                   Diagnóstico / Dificuldades
                 </p>
                 <p className="text-sm font-medium text-stone-800">
-                  {student.difficulties && student.difficulties.trim() !== ""
-                    ? student.difficulties
+                  {attendance.student?.difficulties &&
+                  attendance.student?.difficulties.trim() !== ""
+                    ? attendance.student?.difficulties
                     : "N/A"}
                 </p>
               </div>
@@ -92,7 +90,7 @@ export default function AttendanceCard() {
               </h2>
               <div className="bg-stone-50/50 rounded-lg border border-stone-200 p-4 min-h-20">
                 <p className="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">
-                  {formData.demand || (
+                  {attendance.demand || (
                     <span className="text-stone-400 italic">
                       Nenhuma demanda registrada.
                     </span>
@@ -107,7 +105,7 @@ export default function AttendanceCard() {
               </h2>
               <div className="bg-stone-50/50 rounded-lg border border-stone-200 p-4 min-h-25">
                 <p className="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">
-                  {formData.generalObservations || (
+                  {attendance.generalObservations || (
                     <span className="text-stone-400 italic">
                       Nenhuma observação geral registrada.
                     </span>

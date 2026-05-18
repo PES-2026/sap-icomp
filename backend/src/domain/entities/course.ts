@@ -17,7 +17,7 @@ export type CoursePropsVO = {
   coordinatorId?: ExternalIdVO;
 };
 
-export class CourseVO {
+export class Course {
   constructor(
     public readonly externalId: ExternalIdVO,
     public name: CourseName,
@@ -25,7 +25,7 @@ export class CourseVO {
     public coordinatorId?: ExternalIdVO,
   ) {}
 
-  static create(props: CourseProps): Result<CourseVO> {
+  static create(props: CourseProps): Result<Course> {
     const externalId = ExternalIdVO.create();
     const courseName = CourseName.create(props.name);
     const courseAcronym = AcronymVO.create(props.acronym);
@@ -35,12 +35,12 @@ export class CourseVO {
 
     for (const result of results) {
       if (result?.isFailure) {
-        return Result.fail<CourseVO>(result.error!);
+        return Result.fail<Course>(result.error!);
       }
     }
 
-    return Result.ok<CourseVO>(
-      new CourseVO(
+    return Result.ok<Course>(
+      new Course(
         externalId.getValue(),
         courseName.getValue(),
         courseAcronym.getValue(),
@@ -49,8 +49,8 @@ export class CourseVO {
     );
   }
 
-  static rehydrate(props: CourseProps): CourseVO {
-    return new CourseVO(
+  static rehydrate(props: CourseProps): Course {
+    return new Course(
       ExternalIdVO.fromTrusted(props.courseId!),
       CourseName.fromTrusted(props.name),
       AcronymVO.fromTrusted(props.acronym),

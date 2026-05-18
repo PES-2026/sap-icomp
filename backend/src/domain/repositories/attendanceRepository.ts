@@ -10,6 +10,6 @@ export interface IAttendanceRepository {
   findByStudentId(params: FindByStudentParams): Promise<PaginatedAttendanceResult>;
   update(attendance: Attendance): Promise<void>;
   remove(id: string): Promise<void>;
-  existsTypeById(id: string): Promise<boolean>;
+  existsTypeByUUID(id: string): Promise<boolean>;
   existsAnyPedagogue(): Promise<boolean>;
 }
