@@ -47,6 +47,7 @@ export const formatForBackend = (data: StudentFormData) => {
 export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
   return {
     ...dataFromAPI,
+    courseId: dataFromAPI.course,
     dtBirth: formatDate(dataFromAPI.dtBirth),
     enrollmentId: maskRegistration(dataFromAPI.enrollmentId),
     phoneNumber: maskPhone(dataFromAPI.phoneNumber),
