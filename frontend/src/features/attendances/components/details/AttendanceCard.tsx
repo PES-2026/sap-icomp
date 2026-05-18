@@ -39,7 +39,7 @@ export default function AttendanceCard() {
                 Detalhes do Atendimento
               </p>
               <h1 className="text-2xl font-bold text-stone-800">
-                {formData.type || "Tipo não informado"}
+                {formData.typeId || "Tipo não informado"}
               </h1>
             </div>
 

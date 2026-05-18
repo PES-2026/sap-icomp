@@ -25,7 +25,7 @@ export interface StudentFormData {
   email: string;
   phoneNumber: string;
   courseId: string;
-  diagnosis: string;
+  diagnoses: string[];
   potential: string;
   difficulties: string;
 }

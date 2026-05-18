@@ -15,7 +15,7 @@ export interface Attendance {
 export interface AttendanceFormData {
   studentId: string;
   date: string;
-  type: string;
+  typeId: string;
   demand: string;
   generalObservations: string;
 }

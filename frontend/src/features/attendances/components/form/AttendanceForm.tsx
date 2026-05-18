@@ -203,10 +203,10 @@ export default function AttendanceForm({
                   />
                 </Field>
                 <CustomSelect
-                  value={formData.type}
+                  value={formData.typeId}
                   label="Tipo de Atendimento:"
-                  error={errors.type}
-                  onChange={(val) => handleFieldChange("type", val)}
+                  error={errors.typeId}
+                  onChange={(val) => handleFieldChange("typeId", val)}
                   options={attendanceTypesOptions}
                   required
                 />

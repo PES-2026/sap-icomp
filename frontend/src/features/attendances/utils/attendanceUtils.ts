@@ -8,7 +8,7 @@ import {
 export const EMPTY_FORM_ATTENDANCE: AttendanceFormData = {
   studentId: "",
   date: "",
-  type: "",
+  typeId: "",
   demand: "",
   generalObservations: "",
 };
@@ -18,7 +18,7 @@ export const validateAttendanceForm = (
 ): AttendanceFormErrors => {
   const errs: AttendanceFormErrors = {};
 
-  if (!data.type) errs.type = "Selecione o tipo";
+  if (!data.typeId) errs.typeId = "Selecione o tipo";
   if (!data.demand) errs.demand = "A demanda é obrigatória";
   if (!data.date) errs.date = "A data é obrigátoria";
 
