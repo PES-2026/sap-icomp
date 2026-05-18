@@ -21,7 +21,7 @@ export class CreateAttendance {
       return Result.fail<CreateAttendanceResponse>(new StudentNotFoundError(dto.studentId));
     }
 
-    const typeExists = await this.repository.existsTypeById(dto.typeId);
+    const typeExists = await this.repository.existsTypeByUUID(dto.typeId);
     if (!typeExists) {
       return Result.fail<CreateAttendanceResponse>(new AttendanceTypeNotFoundError(dto.typeId));
     }

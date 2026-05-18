@@ -85,18 +85,6 @@ const attendanceControler = new AttendanceController(
   new AttendanceById(attedanceRepository),
 );
 
-app.use(attendanceRoutes(attendanceControler));
-
-const studentController = new StudentController(
-  new CreateStudent(studentRepository),
-  new ListStudents(studentRepository),
-  new UpdateStudent(studentRepository),
-  new StudentById(studentRepository),
-  new RemoveStudent(studentRepository),
-);
-
-app.use(studentRoutes(studentController));
-
 const diagnosesRepository = new PrismaDiagnosesRepository(prisma);
 
 const diagnosesController = new DiagnosesController(
@@ -118,6 +106,18 @@ const courseController = new CourseController(
   new CourseById(courseRepository),
   new RemoveCourse(courseRepository),
 );
+
+app.use(attendanceRoutes(attendanceControler));
+
+const studentController = new StudentController(
+  new CreateStudent(studentRepository),
+  new ListStudents(studentRepository),
+  new UpdateStudent(studentRepository),
+  new StudentById(studentRepository),
+  new RemoveStudent(studentRepository),
+);
+
+app.use(studentRoutes(studentController));
 
 app.use(courseRoutes(courseController));
 

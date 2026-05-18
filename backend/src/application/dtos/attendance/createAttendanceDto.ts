@@ -35,7 +35,7 @@ export class CreateAttendanceDTO {
 
     const studentId: string = validateStringField(raw.studentId, "studentId");
     const date: Date = validateDateField(raw.date, "date");
-    const typeId: string = validateStringField(raw.type, "type");
+    const typeId: string = validateStringField(raw.typeId, "typeId");
     const demand: string = validateStringField(raw.demand, "demand");
 
     let generalObservations = undefined;
