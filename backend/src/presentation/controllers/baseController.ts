@@ -77,7 +77,7 @@ export abstract class BaseController {
     } else {
       // When an use case returns a generical error that hasn't a HTTP Mapping
       console.error(`[BaseController:handleResult] Unmapped Result Error:`, error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", error: error });
     }
   }
 }
