@@ -39,41 +39,50 @@ export function useDiagnostics() {
     }
   }, []);
 
-  const createDiagnostic = useCallback(async (data: DiagnosticPayload) => {
-    try {
-      const diagnostic = await diagnosticService.createDiagnostic(data);
-      toast.success("Diagnóstico criado com sucesso!");
-      await fetchDiagnostics();
-      return diagnostic;
-    } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
-      return null;
-    }
-  }, [fetchDiagnostics]);
+  const createDiagnostic = useCallback(
+    async (data: DiagnosticPayload) => {
+      try {
+        const diagnostic = await diagnosticService.createDiagnostic(data);
+        toast.success("Diagnóstico criado com sucesso!");
+        await fetchDiagnostics();
+        return diagnostic;
+      } catch (error) {
+        if (error instanceof Error) toast.error(error.message);
+        return null;
+      }
+    },
+    [fetchDiagnostics],
+  );
 
-  const updateDiagnostic = useCallback(async (id: string, data: DiagnosticPayload) => {
-    try {
-      await diagnosticService.updateDiagnostic(id, data);
-      toast.success("Diagnóstico atualizado com sucesso!");
-      await fetchDiagnostics();
-      return true;
-    } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
-      return false;
-    }
-  }, [fetchDiagnostics]);
+  const updateDiagnostic = useCallback(
+    async (id: string, data: DiagnosticPayload) => {
+      try {
+        await diagnosticService.updateDiagnostic(id, data);
+        toast.success("Diagnóstico atualizado com sucesso!");
+        await fetchDiagnostics();
+        return true;
+      } catch (error) {
+        if (error instanceof Error) toast.error(error.message);
+        return false;
+      }
+    },
+    [fetchDiagnostics],
+  );
 
-  const removeDiagnostic = useCallback(async (id: string) => {
-    try {
-      await diagnosticService.removeDiagnostic(id);
-      toast.success("Diagnóstico removido com sucesso");
-      await fetchDiagnostics();
-      return true;
-    } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
-      return false;
-    }
-  }, [fetchDiagnostics]);
+  const removeDiagnostic = useCallback(
+    async (id: string) => {
+      try {
+        await diagnosticService.removeDiagnostic(id);
+        toast.success("Diagnóstico removido com sucesso");
+        await fetchDiagnostics();
+        return true;
+      } catch (error) {
+        if (error instanceof Error) toast.error(error.message);
+        return false;
+      }
+    },
+    [fetchDiagnostics],
+  );
 
   const orderedDiagnostics = useMemo(() => {
     return [...diagnostics].sort((a, b) => a.name.localeCompare(b.name));

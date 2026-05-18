@@ -1,3 +1,4 @@
+import { Diagnostic } from "@/features/diagnostics/types/diagnostic";
 import { formatDate, maskPhone, maskRegistration } from "@/utils/utils";
 import { FormErrors, Student, StudentFormData } from "../types/student";
 
@@ -51,6 +52,23 @@ export const formatForFrontend = (dataFromAPI: any): StudentFormData => {
     dtBirth: formatDate(dataFromAPI.dtBirth),
     enrollmentId: maskRegistration(dataFromAPI.enrollmentId),
     phoneNumber: maskPhone(dataFromAPI.phoneNumber),
+  };
+};
+
+export const formatFormForFrontend = (student: Student): StudentFormData => {
+  console.log(student);
+  return {
+    id: student.id,
+    enrollmentId: maskRegistration(student.enrollmentId),
+    name: student.name,
+    dtBirth: formatDate(student.dtBirth),
+    email: student.email,
+    phoneNumber: maskPhone(student.phoneNumber),
+    courseId: student?.course?.id || "",
+    diagnoses:
+      student?.diagnoses?.map((diag: Diagnostic) => diag?.id || "") || [],
+    potential: student.potential,
+    difficulties: student.difficulties,
   };
 };
 

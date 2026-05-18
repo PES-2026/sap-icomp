@@ -5,7 +5,7 @@ import { InfoBadge } from "@/components/ui/InfoBadge";
 import { ManageSectionCard } from "@/components/ui/ManageSectionCard";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Loader2, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useDiagnostics } from "../hooks/useDiagnostics";
 import { DiagnosticModal } from "./DiagnosticModal";
 
@@ -19,23 +19,21 @@ export default function DiagnosticSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const filteredDiagnostics = useMemo(() => {
-    return diagnostics.filter((diagnostic) => {
-      const nameMatch = diagnostic.name
-        .toLowerCase()
-        .includes(nameFilter.toLowerCase());
+  const filteredDiagnostics = diagnostics.filter((diagnostic) => {
+    const nameMatch = (diagnostic.name || "")
+      .toLowerCase()
+      .includes(nameFilter.toLowerCase());
 
-      const acronymMatch = (diagnostic.acronym ?? "")
-        .toLowerCase()
-        .includes(acronymFilter.toLowerCase());
+    const acronymMatch = (diagnostic.acronym ?? "")
+      .toLowerCase()
+      .includes(acronymFilter.toLowerCase());
 
-      const cidMatch = (diagnostic.cid ?? "")
-        .toLowerCase()
-        .includes(cidFilter.toLowerCase());
+    const cidMatch = (diagnostic.cid ?? "")
+      .toLowerCase()
+      .includes(cidFilter.toLowerCase());
 
-      return nameMatch && acronymMatch && cidMatch;
-    });
-  }, [diagnostics, nameFilter, acronymFilter, cidFilter]);
+    return nameMatch && acronymMatch && cidMatch;
+  });
 
   const handleOpenCreate = () => {
     setSelectedId(null);

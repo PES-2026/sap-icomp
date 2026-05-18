@@ -5,24 +5,30 @@ import { InfoBadge } from "@/components/ui/InfoBadge";
 import { ManageSectionCard } from "@/components/ui/ManageSectionCard";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCoursesSettings } from "../hooks/useCoursesSettings";
 import { CourseModal } from "./CourseModal";
 
 export default function CourseSection() {
   const { courses, fetchCourses, isLoading } = useCoursesSettings();
 
-  const [searchFilter, setSearchFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [acronymFilter, setAcronymFilter] = useState("");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      fetchCourses(searchFilter);
-    }, 300);
+  const filteredCourses = courses.filter((course) => {
+    const nameMatch = (course.name || "")
+      .toLowerCase()
+      .includes(nameFilter.toLowerCase());
 
-    return () => window.clearTimeout(timeout);
-  }, [searchFilter]);
+    const acronymMatch = (course.acronym ?? "")
+      .toLowerCase()
+      .includes(acronymFilter.toLowerCase());
+
+    return nameMatch && acronymMatch;
+  });
 
   const handleOpenCreate = () => {
     setSelectedId(null);
@@ -34,18 +40,25 @@ export default function CourseSection() {
     setIsModalOpen(true);
   };
 
-  const isSearching = searchFilter.trim().length > 0;
+  const isSearching = nameFilter.trim().length > 0;
 
   return (
     <>
       <ManageSectionCard
         title="Gerenciar Cursos"
         searchInputs={
-          <SearchInput
-            placeholder="Buscar por Cursos"
-            value={searchFilter}
-            onChange={setSearchFilter}
-          />
+          <>
+            <SearchInput
+              placeholder="Buscar por nome do curso"
+              value={nameFilter}
+              onChange={setNameFilter}
+            />
+            <SearchInput
+              placeholder="Buscar por sigla do curso"
+              value={acronymFilter}
+              onChange={setAcronymFilter}
+            />
+          </>
         }
         actionButton={
           <CommonButton
@@ -67,7 +80,7 @@ export default function CourseSection() {
             Nenhum curso encontrado.
           </span>
         ) : (
-          courses.map((course, idx) => (
+          filteredCourses.map((course, idx) => (
             <div key={idx} className="flex items-center gap-1">
               <InfoBadge
                 label={`${course.name} (${course.acronym})`}
@@ -82,7 +95,7 @@ export default function CourseSection() {
         <CourseModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSuccess={() => fetchCourses(searchFilter)}
+          onSuccess={fetchCourses}
           courseId={selectedId}
         />
       )}

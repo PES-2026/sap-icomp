@@ -1,15 +1,15 @@
+import { AttendanceType } from "@/features/attendance-types/types/attendanceType";
+import { Student } from "@/features/students/types/student";
+
 export interface Attendance {
-  attendanceId: string;
-  studentId: string;
-  studentName: string;
-  enrollmentId: string;
-  course: string;
-  period: string;
-  attendanceType: string;
-  attendanceDate: string;
+  id: string;
+  student: Student;
+  date: string;
+  type: AttendanceType;
+  demand: string;
   generalObservations: string;
-  updatedAt: Date;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AttendanceFormData {

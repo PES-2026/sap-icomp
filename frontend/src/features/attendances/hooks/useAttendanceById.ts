@@ -1,33 +1,21 @@
 import { useEffect, useState } from "react";
 import { attendanceService } from "../services/attendanceService";
-import { AttendanceFormData } from "../types/attendance";
-import {
-  EMPTY_FORM_ATTENDANCE,
-  formatAttendanceForFrontend,
-} from "../utils/attendanceUtils";
+import { Attendance } from "../types/attendance";
+import { formatGetAttendanceForFrontend } from "../utils/attendanceUtils";
 
-interface useAttendanceFormProps {
+interface useAttendanceByIdProps {
   attendanceId: string;
-  isEditMode?: boolean;
 }
 
-export const useAttendanceForm = ({
-  attendanceId,
-  isEditMode,
-}: useAttendanceFormProps) => {
-  const [formData, setFormData] = useState<AttendanceFormData>(
-    EMPTY_FORM_ATTENDANCE,
-  );
-
-  const [isLoadingAttendances, setIsLoadingAttendances] = useState(
-    isEditMode ? true : false,
-  );
+export const useAttendanceById = ({ attendanceId }: useAttendanceByIdProps) => {
+  const [attendance, setAttendance] = useState<Attendance>();
+  const [isLoadingAttendances, setIsLoadingAttendances] = useState(true);
 
   const fetchAttendanceById = async () => {
     try {
       setIsLoadingAttendances(true);
       const data = await attendanceService.getAttendancesById(attendanceId);
-      setFormData(formatAttendanceForFrontend(data));
+      setAttendance(formatGetAttendanceForFrontend(data));
     } catch (error) {
       console.error("Error to fetch data attendance: ", error);
     } finally {
@@ -35,11 +23,12 @@ export const useAttendanceForm = ({
     }
   };
 
-  if (isEditMode) {
-    useEffect(() => {
-      fetchAttendanceById();
-    }, []);
-  }
+  useEffect(() => {
+    fetchAttendanceById();
+  }, []);
 
-  return { formData, setFormData, isLoadingAttendances };
+  return {
+    attendance,
+    isLoadingAttendances,
+  };
 };
