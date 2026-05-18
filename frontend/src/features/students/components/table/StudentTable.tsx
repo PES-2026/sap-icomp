@@ -26,22 +26,32 @@ export default function StudentTable() {
 
   const [enrollmentFilter, setEnrollmentFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
-  const [needFilter, setNeedFilter] = useState("");
+  const [dignosesFilter, setDiagnosesFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("Todos");
 
   const filteredStudents = students.filter((student) => {
-    const matchEnrollment = student.enrollmentId
+    const matchEnrollment = (student.enrollmentId || "")
       .toLowerCase()
       .includes(enrollmentFilter.toLowerCase());
-    const matchName = student.name
+    const matchName = (student.name || "")
       .toLowerCase()
       .includes(nameFilter.toLowerCase());
-    const matchNeed = (student.diagnosis ?? "")
-      .toLowerCase()
-      .includes(needFilter.toLowerCase());
+    const matchNeed = student.diagnoses
+      ? student.diagnoses.some(
+          (diag) =>
+            (diag.name || "")
+              .toLowerCase()
+              .includes(dignosesFilter.toLowerCase()) ||
+            (diag.acronym || "")
+              .toLowerCase()
+              .includes(dignosesFilter.toLowerCase()),
+        )
+      : dignosesFilter === "";
     const matchCourse =
       courseFilter === "Todos" ||
-      (student.course ?? "").toLowerCase().includes(courseFilter.toLowerCase());
+      (student.course?.id ?? "")
+        .toLowerCase()
+        .includes(courseFilter.toLowerCase());
 
     return matchEnrollment && matchName && matchNeed && matchCourse;
   });
@@ -78,22 +88,26 @@ export default function StudentTable() {
           onChange={setCourseFilter}
           options={coursesOptions}
           placeholder="Todos"
-          isSetLabel={true}
+          // isSetLabel={true}
         />
       ),
-      renderCell: (student) => student.course,
+      renderCell: (student) => student.course?.name || "Não informado",
     },
     {
       label: "Necessidade Ativa",
       width: "w-[160px]",
       renderFilter: () => (
-        <SearchInput value={needFilter} onChange={setNeedFilter} />
+        <SearchInput value={dignosesFilter} onChange={setDiagnosesFilter} />
       ),
       renderCell: (student) =>
-        student.diagnosis ? (
-          <NeedBadge value={student.diagnosis} />
+        student.diagnoses && student.diagnoses.length > 0 ? (
+          <div className="flex flex-wrap gap-1 justify-center">
+            {student.diagnoses.map((diag) => (
+              <NeedBadge key={diag.id} value={diag.acronym || diag.name} />
+            ))}
+          </div>
         ) : (
-          "Nenhum diagnóstico"
+          <span className="text-gray-400">Nenhum diagnóstico</span>
         ),
     },
     {

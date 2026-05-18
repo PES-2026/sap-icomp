@@ -44,7 +44,7 @@ export default function StudentProfileCard({
 
           <div className="mt-1.5 flex items-center gap-1.5 text-sm text-[#7a7268]">
             <BookOpen size={13} className="shrink-0 text-[#6bc4a6]" />
-            {student.course}
+            {student.course?.name || "Curso não informado"}
           </div>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
@@ -77,7 +77,7 @@ export default function StudentProfileCard({
               Necessidades
             </p>
             <p className="text-sm font-bold text-[#7a5c1e] leading-tight">
-              {student.difficulties ?? "N/A"}
+              {student.difficulties || "N/A"}
             </p>
           </div>
         </div>

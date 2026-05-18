@@ -29,14 +29,33 @@ export default function AttendanceTable() {
   const [courseIdFilter, setCourseIdFilter] = useState<string>("");
 
   const filteredAttendances = attendances.filter((attendance) => {
-    const matchEnrollment = attendance.enrollmentId
+    const matchEnrollment = (attendance.student?.enrollmentId || "")
       .toLowerCase()
       .includes(enrollmentFilter.toLowerCase());
-    const matchName = attendance.studentName
+    const matchName = (attendance.student?.name || "")
       .toLowerCase()
       .includes(nameFilter.toLowerCase());
+    const matchCourse =
+      courseIdFilter === "Todos" ||
+      (attendance.student?.course?.id ?? "")
+        .toLowerCase()
+        .includes(courseIdFilter.toLowerCase());
+    const matchAttendaceTypeId =
+      attendanceTypeIdFilter === "Todos" ||
+      (attendance.type?.id ?? "")
+        .toLowerCase()
+        .includes(attendanceTypeIdFilter.toLowerCase());
+    const matchDate = (attendance.date || "")
+      .toLowerCase()
+      .includes(attendanceDateFilter.toLocaleLowerCase());
 
-    return matchEnrollment && matchName;
+    return (
+      matchEnrollment &&
+      matchName &&
+      matchCourse &&
+      matchAttendaceTypeId &&
+      matchDate
+    );
   });
 
   const columns: Column<Attendance>[] = [
@@ -48,7 +67,7 @@ export default function AttendanceTable() {
       ),
       renderCell: (attendance) => (
         <span className="font-semibold text-[#4a4540]">
-          {attendance.enrollmentId}
+          {attendance.student?.enrollmentId || ""}
         </span>
       ),
     },
@@ -60,7 +79,7 @@ export default function AttendanceTable() {
       ),
       renderCell: (attendance) => (
         <span className="font-medium text-[#3a3530]">
-          {attendance.studentName}
+          {attendance.student?.name || ""}
         </span>
       ),
     },
@@ -75,7 +94,8 @@ export default function AttendanceTable() {
           placeholder="Todos"
         />
       ),
-      renderCell: (attendance) => attendance.course,
+      renderCell: (attendance) =>
+        attendance.student?.course?.name || "Sem curso definido",
     },
     {
       label: "Tipo de Atendimento",
@@ -88,7 +108,7 @@ export default function AttendanceTable() {
           placeholder="Todos"
         />
       ),
-      renderCell: (attendance) => attendance.attendanceType,
+      renderCell: (attendance) => attendance.type?.name || "Sem tipo definido",
     },
     {
       label: "Data do Atendimento",
@@ -99,7 +119,7 @@ export default function AttendanceTable() {
           onChange={setAttendanceDateFilter}
         />
       ),
-      renderCell: (attendance) => attendance.attendanceDate,
+      renderCell: (attendance) => attendance.date,
     },
     {
       label: "",
@@ -110,8 +130,8 @@ export default function AttendanceTable() {
             aria-label="Visualizar Atendimento"
             title="Visualizar"
             href={PATHS.visualize_attendance(
-              attendance.studentId,
-              attendance.attendanceId,
+              attendance.student?.id || "",
+              attendance.id,
             )}
             className="flex items-center rounded-md p-1 text-[#6bc4a6] hover:bg-[#e8f7f2]"
           >
@@ -121,8 +141,8 @@ export default function AttendanceTable() {
             aria-label="Editar Atendimento"
             title="Editar"
             href={PATHS.edit_attendance(
-              attendance.studentId,
-              attendance.attendanceId,
+              attendance.student?.id || "",
+              attendance.id,
             )}
             className="flex items-center rounded-md p-1 text-[#b0a898] hover:bg-[#f0ebe0]"
           >
