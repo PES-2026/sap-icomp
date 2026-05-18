@@ -19,8 +19,8 @@ export class RemoveAttendance {
 
     const attendanceEntity = Attendance.rehydrate({
       id: attendance.id!,
-      studentId: attendance.studentId,
-      type: attendance.type,
+      studentId: attendance.student.id,
+      typeId: attendance.type.id,
       date: attendance.date,
       demand: attendance.demand,
       generalObservations: attendance.generalObservations,
