@@ -2,7 +2,7 @@ import { ApplicationError } from "@application/errors/applicationError";
 import { CourseAlreadyExistsError } from "@application/errors/course/courseAlreadyExistsError";
 import { CourseNotFoundError } from "@application/errors/course/courseNotFoundError";
 import { ProfessorNotFoundError } from "@application/errors/professor/professorNotFoundError";
-import { CourseVO, CoursePropsVO } from "@domain/entities/course";
+import { Course, CoursePropsVO } from "@domain/entities/course";
 import { DomainError } from "@domain/errors/domainError";
 import { ICourseRepository } from "@domain/repositories/courseRepository";
 import { Result } from "@domain/shared/result";
@@ -19,7 +19,7 @@ export class UpdateCourse {
     const course = await this.repository.findById(dto.externalId);
     if (!course) return Result.fail<UpdateCourseResponse>(new CourseNotFoundError(dto.externalId));
 
-    const courseEntity = CourseVO.rehydrate({
+    const courseEntity = Course.rehydrate({
       courseId: course.id,
       name: course.name,
       acronym: course.acronym,
