@@ -1,15 +1,14 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
+  "name": "sap-icomp-backend",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx --watch ./src/presentation/server.ts",
+    "dev": "tsx --watch ./src/server.ts",
     "build": "tsc",
-    "start": "node dist/presentation/server.js",
+    "start": "node dist/server.js",
     "test": "jest",
-    "prisma:seed": "tsx src/infrastructure/database/prismaSeed.ts",
-    "prisma:seed:prod": "node dist/infrastructure/database/prismaSeed.js",
-    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+    "lint": "eslint ."
   },
   "type": "module",
   "keywords": [],
@@ -25,14 +24,23 @@
     "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-unicorn": "^64.0.0",
+    "globals": "^17.6.0",
     "prisma": "^7.7.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.59.2"
   },
   "prisma": {
     "seed": "node dist/infrastructure/database/prismaSeed.js"

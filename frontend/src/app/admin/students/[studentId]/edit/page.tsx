@@ -1,11 +1,11 @@
 "use client";
 
-import StudentForm from "@/components/forms/StudentForm";
 import { PATHS } from "@/constants/paths";
-import { studentService } from "@/services";
-import { StudentFormData } from "@/types/student";
+import StudentForm from "@/features/students/components/form/StudentForm";
+import { studentService } from "@/features/students/services/studentService";
+import { StudentFormData } from "@/features/students/types/student";
+import { formatFormForFrontend } from "@/features/students/utils/studentUtils";
 import { useAppNavigation } from "@/utils/navigator";
-import { formatForFrontend } from "@/utils/studentFormUtils";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,16 +25,14 @@ export default function EditStudentPage() {
       try {
         setIsLoading(true);
 
-        const allStudents = await studentService.getStudents();
+        const student = await studentService.getStudentById(id);
 
-        const foundStudent = allStudents.find((s) => s.externalId === id);
-
-        if (foundStudent) {
-          const formattedData = formatForFrontend(foundStudent);
+        if (student) {
+          const formattedData = formatFormForFrontend(student);
           setStudentData(formattedData);
         } else {
           console.error("Student not found.");
-          handleNavigation({ path: "/admin/students" });
+          handleNavigation({ path: PATHS.students_list });
         }
       } catch (error) {
         console.error("Error to fetch data student: ", error);

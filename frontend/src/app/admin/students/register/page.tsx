@@ -1,6 +1,6 @@
 "use client";
 
-import StudentForm from "@/components/forms/StudentForm";
+import StudentForm from "@/features/students/components/form/StudentForm";
 import { useAppNavigation } from "@/utils/navigator";
 
 export default function RegisterStudentPage() {

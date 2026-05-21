@@ -1,4 +1,4 @@
-import AttendanceTable from "@/components/tables/AttendanceTable";
+import AttendanceTable from "@/features/attendances/components/table/AttendanceTable";
 
 export default function AttendanceList() {
   return <AttendanceTable />;

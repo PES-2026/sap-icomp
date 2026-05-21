@@ -10,7 +10,14 @@
     "exactOptionalPropertyTypes": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@application/*": ["./src/application/*"],
+      "@domain/*": ["./src/domain/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"],
+      "@presentation/*": ["./src/presentation/*"],
+      "@prisma/*": ["./prisma/*"]
+    }
   },
-  "include": ["src/**/*", "src/infrastructure/database/prismaSeed.ts"]
+  "include": ["src/**/*", "src/infrastructure/persistence/prismaSeed.ts"]
 }
