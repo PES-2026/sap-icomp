@@ -1,13 +1,24 @@
-const TOKEN_KEY = "@App:token";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { User } from "../types/login";
 
-export const saveAuthToken = (token: string): void => {
-  // Expire in {days} days
-  const days = 1;
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${TOKEN_KEY}=${token};expires=${date.toUTCString()};path=/;Secure;SameSite=Strict`;
-};
+interface AuthState {
+  user: User | null;
+  setUser: (user: User) => void;
+  clearUser: () => void;
+  getUser: () => User | null;
+}
 
-export const clearAuthToken = (): void => {
-  document.cookie = `${TOKEN_KEY}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-};
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      setUser: (user) => set({ user }),
+      clearUser: () => set({ user: null }),
+      getUser: () => get().user,
+    }),
+    {
+      name: "@App:user",
+    },
+  ),
+);

@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/features/login/utils/storage";
 import axios from "axios";
 
 declare module "axios" {
@@ -11,11 +12,17 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().clearUser;
+      return Promise.reject(error);
+    }
+
     if (error.response?.data?.message) {
       return Promise.reject(new Error(error.response.data.message));
     }
@@ -29,14 +36,5 @@ api.interceptors.response.use(
     );
   },
 );
-
-// api.interceptors.request.use((config) => {
-//   const token =
-//     typeof window !== "undefined" ? localStorage.getItem("token") : null;
-//   if (token && config.headers) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
 
 export default api;

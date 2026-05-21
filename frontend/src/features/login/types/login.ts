@@ -1,3 +1,7 @@
+export type Role = "Pedagogue" | "Professor";
+
+export type UserStatus = "Active" | "Inactive" | "Pending";
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -7,11 +11,14 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "Admin" | "Pedagogue" | "Teacher" | "Student";
-  status: "Active" | "Inactive" | "Pending";
+  phoneNumber: string;
+  registrationNumber: string;
+  status: UserStatus;
+  role: Role;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface LoginResponse {
-  token: string;
   user: User;
 }
