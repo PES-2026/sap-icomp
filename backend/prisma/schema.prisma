@@ -32,30 +32,42 @@ model Student {
 }
 
 model Pedagogue {
-  internalId   Int      @id @default(autoincrement())
-  externalId   String   @unique
-  registration String   @unique
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  registration String  @unique
   name         String
-  email        String   @unique
+  email        String  @unique
+  password     String
   phoneNumber  String?
-  removed      Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+  removed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  approved Boolean @default(false)
+  enabled  Boolean @default(false)
 
   attendances Attendance[]
   reports     Report[]
 }
 
 model Professor {
-  internalId   Int      @id @default(autoincrement())
-  externalId   String   @unique
-  registration String   @unique
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  registration String  @unique
   name         String
-  email        String   @unique
+  email        String  @unique
+  password     String
   phoneNumber  String?
-  removed      Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+  removed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  approved Boolean @default(false)
+  enabled  Boolean @default(false)
 
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
