@@ -27,7 +27,7 @@ export default function Sidebar() {
   }, [pathname]);
 
   const navItems = [
-    { label: "Início", icon: Home, id: "Início", href: "/admin" },
+    { label: "Início", icon: Home, id: "Início", href: PATHS.pedagogue },
     {
       label: "Alunos",
       icon: Users,
