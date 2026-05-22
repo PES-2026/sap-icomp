@@ -1,14 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
+import { PATHS } from "@/constants/paths";
+import { useAppNavigation } from "@/utils/navigator";
 import { useLogin } from "../../hooks/useLogin";
 
 export default function LoginForm() {
-  const router = useRouter();
+  const { handleNavigation } = useAppNavigation();
+
   const { form, isLoading, globalError, onSubmit } = useLogin();
   const {
     register,
@@ -24,11 +26,11 @@ export default function LoginForm() {
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
   const handleForgotPassword = () => {
-    router.push("/forgot-password");
+    handleNavigation({ path: PATHS.forgot_password });
   };
 
   const handleCreateAccount = () => {
-    router.push("/sign-up");
+    handleNavigation({ path: PATHS.register });
   };
 
   return (
