@@ -1,0 +1,39 @@
+import { Result } from "@domain/shared/result";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { PasswordTooShortError } from "@domain/errors/password/passwordTooShort";
+import { PasswordTooLongError } from "@domain/errors/password/passwordTooLong";
+
+export type PasswordErrors = RequiredFieldError | PasswordTooShortError | PasswordTooLongError;
+
+export class PasswordVO {
+  private readonly _value: string;
+  private constructor(password: string) {
+    this._value = password;
+  }
+  static create(password: string): Result<PasswordVO, PasswordErrors> {
+    const validationResult = PasswordVO.validate(password);
+    if (validationResult.isFailure) {
+      return Result.fail<PasswordVO>(validationResult.error!);
+    }
+    return Result.ok<PasswordVO>(new PasswordVO(password));
+  }
+  private static validate(password: string): Result<void> {
+    if (!password || password.trim().length === 0) {
+      return Result.fail(new RequiredFieldError("password"));
+    }
+    if (password.length < 8) {
+      return Result.fail(new PasswordTooShortError(password.length));
+    }
+    if (password.length > 128) {
+      return Result.fail(new PasswordTooLongError(password.length));
+    }
+    //maybe need to add more validation rules for password, like requiring a mix of uppercase, lowercase, numbers and special characters. But for now, we will keep it simple.
+    return Result.ok();
+  }
+  get value(): string {
+    return this._value;
+  }
+  static fromTrusted(password: string): PasswordVO {
+    return new PasswordVO(password);
+  }
+}
