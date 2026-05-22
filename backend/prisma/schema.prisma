@@ -7,6 +7,21 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  PROFESSOR
+  PEDAGOGUE
+  STUDENT
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ENABLED
+  DISABLED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -31,31 +46,56 @@ model Student {
   enrollments Enrollment[]
 }
 
-model Pedagogue {
-  internalId   Int      @id @default(autoincrement())
-  externalId   String   @unique
-  registration String   @unique
+model AccountRequest {
+  internalId   Int     @id @default(autoincrement())
+  externalId   String  @unique
+  registration String  @unique
   name         String
-  email        String   @unique
+  email        String  @unique
   phoneNumber  String?
-  removed      Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  password     String
+  role         Role
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
+}
+
+model Pedagogue {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  registration String  @unique
+  name         String
+  email        String  @unique
+  phoneNumber  String?
+  password     String
+
+  userStatus UserStatus @default(APPROVED)
+
+  removed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   attendances Attendance[]
   reports     Report[]
 }
 
 model Professor {
-  internalId   Int      @id @default(autoincrement())
-  externalId   String   @unique
-  registration String   @unique
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  registration String  @unique
   name         String
-  email        String   @unique
+  email        String  @unique
   phoneNumber  String?
-  removed      Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  password     String
+
+  userStatus UserStatus @default(APPROVED)
+
+  removed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
