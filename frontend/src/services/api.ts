@@ -19,7 +19,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 403) {
-      useAuthStore.getState().clearUser;
+      useAuthStore.getState().clearUser();
       return Promise.reject(error);
     }
 

@@ -1,6 +1,8 @@
+import AuthGuard from "@/features/login/components/AuthGuard";
+import { MSWProvider } from "@/features/login/mocks/MSWProvider";
 import type { Metadata } from "next";
-import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SAP IComp",
@@ -15,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <MSWProvider>
+          <AuthGuard>{children}</AuthGuard>
+        </MSWProvider>
         <Toaster
           position="top-right"
           reverseOrder={false}
