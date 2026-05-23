@@ -47,14 +47,15 @@ model Student {
 }
 
 model AccountRequest {
-  internalId   Int     @id @default(autoincrement())
-  externalId   String  @unique
-  registration String  @unique
+  internalId   Int        @id @default(autoincrement())
+  externalId   String     @unique
+  registration String     @unique
   name         String
-  email        String  @unique
+  email        String     @unique
   phoneNumber  String?
   password     String
   role         Role
+  userStatus   UserStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
