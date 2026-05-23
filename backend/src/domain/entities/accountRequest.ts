@@ -8,7 +8,7 @@ import { PasswordVO } from "@domain/valueObjects/shared/password";
 import { UserTypeVO } from "@domain/valueObjects/shared/userType";
 import { Result } from "@domain/shared/result";
 
-export type UserRequestProps = {
+export type AccountRequestProps = {
   id?: string;
   name: string;
   email: string;
@@ -16,10 +16,10 @@ export type UserRequestProps = {
   registrationNumber: string;
   userStatus: string;
   userType: string;
-  password?: string;
+  password: string;
 };
 
-export class UserRequest {
+export class AccountRequest {
   constructor(
     public readonly id: ExternalIdVO,
     public name: NameVO,
@@ -28,10 +28,10 @@ export class UserRequest {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public userType: UserTypeVO,
-    public readonly password?: PasswordVO,
+    public readonly password: PasswordVO,
   ) {}
 
-  static create(props: UserRequestProps): Result<UserRequest> {
+  static create(props: AccountRequestProps): Result<AccountRequest> {
     const id = ExternalIdVO.create();
     const name = NameVO.create(props.name);
     const email = EmailVO.create(props.email);
@@ -39,17 +39,17 @@ export class UserRequest {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const userType = UserTypeVO.create(props.userType);
-    const password = props.password ? PasswordVO.create(props.password) : undefined;
+    const password = PasswordVO.create(props.password);
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, userType, password];
 
     for (const result of results) {
       if (result?.isFailure) {
-        throw Result.fail<UserRequest>(result.error!);
+        throw Result.fail<AccountRequest>(result.error!);
       }
     }
     return Result.ok(
-      new UserRequest(
+      new AccountRequest(
         id.getValue(),
         name.getValue(),
         email.getValue(),
@@ -57,7 +57,7 @@ export class UserRequest {
         registrationNumber.getValue(),
         userStatus.getValue(),
         userType.getValue(),
-        password?.getValue(),
+        password.getValue(),
       ),
     );
   }
