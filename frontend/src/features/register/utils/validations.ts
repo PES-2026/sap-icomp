@@ -12,7 +12,16 @@ export const registerSchema = z
     phoneNumber: z
       .string()
       .trim()
-      .nonempty({ message: "O telefone é obrigatório." }),
+      .min(1, "O telefone é obrigatório.")
+      .transform((val) => val.replace(/\D/g, ""))
+      .pipe(
+        z
+          .string()
+          .length(
+            11,
+            "O telefone deve ter exatamente 11 dígitos (DDD + Número).",
+          ),
+      ),
 
     email: z
       .email({ message: "Formato de e-mail inválido." })
@@ -28,7 +37,14 @@ export const registerSchema = z
       .string()
       .trim()
       .nonempty({ message: "A senha é obrigatória." })
-      .min(8, { message: "A senha deve ter no mínimo 8 caracteres." }),
+      .min(8, { message: "A senha deve ter no mínimo 8 caracteres." })
+      .regex(/[A-Z]/, "Deve conter ao menos uma letra maiúscula.")
+      .regex(/[a-z]/, "Deve conter ao menos uma letra minúscula.")
+      .regex(/[0-9]/, "Deve conter ao menos um número.")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "Deve conter ao menos um caractere especial (@, #, $, etc).",
+      ),
 
     confirmPassword: z
       .string()

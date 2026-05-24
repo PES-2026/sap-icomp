@@ -1,7 +1,7 @@
-import { RegisterCredentials, RegisterResponse } from "../types/register";
+import { RegisterForm, RegisterResponse } from "../types/register";
 
 export const registerService = {
-  async createAccount(data: RegisterCredentials): Promise<RegisterResponse> {
+  async createAccount(data: RegisterForm): Promise<RegisterResponse> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (data.email === "erro@teste.com") {

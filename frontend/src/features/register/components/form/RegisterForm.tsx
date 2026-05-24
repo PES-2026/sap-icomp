@@ -1,17 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import { MailCheck } from "lucide-react";
 
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
 import { useAppNavigation } from "@/utils/navigator";
 import { useRegister } from "../../hooks/useRegister";
+import { maskPhone } from "@/utils/utils";
 
 export default function RegisterForm() {
   const { handleNavigation } = useAppNavigation();
 
-  const { form, isLoading, globalError, onSubmit } = useRegister();
+  const {
+    form,
+    isLoading,
+    isSubmitted,
+    registeredEmail,
+    globalError,
+    onSubmit,
+  } = useRegister();
   const {
     register,
     formState: { errors },
@@ -28,6 +37,45 @@ export default function RegisterForm() {
   const handleBackToLogin = () => {
     handleNavigation({ path: PATHS.login });
   };
+
+  if (isSubmitted) {
+    return (
+      <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center font-['Nunito','Segoe_UI',sans-serif] bg-[#f5f0e8] p-4">
+        <section className="flex w-full max-w-md flex-col items-center rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] px-7 py-10 text-center">
+          <Image
+            src="/SAPICompLogoHorizontal.png"
+            alt="SAP iComp Logo"
+            width={200}
+            height={48}
+            className="mb-6 h-10 md:h-12 w-auto"
+            priority
+          />
+
+          <div className="mb-5 flex h-18 w-18 items-center justify-center rounded-full bg-[#6bc4a6] text-white">
+            <MailCheck size={36} strokeWidth={2.5} />
+          </div>
+
+          <h1 className="m-0 text-2xl font-bold text-stone-800">Quase lá!</h1>
+          <p className="mt-3 mb-6 max-w-[340px] text-sm leading-6 text-stone-600">
+            Seu pedido de cadastro está em análise pela administração.
+            Avisaremos no e-mail{" "}
+            <strong className="font-bold text-stone-800">
+              {registeredEmail}
+            </strong>{" "}
+            assim que for aprovado.
+          </p>
+
+          <CommonButton
+            label="Voltar para o Login"
+            type="button"
+            onClick={handleBackToLogin}
+            className="w-full justify-center"
+            aria-label="Voltar para o Login"
+          />
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center font-['Nunito','Segoe_UI',sans-serif] bg-[#f5f0e8] p-4">
@@ -91,7 +139,12 @@ export default function RegisterForm() {
               <input
                 type="tel"
                 placeholder="(92) 99999-9999"
-                {...register("phoneNumber")}
+                {...register("phoneNumber", {
+                  onChange: (e) => {
+                    const { value } = e.target;
+                    e.target.value = maskPhone(value);
+                  },
+                })}
                 className={getValidationClass(!!errors.phoneNumber)}
                 aria-label="Telefone"
               />

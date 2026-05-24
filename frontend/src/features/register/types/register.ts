@@ -1,6 +1,6 @@
 import { Role, UserStatus } from "@/features/login/types/login";
 
-export interface RegisterCredentials {
+export interface RegisterForm {
   name: string;
   registrationNumber: string;
   phoneNumber: string;
