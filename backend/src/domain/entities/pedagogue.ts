@@ -14,7 +14,7 @@ export type PedagogueProps = {
   phoneNumber: string;
   registrationNumber: string;
   userStatus: string;
-  password?: string;
+  password: string;
 };
 export class Pedagogue {
   constructor(
@@ -24,7 +24,7 @@ export class Pedagogue {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public readonly password?: PasswordVO,
+    public readonly password: PasswordVO,
   ) {}
 
   static create(props: PedagogueProps): Result<Pedagogue> {
@@ -34,7 +34,7 @@ export class Pedagogue {
     const phoneNumber = PhoneNumberVO.create(props.phoneNumber);
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
-    const password = props.password ? PasswordVO.create(props.password) : undefined;
+    const password = PasswordVO.create(props.password);
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
@@ -51,8 +51,19 @@ export class Pedagogue {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        password?.getValue(),
+        password.getValue(),
       ),
+    );
+  }
+  static rehydrate(props: PedagogueProps): Pedagogue {
+    return new Pedagogue(
+      ExternalIdVO.fromTrusted(props.id!),
+      NameVO.fromTrusted(props.name),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      RegistrationNumberVO.fromTrusted(props.registrationNumber),
+      UserStatusVO.fromTrusted(props.userStatus),
+      PasswordVO.fromTrusted(props.password),
     );
   }
 }

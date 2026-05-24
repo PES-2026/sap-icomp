@@ -9,17 +9,37 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     const externalId = pedagogue.id.value;
 
     const baseData = {
+      externalId,
       registration: pedagogue.registrationNumber.value,
       name: pedagogue.name.value,
       email: pedagogue.email.value,
       phoneNumber: pedagogue.phoneNumber.value,
       userStatus: pedagogue.userStatus.value,
+      password: pedagogue.password.value,
     };
     await this.prisma.pedagogue.create({
       data: {
         ...baseData,
-        externalId,
       },
     });
   }
+  async existsByEmail(email: string): Promise<boolean> {
+    const account = await this.prisma.pedagogue.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    return !!account;
+  }
+  async existsByRegistrationNumber(registrationNumber: string): Promise<boolean> {
+    const account = await this.prisma.pedagogue.findFirst({
+      where: {
+        registration: registrationNumber,
+      },
+    });
+
+    return !!account;
+  }
+  //async findByEmail(email: string): Promise<Pedagogue | null> {}
 }
