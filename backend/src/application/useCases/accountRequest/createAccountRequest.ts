@@ -85,8 +85,6 @@ export class CreateAccountRequest {
         } else {
           return Result.ok();
         }
-
-        break;
       }
 
       case UserTypeEnum.PROFESSOR: {
@@ -97,8 +95,6 @@ export class CreateAccountRequest {
         } else {
           return Result.ok();
         }
-
-        break;
       }
     }
 
@@ -117,7 +113,6 @@ export class CreateAccountRequest {
         } else {
           return Result.ok();
         }
-        break;
       }
       case UserTypeEnum.PROFESSOR: {
         const exists = await this.professorRepository.existsByRegistrationNumber(registrationNumber);
@@ -126,7 +121,6 @@ export class CreateAccountRequest {
         } else {
           return Result.ok();
         }
-        break;
       }
     }
     return Result.ok();
