@@ -10,12 +10,12 @@ export class PasswordVO {
   private constructor(password: string) {
     this._value = password;
   }
-  static create(password: string): Result<PasswordVO, PasswordErrors> {
-    const validationResult = PasswordVO.validate(password);
+  static create(plain: string, hashed: string): Result<PasswordVO, PasswordErrors> {
+    const validationResult = PasswordVO.validate(plain);
     if (validationResult.isFailure) {
       return Result.fail<PasswordVO>(validationResult.error!);
     }
-    return Result.ok<PasswordVO>(new PasswordVO(password));
+    return Result.ok<PasswordVO>(new PasswordVO(hashed));
   }
   private static validate(password: string): Result<void> {
     if (!password || password.trim().length === 0) {
