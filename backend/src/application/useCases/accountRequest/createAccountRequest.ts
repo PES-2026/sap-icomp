@@ -2,7 +2,6 @@ import {
   CreateEducatorDTO,
   CreateEducatorResponse,
 } from "@application/dtos/educator/createEducator";
-import { ApplicationError } from "@application/errors/applicationError";
 import { DomainError, ErrorCategory } from "@domain/errors/domainError";
 import { Result } from "@domain/shared/result";
 import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
