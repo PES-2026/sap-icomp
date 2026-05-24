@@ -14,7 +14,7 @@ export type ProfessorProps = {
   phoneNumber: string;
   registrationNumber: string;
   userStatus: string;
-  password?: string;
+  password: string;
 };
 export class Professor {
   constructor(
@@ -24,7 +24,7 @@ export class Professor {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public readonly password?: PasswordVO,
+    public readonly password: PasswordVO,
   ) {}
 
   static create(props: ProfessorProps): Result<Professor> {
@@ -34,7 +34,7 @@ export class Professor {
     const phoneNumber = PhoneNumberVO.create(props.phoneNumber);
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
-    const password = props.password ? PasswordVO.create(props.password) : undefined;
+    const password = PasswordVO.create(props.password);
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
@@ -51,7 +51,7 @@ export class Professor {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        password?.getValue(),
+        password.getValue(),
       ),
     );
   }
