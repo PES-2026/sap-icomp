@@ -3,9 +3,12 @@ import { Pedagogue } from "../entities/pedagogue";
 //import {PedagogueListParams} from "./filters/pedagogueFilters";
 //import {PaginatedPedagogueResult, PedagogueResult} from "./results/pedagogueResult";
 
+import { UserFilters } from "./filters/userFilters";
+import { UserListItem } from "./results/userResult";
+import { PaginatedResult } from "../shared/pagination";
+
 export interface IPedagogueRepository {
-  //findAll(params: PedagogueListParams): Promise<PaginatedPedagogueResult>;
-  //existsByEmail(email: string): Promise<boolean>;
+  findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>>;
   save(pedagogue: Pedagogue): Promise<void>;
   //update(pedagogue: Pedagogue): Promise<void>;
   //existsByUUID(externalId: string): Promise<boolean>;

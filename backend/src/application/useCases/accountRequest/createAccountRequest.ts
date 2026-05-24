@@ -9,6 +9,7 @@ import { Result } from "@domain/shared/result";
 import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
+import { IHashService } from "@domain/services/hashService";
 import { AccountRequest } from "@domain/entities/accountRequest";
 import { UserTypeEnum } from "@domain/enum/userType";
 import { PedagogueEmailAlreadyExistsError } from "@application/errors/pedagogue/pedagogueEmailAlreadyExistsError";
@@ -22,6 +23,7 @@ export class CreateAccountRequest {
     private readonly repository: IAccountRequestRepository,
     private readonly pedagogueRepository: IPedagogueRepository,
     private readonly professorRepository: IProfessorRepository,
+    private readonly hashService: IHashService,
   ) {}
 
   async execute(props: CreateEducatorDTO): Promise<Result<CreateEducatorResponse>> {
@@ -30,16 +32,13 @@ export class CreateAccountRequest {
     if (props.email !== props.emailConfirmation) {
       return Result.fail(new EmailConfirmationMismatchError(props.email, props.emailConfirmation));
     }
-    const emailValidation = await this.validateEmail(props.email, props.userType);
+    const emailValidation = await this.validateEmail(props.email);
 
     if (emailValidation.isFailure) {
       return Result.fail<CreateEducatorResponse>(emailValidation.error!);
     }
     //registration number
-    const registrationNumberValidation = await this.validateRegistrationNumber(
-      props.registrationNumber,
-      props.userType,
-    );
+    const registrationNumberValidation = await this.validateRegistrationNumber(props.registrationNumber);
 
     if (registrationNumberValidation.isFailure) {
       return Result.fail<CreateEducatorResponse>(registrationNumberValidation.error!);
@@ -48,14 +47,18 @@ export class CreateAccountRequest {
     if (props.password !== props.passwordConfirmation) {
       return Result.fail(new PasswordConfirmationMismatchError());
     }
+
+    const hashedPassword = await this.hashService.hash(props.password);
+
     const accountRequestOrError = AccountRequest.create({
       name: props.name,
       email: props.email,
       registrationNumber: props.registrationNumber,
       phoneNumber: props.phoneNumber,
-      userType: props.userType,
-      password: props.password,
+      plainPassword: props.password,
+      hashedPassword: hashedPassword,
       userStatus: "PENDING",
+      userType: props.userType,
     });
 
     if (accountRequestOrError.isFailure) {
@@ -64,71 +67,44 @@ export class CreateAccountRequest {
 
     await this.repository.save(accountRequestOrError.getValue());
 
+    const accountRequest = accountRequestOrError.getValue();
+
     return Result.ok<CreateEducatorResponse>({
-      id: accountRequestOrError.getValue().id.value,
-      name: accountRequestOrError.getValue().name.value,
-      email: accountRequestOrError.getValue().email.value,
-      phoneNumber: accountRequestOrError.getValue().phoneNumber.value,
-      registrationNumber: accountRequestOrError.getValue().registrationNumber.value,
-      userType: accountRequestOrError.getValue().userType.value,
-      userStatus: accountRequestOrError.getValue().userStatus.value,
+      id: accountRequest.id.value,
+      name: accountRequest.name.value,
+      email: accountRequest.email.value,
+      phoneNumber: accountRequest.phoneNumber.value,
+      registrationNumber: accountRequest.registrationNumber.value,
+      userType: accountRequest.userType?.value,
+      userStatus: accountRequest.userStatus.value,
     });
   }
 
-  private async validateEmail(email: string, userType: string): Promise<Result<void, DomainError>> {
-    switch (userType) {
-      case UserTypeEnum.PEDAGOGUE: {
-        const exists = await this.pedagogueRepository.existsByEmail(email);
+  private async validateEmail(email: string): Promise<Result<void, DomainError>> {
+    const existsPedagogue = await this.pedagogueRepository.existsByEmail(email);
+    if (existsPedagogue) {
+      return Result.fail(new PedagogueEmailAlreadyExistsError(email));
+    }
 
-        if (exists) {
-          return Result.fail(new PedagogueEmailAlreadyExistsError(email));
-        } else {
-          return Result.ok();
-        }
-
-        break;
-      }
-
-      case UserTypeEnum.PROFESSOR: {
-        const exists = await this.professorRepository.existsByEmail(email);
-
-        if (exists) {
-          return Result.fail(new ProfessorEmailAlreadyExistsError(email));
-        } else {
-          return Result.ok();
-        }
-
-        break;
-      }
+    const existsProfessor = await this.professorRepository.existsByEmail(email);
+    if (existsProfessor) {
+      return Result.fail(new ProfessorEmailAlreadyExistsError(email));
     }
 
     return Result.ok();
   }
 
-  private async validateRegistrationNumber(
-    registrationNumber: string,
-    userType: string,
-  ): Promise<Result<void, DomainError>> {
-    switch (userType) {
-      case UserTypeEnum.PEDAGOGUE: {
-        const exists = await this.pedagogueRepository.existsByRegistrationNumber(registrationNumber);
-        if (exists) {
-          return Result.fail(new PedagogueRegistrationNumberAlreadyExistsError(registrationNumber));
-        } else {
-          return Result.ok();
-        }
-        break;
-      }
-      case UserTypeEnum.PROFESSOR: {
-        const exists = await this.professorRepository.existsByRegistrationNumber(registrationNumber);
-        if (exists) {
-          return Result.fail(new ProfessorRegistrationNumberAlreadyExistsError(registrationNumber));
-        } else {
-          return Result.ok();
-        }
-        break;
-      }
+  private async validateRegistrationNumber(registrationNumber: string): Promise<Result<void, DomainError>> {
+    const existsPedagogue = await this.pedagogueRepository.existsByRegistrationNumber(registrationNumber);
+    if (existsPedagogue) {
+      return Result.fail(new PedagogueRegistrationNumberAlreadyExistsError(registrationNumber));
     }
+
+    const existsProfessor = await this.professorRepository.existsByRegistrationNumber(registrationNumber);
+    if (existsProfessor) {
+      return Result.fail(new ProfessorRegistrationNumberAlreadyExistsError(registrationNumber));
+    }
+
     return Result.ok();
   }
 }

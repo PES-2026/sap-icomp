@@ -19,6 +19,9 @@ import { CreateCourse } from "@application/useCases/course/createCourse";
 import { ListCourse } from "@application/useCases/course/listCourse";
 import { RemoveCourse } from "@application/useCases/course/removeCourse";
 import { UpdateCourse } from "@application/useCases/course/updateCourse";
+import { CreateAccountRequest } from "@application/useCases/accountRequest/createAccountRequest";
+import { ApproveAccountRequest } from "@application/useCases/accountRequest/approveAccountRequest";
+import { ListPendingAccountRequests } from "@application/useCases/accountRequest/listPendingAccountRequests";
 import { CreateDiagnosis } from "@application/useCases/diagnoses/createDiagnosis";
 import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
@@ -26,26 +29,35 @@ import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
+import { ListUsers } from "@application/useCases/user/listUsers";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { prisma } from "@infrastructure/persistence/prisma";
+import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
 import { PrismaAttendanceTypeRepository } from "@infrastructure/persistence/repositories/prismaAttendanceTypeRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
+import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
+import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
+import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
+import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
+import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
+import { accountRequestRoutes } from "@presentation/routes/accountRequestRoutes";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { userRoutes } from "@presentation/routes/userRoutes";
 
 const app = express();
 app.use(express.json());
@@ -132,6 +144,23 @@ const attendanceTypeController = new AttendanceTypeController(
 );
 
 app.use(attendanceTypeRoutes(attendanceTypeController));
+
+const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
+const professorRepository = new PrismaProfessorRepository(prisma);
+const hashService = new BcryptHashService();
+
+const accountRequestController = new AccountRequestController(
+  new CreateAccountRequest(accountRequestRepository, pedagogueRepository, professorRepository, hashService),
+  new ApproveAccountRequest(accountRequestRepository, pedagogueRepository, professorRepository),
+  new ListPendingAccountRequests(accountRequestRepository),
+);
+
+app.use(accountRequestRoutes(accountRequestController));
+
+const userController = new UserController(new ListUsers(pedagogueRepository, professorRepository));
+
+app.use(userRoutes(userController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

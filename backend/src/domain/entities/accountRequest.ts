@@ -15,8 +15,10 @@ export type AccountRequestProps = {
   phoneNumber: string;
   registrationNumber: string;
   userStatus: string;
-  userType: string;
-  password: string;
+  userType?: string | undefined;
+  password?: string;
+  plainPassword?: string;
+  hashedPassword?: string;
 };
 
 export class AccountRequest {
@@ -27,8 +29,8 @@ export class AccountRequest {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public userType: UserTypeVO,
     public readonly password: PasswordVO,
+    public userType?: UserTypeVO,
   ) {}
 
   static create(props: AccountRequestProps): Result<AccountRequest> {
@@ -38,10 +40,11 @@ export class AccountRequest {
     const phoneNumber = PhoneNumberVO.create(props.phoneNumber);
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
-    const userType = UserTypeVO.create(props.userType);
-    const password = PasswordVO.create(props.password);
+    const password = PasswordVO.create(props.plainPassword!, props.hashedPassword!);
+    const userType = props.userType ? UserTypeVO.create(props.userType) : undefined;
 
-    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, userType, password];
+    const results: Result<any, any>[] = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
+    if (userType) results.push(userType);
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -56,9 +59,30 @@ export class AccountRequest {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        userType.getValue(),
         password.getValue(),
+        userType?.getValue(),
       ),
     );
+  }
+
+  static rehydrate(props: AccountRequestProps): AccountRequest {
+    return new AccountRequest(
+      ExternalIdVO.fromTrusted(props.id!),
+      NameVO.fromTrusted(props.name),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      RegistrationNumberVO.fromTrusted(props.registrationNumber),
+      UserStatusVO.fromTrusted(props.userStatus),
+      PasswordVO.fromTrusted(props.password || props.hashedPassword!),
+      props.userType ? UserTypeVO.fromTrusted(props.userType) : undefined,
+    );
+  }
+
+  approve(): void {
+    this.userStatus = UserStatusVO.fromTrusted("APPROVED");
+  }
+
+  reject(): void {
+    this.userStatus = UserStatusVO.fromTrusted("REJECTED");
   }
 }

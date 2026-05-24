@@ -34,7 +34,7 @@ export class Professor {
     const phoneNumber = PhoneNumberVO.create(props.phoneNumber);
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
-    const password = PasswordVO.create(props.password);
+    const password = PasswordVO.create(props.password, props.password);
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
