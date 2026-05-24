@@ -19,6 +19,7 @@ export type AccountRequestProps = {
   password?: string;
   plainPassword?: string;
   hashedPassword?: string;
+  createdAt?: Date;
 };
 
 export class AccountRequest {
@@ -30,6 +31,7 @@ export class AccountRequest {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
+    public readonly createdAt?: Date,
     public userType?: UserTypeVO,
   ) {}
 
@@ -42,6 +44,7 @@ export class AccountRequest {
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = PasswordVO.create(props.plainPassword!, props.hashedPassword!);
     const userType = props.userType ? UserTypeVO.create(props.userType) : undefined;
+    const createdAt = new Date();
 
     const results: Result<any, any>[] = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
     if (userType) results.push(userType);
@@ -60,6 +63,7 @@ export class AccountRequest {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password.getValue(),
+        createdAt,
         userType?.getValue(),
       ),
     );
@@ -74,6 +78,7 @@ export class AccountRequest {
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
       PasswordVO.fromTrusted(props.password || props.hashedPassword!),
+      props.createdAt,
       props.userType ? UserTypeVO.fromTrusted(props.userType) : undefined,
     );
   }

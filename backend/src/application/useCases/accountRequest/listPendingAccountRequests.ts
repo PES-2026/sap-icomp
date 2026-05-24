@@ -26,6 +26,7 @@ export class ListPendingAccountRequests {
       registrationNumber: request.registrationNumber.value,
       userType: request.userType?.value,
       userStatus: request.userStatus.value,
+      createdAt: request.createdAt,
     }));
 
     return Result.ok(response);

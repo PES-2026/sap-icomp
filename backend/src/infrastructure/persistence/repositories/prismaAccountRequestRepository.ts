@@ -45,6 +45,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       userStatus: accountRequest.userStatus,
       userType: accountRequest.role || undefined,
       password: accountRequest.password,
+      createdAt: accountRequest.createdAt,
     });
   }
 
@@ -53,6 +54,9 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       where: {
         userStatus: "PENDING",
         removed: false,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -66,6 +70,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
         userStatus: request.userStatus,
         userType: request.role || undefined,
         password: request.password,
+        createdAt: request.createdAt,
       }),
     );
   }
