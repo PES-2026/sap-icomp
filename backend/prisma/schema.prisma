@@ -54,7 +54,7 @@ model AccountRequest {
   email        String     @unique
   phoneNumber  String?
   password     String
-  role         Role
+  role         Role?
   userStatus   UserStatus @default(PENDING)
 
   createdAt DateTime @default(now())
