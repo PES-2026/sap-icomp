@@ -1,6 +1,5 @@
 import {
   CreateEducatorDTO,
-  CreateEducatorRequest,
   CreateEducatorResponse,
 } from "@application/dtos/educator/createEducator";
 import { ApplicationError } from "@application/errors/applicationError";
