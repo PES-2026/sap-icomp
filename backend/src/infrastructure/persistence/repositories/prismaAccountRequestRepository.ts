@@ -1,6 +1,6 @@
 import { AccountRequest } from "@domain/entities/accountRequest";
 import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+import { PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaAccountRequestRepository implements IAccountRequestRepository {
   constructor(private readonly prisma: PrismaClient) {}
