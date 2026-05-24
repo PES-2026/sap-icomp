@@ -1,6 +1,5 @@
 import { Result } from "@domain/shared/result";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
-import { UserStatusEnum } from "@domain/enum/userStatus";
 import { UserStatusInvalidError } from "@domain/errors/userStatus/UserStatusInvalidError";
 import { UserTypeEnum } from "@domain/enum/userType";
 import { UserTypeInvalidError } from "@domain/errors/userType/userTypeInvalidError";
