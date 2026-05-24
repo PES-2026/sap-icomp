@@ -1,17 +1,14 @@
 import {
   CreateEducatorDTO,
-  CreateEducatorRequest,
   CreateEducatorResponse,
 } from "@application/dtos/educator/createEducator";
-import { ApplicationError } from "@application/errors/applicationError";
-import { DomainError, ErrorCategory } from "@domain/errors/domainError";
+import { DomainError } from "@domain/errors/domainError";
 import { Result } from "@domain/shared/result";
 import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { IHashService } from "@domain/services/hashService";
 import { AccountRequest } from "@domain/entities/accountRequest";
-import { UserTypeEnum } from "@domain/enum/userType";
 import { PedagogueEmailAlreadyExistsError } from "@application/errors/pedagogue/pedagogueEmailAlreadyExistsError";
 import { ProfessorEmailAlreadyExistsError } from "@application/errors/professor/professorEmailAlreadyExist";
 import { PedagogueRegistrationNumberAlreadyExistsError } from "@application/errors/pedagogue/pedagogueRegistrationNumberAlreadyExists";
