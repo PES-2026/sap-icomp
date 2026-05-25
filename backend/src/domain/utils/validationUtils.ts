@@ -105,7 +105,9 @@ export function validateComparativeField(value: unknown, validatedValue: unknown
   if (typeof value !== "string" || !value.trim()) {
     throw new Error(`${fieldName} is required and must be a string. Please verify it!`);
   }
-
+  if (typeof validatedValue !== "string" || !validatedValue.trim()) {
+    throw new Error(`${fieldName} is required and must be a string. Please verify it!`);
+  }
   if (value !== validatedValue) {
     throw new Error(`${fieldName} does not match the expected value. Please verify it!`);
   }

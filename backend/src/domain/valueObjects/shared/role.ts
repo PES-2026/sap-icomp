@@ -2,6 +2,7 @@ import { Result } from "@domain/shared/result";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { RoleEnum } from "@domain/enum/role";
 import { RoleInvalidError } from "@domain/errors/role/roleInvalidError";
+import { findValueInEnum } from "@domain/utils/enumUtils";
 export type RoleErrors = RequiredFieldError | RoleInvalidError;
 
 export class RoleVO {
@@ -23,7 +24,7 @@ export class RoleVO {
       return Result.fail(new RequiredFieldError("role"));
     }
 
-    if (!Object.values(RoleEnum).includes(role as RoleEnum)) {
+    if (!findValueInEnum(RoleEnum, role)) {
       return Result.fail(new RoleInvalidError(role));
     }
     return Result.ok();

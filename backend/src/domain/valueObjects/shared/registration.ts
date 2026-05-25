@@ -36,7 +36,7 @@ export class RegistrationNumberVO {
     }
 
     //need to check the lenght of registration number with the stackholder.
-    if (trimmedRegistration.length > 7) {
+    if (trimmedRegistration.length > 10) {
       return Result.fail(new RegistrationTooLongError(trimmedRegistration.length));
     }
 
