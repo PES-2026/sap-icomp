@@ -48,7 +48,7 @@ export abstract class BaseController {
    */
   public handleError(error: unknown, res: Response, context?: string): void {
     // Errors retrieveds on try/catch exceptions
-    console.error(`[${context || "BaseController"}] Unhandled Exception:`, error);
+    console.error(`[${context || "BaseController"}] Unhandled Exception:`);
     res.status(500).json({ message: "Internal server error" });
   }
 
