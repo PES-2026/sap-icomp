@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-import { registerService } from "../services/register";
+import { registerService } from "../services/registerService";
 import { RegisterFormData, registerSchema } from "../utils/validations";
 
 const EMAIL_ALREADY_REGISTERED_MESSAGE = "E-mail já cadastrado";
