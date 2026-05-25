@@ -51,7 +51,7 @@ export class Professor {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        password.getValue(),
+        password.getValue(false),
       ),
     );
   }
