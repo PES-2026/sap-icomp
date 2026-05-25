@@ -1,5 +1,6 @@
 import { UserFilters } from "@domain/repositories/filters/userFilters";
 import { validateNumberField, validateStringField } from "@domain/utils/validationUtils";
+
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 export class ListUsersDTO {

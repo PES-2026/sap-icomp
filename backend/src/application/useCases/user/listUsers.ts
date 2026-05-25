@@ -1,9 +1,9 @@
+import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { UserListItem } from "@domain/repositories/results/userResult";
 import { PaginatedResult } from "@domain/shared/pagination";
 import { Result } from "@domain/shared/result";
-import { ListUsersDTO } from "@application/dtos/shared/listUsersDto";
 
 export class ListUsers {
   constructor(
@@ -13,15 +13,15 @@ export class ListUsers {
 
   async execute(dto: ListUsersDTO): Promise<Result<PaginatedResult<UserListItem>>> {
     // To provide true global pagination across two tables without a base table,
-    // we fetch matching records from both. For performance at small-medium scales, 
+    // we fetch matching records from both. For performance at small-medium scales,
     // we can merge and paginate in memory.
-    
+
     // Fetch a large limit or use a dedicated method for all filtered users if needed.
     // For now, we'll fetch with a very large limit to ensure we get all matches for merging.
-    const MAX_ITEMS = 10000; 
+    const MAX_ITEMS = 10000;
 
     const [pedagoguesResult, professorsResult] = await Promise.all([
-      this. pedagogueRepository.findAll(dto.filters, 1, MAX_ITEMS),
+      this.pedagogueRepository.findAll(dto.filters, 1, MAX_ITEMS),
       this.professorRepository.findAll(dto.filters, 1, MAX_ITEMS),
     ]);
 

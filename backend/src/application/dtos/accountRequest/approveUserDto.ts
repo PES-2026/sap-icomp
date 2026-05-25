@@ -1,4 +1,4 @@
-import { validateStringField, validateBooleanField } from "../../../domain/utils/validationUtils";
+import { validateStringField, validateBooleanField } from "@domain/utils/validationUtils";
 
 export interface ApproveUserRequest {
   id: string;

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+
+import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { ListUsers } from "@application/useCases/user/listUsers";
-import { ListUsersDTO } from "@application/dtos/shared/listUsersDto";
+
 import { BaseController } from "./baseController";
 
 export class UserController extends BaseController {

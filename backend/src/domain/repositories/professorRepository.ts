@@ -1,11 +1,11 @@
 import { Professor } from "../entities/professor";
-
-//import {PedagogueListParams} from "./filters/pedagogueFilters";
-//import {PaginatedPedagogueResult, PedagogueResult} from "./results/pedagogueResult";
+import { PaginatedResult } from "../shared/pagination";
 
 import { UserFilters } from "./filters/userFilters";
 import { UserListItem } from "./results/userResult";
-import { PaginatedResult } from "../shared/pagination";
+
+//import {PedagogueListParams} from "./filters/pedagogueFilters";
+//import {PaginatedPedagogueResult, PedagogueResult} from "./results/pedagogueResult";
 
 export interface IProfessorRepository {
   findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>>;

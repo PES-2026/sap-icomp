@@ -1,7 +1,8 @@
-import { IPedagogueRepository } from "../../../domain/repositories/pedagogueRepository";
-import { Pedagogue } from "../../../domain/entities/pedagogue";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+
+import { Pedagogue } from "../../../domain/entities/pedagogue";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
+import { IPedagogueRepository } from "../../../domain/repositories/pedagogueRepository";
 import { UserListItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
@@ -20,7 +21,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as any;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, pedagogues] = await Promise.all([

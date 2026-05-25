@@ -1,7 +1,7 @@
-import { Result } from "@domain/shared/result";
-import { RequiredFieldError } from "@domain/errors/requiredFieldError";
-import { PasswordTooShortError } from "@domain/errors/password/passwordTooShort";
 import { PasswordTooLongError } from "@domain/errors/password/passwordTooLong";
+import { PasswordTooShortError } from "@domain/errors/password/passwordTooShort";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
 
 export type PasswordErrors = RequiredFieldError | PasswordTooShortError | PasswordTooLongError;
 
@@ -10,6 +10,7 @@ export class PasswordVO {
   private constructor(password: string) {
     this._value = password;
   }
+
   static create(plain: string, hashed: string): Result<PasswordVO, PasswordErrors> {
     const validationResult = PasswordVO.validate(plain);
     if (validationResult.isFailure) {
@@ -17,6 +18,7 @@ export class PasswordVO {
     }
     return Result.ok<PasswordVO>(new PasswordVO(hashed));
   }
+
   private static validate(password: string): Result<void> {
     if (!password || password.trim().length === 0) {
       return Result.fail(new RequiredFieldError("password"));
@@ -31,9 +33,11 @@ export class PasswordVO {
     //maybe need to add more validation rules for password, like requiring a mix of uppercase, lowercase, numbers and special characters. But for now, we will keep it simple.
     return Result.ok();
   }
+
   get value(): string {
     return this._value;
   }
+
   static fromTrusted(password: string): PasswordVO {
     return new PasswordVO(password);
   }

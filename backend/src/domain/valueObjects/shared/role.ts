@@ -1,7 +1,7 @@
-import { Result } from "@domain/shared/result";
-import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { RoleEnum } from "@domain/enum/role";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { RoleInvalidError } from "@domain/errors/role/roleInvalidError";
+import { Result } from "@domain/shared/result";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 export type RoleErrors = RequiredFieldError | RoleInvalidError;
 
@@ -19,6 +19,7 @@ export class RoleVO {
 
     return Result.ok(new RoleVO(trimmedRole as RoleEnum));
   }
+
   private static validate(role: string): Result<void> {
     if (!role || role.trim().length === 0) {
       return Result.fail(new RequiredFieldError("role"));

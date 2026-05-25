@@ -1,20 +1,17 @@
-import {
-  CreateEducatorDTO,
-  CreateEducatorResponse,
-} from "@application/dtos/educator/createEducator";
+import { CreateProfessorDTO, CreateProfessorResponse } from "@application/dtos/professor/createProfessor";
+import { EmailConfirmationMismatchError } from "@application/errors/accountRequest/emailConfirmationMismatch";
+import { PasswordConfirmationMismatchError } from "@application/errors/accountRequest/passwordConfirmationMismatch";
+import { PedagogueEmailAlreadyExistsError } from "@application/errors/pedagogue/pedagogueEmailAlreadyExistsError";
+import { PedagogueRegistrationNumberAlreadyExistsError } from "@application/errors/pedagogue/pedagogueRegistrationNumberAlreadyExists";
+import { ProfessorEmailAlreadyExistsError } from "@application/errors/professor/professorEmailAlreadyExist";
+import { ProfessorRegistrationNumberAlreadyExistsError } from "@application/errors/professor/professorRegistrationNumberAlreadyExists";
+import { AccountRequest } from "@domain/entities/accountRequest";
 import { DomainError } from "@domain/errors/domainError";
-import { Result } from "@domain/shared/result";
-import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
+import { IAccountRequestRepository } from "@domain/repositories/accountRequestRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { IHashService } from "@domain/services/hashService";
-import { AccountRequest } from "@domain/entities/accountRequest";
-import { PedagogueEmailAlreadyExistsError } from "@application/errors/pedagogue/pedagogueEmailAlreadyExistsError";
-import { ProfessorEmailAlreadyExistsError } from "@application/errors/professor/professorEmailAlreadyExist";
-import { PedagogueRegistrationNumberAlreadyExistsError } from "@application/errors/pedagogue/pedagogueRegistrationNumberAlreadyExists";
-import { ProfessorRegistrationNumberAlreadyExistsError } from "@application/errors/professor/professorRegistrationNumberAlreadyExists";
-import { EmailConfirmationMismatchError } from "@application/errors/accountRequest/emailConfirmationMismatch";
-import { PasswordConfirmationMismatchError } from "@application/errors/accountRequest/passwordConfirmationMismatch";
+import { Result } from "@domain/shared/result";
 export class CreateAccountRequest {
   constructor(
     private readonly repository: IAccountRequestRepository,
@@ -23,7 +20,7 @@ export class CreateAccountRequest {
     private readonly hashService: IHashService,
   ) {}
 
-  async execute(props: CreateEducatorDTO): Promise<Result<CreateEducatorResponse>> {
+  async execute(props: CreateProfessorDTO): Promise<Result<CreateProfessorResponse>> {
     // Business rules and validations
     //email
     if (props.email !== props.emailConfirmation) {
@@ -32,13 +29,13 @@ export class CreateAccountRequest {
     const emailValidation = await this.validateEmail(props.email);
 
     if (emailValidation.isFailure) {
-      return Result.fail<CreateEducatorResponse>(emailValidation.error!);
+      return Result.fail<CreateProfessorResponse>(emailValidation.error!);
     }
     //registration number
     const registrationNumberValidation = await this.validateRegistrationNumber(props.registrationNumber);
 
     if (registrationNumberValidation.isFailure) {
-      return Result.fail<CreateEducatorResponse>(registrationNumberValidation.error!);
+      return Result.fail<CreateProfessorResponse>(registrationNumberValidation.error!);
     }
     //Password confirmation
     if (props.password !== props.passwordConfirmation) {
@@ -59,14 +56,14 @@ export class CreateAccountRequest {
     });
 
     if (accountRequestOrError.isFailure) {
-      return Result.fail<CreateEducatorResponse>(accountRequestOrError.error!);
+      return Result.fail<CreateProfessorResponse>(accountRequestOrError.error!);
     }
 
     await this.repository.save(accountRequestOrError.getValue());
 
     const accountRequest = accountRequestOrError.getValue();
 
-    return Result.ok<CreateEducatorResponse>({
+    return Result.ok<CreateProfessorResponse>({
       id: accountRequest.id.value,
       name: accountRequest.name.value,
       email: accountRequest.email.value,

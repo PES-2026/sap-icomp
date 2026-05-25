@@ -1,9 +1,9 @@
-import { Result } from "@domain/shared/result";
-import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { RegistrationAlreadyExistError } from "@domain/errors/registration/registrationAlreadyExist";
+import { RegistrationOnlyNumberError } from "@domain/errors/registration/registrationOnlyNumber";
 import { RegistrationTooLongError } from "@domain/errors/registration/registrationTooLongError";
 import { RegistrationTooShortError } from "@domain/errors/registration/registrationTooShortError";
-import { RegistrationOnlyNumberError } from "@domain/errors/registration/registrationOnlyNumber";
-import { RegistrationAlreadyExistError } from "@domain/errors/registration/registrationAlreadyExist";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { Result } from "@domain/shared/result";
 
 export type RegistrationNumberErrors =
   | RegistrationTooLongError
@@ -25,6 +25,7 @@ export class RegistrationNumberVO {
     }
     return Result.ok(new RegistrationNumberVO(registrationNumber));
   }
+
   private static validate(registrationNumber: string): Result<void> {
     if (!registrationNumber || registrationNumber.trim().length === 0) {
       return Result.fail(new RequiredFieldError("registration number"));
@@ -35,7 +36,7 @@ export class RegistrationNumberVO {
       return Result.fail(new RegistrationTooShortError(trimmedRegistration.length));
     }
 
-    //need to check the lenght of registration number with the stackholder.
+    //need to check the lenght of registration number with the stakeholder.
     if (trimmedRegistration.length > 10) {
       return Result.fail(new RegistrationTooLongError(trimmedRegistration.length));
     }
@@ -46,9 +47,11 @@ export class RegistrationNumberVO {
 
     return Result.ok();
   }
+
   static fromTrusted(registrationNumber: string): RegistrationNumberVO {
     return new RegistrationNumberVO(registrationNumber);
   }
+
   get value(): string {
     return this._value;
   }

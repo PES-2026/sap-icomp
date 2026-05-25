@@ -1,5 +1,5 @@
 import { AccountRequest } from "@domain/entities/accountRequest";
-import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
+import { IAccountRequestRepository } from "@domain/repositories/accountRequestRepository";
 import { PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaAccountRequestRepository implements IAccountRequestRepository {
@@ -16,7 +16,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       phoneNumber: accountRequest.phoneNumber.value,
       password: accountRequest.password.value,
       userStatus: accountRequest.userStatus.value,
-      ...(accountRequest.role ? { role: accountRequest.role.value as any } : {}),
+      ...(accountRequest.role ? { role: accountRequest.role.value } : {}),
     };
     await this.prisma.accountRequest.create({
       data: {
@@ -81,8 +81,8 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
         externalId: accountRequest.id.value,
       },
       data: {
-        userStatus: accountRequest.userStatus.value as any,
-        role: accountRequest.role?.value as any,
+        userStatus: accountRequest.userStatus.value,
+        role: accountRequest.role?.value,
       },
     });
   }

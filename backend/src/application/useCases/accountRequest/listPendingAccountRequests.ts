@@ -1,5 +1,5 @@
+import { IAccountRequestRepository } from "@domain/repositories/accountRequestRepository";
 import { Result } from "@domain/shared/result";
-import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
 
 export type ListPendingAccountRequestsResponse = {
   id: string;

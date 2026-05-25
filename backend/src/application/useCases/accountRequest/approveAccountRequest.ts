@@ -1,19 +1,19 @@
-import { ApproveUserDTO } from "@application/dtos/accoutnRequest/approveUserDto";
+import { ApproveUserDTO } from "@application/dtos/accountRequest/approveUserDto";
 import { AccountRequestNotFoundError } from "@application/errors/accountRequest/accountRequestNotFound";
-import { RoleRequiredForApprovalError } from "@application/errors/accountRequest/roleRequiredForApproval";
 import { InvalidRoleError } from "@application/errors/accountRequest/invalidRole";
-import { Result } from "@domain/shared/result";
-import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
-import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
-import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { RoleEnum } from "@domain/enum/role";
+import { RoleRequiredForApprovalError } from "@application/errors/accountRequest/roleRequiredForApproval";
 import { Pedagogue } from "@domain/entities/pedagogue";
 import { Professor } from "@domain/entities/professor";
+import { RoleEnum } from "@domain/enum/role";
 import { UserStatusEnum } from "@domain/enum/userStatus";
+import { IAccountRequestRepository } from "@domain/repositories/accountRequestRepository";
+import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
+import { IProfessorRepository } from "@domain/repositories/professorRepository";
+import { Result } from "@domain/shared/result";
 
 export type ApproveAccountRequestResponse = {
   message: string;
-  user?: any;
+  user?: unknown;
 };
 
 export class ApproveAccountRequest {
@@ -44,7 +44,7 @@ export class ApproveAccountRequest {
     accountRequest.approve();
     await this.repository.update(accountRequest);
 
-    let createdUser: any;
+    let createdUser: unknown;
 
     if (props.role === RoleEnum.PEDAGOGUE) {
       const pedagogueOrError = Pedagogue.create({

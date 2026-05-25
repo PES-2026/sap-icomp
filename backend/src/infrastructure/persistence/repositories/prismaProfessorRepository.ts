@@ -1,7 +1,8 @@
-import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
-import { Professor } from "../../../domain/entities/professor";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+
+import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
+import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
 import { UserListItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
@@ -20,7 +21,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as any;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, professors] = await Promise.all([

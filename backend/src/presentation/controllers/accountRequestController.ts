@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 
-import { CreateEducatorDTO } from "@application/dtos/educator/createEducator";
-import { ApproveUserDTO } from "@application/dtos/accoutnRequest/approveUserDto";
-import { CreateAccountRequest } from "@application/useCases/accountRequest/createAccountRequest";
+import { ApproveUserDTO } from "@application/dtos/accountRequest/approveUserDto";
+import { CreateProfessorDTO } from "@application/dtos/professor/createProfessor";
 import { ApproveAccountRequest } from "@application/useCases/accountRequest/approveAccountRequest";
+import { CreateAccountRequest } from "@application/useCases/accountRequest/createAccountRequest";
 import { ListPendingAccountRequests } from "@application/useCases/accountRequest/listPendingAccountRequests";
 
 import { BaseController } from "./baseController";
@@ -19,7 +19,7 @@ export class AccountRequestController extends BaseController {
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = CreateEducatorDTO.create(req.body);
+      const dto = CreateProfessorDTO.create(req.body);
       const result = await this.createAccountRequest.execute(dto);
 
       this.handleResult(res, result, 201);

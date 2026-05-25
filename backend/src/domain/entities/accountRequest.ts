@@ -1,12 +1,12 @@
+import { Result } from "@domain/shared/result";
+import { EmailVO } from "@domain/valueObjects/shared/email";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
-import { EmailVO } from "@domain/valueObjects/shared/email";
-import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
-import { RegistrationNumberVO } from "@domain/valueObjects/shared/registration";
-import { UserStatusVO } from "@domain/valueObjects/shared/userStatus";
 import { PasswordVO } from "@domain/valueObjects/shared/password";
+import { RegistrationNumberVO } from "@domain/valueObjects/shared/registration";
 import { RoleVO } from "@domain/valueObjects/shared/role";
-import { Result } from "@domain/shared/result";
+import { UserStatusVO } from "@domain/valueObjects/shared/userStatus";
+import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
 
 export type AccountRequestProps = {
   id?: string;
@@ -46,14 +46,14 @@ export class AccountRequest {
     const role = props.role ? RoleVO.create(props.role) : undefined;
     const createdAt = new Date();
 
-    const results: Result<any, any>[] = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
-    if (role) results.push(role);
+    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password, role];
 
     for (const result of results) {
       if (result?.isFailure) {
         throw Result.fail<AccountRequest>(result.error!);
       }
     }
+
     return Result.ok(
       new AccountRequest(
         id.getValue(),

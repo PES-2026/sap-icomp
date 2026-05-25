@@ -1,6 +1,6 @@
-import { validateComparativeField, validateStringField } from "../../../domain/utils/validationUtils";
+import { validateStringField, validateComparativeField } from "@domain/utils/validationUtils";
 
-export interface CreateEducatorRequest {
+export interface CreateProfessorRequest {
   name: string;
   email: string;
   emailConfirmation: string;
@@ -11,7 +11,7 @@ export interface CreateEducatorRequest {
   passwordConfirmation: string;
 }
 
-export interface CreateEducatorResponse {
+export interface CreateProfessorResponse {
   id: string;
   name: string;
   email: string;
@@ -21,7 +21,7 @@ export interface CreateEducatorResponse {
   userStatus: string;
 }
 
-export class CreateEducatorDTO {
+export class CreateProfessorDTO {
   constructor(
     public name: string,
     public email: string,
@@ -33,9 +33,9 @@ export class CreateEducatorDTO {
     public role?: string,
   ) {}
 
-  static create(data: unknown): CreateEducatorDTO {
+  static create(data: unknown): CreateProfessorDTO {
     if (typeof data !== "object" || data === null) {
-      throw new Error(`Invalid input to ${CreateEducatorDTO.name}`);
+      throw new Error(`Invalid input to ${CreateProfessorDTO.name}`);
     }
 
     const raw = data as Record<string, unknown>;
@@ -52,7 +52,7 @@ export class CreateEducatorDTO {
     validateComparativeField(email, emailConfirmation, "emailConfirmation");
     validateComparativeField(password, passwordConfirmation, "passwordConfirmation");
 
-    return new CreateEducatorDTO(
+    return new CreateProfessorDTO(
       name,
       email,
       emailConfirmation,

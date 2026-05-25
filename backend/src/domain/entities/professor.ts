@@ -1,11 +1,11 @@
+import { Result } from "@domain/shared/result";
+import { EmailVO } from "@domain/valueObjects/shared/email";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
-import { EmailVO } from "@domain/valueObjects/shared/email";
-import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
+import { PasswordVO } from "@domain/valueObjects/shared/password";
 import { RegistrationNumberVO } from "@domain/valueObjects/shared/registration";
 import { UserStatusVO } from "@domain/valueObjects/shared/userStatus";
-import { PasswordVO } from "@domain/valueObjects/shared/password";
-import { Result } from "@domain/shared/result";
+import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
 
 export type ProfessorProps = {
   id?: string;

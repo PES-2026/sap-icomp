@@ -1,7 +1,7 @@
-import { Result } from "@domain/shared/result";
-import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { UserStatusEnum } from "@domain/enum/userStatus";
-import { UserStatusInvalidError } from "@domain/errors/userStatus/UserStatusInvalidError";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { UserStatusInvalidError } from "@domain/errors/userStatus/userStatusInvalidError";
+import { Result } from "@domain/shared/result";
 export type UserStatusErrors = RequiredFieldError | UserStatusInvalidError;
 
 export class UserStatusVO {
@@ -18,6 +18,7 @@ export class UserStatusVO {
 
     return Result.ok(new UserStatusVO(trimmedStatus as UserStatusEnum));
   }
+
   private static validate(status: string): Result<void> {
     if (!status || status.trim().length === 0) {
       return Result.fail(new RequiredFieldError("status"));
