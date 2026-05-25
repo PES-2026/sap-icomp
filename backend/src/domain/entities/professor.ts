@@ -24,7 +24,7 @@ export class Professor {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    private readonly password: PasswordVO,
+    public readonly password: PasswordVO,
   ) {}
 
   static create(props: ProfessorProps): Result<Professor> {

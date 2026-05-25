@@ -20,11 +20,8 @@ export class Result<T, Error extends DomainError = DomainError> {
     this._value = value !== undefined ? value : null;
   }
 
-  public getValue(printOnError: boolean = true): T {
+  public getValue(): T {
     if (!this.isSuccess) {
-      if (printOnError) {
-        console.log(this.error);
-      }
       throw new Error("Can't get the value of an error result. Use 'isSuccess' before calling 'getValue()'.");
     }
     return this._value as T;
