@@ -21,11 +21,12 @@ export class PasswordVO {
     if (!password || password.trim().length === 0) {
       return Result.fail(new RequiredFieldError("password"));
     }
+    const pwLength = password.length;
     if (password.length < 8) {
-      return Result.fail(new PasswordTooShortError(password.length));
+      return Result.fail(new PasswordTooShortError(pwLength));
     }
     if (password.length > 128) {
-      return Result.fail(new PasswordTooLongError(password.length));
+      return Result.fail(new PasswordTooLongError(pwLength));
     }
     //maybe need to add more validation rules for password, like requiring a mix of uppercase, lowercase, numbers and special characters. But for now, we will keep it simple.
     return Result.ok();
