@@ -7,6 +7,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  PROFESSOR
+  PEDAGOGUE
+  STUDENT
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ENABLED
+  DISABLED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -31,6 +45,22 @@ model Student {
   enrollments Enrollment[]
 }
 
+model AccountRequest {
+  internalId   Int        @id @default(autoincrement())
+  externalId   String     @unique
+  registration String     @unique
+  name         String
+  email        String     @unique
+  phoneNumber  String?
+  password     String
+  role         Role?
+  userStatus   UserStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
+}
+
 model Pedagogue {
   internalId Int    @id @default(autoincrement())
   externalId String @unique
@@ -38,15 +68,14 @@ model Pedagogue {
   registration String  @unique
   name         String
   email        String  @unique
-  password     String
   phoneNumber  String?
+  password     String
+
+  userStatus UserStatus @default(APPROVED)
 
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  approved Boolean @default(false)
-  enabled  Boolean @default(false)
 
   attendances Attendance[]
   reports     Report[]
@@ -59,15 +88,14 @@ model Professor {
   registration String  @unique
   name         String
   email        String  @unique
-  password     String
   phoneNumber  String?
+  password     String
+
+  userStatus UserStatus @default(APPROVED)
 
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  approved Boolean @default(false)
-  enabled  Boolean @default(false)
 
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
