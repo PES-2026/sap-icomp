@@ -24,7 +24,7 @@ export class Professor {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public readonly password: PasswordVO,
+    private readonly password: PasswordVO,
   ) {}
 
   static create(props: ProfessorProps): Result<Professor> {
@@ -51,7 +51,7 @@ export class Professor {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        password.getValue(false),
+        password.getValue(),
       ),
     );
   }
