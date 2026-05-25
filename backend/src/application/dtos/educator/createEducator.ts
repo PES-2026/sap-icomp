@@ -6,7 +6,7 @@ export interface CreateEducatorRequest {
   emailConfirmation: string;
   phoneNumber: string;
   registrationNumber: string;
-  userType?: string;
+  role?: string;
   password: string;
   passwordConfirmation: string;
 }
@@ -17,7 +17,7 @@ export interface CreateEducatorResponse {
   email: string;
   phoneNumber: string;
   registrationNumber: string;
-  userType?: string | undefined;
+  role?: string | undefined;
   userStatus: string;
 }
 
@@ -30,7 +30,7 @@ export class CreateEducatorDTO {
     public registrationNumber: string,
     public password: string,
     public passwordConfirmation: string,
-    public userType?: string,
+    public role?: string,
   ) {}
 
   static create(data: unknown): CreateEducatorDTO {
@@ -47,7 +47,7 @@ export class CreateEducatorDTO {
     const registrationNumber = validateStringField(raw.registrationNumber, "registrationNumber");
     const password = validateStringField(raw.password, "password");
     const passwordConfirmation = validateStringField(raw.passwordConfirmation, "passwordConfirmation");
-    const userType = raw.userType ? validateStringField(raw.userType, "userType") : undefined;
+    const role = raw.role ? validateStringField(raw.role, "role") : undefined;
 
     validateComparativeField(email, emailConfirmation, "emailConfirmation");
     validateComparativeField(password, passwordConfirmation, "passwordConfirmation");
@@ -60,7 +60,7 @@ export class CreateEducatorDTO {
       registrationNumber,
       password,
       passwordConfirmation,
-      userType,
+      role,
     );
   }
 }

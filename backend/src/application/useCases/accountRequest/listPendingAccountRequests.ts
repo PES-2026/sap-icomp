@@ -7,7 +7,7 @@ export type ListPendingAccountRequestsResponse = {
   email: string;
   phoneNumber: string;
   registrationNumber: string;
-  userType?: string | undefined;
+  role?: string | undefined;
   userStatus: string;
   createdAt?: Date | undefined;
 }[];
@@ -24,7 +24,7 @@ export class ListPendingAccountRequests {
       email: request.email.value,
       phoneNumber: request.phoneNumber.value,
       registrationNumber: request.registrationNumber.value,
-      userType: request.userType?.value,
+      role: request.role?.value,
       userStatus: request.userStatus.value,
       createdAt: request.createdAt,
     }));

@@ -55,7 +55,7 @@ export class CreateAccountRequest {
       plainPassword: props.password,
       hashedPassword: hashedPassword,
       userStatus: "PENDING",
-      userType: props.userType,
+      role: props.role,
     });
 
     if (accountRequestOrError.isFailure) {
@@ -72,7 +72,7 @@ export class CreateAccountRequest {
       email: accountRequest.email.value,
       phoneNumber: accountRequest.phoneNumber.value,
       registrationNumber: accountRequest.registrationNumber.value,
-      userType: accountRequest.userType?.value,
+      role: accountRequest.role?.value,
       userStatus: accountRequest.userStatus.value,
     });
   }

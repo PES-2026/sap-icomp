@@ -6,7 +6,7 @@ import { Result } from "@domain/shared/result";
 import { IAccountRequestRepository } from "@domain/repositories/AccountRequestRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserTypeEnum } from "@domain/enum/userType";
+import { RoleEnum } from "@domain/enum/role";
 import { Pedagogue } from "@domain/entities/pedagogue";
 import { Professor } from "@domain/entities/professor";
 import { UserStatusEnum } from "@domain/enum/userStatus";
@@ -46,7 +46,7 @@ export class ApproveAccountRequest {
 
     let createdUser: any;
 
-    if (props.role === UserTypeEnum.PEDAGOGUE) {
+    if (props.role === RoleEnum.PEDAGOGUE) {
       const pedagogueOrError = Pedagogue.create({
         name: accountRequest.name.value,
         email: accountRequest.email.value,
@@ -62,7 +62,7 @@ export class ApproveAccountRequest {
 
       createdUser = pedagogueOrError.getValue();
       await this.pedagogueRepository.save(createdUser);
-    } else if (props.role === UserTypeEnum.PROFESSOR) {
+    } else if (props.role === RoleEnum.PROFESSOR) {
       const professorOrError = Professor.create({
         name: accountRequest.name.value,
         email: accountRequest.email.value,

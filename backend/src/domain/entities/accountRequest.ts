@@ -5,7 +5,7 @@ import { PhoneNumberVO } from "@domain/valueObjects/student/phoneNumber";
 import { RegistrationNumberVO } from "@domain/valueObjects/shared/registration";
 import { UserStatusVO } from "@domain/valueObjects/shared/userStatus";
 import { PasswordVO } from "@domain/valueObjects/shared/password";
-import { UserTypeVO } from "@domain/valueObjects/shared/userType";
+import { RoleVO } from "@domain/valueObjects/shared/role";
 import { Result } from "@domain/shared/result";
 
 export type AccountRequestProps = {
@@ -15,7 +15,7 @@ export type AccountRequestProps = {
   phoneNumber: string;
   registrationNumber: string;
   userStatus: string;
-  userType?: string | undefined;
+  role?: string | undefined;
   password?: string;
   plainPassword?: string;
   hashedPassword?: string;
@@ -32,7 +32,7 @@ export class AccountRequest {
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
     public readonly createdAt?: Date,
-    public userType?: UserTypeVO,
+    public role?: RoleVO,
   ) {}
 
   static create(props: AccountRequestProps): Result<AccountRequest> {
@@ -43,11 +43,11 @@ export class AccountRequest {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = PasswordVO.create(props.plainPassword!, props.hashedPassword!);
-    const userType = props.userType ? UserTypeVO.create(props.userType) : undefined;
+    const role = props.role ? RoleVO.create(props.role) : undefined;
     const createdAt = new Date();
 
     const results: Result<any, any>[] = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
-    if (userType) results.push(userType);
+    if (role) results.push(role);
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -64,7 +64,7 @@ export class AccountRequest {
         userStatus.getValue(),
         password.getValue(),
         createdAt,
-        userType?.getValue(),
+        role?.getValue(),
       ),
     );
   }
@@ -79,7 +79,7 @@ export class AccountRequest {
       UserStatusVO.fromTrusted(props.userStatus),
       PasswordVO.fromTrusted(props.password || props.hashedPassword!),
       props.createdAt,
-      props.userType ? UserTypeVO.fromTrusted(props.userType) : undefined,
+      props.role ? RoleVO.fromTrusted(props.role) : undefined,
     );
   }
 

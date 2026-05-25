@@ -16,7 +16,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       phoneNumber: accountRequest.phoneNumber.value,
       password: accountRequest.password.value,
       userStatus: accountRequest.userStatus.value,
-      ...(accountRequest.userType ? { role: accountRequest.userType.value as any } : {}),
+      ...(accountRequest.role ? { role: accountRequest.role.value as any } : {}),
     };
     await this.prisma.accountRequest.create({
       data: {
@@ -43,7 +43,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       phoneNumber: accountRequest.phoneNumber || "",
       registrationNumber: accountRequest.registration,
       userStatus: accountRequest.userStatus,
-      userType: accountRequest.role || undefined,
+      role: accountRequest.role || undefined,
       password: accountRequest.password,
       createdAt: accountRequest.createdAt,
     });
@@ -68,7 +68,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
         phoneNumber: request.phoneNumber || "",
         registrationNumber: request.registration,
         userStatus: request.userStatus,
-        userType: request.role || undefined,
+        role: request.role || undefined,
         password: request.password,
         createdAt: request.createdAt,
       }),
@@ -82,7 +82,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       },
       data: {
         userStatus: accountRequest.userStatus.value as any,
-        role: accountRequest.userType?.value as any,
+        role: accountRequest.role?.value as any,
       },
     });
   }
