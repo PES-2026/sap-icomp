@@ -12,6 +12,7 @@ export interface IProfessorRepository {
   save(professor: Professor): Promise<void>;
   update(professor: Professor): Promise<void>;
   findById(id: string): Promise<Professor | null>;
+  findByEmail(email: string): Promise<Professor | null>;
   //existsByUUID(externalId: string): Promise<boolean>;
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;

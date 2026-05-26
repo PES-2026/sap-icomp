@@ -91,6 +91,24 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     });
   }
 
+  async findByEmail(email: string): Promise<Professor | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { email },
+    });
+
+    if (!raw) return null;
+
+    return Professor.rehydrate({
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      password: raw.password,
+    });
+  }
+
   async update(professor: Professor): Promise<void> {
     await this.prisma.professor.update({
       where: { externalId: professor.id.value },

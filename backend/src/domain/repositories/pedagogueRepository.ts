@@ -12,6 +12,7 @@ export interface IPedagogueRepository {
   save(pedagogue: Pedagogue): Promise<void>;
   update(pedagogue: Pedagogue): Promise<void>;
   findById(id: string): Promise<Pedagogue | null>;
+  findByEmail(email: string): Promise<Pedagogue | null>;
   //existsByUUID(externalId: string): Promise<boolean>;
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;

@@ -1,8 +1,10 @@
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
+import { EmailAlreadyInUseError } from "@application/errors/user/emailAlreadyInUse";
 import { UserNotFoundError } from "@application/errors/user/userNotFound";
 import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
+import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
 import { EmailVO } from "@domain/valueObjects/shared/email";
 import { NameVO } from "@domain/valueObjects/shared/name";
@@ -20,6 +22,7 @@ export class UpdateUser {
   constructor(
     private readonly pedagogueRepository: IPedagogueRepository,
     private readonly professorRepository: IProfessorRepository,
+    private readonly studentRepository: IStudentRepository,
   ) {}
 
   async execute(dto: UpdateUserDTO): Promise<Result<UpdateUserResponse>> {
@@ -47,9 +50,25 @@ export class UpdateUser {
     }
 
     if (dto.email) {
-      const email = EmailVO.create(dto.email);
-      if (email.isFailure) return Result.fail(email.error!);
-      updateProps.email = email.getValue();
+      const emailOrError = EmailVO.create(dto.email);
+      if (emailOrError.isFailure) return Result.fail(emailOrError.error!);
+      const newEmail = emailOrError.getValue();
+
+      // Check if email changed
+      if (newEmail.value !== user.email.value) {
+        // Check duplication in ALL user repositories (Pedagogue, Professor, Student)
+        const [pedagogueExists, professorExists, studentExists] = await Promise.all([
+          this.pedagogueRepository.existsByEmail(newEmail.value),
+          this.professorRepository.existsByEmail(newEmail.value),
+          this.studentRepository.existsByEmail(newEmail.value),
+        ]);
+
+        if (pedagogueExists || professorExists || studentExists) {
+          return Result.fail(new EmailAlreadyInUseError(newEmail.value));
+        }
+      }
+
+      updateProps.email = newEmail;
     }
 
     if (dto.phoneNumber) {

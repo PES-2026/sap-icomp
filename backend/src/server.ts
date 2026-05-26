@@ -161,7 +161,7 @@ app.use(accountRequestRoutes(accountRequestController));
 
 const userController = new UserController(
   new ListUsers(pedagogueRepository, professorRepository),
-  new UpdateUser(pedagogueRepository, professorRepository),
+  new UpdateUser(pedagogueRepository, professorRepository, studentRepository),
 );
 
 app.use(userRoutes(userController));
