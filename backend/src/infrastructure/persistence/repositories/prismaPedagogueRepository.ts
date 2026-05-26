@@ -21,7 +21,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as any;
     }
 
     const [totalItems, pedagogues] = await Promise.all([
@@ -72,6 +72,38 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       },
     });
   }
+
+  async findById(id: string): Promise<Pedagogue | null> {
+    const raw = await this.prisma.pedagogue.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return Pedagogue.rehydrate({
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      password: raw.password,
+    });
+  }
+
+  async update(pedagogue: Pedagogue): Promise<void> {
+    await this.prisma.pedagogue.update({
+      where: { externalId: pedagogue.id.value },
+      data: {
+        name: pedagogue.name.value,
+        email: pedagogue.email.value,
+        phoneNumber: pedagogue.phoneNumber.value,
+        registration: pedagogue.registrationNumber.value,
+        userStatus: pedagogue.userStatus.value,
+      },
+    });
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.pedagogue.findFirst({
       where: {

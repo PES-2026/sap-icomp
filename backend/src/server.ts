@@ -33,6 +33,7 @@ import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { ListUsers } from "@application/useCases/user/listUsers";
+import { UpdateUser } from "@application/useCases/user/updateUser";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -158,7 +159,10 @@ const accountRequestController = new AccountRequestController(
 
 app.use(accountRequestRoutes(accountRequestController));
 
-const userController = new UserController(new ListUsers(pedagogueRepository, professorRepository));
+const userController = new UserController(
+  new ListUsers(pedagogueRepository, professorRepository),
+  new UpdateUser(pedagogueRepository, professorRepository),
+);
 
 app.use(userRoutes(userController));
 

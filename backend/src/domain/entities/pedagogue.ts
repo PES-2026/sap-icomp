@@ -16,6 +16,16 @@ export type PedagogueProps = {
   userStatus: string;
   password: string;
 };
+
+export type PedagogueVOProps = {
+  name: NameVO;
+  email: EmailVO;
+  phoneNumber: PhoneNumberVO;
+  registrationNumber: RegistrationNumberVO;
+  userStatus: UserStatusVO;
+  password: PasswordVO;
+};
+
 export class Pedagogue {
   constructor(
     public readonly id: ExternalIdVO,
@@ -26,6 +36,14 @@ export class Pedagogue {
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
   ) {}
+
+  update(props: Partial<PedagogueVOProps>): void {
+    if (props.name !== undefined) this.name = props.name;
+    if (props.email !== undefined) this.email = props.email;
+    if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
+    if (props.registrationNumber !== undefined) this.registrationNumber = props.registrationNumber;
+    if (props.userStatus !== undefined) this.userStatus = props.userStatus;
+  }
 
   static create(props: PedagogueProps): Result<Pedagogue> {
     const id = ExternalIdVO.create();

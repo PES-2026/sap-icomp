@@ -16,6 +16,16 @@ export type ProfessorProps = {
   userStatus: string;
   password: string;
 };
+
+export type ProfessorVOProps = {
+  name: NameVO;
+  email: EmailVO;
+  phoneNumber: PhoneNumberVO;
+  registrationNumber: RegistrationNumberVO;
+  userStatus: UserStatusVO;
+  password: PasswordVO;
+};
+
 export class Professor {
   constructor(
     public readonly id: ExternalIdVO,
@@ -26,6 +36,14 @@ export class Professor {
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
   ) {}
+
+  update(props: Partial<ProfessorVOProps>): void {
+    if (props.name !== undefined) this.name = props.name;
+    if (props.email !== undefined) this.email = props.email;
+    if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
+    if (props.registrationNumber !== undefined) this.registrationNumber = props.registrationNumber;
+    if (props.userStatus !== undefined) this.userStatus = props.userStatus;
+  }
 
   static create(props: ProfessorProps): Result<Professor> {
     const id = ExternalIdVO.create();
@@ -53,6 +71,18 @@ export class Professor {
         userStatus.getValue(),
         password.getValue(),
       ),
+    );
+  }
+
+  static rehydrate(props: ProfessorProps): Professor {
+    return new Professor(
+      ExternalIdVO.fromTrusted(props.id!),
+      NameVO.fromTrusted(props.name),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      RegistrationNumberVO.fromTrusted(props.registrationNumber),
+      UserStatusVO.fromTrusted(props.userStatus),
+      PasswordVO.fromTrusted(props.password),
     );
   }
 }

@@ -21,7 +21,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as any;
     }
 
     const [totalItems, professors] = await Promise.all([
@@ -72,6 +72,38 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       },
     });
   }
+
+  async findById(id: string): Promise<Professor | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return Professor.rehydrate({
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      password: raw.password,
+    });
+  }
+
+  async update(professor: Professor): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: professor.id.value },
+      data: {
+        name: professor.name.value,
+        email: professor.email.value,
+        phoneNumber: professor.phoneNumber.value,
+        registration: professor.registrationNumber.value,
+        userStatus: professor.userStatus.value,
+      },
+    });
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.professor.findFirst({
       where: {

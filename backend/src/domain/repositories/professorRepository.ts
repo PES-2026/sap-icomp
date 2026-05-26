@@ -10,7 +10,8 @@ import { UserListItem } from "./results/userResult";
 export interface IProfessorRepository {
   findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>>;
   save(professor: Professor): Promise<void>;
-  //update(professor: Professor): Promise<void>;
+  update(professor: Professor): Promise<void>;
+  findById(id: string): Promise<Professor | null>;
   //existsByUUID(externalId: string): Promise<boolean>;
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;
