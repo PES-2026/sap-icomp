@@ -2,18 +2,26 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import { userService } from "../services/userService";
-import { UserListItem } from "../types/user";
+import { UserFilters, UserListItem } from "../types/user";
 
-export const useUsers = (page: number, limit: number) => {
+export const useUsers = (
+  page: number,
+  limit: number,
+  filters: UserFilters = {},
+) => {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const { name, userStatus } = filters;
 
   const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const data = await userService.getUsers(page, limit);
+      const data = await userService.getUsers(page, limit, {
+        name,
+        userStatus,
+      });
 
       setUsers(data.items ?? []);
       setTotalItems(data.totalItems ?? 0);
@@ -23,7 +31,7 @@ export const useUsers = (page: number, limit: number) => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit]);
+  }, [page, limit, name, userStatus]);
 
   useEffect(() => {
     fetchUsers();

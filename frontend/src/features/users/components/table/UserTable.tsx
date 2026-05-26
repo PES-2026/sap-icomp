@@ -1,11 +1,12 @@
 "use client";
 
 import { Column, DataTable } from "@/components/ui/DataTable";
+import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useUsers } from "../../hooks/useUsers";
-import { UserListItem, UserStatus } from "../../types/user";
+import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
 
 const roleLabelMap: Record<string, string> = {
   PEDAGOGUE: "Pedagoga",
@@ -21,8 +22,12 @@ const statusLabelMap: Record<string, string> = {
 };
 
 const formatRole = (role: string) => roleLabelMap[role] ?? role;
-
 const formatStatus = (status: string) => statusLabelMap[status] ?? status;
+
+const statusFilterOptions = [
+  { value: "ENABLED", label: "Apenas Ativos" },
+  { value: "DISABLED", label: "Apenas Inativos" },
+];
 
 function StatusBadge({ status }: { status: UserStatus }) {
   const isActive = status === "ENABLED" || status === "APPROVED";
@@ -48,18 +53,53 @@ export default function UserTable() {
   const [limit, setLimit] = useState(10);
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("");
 
-  const { users, isLoading } = useUsers(page, limit);
+  const { users, isLoading } = useUsers(page, limit, {
+    name: debouncedNameFilter,
+    userStatus: statusFilter,
+  });
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedNameFilter(nameFilter.trim());
+      setPage(1);
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [nameFilter]);
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value as UserStatusFilter);
+    setPage(1);
+  };
+
+  const handleEmailFilterChange = (value: string) => {
+    setEmailFilter(value);
+    setPage(1);
+  };
+
+  const handleRoleFilterChange = (value: string) => {
+    setRoleFilter(value);
+    setPage(1);
+  };
+
+  // frontend filter since the current backend only accepts name and userStatus in /users
   const filteredUsers = users.filter((user) => {
-    const matchesName = (user.name || "")
-      .toLowerCase()
-      .includes(nameFilter.toLowerCase());
+    const normalizedEmailFilter = emailFilter.toLowerCase();
+    const normalizedRoleFilter = roleFilter.toLowerCase();
+    const formattedRole = formatRole(user.role).toLowerCase();
+
     const matchesEmail = (user.email || "")
       .toLowerCase()
-      .includes(emailFilter.toLowerCase());
+      .includes(normalizedEmailFilter);
+    const matchesRole =
+      formattedRole.includes(normalizedRoleFilter) ||
+      (user.role || "").toLowerCase().includes(normalizedRoleFilter);
 
-    return matchesName && matchesEmail;
+    return matchesEmail && matchesRole;
   });
 
   const columns: Column<UserListItem>[] = [
@@ -67,7 +107,11 @@ export default function UserTable() {
       label: "Nome",
       width: "w-[360px]",
       renderFilter: () => (
-        <SearchInput value={nameFilter} onChange={setNameFilter} />
+        <SearchInput
+          placeholder="Buscar por nome"
+          value={nameFilter}
+          onChange={setNameFilter}
+        />
       ),
       renderCell: (user) => (
         <span className="font-medium text-[#3a3530]">{user.name}</span>
@@ -77,18 +121,37 @@ export default function UserTable() {
       label: "E-mail",
       width: "w-[320px]",
       renderFilter: () => (
-        <SearchInput value={emailFilter} onChange={setEmailFilter} />
+        <SearchInput
+          placeholder="Buscar por e-mail"
+          value={emailFilter}
+          onChange={handleEmailFilterChange}
+        />
       ),
       renderCell: (user) => user.email,
     },
     {
-      label: "Perfil/Cargo",
+      label: "Cargo",
       width: "w-[180px]",
+      renderFilter: () => (
+        <SearchInput
+          placeholder="Buscar por cargo"
+          value={roleFilter}
+          onChange={handleRoleFilterChange}
+        />
+      ),
       renderCell: (user) => formatRole(user.role),
     },
     {
       label: "Status",
       width: "w-[140px]",
+      renderFilter: () => (
+        <SelectInput
+          value={statusFilter}
+          onChange={handleStatusFilterChange}
+          options={statusFilterOptions}
+          placeholder="Todos"
+        />
+      ),
       renderCell: (user) => <StatusBadge status={user.userStatus} />,
     },
   ];
@@ -103,7 +166,7 @@ export default function UserTable() {
       setPage={setPage}
       limit={limit}
       setLimit={setLimit}
-      totalItems={users.length}
+      totalItems={filteredUsers.length}
       emptyMessage="Nenhum usuário encontrado."
     />
   );

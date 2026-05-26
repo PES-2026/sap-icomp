@@ -8,6 +8,13 @@ export type UserStatus =
   | "REJECTED"
   | string;
 
+export type UserStatusFilter = "" | "ENABLED" | "DISABLED";
+
+export interface UserFilters {
+  name?: string;
+  userStatus?: UserStatusFilter;
+}
+
 export interface UserListItem {
   id: string;
   name: string;
