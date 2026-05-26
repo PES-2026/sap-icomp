@@ -141,5 +141,15 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
 
     return !!account;
   }
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.pedagogue.update({
+      where: { externalId: id },
+      data: { 
+        removed: true,
+        userStatus: "DISABLED"
+      },
+    });
+  }
   //async findByEmail(email: string): Promise<Pedagogue | null> {}
 }

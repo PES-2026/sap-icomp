@@ -141,4 +141,14 @@ export class PrismaProfessorRepository implements IProfessorRepository {
 
     return !!account;
   }
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: id },
+      data: { 
+        removed: true,
+        userStatus: "DISABLED"
+      },
+    });
+  }
 }

@@ -4,6 +4,7 @@ import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
 import { UpdateUserPasswordDTO } from "@application/dtos/user/updateUserPasswordDto";
 import { UserByIdDTO } from "@application/dtos/user/userByIdDto";
+import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
 import { UserController } from "@presentation/controllers/userController";
 import { validateParams } from "@presentation/middlewares/validateParams";
 
@@ -14,6 +15,7 @@ export function userRoutes(controller: UserController): Router {
   router.put("/users/:id", validateParams(UpdateUserDTO), controller.update);
   router.put("/users/:id/password", validateParams(UpdateUserPasswordDTO), controller.updatePassword);
   router.get("/users/:id", validateParams(UserByIdDTO), controller.getById);
+  router.post("/users/:id/remove", validateParams(RemoveUserDTO), controller.remove);
 
   return router;
 }
