@@ -16,4 +16,5 @@ export interface IPedagogueRepository {
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;
   //findByUUID(externalId: string): Promise<PedagogueResult | null>;
   //disableByUUID(externalId: string): Promise<boolean>;
+  findByEmail(email: string): Promise<Pedagogue | null>;
 }

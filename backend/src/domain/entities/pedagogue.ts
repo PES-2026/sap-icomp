@@ -15,6 +15,8 @@ export type PedagogueProps = {
   registrationNumber: string;
   userStatus: string;
   password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 export class Pedagogue {
   constructor(
@@ -25,6 +27,8 @@ export class Pedagogue {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date,
   ) {}
 
   static create(props: PedagogueProps): Result<Pedagogue> {
@@ -35,6 +39,9 @@ export class Pedagogue {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = PasswordVO.create(props.password, props.password);
+
+    const createdAt = props.createdAt || new Date();
+    const updatedAt = props.updatedAt || new Date();
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
@@ -52,6 +59,8 @@ export class Pedagogue {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password.getValue(),
+        createdAt,
+        updatedAt,
       ),
     );
   }
@@ -64,6 +73,8 @@ export class Pedagogue {
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
       PasswordVO.fromTrusted(props.password),
+      props.createdAt,
+      props.updatedAt,
     );
   }
 }

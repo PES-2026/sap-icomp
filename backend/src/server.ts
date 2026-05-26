@@ -32,7 +32,9 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { ListUsers } from "@application/useCases/user/listUsers";
+import { UserResolver } from "@application/useCases/user/userResolver";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -43,9 +45,11 @@ import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositor
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
+import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
+import { AuthController } from "@presentation/controllers/authController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
@@ -54,6 +58,7 @@ import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { accountRequestRoutes } from "@presentation/routes/accountRequestRoutes";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
+import { authRoutes } from "@presentation/routes/authRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
@@ -161,6 +166,16 @@ app.use(accountRequestRoutes(accountRequestController));
 const userController = new UserController(new ListUsers(pedagogueRepository, professorRepository));
 
 app.use(userRoutes(userController));
+
+const tokenService = new JwtTokenService();
+
+const userResolver = new UserResolver(professorRepository, pedagogueRepository);
+
+const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
+
+const authController = new AuthController(authenticateUserUseCase);
+
+app.use("/auth", authRoutes(authController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

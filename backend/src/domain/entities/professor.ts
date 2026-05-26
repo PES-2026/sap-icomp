@@ -15,6 +15,8 @@ export type ProfessorProps = {
   registrationNumber: string;
   userStatus: string;
   password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 export class Professor {
   constructor(
@@ -25,6 +27,8 @@ export class Professor {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public readonly password: PasswordVO,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date,
   ) {}
 
   static create(props: ProfessorProps): Result<Professor> {
@@ -35,6 +39,9 @@ export class Professor {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = PasswordVO.create(props.password, props.password);
+
+    const createdAt = props.createdAt || new Date();
+    const updatedAt = props.updatedAt || new Date();
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
@@ -52,7 +59,22 @@ export class Professor {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password.getValue(),
+        createdAt,
+        updatedAt,
       ),
+    );
+  }
+  static rehydrate(props: ProfessorProps): Professor {
+    return new Professor(
+      ExternalIdVO.fromTrusted(props.id!),
+      NameVO.fromTrusted(props.name),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      RegistrationNumberVO.fromTrusted(props.registrationNumber),
+      UserStatusVO.fromTrusted(props.userStatus),
+      PasswordVO.fromTrusted(props.password),
+      props.createdAt,
+      props.updatedAt,
     );
   }
 }

@@ -1,4 +1,8 @@
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+import {
+  Prisma,
+  PrismaClient,
+  UserStatus as PrismaUserStatus,
+} from "@prisma/src/infrastructure/database/generated/client";
 
 import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
@@ -21,7 +25,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as PrismaUserStatus;
     }
 
     const [totalItems, professors] = await Promise.all([
@@ -89,5 +93,31 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     });
 
     return !!account;
+  }
+  async findByEmail(email: string): Promise<Professor | null> {
+    const data = await this.prisma.professor.findUnique({
+      where: { email },
+    });
+
+    if (!data) {
+      return null;
+    }
+
+    try {
+      return Professor.rehydrate({
+        id: data.externalId,
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber || "",
+        registrationNumber: data.registration,
+        userStatus: data.userStatus,
+        password: data.password,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      });
+    } catch (error) {
+      console.error("Erro ao reidratar Professor:", error);
+      return null;
+    }
   }
 }
