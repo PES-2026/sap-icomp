@@ -1,5 +1,6 @@
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
 import { EmailAlreadyInUseError } from "@application/errors/user/emailAlreadyInUse";
+import { RegistrationNumberAlreadyInUseError } from "@application/errors/user/registrationNumberAlreadyInUse";
 import { UserNotFoundError } from "@application/errors/user/userNotFound";
 import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
@@ -78,9 +79,25 @@ export class UpdateUser {
     }
 
     if (dto.registrationNumber) {
-      const registrationNumber = RegistrationNumberVO.create(dto.registrationNumber);
-      if (registrationNumber.isFailure) return Result.fail(registrationNumber.error!);
-      updateProps.registrationNumber = registrationNumber.getValue();
+      const registrationNumberOrError = RegistrationNumberVO.create(dto.registrationNumber);
+      if (registrationNumberOrError.isFailure) return Result.fail(registrationNumberOrError.error!);
+      const newRegistrationNumber = registrationNumberOrError.getValue();
+
+      // Check if registration number changed
+      if (newRegistrationNumber.value !== user.registrationNumber.value) {
+        // Check duplication in ALL user repositories
+        const [pedagogueExists, professorExists, studentExists] = await Promise.all([
+          this.pedagogueRepository.existsByRegistrationNumber(newRegistrationNumber.value),
+          this.professorRepository.existsByRegistrationNumber(newRegistrationNumber.value),
+          this.studentRepository.existsByEnrollmentId(newRegistrationNumber.value),
+        ]);
+
+        if (pedagogueExists || professorExists || studentExists) {
+          return Result.fail(new RegistrationNumberAlreadyInUseError(newRegistrationNumber.value));
+        }
+      }
+
+      updateProps.registrationNumber = newRegistrationNumber;
     }
 
     user.update(updateProps);

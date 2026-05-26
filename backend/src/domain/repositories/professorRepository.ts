@@ -16,6 +16,5 @@ export interface IProfessorRepository {
   //existsByUUID(externalId: string): Promise<boolean>;
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;
-  //findByUUID(externalId: string): Promise<ProfessorResult | null>;
   //disableByUUID(externalId: string): Promise<boolean>;
 }
