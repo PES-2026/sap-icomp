@@ -35,6 +35,7 @@ import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { ListUsers } from "@application/useCases/user/listUsers";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
+import { GetUserById } from "@application/useCases/user/getUserById";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -164,6 +165,7 @@ const userController = new UserController(
   new ListUsers(pedagogueRepository, professorRepository),
   new UpdateUser(pedagogueRepository, professorRepository, studentRepository),
   new UpdateUserPassword(pedagogueRepository, professorRepository, hashService),
+  new GetUserById(pedagogueRepository, professorRepository),
 );
 
 app.use(userRoutes(userController));

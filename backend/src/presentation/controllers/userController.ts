@@ -3,9 +3,11 @@ import { Request, Response } from "express";
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
 import { UpdateUserPasswordDTO } from "@application/dtos/user/updateUserPasswordDto";
+import { UserByIdDTO } from "@application/dtos/user/userByIdDto";
 import { ListUsers } from "@application/useCases/user/listUsers";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
+import { GetUserById } from "@application/useCases/user/getUserById";
 
 import { BaseController } from "./baseController";
 
@@ -14,6 +16,7 @@ export class UserController extends BaseController {
     private readonly listUsersUseCase: ListUsers,
     private readonly updateUserUseCase: UpdateUser,
     private readonly updateUserPasswordUseCase: UpdateUserPassword,
+    private readonly getUserByIdUseCase: GetUserById,
   ) {
     super();
   }
@@ -48,6 +51,17 @@ export class UserController extends BaseController {
       this.handleResult(res, result, 200);
     } catch (error) {
       this.handleError(error, res, `${UserController.name}:updatePassword`);
+    }
+  };
+
+  getById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = req.dto as UserByIdDTO;
+      const result = await this.getUserByIdUseCase.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${UserController.name}:getById`);
     }
   };
 }
