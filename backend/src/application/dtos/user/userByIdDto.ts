@@ -1,5 +1,3 @@
-import { validateStringField } from "@domain/utils/validationUtils";
-
 export class UserByIdDTO {
   constructor(
     public readonly id: string,
