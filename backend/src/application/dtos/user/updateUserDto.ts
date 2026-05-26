@@ -10,20 +10,16 @@ export class UpdateUserDTO {
     public readonly registrationNumber?: string,
   ) {}
 
-  static create(idOrbody: unknown, body: unknown): UpdateUserDTO {
-    let id: string;
-    let raw: Record<string, unknown>;
+  static create(id: unknown, body: unknown): UpdateUserDTO {
+    if (typeof id === "object") {
+      throw new Error("id must be sent via parameter and sensitive information via body");
+    }
 
-    if (typeof idOrbody === "string" && body && typeof body === "object") {
-      id = idOrbody;
-      raw = body as Record<string, unknown>;
-    } else if (typeof idOrbody === "object" && idOrbody !== null) {
-      raw = idOrbody as Record<string, unknown>;
-      id = validateStringField(raw.id, "id");
-    } else {
+    if (typeof id !== "string" || !body || typeof body !== "object") {
       throw new Error(`Invalid input to ${UpdateUserDTO.name}`);
     }
 
+    const raw = body as Record<string, unknown>;
     const role = validateStringField(raw.role, "role");
     const name = validateOptionalStringField(raw.name, "name");
     const email = validateOptionalStringField(raw.email, "email");
