@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
+import { UpdateUserPasswordDTO } from "@application/dtos/user/updateUserPasswordDto";
 import { UserController } from "@presentation/controllers/userController";
 import { validateParams } from "@presentation/middlewares/validateParams";
 
@@ -10,6 +11,7 @@ export function userRoutes(controller: UserController): Router {
 
   router.get("/users", validateParams(ListUsersDTO), controller.list);
   router.put("/users/:id", validateParams(UpdateUserDTO), controller.update);
+  router.put("/users/:id/password", validateParams(UpdateUserPasswordDTO), controller.updatePassword);
 
   return router;
 }

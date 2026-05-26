@@ -34,7 +34,7 @@ export class Pedagogue {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public readonly password: PasswordVO,
+    public password: PasswordVO,
   ) {}
 
   update(props: Partial<PedagogueVOProps>): void {
@@ -43,6 +43,10 @@ export class Pedagogue {
     if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
     if (props.registrationNumber !== undefined) this.registrationNumber = props.registrationNumber;
     if (props.userStatus !== undefined) this.userStatus = props.userStatus;
+  }
+
+  changePassword(newPassword: PasswordVO): void {
+    this.password = newPassword;
   }
 
   static create(props: PedagogueProps): Result<Pedagogue> {

@@ -118,6 +118,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
         phoneNumber: professor.phoneNumber.value,
         registration: professor.registrationNumber.value,
         userStatus: professor.userStatus.value,
+        password: professor.password.value,
       },
     });
   }

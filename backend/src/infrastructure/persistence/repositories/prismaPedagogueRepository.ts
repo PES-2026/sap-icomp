@@ -118,6 +118,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
         phoneNumber: pedagogue.phoneNumber.value,
         registration: pedagogue.registrationNumber.value,
         userStatus: pedagogue.userStatus.value,
+        password: pedagogue.password.value,
       },
     });
   }
