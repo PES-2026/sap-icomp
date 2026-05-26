@@ -10,15 +10,15 @@ export class UpdateUserDTO {
     public readonly registrationNumber?: string,
   ) {}
 
-  static create(idOrData: unknown, data?: unknown): UpdateUserDTO {
+  static create(idOrbody: unknown, body: unknown): UpdateUserDTO {
     let id: string;
     let raw: Record<string, unknown>;
 
-    if (typeof idOrData === "string" && data && typeof data === "object") {
-      id = idOrData;
-      raw = data as Record<string, unknown>;
-    } else if (typeof idOrData === "object" && idOrData !== null) {
-      raw = idOrData as Record<string, unknown>;
+    if (typeof idOrbody === "string" && body && typeof body === "object") {
+      id = idOrbody;
+      raw = body as Record<string, unknown>;
+    } else if (typeof idOrbody === "object" && idOrbody !== null) {
+      raw = idOrbody as Record<string, unknown>;
       id = validateStringField(raw.id, "id");
     } else {
       throw new Error(`Invalid input to ${UpdateUserDTO.name}`);
