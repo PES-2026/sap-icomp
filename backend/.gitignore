@@ -12,6 +12,8 @@
 
 generated/
 
+seed.ts
+
 # testing
 /coverage
 
