@@ -4,7 +4,6 @@ import { RoleEnum } from "@domain/enum/role";
 import { DomainError } from "@domain/errors/domainError";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { AuthResult } from "@domain/repositories/results/authResult";
 import { UserResolverResult } from "@domain/repositories/results/userResolverResult";
 import { Result } from "@domain/shared/result";
 

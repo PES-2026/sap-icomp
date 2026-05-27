@@ -1,14 +1,12 @@
 import {
   Prisma,
   PrismaClient,
-  Pedagogue as PrismaPedagogue,
   UserStatus as PrismaUserStatus,
 } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Pedagogue } from "@domain/entities/pedagogue";
 import { UserFilters } from "@domain/repositories/filters/userFilters";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
-import { PedagogueResult } from "@domain/repositories/results/pedagogueResult";
 import { UserListItem } from "@domain/repositories/results/userResult";
 import { PaginatedResult } from "@domain/shared/pagination";
 
