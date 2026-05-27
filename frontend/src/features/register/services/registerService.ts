@@ -5,9 +5,16 @@ import {
   RegisterPayload,
   RegisterResponse,
 } from "../types/register";
+import { createMockAccount } from "./registerMock";
+
+const shouldUseMocks = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
 
 export const registerService = {
   async createAccount(data: RegisterForm): Promise<RegisterResponse> {
+    if (shouldUseMocks) {
+      return createMockAccount(data);
+    }
+
     const payload: RegisterPayload = {
       name: data.name,
       registrationNumber: data.registrationNumber,
