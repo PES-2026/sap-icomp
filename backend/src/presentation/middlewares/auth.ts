@@ -1,7 +1,6 @@
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { NextFunction, Request, Response } from "express";
 
-// Ajuste na tipagem do Express (Isso pode ir para presentation/@types/express.d.ts)
 declare global {
   namespace Express {
     interface Request {
