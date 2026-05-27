@@ -33,6 +33,10 @@ export class AuthController extends BaseController {
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
+      res.cookie("userRole", authData.role, {
+        ...cookieOptions,
+        httpOnly: false,
+      });
 
       const { token: _, ...userData } = authData;
 
@@ -45,6 +49,7 @@ export class AuthController extends BaseController {
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
       res.clearCookie("accessToken");
+      res.clearCookie("userRole");
       res.status(200).json({ message: "Logout successful." });
     } catch (error) {
       this.handleError(error, res, `${AuthController.name}:logout`);
