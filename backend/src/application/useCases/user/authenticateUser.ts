@@ -19,7 +19,7 @@ export class AuthenticateUser {
     const resolvedData = await this.userResolver.execute(input.email);
 
     if (resolvedData.isFailure) {
-      return Result.fail<AuthResult>(resolvedData.error as ApplicationError);
+      return Result.fail<AuthResult>(resolvedData.error!);
     }
 
     const { userData, role } = resolvedData.getValue();
