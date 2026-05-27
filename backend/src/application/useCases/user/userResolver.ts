@@ -1,11 +1,12 @@
+import { ApplicationError } from "@application/errors/applicationError";
+import { UserNotFoundError } from "@application/errors/user/userNotFoundError";
 import { RoleEnum } from "@domain/enum/role";
+import { DomainError } from "@domain/errors/domainError";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-
-type ResolvedUser = {
-  userEntity: any;
-  role: RoleEnum;
-};
+import { AuthResult } from "@domain/repositories/results/authResult";
+import { UserResolverResult } from "@domain/repositories/results/userResolverResult";
+import { Result } from "@domain/shared/result";
 
 export class UserResolver {
   constructor(
@@ -13,17 +14,17 @@ export class UserResolver {
     private pedagogueRepository: IPedagogueRepository,
   ) {}
 
-  async execute(email: string): Promise<ResolvedUser | null> {
+  async execute(email: string): Promise<Result<UserResolverResult, ApplicationError | DomainError>> {
     const professor = await this.professorRepository.findByEmail(email);
     if (professor) {
-      return { userEntity: professor, role: RoleEnum.PROFESSOR };
+      return Result.ok<UserResolverResult>({ userData: professor, role: RoleEnum.PROFESSOR });
     }
 
     const pedagogue = await this.pedagogueRepository.findByEmail(email);
     if (pedagogue) {
-      return { userEntity: pedagogue, role: RoleEnum.PEDAGOGUE };
+      return Result.ok<UserResolverResult>({ userData: pedagogue, role: RoleEnum.PEDAGOGUE });
     }
 
-    return null;
+    return Result.fail<UserResolverResult>(new UserNotFoundError());
   }
 }

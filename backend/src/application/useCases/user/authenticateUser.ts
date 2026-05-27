@@ -18,32 +18,32 @@ export class AuthenticateUser {
   async execute(input: AuthenticateUserRequestDTO): Promise<Result<AuthResult, ApplicationError>> {
     const resolvedData = await this.userResolver.execute(input.email);
 
-    if (!resolvedData) {
-      return Result.fail<AuthResult>(new InvalidCredentialsError());
+    if (resolvedData.isFailure) {
+      return Result.fail<AuthResult>(resolvedData.error as ApplicationError);
     }
 
-    const { userEntity, role } = resolvedData;
+    const { userData, role } = resolvedData.getValue();
 
-    const isPasswordValid = await this.hashService.compare(input.password, userEntity.password.value);
+    const isPasswordValid = await this.hashService.compare(input.password, userData.password);
 
     if (!isPasswordValid) {
       return Result.fail<AuthResult>(new InvalidCredentialsError());
     }
 
-    const token = this.tokenService.generateToken({ id: userEntity.id.value, role: role }, "1d");
+    const token = this.tokenService.generateToken({ id: userData.id, role: role });
 
-    const authResult = new AuthResult(
-      userEntity.id.value,
-      userEntity.name.value,
-      userEntity.email.value,
-      userEntity.phoneNumber?.value || "",
-      userEntity.registrationNumber.value,
-      role,
-      userEntity.userStatus.value,
-      userEntity.createdAt,
-      userEntity.updatedAt,
+    const authResult: AuthResult = {
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      phoneNumber: userData.phoneNumber || "",
+      registrationNumber: userData.registrationNumber,
+      role: role,
+      userStatus: userData.userStatus,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
       token,
-    );
+    };
 
     return Result.ok<AuthResult>(authResult);
   }

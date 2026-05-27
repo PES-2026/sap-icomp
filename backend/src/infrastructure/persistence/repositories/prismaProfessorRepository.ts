@@ -10,6 +10,8 @@ import { IProfessorRepository } from "../../../domain/repositories/professorRepo
 import { UserListItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
+
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -94,30 +96,23 @@ export class PrismaProfessorRepository implements IProfessorRepository {
 
     return !!account;
   }
-  async findByEmail(email: string): Promise<Professor | null> {
+  async findByEmail(email: string): Promise<UserAuthResult | null> {
     const data = await this.prisma.professor.findUnique({
-      where: { email },
+      where: { email, removed: false },
     });
 
-    if (!data) {
-      return null;
-    }
+    if (!data) return null;
 
-    try {
-      return Professor.rehydrate({
-        id: data.externalId,
-        name: data.name,
-        email: data.email,
-        phoneNumber: data.phoneNumber || "",
-        registrationNumber: data.registration,
-        userStatus: data.userStatus,
-        password: data.password,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-      });
-    } catch (error) {
-      console.error("Erro ao reidratar Professor:", error);
-      return null;
-    }
+    return {
+      id: data.externalId,
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber || "",
+      registrationNumber: data.registration,
+      userStatus: data.userStatus,
+      password: data.password,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 }

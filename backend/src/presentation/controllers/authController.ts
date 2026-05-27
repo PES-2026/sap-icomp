@@ -1,5 +1,7 @@
 import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateUserDto";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
+import { parseExpirationToMs } from "@domain/utils/timeUtils";
+import { env } from "@infrastructure/config/env";
 import { Request, Response } from "express";
 import { BaseController } from "./baseController";
 
@@ -15,21 +17,24 @@ export class AuthController extends BaseController {
       const result = await this.authenticateUserUseCase.execute(dto);
 
       if (result.isFailure) {
-        return this.handleError(result.error, res, `${AuthController.name}:login`);
+        return this.handleResult(res, result);
       }
 
       const authData = result.getValue();
 
+      const expiration = env.JWT_TOKEN_EXPIRES;
+      const maxAge = parseExpirationToMs(expiration);
+
       const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "strict" as const,
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: maxAge,
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
 
-      const { token, ...userData } = authData;
+      const { token: _, ...userData } = authData;
 
       res.status(200).json({ user: userData });
     } catch (error) {
@@ -40,7 +45,7 @@ export class AuthController extends BaseController {
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
       res.clearCookie("accessToken");
-      res.status(200).json({ message: "Logout realizado com sucesso." });
+      res.status(200).json({ message: "Logout successful." });
     } catch (error) {
       this.handleError(error, res, `${AuthController.name}:logout`);
     }

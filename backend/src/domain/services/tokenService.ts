@@ -1,4 +1,4 @@
 export interface ITokenService {
-  generateToken(payload: string | object, expiresIn?: string | number): string;
+  generateToken(payload: string | object): string;
   verifyToken(token: string): any | null;
 }

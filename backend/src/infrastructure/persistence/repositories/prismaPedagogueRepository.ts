@@ -1,14 +1,18 @@
 import {
   Prisma,
   PrismaClient,
+  Pedagogue as PrismaPedagogue,
   UserStatus as PrismaUserStatus,
 } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Pedagogue } from "@domain/entities/pedagogue";
 import { UserFilters } from "@domain/repositories/filters/userFilters";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
+import { PedagogueResult } from "@domain/repositories/results/pedagogueResult";
 import { UserListItem } from "@domain/repositories/results/userResult";
 import { PaginatedResult } from "@domain/shared/pagination";
+
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 
 export class PrismaPedagogueRepository implements IPedagogueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -70,12 +74,14 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       userStatus: pedagogue.userStatus.value,
       password: pedagogue.password.value,
     };
+
     await this.prisma.pedagogue.create({
       data: {
         ...baseData,
       },
     });
   }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.pedagogue.findFirst({
       where: {
@@ -85,6 +91,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
 
     return !!account;
   }
+
   async existsByRegistrationNumber(registrationNumber: string): Promise<boolean> {
     const account = await this.prisma.pedagogue.findFirst({
       where: {
@@ -94,30 +101,24 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
 
     return !!account;
   }
-  async findByEmail(email: string): Promise<Pedagogue | null> {
+
+  async findByEmail(email: string): Promise<UserAuthResult | null> {
     const data = await this.prisma.pedagogue.findUnique({
-      where: { email },
+      where: { email, removed: false },
     });
 
-    if (!data) {
-      return null;
-    }
+    if (!data) return null;
 
-    try {
-      return Pedagogue.rehydrate({
-        id: data.externalId,
-        name: data.name,
-        email: data.email,
-        phoneNumber: data.phoneNumber || "",
-        registrationNumber: data.registration,
-        userStatus: data.userStatus,
-        password: data.password,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-      });
-    } catch (error) {
-      console.error("Erro ao reidratar Pedagogue:", error);
-      return null;
-    }
+    return {
+      id: data.externalId,
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber || "",
+      registrationNumber: data.registration,
+      userStatus: data.userStatus,
+      password: data.password,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 }

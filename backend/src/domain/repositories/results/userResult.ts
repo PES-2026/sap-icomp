@@ -2,7 +2,7 @@ export interface UserListItem {
   id: string;
   name: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   registrationNumber: string;
   role: string;
   userStatus: string;

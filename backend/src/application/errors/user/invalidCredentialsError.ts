@@ -3,6 +3,6 @@ import { ApplicationError } from "../applicationError";
 
 export class InvalidCredentialsError extends ApplicationError {
   constructor() {
-    super("Email ou senha inválidos.", ErrorCategory.BUSINESS_RULE);
+    super("Invalid email address or password.", ErrorCategory.BUSINESS_RULE);
   }
 }

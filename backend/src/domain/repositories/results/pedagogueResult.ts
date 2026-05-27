@@ -1,12 +1,11 @@
-export interface AuthResult {
+export interface PedagogueResult {
   id: string;
   name: string;
   email: string;
-  phoneNumber: string;
+  password: string;
+  phoneNumber: string | null;
   registrationNumber: string;
-  role: string;
   userStatus: string;
   createdAt: Date;
   updatedAt: Date;
-  token: string;
 }

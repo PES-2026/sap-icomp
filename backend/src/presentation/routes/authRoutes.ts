@@ -4,8 +4,8 @@ import { Router } from "express";
 export const authRoutes = (authController: AuthController) => {
   const routes = Router();
 
-  routes.post("/login", authController.login);
-  routes.post("/logout", authController.logout);
+  routes.post("/auth/login", authController.login);
+  routes.post("/auth/logout", authController.logout);
 
   return routes;
 };

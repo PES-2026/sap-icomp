@@ -1,14 +1,18 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import { ITokenService } from "../../domain/services/tokenService";
+import { env } from "../config/env";
 
 export class JwtTokenService implements ITokenService {
-  private secret = process.env.JWT_SECRET || "fallback_secret_dev_only";
+  private secret = env.JWT_SECRET;
+  private expiresDefault = env.JWT_TOKEN_EXPIRES;
 
-  generateToken(payload: string | object, expiresIn: string | number = "1d"): string {
+  generateToken(payload: string | object): string {
     const options: SignOptions = {};
 
-    if (expiresIn) {
-      options.expiresIn = expiresIn as Exclude<SignOptions["expiresIn"], undefined>;
+    const expiration = this.expiresDefault;
+
+    if (expiration) {
+      options.expiresIn = expiration as Exclude<SignOptions["expiresIn"], undefined>;
     }
 
     return jwt.sign(payload, this.secret, options);

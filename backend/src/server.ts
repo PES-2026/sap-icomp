@@ -1,5 +1,4 @@
-import "dotenv/config";
-
+import { env } from "@infrastructure/config/env";
 import cors from "cors";
 import express from "express";
 
@@ -68,9 +67,9 @@ const app = express();
 app.use(express.json());
 
 const allowedOrigins = [
-  `https://${process.env.FRONTEND_HOST}`,
-  `http://${process.env.FRONTEND_HOST}`,
-  `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+  `https://${env.FRONTEND_HOST}`,
+  `http://${env.FRONTEND_HOST}`,
+  `http://${env.FRONTEND_HOST}:${env.FRONTEND_PORT}`,
 ];
 
 app.use(
@@ -175,12 +174,12 @@ const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, 
 
 const authController = new AuthController(authenticateUserUseCase);
 
-app.use("/auth", authRoutes(authController));
+app.use(authRoutes(authController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
 
-const PORT = process.env.BACKEND_PORT;
+const PORT = env.BACKEND_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
