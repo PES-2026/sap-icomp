@@ -16,9 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {/* <MSWProvider> */}
         <AuthGuard>{children}</AuthGuard>
-        {/* </MSWProvider> */}
         <Toaster
           position="top-right"
           reverseOrder={false}

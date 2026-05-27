@@ -45,27 +45,26 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
 
     let mounted = true;
+    setChecking(true);
 
     authService
       .me()
       .then((fetchedUser) => {
         if (!mounted) return;
         setUser(fetchedUser.user);
+        setChecking(false);
       })
       .catch(() => {
         if (!mounted) return;
         toast.error("Acesso negado, faça o login.");
         router.replace(PATHS.login);
-      })
-      .finally(() => {
-        if (!mounted) return;
         setChecking(false);
       });
 
     return () => {
       mounted = false;
     };
-  }, [pathname]);
+  }, [pathname, user, router, setUser]);
 
   if (checking) {
     return (
