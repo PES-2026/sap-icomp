@@ -11,6 +11,7 @@ export const useUsers = (
 ) => {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const { name, userStatus } = filters;
 
@@ -25,6 +26,7 @@ export const useUsers = (
 
       setUsers(data.items ?? []);
       setTotalItems(data.totalItems ?? 0);
+      setTotalPages(data.totalPages ?? 1);
     } catch (error) {
       console.error("Error loading users list:", error);
       toast.error("Não foi possível carregar a lista de usuários.");
@@ -37,5 +39,5 @@ export const useUsers = (
     fetchUsers();
   }, [fetchUsers]);
 
-  return { users, totalItems, isLoading, fetchUsers };
+  return { users, totalItems, totalPages, isLoading, fetchUsers };
 };

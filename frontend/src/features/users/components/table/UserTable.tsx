@@ -57,7 +57,7 @@ export default function UserTable() {
   const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("");
 
-  const { users, isLoading } = useUsers(page, limit, {
+  const { users, totalPages, isLoading } = useUsers(page, limit, {
     name: debouncedNameFilter,
     userStatus: statusFilter,
   });
@@ -143,7 +143,7 @@ export default function UserTable() {
     },
     {
       label: "Status",
-      width: "w-[140px]",
+      width: "w-[190px]",
       renderFilter: () => (
         <SelectInput
           value={statusFilter}
@@ -167,6 +167,7 @@ export default function UserTable() {
       limit={limit}
       setLimit={setLimit}
       totalItems={filteredUsers.length}
+      totalPages={totalPages}
       emptyMessage="Nenhum usuário encontrado."
     />
   );
