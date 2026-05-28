@@ -90,6 +90,8 @@ jobs:
           FRONTEND_HOST="${{ vars.FRONTEND_HOST }}"
           DATABASE_URL="postgresql://${DB_USER_ENC}:${DB_PASSWORD_ENC}@db:5432/${{ secrets.DB_NAME }}?schema=public"
           NEXT_PUBLIC_API_URL="http://${{ vars.BACKEND_HOST }}"
+          JWT_SECRET="${{ secrets.JWT_SECRET }}"
+          JWT_TOKEN_EXPIRES="${{ vars.JWT_TOKEN_EXPIRES }}"
           EOF
           echo ".env file generated successfully"
 
