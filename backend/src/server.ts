@@ -32,6 +32,7 @@ import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
+import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { ListUsers } from "@application/useCases/user/listUsers";
 import { UserResolver } from "@application/useCases/user/userResolver";
 import { prisma } from "@infrastructure/persistence/prisma";
@@ -62,8 +63,10 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import cookieParser from "cookie-parser";
 
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 
 const allowedOrigins = [
@@ -167,12 +170,10 @@ const userController = new UserController(new ListUsers(pedagogueRepository, pro
 app.use(userRoutes(userController));
 
 const tokenService = new JwtTokenService();
-
 const userResolver = new UserResolver(professorRepository, pedagogueRepository);
-
 const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
-
-const authController = new AuthController(authenticateUserUseCase);
+const getAuthenticatedUserUseCase = new GetAuthenticatedUser(userResolver);
+const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase);
 
 app.use(authRoutes(authController));
 

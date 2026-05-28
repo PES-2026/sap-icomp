@@ -1,12 +1,16 @@
 import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateUserDto";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
+import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { parseExpirationToMs } from "@domain/utils/timeUtils";
 import { env } from "@infrastructure/config/env";
 import { Request, Response } from "express";
 import { BaseController } from "./baseController";
 
 export class AuthController extends BaseController {
-  constructor(private readonly authenticateUserUseCase: AuthenticateUser) {
+  constructor(
+    private readonly authenticateUserUseCase: AuthenticateUser,
+    private readonly getAuthenticatedUserUseCase: GetAuthenticatedUser,
+  ) {
     super();
   }
 
@@ -39,6 +43,23 @@ export class AuthController extends BaseController {
       res.status(200).json({ user: userData });
     } catch (error) {
       this.handleError(error, res, `${AuthController.name}:login`);
+    }
+  };
+
+  me = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const email = req.userEmail;
+
+      if (!email) {
+        res.status(401).json({ error: "Email not found in token" });
+        return;
+      }
+
+      const result = await this.getAuthenticatedUserUseCase.execute(email);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${AuthController.name}:me`);
     }
   };
 

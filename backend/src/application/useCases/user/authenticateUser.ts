@@ -30,7 +30,8 @@ export class AuthenticateUser {
       return Result.fail<AuthResult>(new InvalidCredentialsError());
     }
 
-    const token = this.tokenService.generateToken({ id: userData.id, role: role });
+    const { password: _, ...userPayload } = userData;
+    const token = this.tokenService.generateToken({ ...userPayload, role: role });
 
     const authResult: AuthResult = {
       id: userData.id,
