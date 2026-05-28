@@ -1,4 +1,4 @@
-import AuthGuard from "@/features/login/components/AuthGuard";
+import { AuthProvider } from "@/providers/AuthProvider";
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <AuthGuard>{children}</AuthGuard>
+        <AuthProvider>{children}</AuthProvider>
         <Toaster
           position="top-right"
           reverseOrder={false}

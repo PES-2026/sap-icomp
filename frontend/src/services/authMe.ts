@@ -1,10 +1,10 @@
+import { LoginResponse } from "@/features/login/types/login";
 import api from "@/services/api";
-import { LoginResponse } from "../types/login";
 
-export const authService = {
+export const authMeService = {
   async me(): Promise<LoginResponse> {
     const response = await api.get<LoginResponse>("/auth/me", {
-      fallbackMsg: "Não foi possível verificar usuário.",
+      fallbackMsg: "Não foi possível realizar a autenticação.",
     });
     return response.data;
   },
