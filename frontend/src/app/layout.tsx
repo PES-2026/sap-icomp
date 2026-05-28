@@ -1,6 +1,7 @@
+import { AuthProvider } from "@/providers/AuthProvider";
 import type { Metadata } from "next";
-import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SAP IComp",
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <Toaster
           position="top-right"
           reverseOrder={false}
