@@ -34,5 +34,9 @@ export const PATHS = {
     `/${RoleMap.Pedagogue}/students/${studentId}/attendance/${attendanceId}`,
   edit_attendance: (studentId: string, attendanceId: string) =>
     `/${RoleMap.Pedagogue}/students/${studentId}/attendance/${attendanceId}/edit`,
+
+  // Users
+  users_list: `/${RoleMap.Pedagogue}/users`,
+
   visualize_settings: `/${RoleMap.Pedagogue}/settings`,
 };

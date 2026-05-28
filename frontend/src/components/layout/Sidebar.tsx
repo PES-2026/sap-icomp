@@ -8,23 +8,20 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LogoSAPIComp from "../../../public/SAPICompLogoHorizontal.png";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   const navItems = [
     { label: "Início", icon: Home, id: "Início", href: PATHS.pedagogue },
@@ -39,6 +36,12 @@ export default function Sidebar() {
       icon: CalendarFold,
       id: "Envio",
       href: PATHS.attendances_list,
+    },
+    {
+      label: "Usuários",
+      icon: UserCog,
+      id: "Usuários",
+      href: PATHS.users_list,
     },
     {
       label: "Cadastros Gerais",
@@ -123,6 +126,7 @@ export default function Sidebar() {
               <Link
                 key={item.id}
                 href={item.href}
+                onClick={() => setMobileOpen(false)}
                 title={collapsed ? item.label : undefined}
                 className={`
                   flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]

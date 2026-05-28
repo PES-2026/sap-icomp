@@ -1,5 +1,3 @@
-import { Role, UserStatus } from "@/features/login/types/login";
-
 export interface RegisterForm {
   name: string;
   registrationNumber: string;
@@ -10,18 +8,22 @@ export interface RegisterForm {
   confirmPassword: string;
 }
 
-export interface RegisteredUser {
+export interface RegisterPayload {
+  name: string;
+  registrationNumber: string;
+  phoneNumber: string;
+  email: string;
+  emailConfirmation: string;
+  password: string;
+  passwordConfirmation: string;
+}
+
+export interface RegisterResponse {
   id: string;
   name: string;
   email: string;
   phoneNumber: string;
   registrationNumber: string;
-  status: UserStatus;
-  role: Role;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface RegisterResponse {
-  user: RegisteredUser;
+  role?: string;
+  userStatus: string;
 }

@@ -21,6 +21,7 @@ interface DataTableProps<T> {
   limit: number;
   setLimit: (limit: number) => void;
   totalItems: number;
+  totalPages?: number;
 }
 
 export function DataTable<T>({
@@ -36,6 +37,7 @@ export function DataTable<T>({
   limit,
   setLimit,
   totalItems,
+  totalPages,
 }: DataTableProps<T>) {
   if (isLoading && loadingComponent) {
     return <>{loadingComponent}</>;
@@ -118,6 +120,7 @@ export function DataTable<T>({
           limit={limit}
           setLimit={setLimit}
           lengthData={totalItems}
+          totalPages={totalPages}
         />
       </div>
     </main>
