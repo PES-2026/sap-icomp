@@ -101,6 +101,20 @@ export function validateExternalIdField(value: unknown, fieldName: string): stri
   return trimmed;
 }
 
+export function validateComparativeField(value: unknown, validatedValue: unknown, fieldName: string): boolean {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${fieldName} is required and must be a string. Please verify it!`);
+  }
+  if (typeof validatedValue !== "string" || !validatedValue.trim()) {
+    throw new Error(`${fieldName} is required and must be a string. Please verify it!`);
+  }
+  if (value !== validatedValue) {
+    throw new Error(`${fieldName} does not match the expected value. Please verify it!`);
+  }
+
+  return true;
+}
+
 function isUUID(value: string): boolean {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);

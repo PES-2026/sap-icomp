@@ -120,7 +120,8 @@ export default tseslint.config(
           patterns: [
             {
               group: ["@infrastructure/**"],
-              message: "Presentation layer subfolders must not depend on Infrastructure layer. Use Application or Domain layers instead.",
+              message:
+                "Presentation layer subfolders must not depend on Infrastructure layer. Use Application or Domain layers instead.",
             },
           ],
         },
