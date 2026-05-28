@@ -16,6 +16,7 @@ export type ProfessorProps = {
   userStatus: string;
   password: string;
 };
+
 export class Professor {
   constructor(
     public readonly id: ExternalIdVO,
@@ -53,6 +54,18 @@ export class Professor {
         userStatus.getValue(),
         password.getValue(),
       ),
+    );
+  }
+
+  static rehydrate(props: ProfessorProps): Professor {
+    return new Professor(
+      ExternalIdVO.fromTrusted(props.id!),
+      NameVO.fromTrusted(props.name),
+      EmailVO.fromTrusted(props.email),
+      PhoneNumberVO.fromTrusted(props.phoneNumber),
+      RegistrationNumberVO.fromTrusted(props.registrationNumber),
+      UserStatusVO.fromTrusted(props.userStatus),
+      PasswordVO.fromTrusted(props.password),
     );
   }
 }

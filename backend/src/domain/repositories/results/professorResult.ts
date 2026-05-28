@@ -1,10 +1,10 @@
-export interface UserListItem {
+export interface ProfessorResult {
   id: string;
   name: string;
   email: string;
+  password: string;
   phoneNumber: string | null;
   registrationNumber: string;
-  role: string;
   userStatus: string;
   createdAt: Date;
   updatedAt: Date;

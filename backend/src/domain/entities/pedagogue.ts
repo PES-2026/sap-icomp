@@ -16,6 +16,7 @@ export type PedagogueProps = {
   userStatus: string;
   password: string;
 };
+
 export class Pedagogue {
   constructor(
     public readonly id: ExternalIdVO,
@@ -55,6 +56,7 @@ export class Pedagogue {
       ),
     );
   }
+
   static rehydrate(props: PedagogueProps): Pedagogue {
     return new Pedagogue(
       ExternalIdVO.fromTrusted(props.id!),

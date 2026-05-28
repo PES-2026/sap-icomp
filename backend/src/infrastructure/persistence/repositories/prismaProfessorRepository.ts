@@ -1,10 +1,16 @@
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+import {
+  Prisma,
+  PrismaClient,
+  UserStatus as PrismaUserStatus,
+} from "@prisma/src/infrastructure/database/generated/client";
 
 import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
 import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
 import { UserListItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
+
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -21,7 +27,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as PrismaUserStatus;
     }
 
     const [totalItems, professors] = await Promise.all([
@@ -89,5 +95,24 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     });
 
     return !!account;
+  }
+  async findByEmail(email: string): Promise<UserAuthResult | null> {
+    const data = await this.prisma.professor.findUnique({
+      where: { email, removed: false },
+    });
+
+    if (!data) return null;
+
+    return {
+      id: data.externalId,
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber || "",
+      registrationNumber: data.registration,
+      userStatus: data.userStatus,
+      password: data.password,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 }

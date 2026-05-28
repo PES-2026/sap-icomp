@@ -1,5 +1,4 @@
-import "dotenv/config";
-
+import { env } from "@infrastructure/config/env";
 import cors from "cors";
 import express from "express";
 
@@ -32,7 +31,10 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
+import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { ListUsers } from "@application/useCases/user/listUsers";
+import { UserResolver } from "@application/useCases/user/userResolver";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -43,9 +45,11 @@ import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositor
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
+import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
+import { AuthController } from "@presentation/controllers/authController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
 import { StudentController } from "@presentation/controllers/studentController";
@@ -54,18 +58,21 @@ import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { accountRequestRoutes } from "@presentation/routes/accountRequestRoutes";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
+import { authRoutes } from "@presentation/routes/authRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import cookieParser from "cookie-parser";
 
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 
 const allowedOrigins = [
-  `https://${process.env.FRONTEND_HOST}`,
-  `http://${process.env.FRONTEND_HOST}`,
-  `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+  `https://${env.FRONTEND_HOST}`,
+  `http://${env.FRONTEND_HOST}`,
+  `http://${env.FRONTEND_HOST}:${env.FRONTEND_PORT}`,
 ];
 
 app.use(
@@ -162,10 +169,18 @@ const userController = new UserController(new ListUsers(pedagogueRepository, pro
 
 app.use(userRoutes(userController));
 
+const tokenService = new JwtTokenService();
+const userResolver = new UserResolver(professorRepository, pedagogueRepository);
+const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
+const getAuthenticatedUserUseCase = new GetAuthenticatedUser(userResolver);
+const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase);
+
+app.use(authRoutes(authController));
+
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
 
-const PORT = process.env.BACKEND_PORT;
+const PORT = env.BACKEND_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
