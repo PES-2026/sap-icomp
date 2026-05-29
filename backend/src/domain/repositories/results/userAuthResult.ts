@@ -7,4 +7,5 @@ export interface UserAuthResult extends BaseItem {
   registrationNumber: string;
   password: string;
   userStatus: string;
+  role: string;
 }

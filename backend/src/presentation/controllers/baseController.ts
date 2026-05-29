@@ -59,7 +59,7 @@ export abstract class BaseController {
   public handleResult<T>(
     res: Response,
     result: Result<T, DomainError | ApplicationError>,
-    successStatusCode: 200 | 201 = 200,
+    successStatusCode: 200 | 201 | 204 = 200,
   ): void {
     if (result.isSuccess) {
       if (successStatusCode === 201) {
@@ -71,7 +71,7 @@ export abstract class BaseController {
     }
 
     const error = result.error;
-    if (error instanceof DomainError || error instanceof ApplicationError) {
+    if (error instanceof DomainError) {
       const { statusCode, body } = HttpErrorMapper.toResponse(error);
       res.status(statusCode).json(body);
     } else {

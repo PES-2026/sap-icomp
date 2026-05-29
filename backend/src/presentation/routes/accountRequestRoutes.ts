@@ -10,7 +10,7 @@ export function accountRequestRoutes(controller: AccountRequestController): Rout
 
   router.post("/account-requests", validateBody(CreateProfessorDTO), controller.create);
   router.get("/account-requests/pending", controller.listPending);
-  router.post("/approve-users", validateBody(ApproveUserDTO), controller.approve);
+  router.post("/account-requests/approve-users", validateBody(ApproveUserDTO), controller.approve);
 
   return router;
 }

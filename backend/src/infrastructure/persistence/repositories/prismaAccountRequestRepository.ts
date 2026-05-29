@@ -82,7 +82,7 @@ export class PrismaAccountRequestRepository implements IAccountRequestRepository
       },
       data: {
         userStatus: accountRequest.userStatus.value,
-        role: accountRequest.role?.value,
+        role: accountRequest.role?.value ?? null,
       },
     });
   }

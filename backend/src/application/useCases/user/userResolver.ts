@@ -14,12 +14,12 @@ export class UserResolver {
   ) {}
 
   async execute(email: string): Promise<Result<UserResolverResult, ApplicationError | DomainError>> {
-    const professor = await this.professorRepository.findByEmail(email);
+    const professor = await this.professorRepository.findByEmailWithPassword(email);
     if (professor) {
       return Result.ok<UserResolverResult>({ userData: professor, role: RoleEnum.PROFESSOR });
     }
 
-    const pedagogue = await this.pedagogueRepository.findByEmail(email);
+    const pedagogue = await this.pedagogueRepository.findByEmailWithPassword(email);
     if (pedagogue) {
       return Result.ok<UserResolverResult>({ userData: pedagogue, role: RoleEnum.PEDAGOGUE });
     }

@@ -56,7 +56,7 @@ export default function RegisterForm() {
           </div>
 
           <h1 className="m-0 text-2xl font-bold text-stone-800">Quase lá!</h1>
-          <p className="mt-3 mb-6 max-w-[340px] text-sm leading-6 text-stone-600">
+          <p className="mt-3 mb-6 max-w-85 text-sm leading-6 text-stone-600">
             Seu pedido de cadastro está em análise pela administração.
             Avisaremos no e-mail{" "}
             <strong className="font-bold text-stone-800">
