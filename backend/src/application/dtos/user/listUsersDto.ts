@@ -1,4 +1,6 @@
+import { UserStatusEnum } from "@domain/enum/userStatus";
 import { UserFilters } from "@domain/repositories/filters/userFilters";
+import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
@@ -26,7 +28,8 @@ export class ListUsersDTO {
       filters.name = validateStringField(raw.name, "name");
     }
     if (raw.userStatus) {
-      filters.userStatus = validateStringField(raw.userStatus, "userStatus");
+      const userStatus = validateStringField(raw.userStatus, "userStatus");
+      filters.userStatus = findValueInEnum(UserStatusEnum, userStatus);
     }
 
     validatePageLimitValues(page, limit);

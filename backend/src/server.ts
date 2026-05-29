@@ -31,10 +31,11 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
-import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
-import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
+import { GetUserById } from "@application/useCases/user/getUserById";
 import { ListUsers } from "@application/useCases/user/listUsers";
-import { UserResolver } from "@application/useCases/user/userResolver";
+import { RemoveUser } from "@application/useCases/user/removeUser";
+import { UpdateUser } from "@application/useCases/user/updateUser";
+import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -165,7 +166,13 @@ const accountRequestController = new AccountRequestController(
 
 app.use(accountRequestRoutes(accountRequestController));
 
-const userController = new UserController(new ListUsers(pedagogueRepository, professorRepository));
+const userController = new UserController(
+  new ListUsers(pedagogueRepository, professorRepository),
+  new UpdateUser(pedagogueRepository, professorRepository, studentRepository),
+  new UpdateUserPassword(pedagogueRepository, professorRepository, hashService),
+  new GetUserById(pedagogueRepository, professorRepository),
+  new RemoveUser(pedagogueRepository, professorRepository),
+);
 
 app.use(userRoutes(userController));
 
