@@ -22,7 +22,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as PrismaUserStatus;
     }
 
     const [totalItems, pedagogues] = await Promise.all([
@@ -67,6 +67,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       userStatus: pedagogue.userStatus.value,
       password: pedagogue.password!.value,
     };
+
     await this.prisma.pedagogue.create({
       data: {
         ...baseData,
@@ -144,6 +145,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
 
     return !!account;
   }
+
   async existsByRegistrationNumber(registrationNumber: string): Promise<boolean> {
     const account = await this.prisma.pedagogue.findFirst({
       where: {

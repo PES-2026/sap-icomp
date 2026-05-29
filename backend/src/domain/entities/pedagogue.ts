@@ -77,6 +77,7 @@ export class Pedagogue {
       ),
     );
   }
+
   static rehydrate(props: PedagogueProps): Pedagogue {
     return new Pedagogue(
       ExternalIdVO.fromTrusted(props.id!),

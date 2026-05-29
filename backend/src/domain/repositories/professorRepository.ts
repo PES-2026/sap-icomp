@@ -7,6 +7,8 @@ import { UserItem } from "./results/userResult";
 //import {PedagogueListParams} from "./filters/pedagogueFilters";
 //import {PaginatedPedagogueResult, PedagogueResult} from "./results/pedagogueResult";
 
+import { UserAuthResult } from "./results/userAuthResult";
+
 export interface IProfessorRepository {
   findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>>;
   save(professor: Professor): Promise<void>;

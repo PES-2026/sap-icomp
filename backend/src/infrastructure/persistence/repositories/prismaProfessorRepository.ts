@@ -7,6 +7,8 @@ import { IProfessorRepository } from "../../../domain/repositories/professorRepo
 import { UserItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
+
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -22,7 +24,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus;
+      where.userStatus = filters.userStatus as PrismaUserStatus;
     }
 
     const [totalItems, professors] = await Promise.all([
