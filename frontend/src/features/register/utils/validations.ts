@@ -2,7 +2,11 @@ import { z } from "zod";
 
 export const registerSchema = z
   .object({
-    name: z.string().trim().nonempty({ message: "O nome é obrigatório." }),
+    name: z
+      .string()
+      .trim()
+      .nonempty({ message: "O nome é obrigatório." })
+      .transform((val) => val.replace(/\b\w/g, (char) => char.toUpperCase())),
 
     registrationNumber: z
       .string()

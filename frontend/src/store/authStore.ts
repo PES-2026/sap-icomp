@@ -1,3 +1,4 @@
+import { User } from "@/features/login/types/login";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
