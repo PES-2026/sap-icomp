@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
-
 import { RoleEnum } from "@domain/enum/role";
+import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
@@ -66,7 +65,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       email: professor.email.value,
       phoneNumber: professor.phoneNumber.value,
       userStatus: professor.userStatus.value,
-      password: professor.password.value,
+      password: professor.password!.value,
     };
     await this.prisma.professor.create({
       data: {
@@ -116,6 +115,8 @@ export class PrismaProfessorRepository implements IProfessorRepository {
   }
 
   async update(professor: Professor): Promise<void> {
+    const passwordValue = professor.password ? professor.password.value : undefined;
+
     await this.prisma.professor.update({
       where: { externalId: professor.id.value },
       data: {
@@ -124,9 +125,16 @@ export class PrismaProfessorRepository implements IProfessorRepository {
         phoneNumber: professor.phoneNumber.value,
         registration: professor.registrationNumber.value,
         userStatus: professor.userStatus.value,
-        password: professor.password.value,
       },
     });
+    if (passwordValue) {
+      await this.prisma.professor.update({
+        where: { externalId: professor.id.value },
+        data: {
+          password: passwordValue,
+        },
+      });
+    }
   }
 
   async existsByEmail(email: string): Promise<boolean> {

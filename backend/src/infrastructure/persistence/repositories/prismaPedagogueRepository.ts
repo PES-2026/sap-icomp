@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
-
 import { RoleEnum } from "@domain/enum/role";
+import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Pedagogue } from "../../../domain/entities/pedagogue";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
@@ -66,7 +65,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       email: pedagogue.email.value,
       phoneNumber: pedagogue.phoneNumber.value,
       userStatus: pedagogue.userStatus.value,
-      password: pedagogue.password.value,
+      password: pedagogue.password!.value,
     };
     await this.prisma.pedagogue.create({
       data: {
@@ -116,6 +115,8 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
   }
 
   async update(pedagogue: Pedagogue): Promise<void> {
+    const passwordValue = pedagogue.password ? pedagogue.password.value : undefined;
+
     await this.prisma.pedagogue.update({
       where: { externalId: pedagogue.id.value },
       data: {
@@ -124,9 +125,14 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
         phoneNumber: pedagogue.phoneNumber.value,
         registration: pedagogue.registrationNumber.value,
         userStatus: pedagogue.userStatus.value,
-        password: pedagogue.password.value,
       },
     });
+    if (passwordValue) {
+      await this.prisma.pedagogue.update({
+        where: { externalId: pedagogue.id.value },
+        data: { password: passwordValue },
+      });
+    }
   }
 
   async existsByEmail(email: string): Promise<boolean> {

@@ -12,7 +12,7 @@ export class RemoveUser {
 
   async execute(dto: RemoveUserDTO): Promise<Result<void>> {
     let user = await this.pedagogueRepository.findById(dto.id);
-    let repository: any = this.pedagogueRepository;
+    let repository: IPedagogueRepository | IProfessorRepository = this.pedagogueRepository;
 
     if (!user) {
       user = await this.professorRepository.findById(dto.id);
@@ -20,7 +20,7 @@ export class RemoveUser {
     }
 
     if (!user) {
-      return Result.fail(new UserNotFoundError());
+      return Result.fail(new UserNotFoundError(dto.id));
     }
 
     await repository.remove(dto.id);

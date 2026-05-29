@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx --watch ./src/server.ts",
     "build": "tsc",
+    "build:noEmit": "tsc --noEmit",
     "start": "node dist/server.js",
     "test": "jest",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
