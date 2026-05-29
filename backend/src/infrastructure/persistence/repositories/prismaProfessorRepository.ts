@@ -1,13 +1,10 @@
-import {
-  Prisma,
-  PrismaClient,
-  UserStatus as PrismaUserStatus,
-} from "@prisma/src/infrastructure/database/generated/client";
+import { RoleEnum } from "@domain/enum/role";
+import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
 import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
-import { UserListItem } from "../../../domain/repositories/results/userResult";
+import { UserItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
@@ -15,7 +12,7 @@ import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>> {
+  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>> {
     const skip = (page - 1) * limit;
 
     const where: Prisma.ProfessorWhereInput = {
@@ -40,7 +37,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       }),
     ]);
 
-    const items: UserListItem[] = professors.map((p) => ({
+    const items: UserItem[] = professors.map((p) => ({
       id: p.externalId,
       name: p.name,
       email: p.email,
@@ -70,7 +67,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       email: professor.email.value,
       phoneNumber: professor.phoneNumber.value,
       userStatus: professor.userStatus.value,
-      password: professor.password.value,
+      password: professor.password!.value,
     };
     await this.prisma.professor.create({
       data: {
@@ -78,6 +75,70 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       },
     });
   }
+
+  async findById(id: string): Promise<UserItem | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+    };
+  }
+
+  async findByEmail(email: string): Promise<UserItem | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { email },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+    };
+  }
+
+  async update(professor: Professor): Promise<void> {
+    const passwordValue = professor.password ? professor.password.value : undefined;
+
+    await this.prisma.professor.update({
+      where: { externalId: professor.id.value },
+      data: {
+        name: professor.name.value,
+        email: professor.email.value,
+        phoneNumber: professor.phoneNumber.value,
+        registration: professor.registrationNumber.value,
+        userStatus: professor.userStatus.value,
+      },
+    });
+    if (passwordValue) {
+      await this.prisma.professor.update({
+        where: { externalId: professor.id.value },
+        data: {
+          password: passwordValue,
+        },
+      });
+    }
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.professor.findFirst({
       where: {
@@ -96,23 +157,14 @@ export class PrismaProfessorRepository implements IProfessorRepository {
 
     return !!account;
   }
-  async findByEmail(email: string): Promise<UserAuthResult | null> {
-    const data = await this.prisma.professor.findUnique({
-      where: { email, removed: false },
+
+  async remove(id: string): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: id },
+      data: {
+        removed: true,
+        userStatus: "DISABLED",
+      },
     });
-
-    if (!data) return null;
-
-    return {
-      id: data.externalId,
-      name: data.name,
-      email: data.email,
-      phoneNumber: data.phoneNumber || "",
-      registrationNumber: data.registration,
-      userStatus: data.userStatus,
-      password: data.password,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
   }
 }

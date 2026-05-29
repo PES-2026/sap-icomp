@@ -59,7 +59,7 @@ export abstract class BaseController {
   public handleResult<T>(
     res: Response,
     result: Result<T, DomainError | ApplicationError>,
-    successStatusCode: 200 | 201 = 200,
+    successStatusCode: 200 | 201 | 204 = 200,
   ): void {
     if (result.isSuccess) {
       if (successStatusCode === 201) {

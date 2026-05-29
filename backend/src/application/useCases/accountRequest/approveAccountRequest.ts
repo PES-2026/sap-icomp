@@ -44,7 +44,7 @@ export class ApproveAccountRequest {
     accountRequest.approve();
     await this.repository.update(accountRequest);
 
-    let createdUser: unknown;
+    let createdUser: Pedagogue | Professor;
 
     if (props.role === RoleEnum.PEDAGOGUE) {
       const pedagogueOrError = Pedagogue.create({
