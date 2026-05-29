@@ -4,6 +4,6 @@ import { ApplicationError } from "../applicationError";
 
 export class RegistrationNumberAlreadyInUseError extends ApplicationError {
   constructor(registrationNumber: string) {
-    super(`A matrícula ${registrationNumber} já está em uso por outra conta.`, ErrorCategory.CONFLICT);
+    super(`The registration "${registrationNumber}" is already in use by another account`, ErrorCategory.VALIDATION);
   }
 }

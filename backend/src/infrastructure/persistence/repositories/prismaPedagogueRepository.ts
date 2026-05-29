@@ -1,15 +1,17 @@
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
+import { RoleEnum } from "@domain/enum/role";
+
 import { Pedagogue } from "../../../domain/entities/pedagogue";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
 import { IPedagogueRepository } from "../../../domain/repositories/pedagogueRepository";
-import { UserListItem } from "../../../domain/repositories/results/userResult";
+import { UserItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
 export class PrismaPedagogueRepository implements IPedagogueRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>> {
+  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>> {
     const skip = (page - 1) * limit;
 
     const where: Prisma.PedagogueWhereInput = {
@@ -21,7 +23,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as any;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, pedagogues] = await Promise.all([
@@ -34,7 +36,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       }),
     ]);
 
-    const items: UserListItem[] = pedagogues.map((p) => ({
+    const items: UserItem[] = pedagogues.map((p) => ({
       id: p.externalId,
       name: p.name,
       email: p.email,
@@ -73,40 +75,44 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     });
   }
 
-  async findById(id: string): Promise<Pedagogue | null> {
+  async findById(id: string): Promise<UserItem | null> {
     const raw = await this.prisma.pedagogue.findUnique({
       where: { externalId: id },
     });
 
     if (!raw) return null;
 
-    return Pedagogue.rehydrate({
+    return {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
       phoneNumber: raw.phoneNumber || "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
-      password: raw.password,
-    });
+      role: RoleEnum.PEDAGOGUE,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    };
   }
 
-  async findByEmail(email: string): Promise<Pedagogue | null> {
+  async findByEmail(email: string): Promise<UserItem | null> {
     const raw = await this.prisma.pedagogue.findUnique({
       where: { email },
     });
 
     if (!raw) return null;
 
-    return Pedagogue.rehydrate({
+    return {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
       phoneNumber: raw.phoneNumber || "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
-      password: raw.password,
-    });
+      role: RoleEnum.PEDAGOGUE,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    };
   }
 
   async update(pedagogue: Pedagogue): Promise<void> {
@@ -145,9 +151,9 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
   async remove(id: string): Promise<void> {
     await this.prisma.pedagogue.update({
       where: { externalId: id },
-      data: { 
+      data: {
         removed: true,
-        userStatus: "DISABLED"
+        userStatus: "DISABLED",
       },
     });
   }

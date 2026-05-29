@@ -1,15 +1,17 @@
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
+import { RoleEnum } from "@domain/enum/role";
+
 import { Professor } from "../../../domain/entities/professor";
 import { UserFilters } from "../../../domain/repositories/filters/userFilters";
 import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
-import { UserListItem } from "../../../domain/repositories/results/userResult";
+import { UserItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
 
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserListItem>> {
+  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>> {
     const skip = (page - 1) * limit;
 
     const where: Prisma.ProfessorWhereInput = {
@@ -21,7 +23,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as any;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, professors] = await Promise.all([
@@ -34,7 +36,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       }),
     ]);
 
-    const items: UserListItem[] = professors.map((p) => ({
+    const items: UserItem[] = professors.map((p) => ({
       id: p.externalId,
       name: p.name,
       email: p.email,
@@ -73,40 +75,44 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     });
   }
 
-  async findById(id: string): Promise<Professor | null> {
+  async findById(id: string): Promise<UserItem | null> {
     const raw = await this.prisma.professor.findUnique({
       where: { externalId: id },
     });
 
     if (!raw) return null;
 
-    return Professor.rehydrate({
+    return {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
       phoneNumber: raw.phoneNumber || "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
-      password: raw.password,
-    });
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+    };
   }
 
-  async findByEmail(email: string): Promise<Professor | null> {
+  async findByEmail(email: string): Promise<UserItem | null> {
     const raw = await this.prisma.professor.findUnique({
       where: { email },
     });
 
     if (!raw) return null;
 
-    return Professor.rehydrate({
+    return {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
       phoneNumber: raw.phoneNumber || "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
-      password: raw.password,
-    });
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+    };
   }
 
   async update(professor: Professor): Promise<void> {
@@ -145,9 +151,9 @@ export class PrismaProfessorRepository implements IProfessorRepository {
   async remove(id: string): Promise<void> {
     await this.prisma.professor.update({
       where: { externalId: id },
-      data: { 
+      data: {
         removed: true,
-        userStatus: "DISABLED"
+        userStatus: "DISABLED",
       },
     });
   }

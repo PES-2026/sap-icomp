@@ -10,11 +10,11 @@ export class UpdateUserPasswordDTO {
   ) {}
 
   static create(id: unknown, body: unknown): UpdateUserPasswordDTO {
-    if (typeof id === "object") {
-      throw new Error("id must be sent via parameter and sensitive information via body");
+    if (typeof id !== "string" || id.trim().length === 0) {
+      throw new Error("User Id is required and must be a string");
     }
 
-    if (typeof id !== "string" || !body || typeof body !== "object") {
+    if (typeof body !== "object" || body === null) {
       throw new Error(`Invalid input to ${UpdateUserPasswordDTO.name}`);
     }
 

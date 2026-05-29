@@ -1,10 +1,10 @@
 import { Router } from "express";
 
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
+import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
 import { UpdateUserPasswordDTO } from "@application/dtos/user/updateUserPasswordDto";
 import { UserByIdDTO } from "@application/dtos/user/userByIdDto";
-import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
 import { UserController } from "@presentation/controllers/userController";
 import { validateParams } from "@presentation/middlewares/validateParams";
 

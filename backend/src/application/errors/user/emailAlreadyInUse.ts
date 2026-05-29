@@ -4,6 +4,6 @@ import { ApplicationError } from "../applicationError";
 
 export class EmailAlreadyInUseError extends ApplicationError {
   constructor(email: string) {
-    super(`This email "${email}" already in use.`, ErrorCategory.BUSINESS_RULE);
+    super(`The email "${email}" is already in use by another account`, ErrorCategory.BUSINESS_RULE);
   }
 }

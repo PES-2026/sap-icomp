@@ -14,7 +14,7 @@ export type ProfessorProps = {
   phoneNumber: string;
   registrationNumber: string;
   userStatus: string;
-  password: string;
+  password?: string;
 };
 
 export type ProfessorVOProps = {
@@ -34,7 +34,7 @@ export class Professor {
     public phoneNumber: PhoneNumberVO,
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
-    public password: PasswordVO,
+    public password?: PasswordVO,
   ) {}
 
   update(props: Partial<ProfessorVOProps>): void {
@@ -56,7 +56,7 @@ export class Professor {
     const phoneNumber = PhoneNumberVO.create(props.phoneNumber);
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
-    const password = PasswordVO.create(props.password, props.password);
+    const password = props.password ? PasswordVO.create(props.password, props.password) : undefined;
 
     const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
@@ -73,7 +73,7 @@ export class Professor {
         phoneNumber.getValue(),
         registrationNumber.getValue(),
         userStatus.getValue(),
-        password.getValue(),
+        password?.getValue(),
       ),
     );
   }
@@ -86,7 +86,7 @@ export class Professor {
       PhoneNumberVO.fromTrusted(props.phoneNumber),
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
-      PasswordVO.fromTrusted(props.password),
+      props.password ? PasswordVO.fromTrusted(props.password) : undefined,
     );
   }
 }

@@ -1,7 +1,7 @@
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserListItem } from "@domain/repositories/results/userResult";
+import { UserItem } from "@domain/repositories/results/userResult";
 import { PaginatedResult } from "@domain/shared/pagination";
 import { Result } from "@domain/shared/result";
 
@@ -11,7 +11,7 @@ export class ListUsers {
     private readonly professorRepository: IProfessorRepository,
   ) {}
 
-  async execute(dto: ListUsersDTO): Promise<Result<PaginatedResult<UserListItem>>> {
+  async execute(dto: ListUsersDTO): Promise<Result<PaginatedResult<UserItem>>> {
     // To provide true global pagination across two tables without a base table,
     // we fetch matching records from both. For performance at small-medium scales,
     // we can merge and paginate in memory.
@@ -25,7 +25,7 @@ export class ListUsers {
       this.professorRepository.findAll(dto.filters, 1, MAX_ITEMS),
     ]);
 
-    const allUsers: UserListItem[] = [...pedagoguesResult.items, ...professorsResult.items];
+    const allUsers: UserItem[] = [...pedagoguesResult.items, ...professorsResult.items];
 
     // Sort by name as a default
     allUsers.sort((a, b) => a.name.localeCompare(b.name));

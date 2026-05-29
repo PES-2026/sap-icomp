@@ -1,9 +1,16 @@
-import { validateStringField, validateOptionalStringField } from "@domain/utils/validationUtils";
+import { validateOptionalStringField } from "@domain/utils/validationUtils";
+
+export interface UpdateUserResponse {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  registrationNumber: string;
+}
 
 export class UpdateUserDTO {
   constructor(
     public readonly id: string,
-    public readonly role: string,
+    public readonly role?: string,
     public readonly name?: string,
     public readonly email?: string,
     public readonly phoneNumber?: string,
@@ -11,16 +18,16 @@ export class UpdateUserDTO {
   ) {}
 
   static create(id: unknown, body: unknown): UpdateUserDTO {
-    if (typeof id === "object") {
-      throw new Error("id must be sent via parameter and sensitive information via body");
+    if (typeof id !== "string" || id.trim().length === 0) {
+      throw new Error("User Id is required and must be a string");
     }
 
-    if (typeof id !== "string" || !body || typeof body !== "object") {
+    if (typeof body !== "object" || body === null) {
       throw new Error(`Invalid input to ${UpdateUserDTO.name}`);
     }
 
     const raw = body as Record<string, unknown>;
-    const role = validateStringField(raw.role, "role");
+    const role = validateOptionalStringField(raw.role, "role");
     const name = validateOptionalStringField(raw.name, "name");
     const email = validateOptionalStringField(raw.email, "email");
     const phoneNumber = validateOptionalStringField(raw.phoneNumber, "phoneNumber");

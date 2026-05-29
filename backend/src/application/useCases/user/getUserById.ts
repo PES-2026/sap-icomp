@@ -1,8 +1,9 @@
 import { UserByIdDTO } from "@application/dtos/user/userByIdDto";
 import { UserNotFoundError } from "@application/errors/user/userNotFound";
+import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserListItem } from "@domain/repositories/results/userResult";
+import { UserItem } from "@domain/repositories/results/userResult";
 import { Result } from "@domain/shared/result";
 
 export class GetUserById {
@@ -11,13 +12,13 @@ export class GetUserById {
     private readonly professorRepository: IProfessorRepository,
   ) {}
 
-  async execute(dto: UserByIdDTO): Promise<Result<UserListItem>> {
-    let user: any = await this.pedagogueRepository.findById(dto.id);
-    let roleName = "PEDAGOGUE";
+  async execute(dto: UserByIdDTO): Promise<Result<UserItem>> {
+    let user: UserItem | null = await this.pedagogueRepository.findById(dto.id);
+    let roleName = RoleEnum.PEDAGOGUE;
 
     if (!user) {
       user = await this.professorRepository.findById(dto.id);
-      roleName = "PROFESSOR";
+      roleName = RoleEnum.PROFESSOR;
     }
 
     if (!user) {
@@ -25,16 +26,16 @@ export class GetUserById {
     }
 
     // Map entity to the response format
-    const response: UserListItem = {
-      id: user.id.value,
-      name: user.name.value,
-      email: user.email.value,
-      phoneNumber: user.phoneNumber.value,
-      registrationNumber: user.registrationNumber.value,
+    const response: UserItem = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      registrationNumber: user.registrationNumber,
       role: roleName,
-      userStatus: user.userStatus.value,
-      createdAt: (user as any).createdAt || new Date(),
-      updatedAt: (user as any).updatedAt || new Date(),
+      userStatus: user.userStatus,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
 
     return Result.ok(response);

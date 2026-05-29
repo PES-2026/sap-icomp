@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
+import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
 import { UpdateUserPasswordDTO } from "@application/dtos/user/updateUserPasswordDto";
 import { UserByIdDTO } from "@application/dtos/user/userByIdDto";
-import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
+import { GetUserById } from "@application/useCases/user/getUserById";
 import { ListUsers } from "@application/useCases/user/listUsers";
+import { RemoveUser } from "@application/useCases/user/removeUser";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
-import { GetUserById } from "@application/useCases/user/getUserById";
-import { RemoveUser } from "@application/useCases/user/removeUser";
 
 import { BaseController } from "./baseController";
 
