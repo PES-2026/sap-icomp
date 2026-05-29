@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/login/utils/storage";
+import { useAuthStore } from "@/store/authStore";
 import axios from "axios";
 
 declare module "axios" {

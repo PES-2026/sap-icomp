@@ -5,11 +5,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { PATHS } from "@/constants/paths";
+import { useAuthStore } from "@/store/authStore";
 import { useAppNavigation } from "@/utils/navigator";
 import toast from "react-hot-toast";
-import { loginService } from "../services/login";
+import { loginService } from "../services/loginService";
 import { Role } from "../types/login";
-import { useAuthStore } from "../utils/storage";
 import { LoginFormData, loginSchema } from "../utils/validations";
 
 export const roleRedirects: Record<Lowercase<Role>, string> = {
