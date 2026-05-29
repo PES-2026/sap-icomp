@@ -1,4 +1,7 @@
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+
+import { VerifyTokenResult } from "@domain/services/results/verifyTokenResult";
+
 import { ITokenService } from "../../domain/services/tokenService";
 import { env } from "../config/env";
 
@@ -18,11 +21,17 @@ export class JwtTokenService implements ITokenService {
     return jwt.sign(payload, this.secret, options);
   }
 
-  verifyToken(token: string): any | null {
+  verifyToken(token: string): VerifyTokenResult {
     try {
-      return jwt.verify(token, this.secret);
-    } catch (error) {
-      return null;
+      const decoded = jwt.verify(token, this.secret);
+      if (typeof decoded === "string") {
+        return { valid: false };
+      }
+      // jwt.verify returns JwtPayload | string. We expect an object with id, role and email.
+      const payload = decoded as JwtPayload & { id: string; role: string; email: string };
+      return { valid: true, payload };
+    } catch {
+      return { valid: false };
     }
   }
 }

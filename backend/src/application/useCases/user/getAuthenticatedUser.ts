@@ -1,6 +1,7 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { RoleEnum } from "@domain/enum/role";
 import { Result } from "@domain/shared/result";
+
 import { UserResolver } from "./userResolver";
 
 export interface AuthenticatedUserResponse {

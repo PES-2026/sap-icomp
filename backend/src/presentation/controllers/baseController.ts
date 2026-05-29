@@ -71,7 +71,7 @@ export abstract class BaseController {
     }
 
     const error = result.error;
-    if (error instanceof DomainError || error instanceof ApplicationError) {
+    if (error instanceof DomainError) {
       const { statusCode, body } = HttpErrorMapper.toResponse(error);
       res.status(statusCode).json(body);
     } else {

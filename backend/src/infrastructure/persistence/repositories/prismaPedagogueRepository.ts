@@ -1,4 +1,5 @@
 import { RoleEnum } from "@domain/enum/role";
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Pedagogue } from "../../../domain/entities/pedagogue";
@@ -22,7 +23,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as PrismaUserStatus;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, pedagogues] = await Promise.all([
@@ -165,5 +166,25 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       },
     });
   }
-  //async findByEmail(email: string): Promise<Pedagogue | null> {}
+
+  async findByEmailWithPassword(email: string): Promise<UserAuthResult | null> {
+    const raw = await this.prisma.pedagogue.findUnique({
+      where: { email },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      role: RoleEnum.PEDAGOGUE,
+      password: raw.password,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    };
+  }
 }

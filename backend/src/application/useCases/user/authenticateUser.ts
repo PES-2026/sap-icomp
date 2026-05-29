@@ -1,11 +1,12 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { InvalidCredentialsError } from "@application/errors/user/invalidCredentialsError";
 import { AuthResult } from "@domain/repositories/results/authResult";
-import { Result } from "@domain/shared/result";
-import { AuthenticateUserRequestDTO } from "../../dtos/user/authenticateUserDto";
-
 import { IHashService } from "@domain/services/hashService";
 import { ITokenService } from "@domain/services/tokenService";
+import { Result } from "@domain/shared/result";
+
+import { AuthenticateUserRequestDTO } from "../../dtos/user/authenticateUserDto";
+
 import { UserResolver } from "./userResolver";
 
 export class AuthenticateUser {

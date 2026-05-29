@@ -1,9 +1,11 @@
+import { Request, Response } from "express";
+
 import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateUserDto";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { parseExpirationToMs } from "@domain/utils/timeUtils";
 import { env } from "@infrastructure/config/env";
-import { Request, Response } from "express";
+
 import { BaseController } from "./baseController";
 
 export class AuthController extends BaseController {
