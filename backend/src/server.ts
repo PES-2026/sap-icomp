@@ -1,4 +1,4 @@
-import { env } from "@infrastructure/config/env";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 
@@ -31,11 +31,15 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
+import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { GetUserById } from "@application/useCases/user/getUserById";
 import { ListUsers } from "@application/useCases/user/listUsers";
 import { RemoveUser } from "@application/useCases/user/removeUser";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
+import { UserResolver } from "@application/useCases/user/userResolver";
+import { env } from "@infrastructure/config/env";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
@@ -64,7 +68,6 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
-import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(cookieParser());

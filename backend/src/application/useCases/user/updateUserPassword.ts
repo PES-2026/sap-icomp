@@ -47,7 +47,7 @@ export class UpdateUserPassword {
         id: userItem.id,
         name: userItem.name,
         email: userItem.email,
-        phoneNumber: userItem.phoneNumber,
+        phoneNumber: userItem.phoneNumber ?? "",
         registrationNumber: userItem.registrationNumber,
         userStatus: userItem.userStatus,
       });
@@ -56,7 +56,7 @@ export class UpdateUserPassword {
         id: userItem.id,
         name: userItem.name,
         email: userItem.email,
-        phoneNumber: userItem.phoneNumber,
+        phoneNumber: userItem.phoneNumber ?? "",
         registrationNumber: userItem.registrationNumber,
         userStatus: userItem.userStatus,
       });

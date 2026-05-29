@@ -1,4 +1,5 @@
 import { ErrorCategory } from "@domain/errors/domainError";
+
 import { ApplicationError } from "../applicationError";
 
 export class UserNotFoundError extends ApplicationError {

@@ -1,34 +1,27 @@
-import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { NextFunction, Request, Response } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: string;
-      userRole?: string;
-      userEmail?: string;
-    }
-  }
-}
+import { ITokenService } from "@domain/services/tokenService";
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const tokenService = new JwtTokenService();
-
+export const authMiddleware = (jwtService: ITokenService, req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies?.accessToken;
 
   if (!token) {
     return res.status(401).json({ error: "Access denied. Token not provided." });
   }
 
-  const decoded = tokenService.verifyToken(token);
+  const decoded = jwtService.verifyToken(token);
 
-  if (!decoded) {
+  if (!decoded || typeof decoded === "string" || !decoded.payload || decoded.valid === false) {
     return res.status(401).json({ error: "Invalid or expired token." });
   }
 
-  req.userId = decoded.id;
-  req.userRole = decoded.role;
-  req.userEmail = decoded.email;
+  if (!decoded.payload?.id || !decoded.payload?.role || !decoded.payload?.email) {
+    return res.status(401).json({ error: "Invalid token payload." });
+  }
+
+  req.userId = decoded.payload.id;
+  req.userRole = decoded.payload.role;
+  req.userEmail = decoded.payload.email;
 
   next();
 };

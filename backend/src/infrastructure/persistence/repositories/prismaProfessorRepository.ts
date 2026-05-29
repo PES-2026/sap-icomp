@@ -1,4 +1,5 @@
 import { RoleEnum } from "@domain/enum/role";
+import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
 
 import { Professor } from "../../../domain/entities/professor";
@@ -6,8 +7,6 @@ import { UserFilters } from "../../../domain/repositories/filters/userFilters";
 import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
 import { UserItem } from "../../../domain/repositories/results/userResult";
 import { PaginatedResult } from "../../../domain/shared/pagination";
-
-import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -24,7 +23,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
 
     if (filters.userStatus) {
-      where.userStatus = filters.userStatus as PrismaUserStatus;
+      where.userStatus = filters.userStatus;
     }
 
     const [totalItems, professors] = await Promise.all([
@@ -148,6 +147,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
 
     return !!account;
   }
+
   async existsByRegistrationNumber(registrationNumber: string): Promise<boolean> {
     const account = await this.prisma.professor.findFirst({
       where: {
@@ -166,5 +166,26 @@ export class PrismaProfessorRepository implements IProfessorRepository {
         userStatus: "DISABLED",
       },
     });
+  }
+
+  async findByEmailWithPassword(email: string): Promise<UserAuthResult | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { email },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+      password: raw.password,
+    };
   }
 }
