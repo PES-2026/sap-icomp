@@ -34,8 +34,9 @@ export class AuthController extends BaseController {
       const cookieOptions = {
         httpOnly: true,
         secure: env.NODE_ENV === "production",
-        sameSite: "strict" as const,
+        sameSite: "lax" as const,
         maxAge: maxAge,
+        domain: ".nelsul.com",
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
