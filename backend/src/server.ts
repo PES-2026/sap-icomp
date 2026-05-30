@@ -185,7 +185,7 @@ const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, 
 const getAuthenticatedUserUseCase = new GetAuthenticatedUser(userResolver);
 const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase);
 
-app.use(authRoutes(authController));
+app.use(authRoutes(authController, tokenService));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
