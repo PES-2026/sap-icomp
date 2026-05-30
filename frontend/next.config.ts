@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
     ];
   },
   allowedDevOrigins: ["sap-icomp.nelsul.com", "*.nelsul.com"],
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
