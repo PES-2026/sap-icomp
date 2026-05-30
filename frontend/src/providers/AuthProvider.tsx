@@ -1,13 +1,14 @@
 "use client";
 
+import { PATHS } from "@/constants/paths";
 import { authMeService } from "@/services/authMe";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
+import { useAppNavigation } from "@/utils/navigator";
 import { useEffect } from "react";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, clearUser } = useAuthStore();
-  const router = useRouter();
+  const { handleNavigation } = useAppNavigation();
 
   useEffect(() => {
     async function validateSession() {
@@ -16,14 +17,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!res) {
           clearUser();
-          router.push("/login");
+          handleNavigation({ path: PATHS.login });
           return;
         }
 
         setUser(res.user);
       } catch {
         clearUser();
-        router.push("/login");
+        handleNavigation({ path: PATHS.login });
       }
     }
 

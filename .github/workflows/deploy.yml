@@ -48,6 +48,7 @@ jobs:
 
           docker build \
               --build-arg NEXT_PUBLIC_API_URL=https://${{ vars.BACKEND_HOST }} \
+              --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -t sap-icomp-frontend-$APP_ENV:latest \
               -f ./frontend/Dockerfile.$APP_ENV \
               ./frontend

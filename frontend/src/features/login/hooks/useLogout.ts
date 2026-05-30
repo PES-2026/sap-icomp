@@ -2,16 +2,16 @@
 
 import { PATHS } from "@/constants/paths";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useAppNavigation } from "@/utils/navigator";
 import toast from "react-hot-toast";
 import { logoutService } from "../services/logoutService";
 
 export const useLogout = () => {
-  const clearUser = useAuthStore((s) => s.clearUser);
-  const router = useRouter();
+  const { handleNavigation } = useAppNavigation();
 
-  const logout = useCallback(async () => {
+  const clearUser = useAuthStore((s) => s.clearUser);
+
+  const logout = async () => {
     try {
       await logoutService.logout();
     } catch (error) {
@@ -19,9 +19,9 @@ export const useLogout = () => {
       if (error instanceof Error) toast.error(error.message);
     } finally {
       clearUser?.();
-      router.push(PATHS.login);
+      handleNavigation({ path: PATHS.login });
     }
-  }, [clearUser, router]);
+  };
 
   return { logout };
 };
