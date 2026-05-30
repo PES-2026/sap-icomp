@@ -183,7 +183,11 @@ const tokenService = new JwtTokenService();
 const userResolver = new UserResolver(professorRepository, pedagogueRepository);
 const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
 const getAuthenticatedUserUseCase = new GetAuthenticatedUser(userResolver);
-const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase);
+const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase, {
+  jwtExpires: env.JWT_TOKEN_EXPIRES,
+  isProduction: env.NODE_ENV === "production",
+  domain: env.BASE_DOMAIN,
+});
 
 app.use(authRoutes(authController, tokenService));
 
