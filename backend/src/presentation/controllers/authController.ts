@@ -4,14 +4,20 @@ import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateU
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { parseExpirationToMs } from "@domain/utils/timeUtils";
-import { env } from "@infrastructure/config/env";
 
 import { BaseController } from "./baseController";
+
+export interface AuthControllerConfig {
+  jwtExpires: string;
+  isProduction: boolean;
+  domain: string;
+}
 
 export class AuthController extends BaseController {
   constructor(
     private readonly authenticateUserUseCase: AuthenticateUser,
     private readonly getAuthenticatedUserUseCase: GetAuthenticatedUser,
+    private readonly config: AuthControllerConfig,
   ) {
     super();
   }
@@ -28,16 +34,16 @@ export class AuthController extends BaseController {
 
       const authData = result.getValue();
 
-      const expiration = env.JWT_TOKEN_EXPIRES;
+      const expiration = this.config.jwtExpires;
       const maxAge = parseExpirationToMs(expiration);
 
       const domainEnv = env.ENVIRONMENT === "local" ? undefined : env.BASE_DOMAIN;
       const cookieOptions = {
         httpOnly: true,
-        secure: env.ENVIRONMENT !== "local",
+        secure: this.config.isProduction,
         sameSite: "lax" as const,
         maxAge: maxAge,
-        domain: domainEnv,
+        domain: ".nelsul.com",
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
