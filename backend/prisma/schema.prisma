@@ -77,8 +77,9 @@ model Pedagogue {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  attendances Attendance[]
-  reports     Report[]
+  attendances    Attendance[]
+  reports        Report[]
+  passwordResets PasswordReset[]
 }
 
 model Professor {
@@ -100,6 +101,7 @@ model Professor {
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
   coordinatedCourses Course[]         @relation("Coordinator")
+  passwordResets     PasswordReset[]
 }
 
 model Attendance {
@@ -280,4 +282,20 @@ model ClassProfessor {
   class     ClassOffering @relation(fields: [classId], references: [internalId])
 
   @@id([professorId, classId])
+}
+
+model PasswordReset {
+  internalId Int      @id @default(autoincrement())
+  token      String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  usedAt     DateTime?
+
+  professorId Int?
+  professor   Professor? @relation(fields: [professorId], references: [internalId])
+
+  pedagogueId Int?
+  pedagogue   Pedagogue? @relation(fields: [pedagogueId], references: [internalId])
+
+  @@index([token])
 }

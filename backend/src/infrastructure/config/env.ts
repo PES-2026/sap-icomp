@@ -16,5 +16,8 @@ export const env = {
   FRONTEND_HOST: getEnv("FRONTEND_HOST"),
   FRONTEND_PORT: getEnv("FRONTEND_PORT"),
   NODE_ENV: process.env.NODE_ENV || "development",
+  GMAIL_USER: getEnv("GMAIL_USER"),
+  GMAIL_APP_PASSWORD: getEnv("GMAIL_APP_PASSWORD"),
+  FRONTEND_URL: getEnv("FRONTEND_URL"),
   BASE_DOMAIN: getEnv("BASE_DOMAIN"),
 };

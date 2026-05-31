@@ -137,6 +137,13 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
   }
 
+  async updatePassword(internalId: number, passwordHash: string): Promise<void> {
+    await this.prisma.pedagogue.update({
+      where: { internalId },
+      data: { password: passwordHash },
+    });
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.pedagogue.findFirst({
       where: {
