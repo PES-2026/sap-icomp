@@ -14,5 +14,8 @@ export const authRoutes = (authController: AuthController, jwtService: ITokenSer
   routes.get("/auth/me", (req, res, next) => authMiddleware(jwtService, req, res, next), authController.me);
   routes.post("/auth/logout", authController.logout);
 
+  routes.post("/auth/forgot-password", authController.forgotPassword);
+  routes.post("/auth/reset-password", authController.resetPassword);
+
   return routes;
 };
