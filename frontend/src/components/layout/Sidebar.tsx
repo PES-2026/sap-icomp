@@ -1,5 +1,6 @@
 "use client";
 
+import { Images } from "@/assets";
 import { PATHS } from "@/constants/paths";
 import {
   CalendarFold,
@@ -16,7 +17,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import LogoSAPIComp from "../../../public/SAPICompLogoHorizontal.png";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -86,7 +86,7 @@ export default function Sidebar() {
               ${collapsed ? "hidden w-0 opacity-0 md:w-0 md:opacity-0" : "opacity-100"}
             `}
           >
-            <Image src={LogoSAPIComp} alt="Logo SAP IComp" />
+            <Image src={Images.logoHorizontal} alt="Logo SAP IComp" />
           </div>
 
           <button

@@ -31,12 +31,13 @@ export class AuthController extends BaseController {
       const expiration = env.JWT_TOKEN_EXPIRES;
       const maxAge = parseExpirationToMs(expiration);
 
+      const domainEnv = env.NODE_ENV === "production" ? ".nelsul.com" : undefined;
       const cookieOptions = {
         httpOnly: true,
         secure: env.NODE_ENV === "production",
         sameSite: "lax" as const,
         maxAge: maxAge,
-        domain: ".nelsul.com",
+        domain: domainEnv,
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
@@ -68,7 +69,15 @@ export class AuthController extends BaseController {
 
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
-      res.clearCookie("accessToken");
+      const domainEnv = env.NODE_ENV === "production" ? ".nelsul.com" : undefined;
+
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        domain: domainEnv,
+      });
+
       res.status(200).json({ message: "Logout successful." });
     } catch (error) {
       this.handleError(error, res, `${AuthController.name}:logout`);

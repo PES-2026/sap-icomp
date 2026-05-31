@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { MailCheck } from "lucide-react";
+import Image from "next/image";
 
+import { Images } from "@/assets";
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
 import { useAppNavigation } from "@/utils/navigator";
-import { useRegister } from "../../hooks/useRegister";
 import { maskPhone } from "@/utils/utils";
+import { useRegister } from "../../hooks/useRegister";
 
 export default function RegisterForm() {
   const { handleNavigation } = useAppNavigation();
@@ -43,7 +44,7 @@ export default function RegisterForm() {
       <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center font-['Nunito','Segoe_UI',sans-serif] bg-[#f5f0e8] p-4">
         <section className="flex w-full max-w-md flex-col items-center rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] px-7 py-10 text-center">
           <Image
-            src="/SAPICompLogoHorizontal.png"
+            src={Images.logoHorizontal}
             alt="SAP iComp Logo"
             width={200}
             height={48}
@@ -86,7 +87,7 @@ export default function RegisterForm() {
       >
         <div className="shrink-0 px-7 pt-7 pb-4 flex flex-col items-center">
           <Image
-            src="/SAPICompLogoHorizontal.png"
+            src={Images.logoHorizontal}
             alt="SAP iComp Logo"
             width={200}
             height={48}
