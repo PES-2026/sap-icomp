@@ -15,5 +15,6 @@ export const env = {
   BACKEND_PORT: getEnv("BACKEND_PORT"),
   FRONTEND_HOST: getEnv("FRONTEND_HOST"),
   FRONTEND_PORT: getEnv("FRONTEND_PORT"),
-  NODE_ENV: process.env.NODE_ENV || "development",
+  ENVIRONMENT: getEnv("ENVIRONMENT"),
+  BASE_DOMAIN: getEnv("BASE_DOMAIN"),
 };

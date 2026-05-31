@@ -31,6 +31,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_TOKEN_EXPIRES=${JWT_TOKEN_EXPIRES}
       - JWT_SECRET=${JWT_SECRET}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - BASE_DOMAIN=${BASE_DOMAIN}
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
@@ -47,6 +49,7 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - JWT_TOKEN_EXPIRES=${JWT_TOKEN_EXPIRES}
       - JWT_SECRET=${JWT_SECRET}
+      - ENVIRONMENT=${ENVIRONMENT}
     ports:
       - "${FRONTEND_PORT}:3000"
     networks:
