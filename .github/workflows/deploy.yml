@@ -93,6 +93,7 @@ jobs:
           NEXT_PUBLIC_API_URL="http://${{ vars.BACKEND_HOST }}"
           JWT_SECRET="${{ secrets.JWT_SECRET }}"
           JWT_TOKEN_EXPIRES="${{ vars.JWT_TOKEN_EXPIRES }}"
+          BASE_DOMAIN="${{ vars.BASE_DOMAIN }}"
           EOF
           echo ".env file generated successfully"
 

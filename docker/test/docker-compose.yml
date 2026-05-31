@@ -32,6 +32,7 @@ services:
       - JWT_TOKEN_EXPIRES=${JWT_TOKEN_EXPIRES}
       - JWT_SECRET=${JWT_SECRET}
       - ENVIRONMENT=${ENVIRONMENT}
+      - BASE_DOMAIN=${BASE_DOMAIN}
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
