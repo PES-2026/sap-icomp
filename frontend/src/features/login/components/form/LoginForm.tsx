@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 
+import { Images } from "@/assets";
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
@@ -42,7 +43,7 @@ export default function LoginForm() {
       >
         <div className="shrink-0 px-7 pt-7 pb-4 flex flex-col items-center">
           <Image
-            src="/SAPICompLogoHorizontal.png"
+            src={Images.logoHorizontal}
             alt="SAP iComp Logo"
             width={200}
             height={48}

@@ -1,5 +1,5 @@
+import { Images } from "@/assets";
 import Image from "next/image";
-import LogoSAPIComp from "../../../public/SAPICompLogoHorizontal.png";
 
 export default function Home() {
   return (
@@ -7,7 +7,7 @@ export default function Home() {
       <div
         className={`overflow-hidden transition-all duration-300 w-80 p-5 rounded-2xl border border-[#ece7db] bg-[#faf7f0] shadow-[0_2px_12px_rgba(0,0,0,0.04)]`}
       >
-        <Image src={LogoSAPIComp} alt="Logo SAP IComp" />
+        <Image src={Images.logoHorizontal} alt="Logo SAP IComp" />
       </div>
 
       <div className="flex w-full max-w-2xl flex-col items-center justify-center space-y-5 rounded-2xl border border-[#ece7db] bg-[#faf7f0] p-8 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
