@@ -16,4 +16,5 @@ export const env = {
   FRONTEND_HOST: getEnv("FRONTEND_HOST"),
   FRONTEND_PORT: getEnv("FRONTEND_PORT"),
   ENVIRONMENT: getEnv("ENVIRONMENT"),
+  BASE_DOMAIN: getEnv("BASE_DOMAIN"),
 };
