@@ -6,6 +6,7 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { useEffect, useState } from "react";
 
 import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Trash } from "lucide-react";
 import { useUsers } from "../../hooks/useUsers";
 import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
@@ -59,6 +60,11 @@ export default function UserTable() {
   const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("");
 
+  const [showDisableUser, setShowDisableUser] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<UserListItem>(
+    {} as UserListItem,
+  );
+
   const { users, totalPages, isLoading, removeUser } = useUsers(page, limit, {
     name: debouncedNameFilter,
     userStatus: statusFilter,
@@ -86,6 +92,11 @@ export default function UserTable() {
   const handleRoleFilterChange = (value: string) => {
     setRoleFilter(value);
     setPage(1);
+  };
+
+  const handleDisableUser = () => {
+    removeUser(selectedUser.id);
+    setShowDisableUser(false);
   };
 
   const filteredUsers = users.filter((user) => {
@@ -164,8 +175,11 @@ export default function UserTable() {
             label=""
             aria-label="Desativar usuário"
             title="Desativar usuário"
-            onClick={() => removeUser(user.id)}
-            className="flex items-center rounded-lg bg-red-400 hover:bg-red-500 text-white p-2 gap-0"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowDisableUser(true);
+            }}
+            className="flex items-center rounded-lg bg-[#f4a598] hover:bg-[#f0a195] border-[#f0a195] text-white p-2 gap-0"
             startIcon={Trash}
           />
         </div>
@@ -174,18 +188,30 @@ export default function UserTable() {
   ];
 
   return (
-    <DataTable
-      title="Lista Geral de Usuários"
-      isLoading={isLoading}
-      data={filteredUsers}
-      columns={columns}
-      page={page}
-      setPage={setPage}
-      limit={limit}
-      setLimit={setLimit}
-      totalItems={filteredUsers.length}
-      totalPages={totalPages}
-      emptyMessage="Nenhum usuário encontrado."
-    />
+    <>
+      <DataTable
+        title="Lista Geral de Usuários"
+        isLoading={isLoading}
+        data={filteredUsers}
+        columns={columns}
+        page={page}
+        setPage={setPage}
+        limit={limit}
+        setLimit={setLimit}
+        totalItems={filteredUsers.length}
+        totalPages={totalPages}
+        emptyMessage="Nenhum usuário encontrado."
+      />
+
+      <ConfirmModal
+        open={showDisableUser}
+        title={"Inativar Usuário"}
+        message={`Tem certeza que deseja inativar ${selectedUser.name}? O usuário não aparecerá mais na listagem ativa.`}
+        confirmLabel="Inativar"
+        confirmColor="critical"
+        onConfirm={handleDisableUser}
+        onCancel={() => setShowDisableUser(false)}
+      />
+    </>
   );
 }
