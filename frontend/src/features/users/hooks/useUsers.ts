@@ -39,5 +39,19 @@ export const useUsers = (
     fetchUsers();
   }, [fetchUsers]);
 
-  return { users, totalItems, totalPages, isLoading, fetchUsers };
+  const removeUser = useCallback(
+    async (id: string) => {
+      try {
+        await userService.remove(id);
+        toast.success("Usuário removido com sucesso.");
+        fetchUsers();
+      } catch (error) {
+        console.error("Error removing user:", error);
+        toast.error("Não foi possível remover o usuário.");
+      }
+    },
+    [fetchUsers],
+  );
+
+  return { users, totalItems, totalPages, isLoading, fetchUsers, removeUser };
 };
