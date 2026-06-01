@@ -1,46 +1,31 @@
 "use client";
 
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { SelectInput } from "@/components/ui/FilterSelect";
-import { SearchInput } from "@/components/ui/SearchInput";
 import { useEffect, useState } from "react";
 
 import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Trash } from "lucide-react";
+import { SelectInput } from "@/components/ui/FilterSelect";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { UserRoundX } from "lucide-react";
 import { useUsers } from "../../hooks/useUsers";
 import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
-
-const roleLabelMap: Record<string, string> = {
-  PEDAGOGUE: "Pedagoga",
-  PROFESSOR: "Professor",
-};
-
-const statusLabelMap: Record<string, string> = {
-  ENABLED: "Ativo",
-  APPROVED: "Ativo",
-  DISABLED: "Inativo",
-  PENDING: "Pendente",
-  REJECTED: "Rejeitado",
-};
-
-const formatRole = (role: string) => roleLabelMap[role] ?? role;
-const formatStatus = (status: string) => statusLabelMap[status] ?? status;
+import { formatRole, formatStatus } from "./userTableColumns";
 
 const statusFilterOptions = [
   { value: "ENABLED", label: "Ativos" },
   { value: "DISABLED", label: "Inativos" },
 ];
 
-function StatusBadge({ status }: { status: UserStatus }) {
+export function StatusBadge({ status }: { status: UserStatus }) {
   const isActive = status === "ENABLED" || status === "APPROVED";
   const isInactive = status === "DISABLED";
 
   const colorClass = isActive
-    ? "bg-emerald-200 text-emerald-700"
+    ? "bg-emerald-100 text-emerald-700"
     : isInactive
-      ? "bg-stone-100 text-stone-600"
-      : "bg-amber-200 text-amber-700";
+      ? "bg-stone-100 text-stone-700"
+      : "bg-amber-100 text-amber-700";
 
   return (
     <span
@@ -179,8 +164,9 @@ export default function UserTable() {
               setSelectedUser(user);
               setShowDisableUser(true);
             }}
-            className="flex items-center rounded-lg bg-[#f4a598] hover:bg-[#f0a195] border-[#f0a195] text-white p-2 gap-0"
-            startIcon={Trash}
+            className="flex items-center rounded-lg bg-transparent border-0 hover:bg-red-100 text-red-500 p-1 gap-0"
+            sizeIcon={20}
+            startIcon={UserRoundX}
           />
         </div>
       ),

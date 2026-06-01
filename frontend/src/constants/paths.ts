@@ -37,6 +37,7 @@ export const PATHS = {
 
   // Users
   users_list: `/${RoleMap.PEDAGOGUE}/users`,
+  users_pending: `/${RoleMap.PEDAGOGUE}/users/pending`,
 
   visualize_settings: `/${RoleMap.PEDAGOGUE}/settings`,
 };
