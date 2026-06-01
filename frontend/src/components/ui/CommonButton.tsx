@@ -1,6 +1,6 @@
+import { cn } from "@/utils/cn";
 import { LucideIcon } from "lucide-react";
 import { ButtonHTMLAttributes } from "react";
-import { cn } from "@/utils/cn";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
@@ -14,7 +14,7 @@ export default function CommonButton({
   className,
   startIcon: StartIcon,
   endIcon: EndIcon,
-  sizeIcon=16,
+  sizeIcon = 16,
   ...props
 }: ButtonProps) {
   return (

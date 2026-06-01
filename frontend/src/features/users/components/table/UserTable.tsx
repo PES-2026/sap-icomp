@@ -5,6 +5,8 @@ import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useEffect, useState } from "react";
 
+import CommonButton from "@/components/ui/CommonButton";
+import { Trash } from "lucide-react";
 import { useUsers } from "../../hooks/useUsers";
 import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
 
@@ -25,8 +27,8 @@ const formatRole = (role: string) => roleLabelMap[role] ?? role;
 const formatStatus = (status: string) => statusLabelMap[status] ?? status;
 
 const statusFilterOptions = [
-  { value: "ENABLED", label: "Apenas Ativos" },
-  { value: "DISABLED", label: "Apenas Inativos" },
+  { value: "ENABLED", label: "Ativos" },
+  { value: "DISABLED", label: "Inativos" },
 ];
 
 function StatusBadge({ status }: { status: UserStatus }) {
@@ -34,14 +36,14 @@ function StatusBadge({ status }: { status: UserStatus }) {
   const isInactive = status === "DISABLED";
 
   const colorClass = isActive
-    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    ? "bg-emerald-200 text-emerald-700"
     : isInactive
-      ? "bg-stone-100 text-stone-600 border-stone-200"
-      : "bg-amber-50 text-amber-700 border-amber-200";
+      ? "bg-stone-100 text-stone-600"
+      : "bg-amber-200 text-amber-700";
 
   return (
     <span
-      className={`inline-flex min-w-20 justify-center rounded-md border px-2.5 py-1 text-xs font-semibold ${colorClass}`}
+      className={`inline-flex justify-center rounded-lg px-3 py-1 text-xs font-semibold ${colorClass}`}
     >
       {formatStatus(status)}
     </span>
@@ -57,7 +59,7 @@ export default function UserTable() {
   const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("");
 
-  const { users, totalPages, isLoading } = useUsers(page, limit, {
+  const { users, totalPages, isLoading, removeUser } = useUsers(page, limit, {
     name: debouncedNameFilter,
     userStatus: statusFilter,
   });
@@ -86,7 +88,6 @@ export default function UserTable() {
     setPage(1);
   };
 
-  // frontend filter since the current backend only accepts name and userStatus in /users
   const filteredUsers = users.filter((user) => {
     const normalizedEmailFilter = emailFilter.toLowerCase();
     const normalizedRoleFilter = roleFilter.toLowerCase();
@@ -153,6 +154,22 @@ export default function UserTable() {
         />
       ),
       renderCell: (user) => <StatusBadge status={user.userStatus} />,
+    },
+    {
+      label: "",
+      width: "w-[70px]",
+      renderCell: (user) => (
+        <div className="flex justify-center gap-0.5">
+          <CommonButton
+            label=""
+            aria-label="Desativar usuário"
+            title="Desativar usuário"
+            onClick={() => removeUser(user.id)}
+            className="flex items-center rounded-lg bg-red-400 hover:bg-red-500 text-white p-2 gap-0"
+            startIcon={Trash}
+          />
+        </div>
+      ),
     },
   ];
 
