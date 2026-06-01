@@ -22,9 +22,15 @@ export const usePendingAccountRequests = () => {
     }
   }, []);
 
+  const removeRequest = useCallback((id: string) => {
+    setRequests((currentRequests) =>
+      currentRequests.filter((request) => request.id !== id),
+    );
+  }, []);
+
   useEffect(() => {
     fetchPendingRequests();
   }, [fetchPendingRequests]);
 
-  return { requests, isLoading, fetchPendingRequests };
+  return { requests, isLoading, fetchPendingRequests, removeRequest };
 };

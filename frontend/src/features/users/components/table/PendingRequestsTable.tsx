@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DataTable } from "@/components/ui/DataTable";
 
 import { useApproveAccountRequest } from "../../hooks/useApproveAccountRequest";
 import { usePendingAccountRequests } from "../../hooks/usePendingAccountRequests";
-import { getPendingRequestsColumns } from "./pendingRequestsColumns";
+import {
+  getPendingRequestsColumns,
+  PendingRequestAction,
+} from "./PendingRequestsColumns";
 
 export default function PendingRequestsTable() {
   const [page, setPage] = useState(1);
@@ -14,17 +17,13 @@ export default function PendingRequestsTable() {
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
-  
-  // Track which request is currently being processed
-  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<{
+    id: string;
+    action: PendingRequestAction;
+  } | null>(null);
 
-  const { requests, isLoading: isLoadingRequests, fetchPendingRequests } = usePendingAccountRequests();
-  const { approveRequest } = useApproveAccountRequest({
-    onSuccess: () => {
-      fetchPendingRequests();
-      setProcessingId(null);
-    },
-  });
+  const { requests, isLoading, removeRequest } = usePendingAccountRequests();
+  const { approveRequest } = useApproveAccountRequest();
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -35,66 +34,96 @@ export default function PendingRequestsTable() {
     return () => window.clearTimeout(timeoutId);
   }, [nameFilter]);
 
+  const handleNameFilterChange = (value: string) => {
+    setNameFilter(value);
+  };
+
   const handleEmailFilterChange = (value: string) => {
     setEmailFilter(value);
     setPage(1);
   };
 
+  const filteredRequests = useMemo(() => {
+    const normalizedEmailFilter = emailFilter.toLowerCase().trim();
+
+    return requests.filter((request) => {
+      const matchesName = request.name
+        .toLowerCase()
+        .includes(debouncedNameFilter);
+      const matchesEmail = request.email
+        .toLowerCase()
+        .includes(normalizedEmailFilter);
+
+      return matchesName && matchesEmail;
+    });
+  }, [requests, debouncedNameFilter, emailFilter]);
+
+  const totalItems = filteredRequests.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+
+  const adjustPageAfterRemoval = () => {
+    setPage((currentPage) => {
+      const remainingItems = Math.max(totalItems - 1, 0);
+      const nextTotalPages = Math.max(1, Math.ceil(remainingItems / limit));
+
+      return Math.min(currentPage, nextTotalPages);
+    });
+  };
+
   const handleApprove = async (id: string, role?: string) => {
-    setProcessingId(id);
-    await approveRequest(id, true, role || "PROFESSOR");
+    setProcessingAction({ id, action: "approve" });
+
+    const wasApproved = await approveRequest(id, true, role || "PROFESSOR");
+
+    if (wasApproved) {
+      removeRequest(id);
+      adjustPageAfterRemoval();
+    }
+
+    setProcessingAction(null);
   };
 
   const handleReject = async (id: string) => {
-    // Adding confirmation for rejection would be ideal, but keeping it simple for now
-    if (window.confirm("Tem certeza que deseja rejeitar esta solicitação?")) {
-      setProcessingId(id);
-      await approveRequest(id, false);
+    setProcessingAction({ id, action: "reject" });
+
+    const wasRejected = await approveRequest(id, false);
+
+    if (wasRejected) {
+      removeRequest(id);
+      adjustPageAfterRemoval();
     }
+
+    setProcessingAction(null);
   };
 
-  const filteredRequests = requests.filter((request) => {
-    const normalizedEmailFilter = emailFilter.toLowerCase();
-
-    const matchesName = (request.name || "")
-      .toLowerCase()
-      .includes(debouncedNameFilter);
-      
-    const matchesEmail = (request.email || "")
-      .toLowerCase()
-      .includes(normalizedEmailFilter);
-
-    return matchesName && matchesEmail;
-  });
-
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredRequests.length / limit) || 1;
+  const paginatedRequests = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    return filteredRequests.slice(startIndex, startIndex + limit);
+  }, [filteredRequests, page, limit]);
 
   const columns = getPendingRequestsColumns({
     nameFilter,
-    onNameFilterChange: setNameFilter,
+    onNameFilterChange: handleNameFilterChange,
     emailFilter,
     onEmailFilterChange: handleEmailFilterChange,
     onApprove: handleApprove,
     onReject: handleReject,
-    isProcessingId: processingId,
+    processingAction,
   });
 
   return (
     <DataTable
-      title="Solicitações de Acesso Pendentes"
-      isLoading={isLoadingRequests}
+      title="Solicitações Pendentes"
+      isLoading={isLoading}
       data={paginatedRequests}
       columns={columns}
       page={page}
       setPage={setPage}
       limit={limit}
       setLimit={setLimit}
-      totalItems={filteredRequests.length}
+      totalItems={totalItems}
       totalPages={totalPages}
-      emptyMessage="Nenhuma solicitação pendente no momento."
+      emptyMessage="Nenhuma solicitação pendente encontrada."
     />
   );
 }

@@ -1,10 +1,12 @@
-import { Check, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 
 import { Column } from "@/components/ui/DataTable";
 import { SearchInput } from "@/components/ui/SearchInput";
 
 import { PendingAccountRequestItem } from "../../types/user";
 import { StatusBadge } from "./UserTable";
+
+export type PendingRequestAction = "approve" | "reject";
 
 export function getPendingRequestsColumns({
   nameFilter,
@@ -13,7 +15,7 @@ export function getPendingRequestsColumns({
   onEmailFilterChange,
   onApprove,
   onReject,
-  isProcessingId,
+  processingAction,
 }: {
   nameFilter: string;
   onNameFilterChange: (value: string) => void;
@@ -21,7 +23,7 @@ export function getPendingRequestsColumns({
   onEmailFilterChange: (value: string) => void;
   onApprove: (id: string, role?: string) => void;
   onReject: (id: string) => void;
-  isProcessingId: string | null;
+  processingAction: { id: string; action: PendingRequestAction } | null;
 }): Column<PendingAccountRequestItem>[] {
   return [
     {
@@ -62,28 +64,43 @@ export function getPendingRequestsColumns({
     },
     {
       label: "Ações",
-      width: "w-[160px]",
+      width: "w-[220px]",
       renderCell: (request) => {
-        const isProcessing = isProcessingId === request.id;
+        const isApproving =
+          processingAction?.id === request.id &&
+          processingAction.action === "approve";
+        const isRejecting =
+          processingAction?.id === request.id &&
+          processingAction.action === "reject";
+        const isProcessing = isApproving || isRejecting;
 
         return (
-          <div className="flex items-center gap-2 justify-center">
+          <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => onApprove(request.id, request.role)}
               disabled={isProcessing}
-              className="flex h-8 items-center justify-center gap-1 rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50"
+              className="flex h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
               title="Aprovar"
             >
-              <Check className="h-4 w-4" />
-              Aprovar
+              {isApproving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              {isApproving ? "Aprovando" : "Aprovar"}
             </button>
             <button
               onClick={() => onReject(request.id)}
               disabled={isProcessing}
-              className="flex h-8 w-8 items-center justify-center rounded-md bg-red-50 text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
-              title="Rejeitar"
+              className="flex h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-red-50 px-3 py-1 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              title="Reprovar"
             >
-              <X className="h-4 w-4" />
+              {isRejecting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <X className="h-4 w-4" />
+              )}
+              {isRejecting ? "Reprovando" : "Reprovar"}
             </button>
           </div>
         );

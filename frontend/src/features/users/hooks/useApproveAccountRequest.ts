@@ -7,10 +7,16 @@ interface UseApproveAccountRequestOptions {
   onSuccess?: () => void;
 }
 
-export const useApproveAccountRequest = (options?: UseApproveAccountRequestOptions) => {
+export const useApproveAccountRequest = (
+  options?: UseApproveAccountRequestOptions,
+) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const approveRequest = async (id: string, isApproved: boolean, role?: string) => {
+  const approveRequest = async (
+    id: string,
+    isApproved: boolean,
+    role?: string,
+  ) => {
     try {
       setIsLoading(true);
       await accountRequestService.approveAccountRequest(id, isApproved, role);
@@ -18,12 +24,19 @@ export const useApproveAccountRequest = (options?: UseApproveAccountRequestOptio
       if (isApproved) {
         toast.success("Solicitação aprovada com sucesso.");
       } else {
-        toast.success("Solicitação rejeitada com sucesso.");
+        toast.success("Solicitação reprovada com sucesso.");
       }
-      
+
       options?.onSuccess?.();
-    } catch (error: any) {
-      toast.error(error?.message || "Erro ao processar a solicitação.");
+      return true;
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Erro ao processar a solicitação.";
+
+      toast.error(message);
+      return false;
     } finally {
       setIsLoading(false);
     }
