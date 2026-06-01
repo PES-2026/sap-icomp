@@ -125,7 +125,7 @@ export default function RegisterForm() {
             >
               <input
                 type="text"
-                placeholder="123456"
+                placeholder="1234567"
                 {...register("registrationNumber")}
                 className={getValidationClass(!!errors.registrationNumber)}
                 aria-label="Número de Registro"
