@@ -99,13 +99,14 @@ export default function StudentForm({
 
       setIsSubmitted(true);
     } catch (error: any) {
+      console.log(error);
       isEditMode
         ? toast.error(
-            error.response?.data?.error ||
+            error?.message ||
               "Erro ao conectar com o servidor, não foi possível editar.",
           )
         : toast.error(
-            error.response?.data?.error ||
+            error?.message ||
               "Erro ao conectar com o servidor, não foi possível registrar.",
           );
     } finally {
