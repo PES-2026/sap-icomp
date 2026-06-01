@@ -37,17 +37,19 @@ export default function StudentTable() {
       .toLowerCase()
       .includes(nameFilter.toLowerCase());
     const matchNeed =
-      student.diagnoses.length > 0
-        ? student.diagnoses.some(
-            (diag) =>
-              (diag.name || "")
-                .toLowerCase()
-                .includes(dignosesFilter.toLowerCase()) ||
-              (diag.acronym || "")
-                .toLowerCase()
-                .includes(dignosesFilter.toLowerCase()),
-          )
-        : true;
+      !dignosesFilter || dignosesFilter === ""
+        ? true
+        : student.diagnoses && student.diagnoses.length > 0
+          ? student.diagnoses.some(
+              (diag) =>
+                (diag.name || "")
+                  .toLowerCase()
+                  .includes(dignosesFilter.toLowerCase()) ||
+                (diag.acronym || "")
+                  .toLowerCase()
+                  .includes(dignosesFilter.toLowerCase()),
+            )
+          : false;
     const matchCourse =
       courseFilter === "Todos" ||
       (student.course?.id ?? "")
