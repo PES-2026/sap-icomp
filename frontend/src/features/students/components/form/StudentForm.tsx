@@ -99,7 +99,6 @@ export default function StudentForm({
 
       setIsSubmitted(true);
     } catch (error: any) {
-      console.log(error);
       isEditMode
         ? toast.error(
             error?.message ||
