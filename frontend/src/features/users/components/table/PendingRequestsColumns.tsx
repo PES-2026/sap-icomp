@@ -79,7 +79,7 @@ export function getPendingRequestsColumns({
             <button
               onClick={() => onApprove(request.id, request.role)}
               disabled={isProcessing}
-              className="flex h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex cursor-pointer h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
               title="Aprovar"
             >
               {isApproving ? (
@@ -92,7 +92,7 @@ export function getPendingRequestsColumns({
             <button
               onClick={() => onReject(request.id)}
               disabled={isProcessing}
-              className="flex h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-red-50 px-3 py-1 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex cursor-pointer h-8 min-w-24 items-center justify-center gap-1.5 rounded-md bg-red-50 px-3 py-1 text-sm font-medium text-red-500 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
               title="Reprovar"
             >
               {isRejecting ? (

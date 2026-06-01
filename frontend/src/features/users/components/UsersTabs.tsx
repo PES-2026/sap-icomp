@@ -15,7 +15,7 @@ export default function UsersTabs() {
           <button
             onClick={() => setActiveTab("users")}
             className={`
-              flex items-center gap-3 whitespace-nowrap border-b-3 py-3 w-50 justify-center text-sm font-medium
+              flex cursor-pointer items-center gap-3 whitespace-nowrap border-b-3 py-3 w-50 justify-center text-sm font-medium
               ${
                 activeTab === "users"
                   ? "border-emerald-500 text-emerald-600"
@@ -30,7 +30,7 @@ export default function UsersTabs() {
           <button
             onClick={() => setActiveTab("pending")}
             className={`
-              flex items-center gap-3 whitespace-nowrap border-b-3 py-3 w-50 justify-center text-sm font-medium
+              flex cursor-pointer items-center gap-3 whitespace-nowrap border-b-3 py-3 w-50 justify-center text-sm font-medium
               ${
                 activeTab === "pending"
                   ? "border-emerald-500 text-emerald-600"

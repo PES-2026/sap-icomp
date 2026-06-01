@@ -1,3 +1,5 @@
+"use client";
+
 import { Column } from "@/components/ui/DataTable";
 import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";

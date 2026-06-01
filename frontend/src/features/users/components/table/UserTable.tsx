@@ -10,7 +10,7 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { UserRoundX } from "lucide-react";
 import { useUsers } from "../../hooks/useUsers";
 import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
-import { formatRole, formatStatus } from "./userTableColumns";
+import { formatRole, formatStatus } from "./UserTableColumns";
 
 const statusFilterOptions = [
   { value: "ENABLED", label: "Ativos" },
