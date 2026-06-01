@@ -55,7 +55,6 @@ export default function StudentTable() {
       (student.course?.id ?? "")
         .toLowerCase()
         .includes(courseFilter.toLowerCase());
-
     return matchEnrollment && matchName && matchNeed && matchCourse;
   });
 

@@ -101,11 +101,11 @@ export default function StudentForm({
     } catch (error: any) {
       isEditMode
         ? toast.error(
-            error.response?.data?.error ||
+            error?.message ||
               "Erro ao conectar com o servidor, não foi possível editar.",
           )
         : toast.error(
-            error.response?.data?.error ||
+            error?.message ||
               "Erro ao conectar com o servidor, não foi possível registrar.",
           );
     } finally {
