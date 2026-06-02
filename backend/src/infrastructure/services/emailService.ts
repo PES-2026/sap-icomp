@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import { IEmailService } from "../../domain/services/emailService";
 import { env } from "../config/env";
 
-export class GmailEmailService implements IEmailService {
+export class EmailService implements IEmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
