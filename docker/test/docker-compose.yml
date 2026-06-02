@@ -31,10 +31,10 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_TOKEN_EXPIRES=${JWT_TOKEN_EXPIRES}
       - JWT_SECRET=${JWT_SECRET}
-<<<<<<< HEAD
       - ENVIRONMENT=${ENVIRONMENT}
-=======
->>>>>>> fd44f1b (fix: fixing env file lint problems and defining env)
+      - BASE_DOMAIN=${BASE_DOMAIN}
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
       - BASE_DOMAIN=${BASE_DOMAIN}
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}

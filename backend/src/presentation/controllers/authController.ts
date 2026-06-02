@@ -72,7 +72,7 @@ export class AuthController extends BaseController {
         secure: this.config.isProduction,
         sameSite: "lax" as const,
         maxAge: maxAge,
-        domain: ".nelsul.com",
+        domain: this.config.domain,
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
