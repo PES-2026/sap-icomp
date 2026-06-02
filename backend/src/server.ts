@@ -53,7 +53,7 @@ import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositor
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
-import { GmailEmailService } from "@infrastructure/services/gmailEmailService";
+import { EmailService } from "@infrastructure/services/emailService";
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
@@ -158,7 +158,7 @@ const userController = new UserController(
 app.use(userRoutes(userController));
 
 const tokenService = new JwtTokenService();
-const emailService = new GmailEmailService();
+const emailService = new EmailService();
 const passwordResetRepository = new PrismaPasswordResetRepository();
 const userResolver = new UserResolver(professorRepository, pedagogueRepository);
 const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
