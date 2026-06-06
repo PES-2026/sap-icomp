@@ -44,7 +44,7 @@ export function DataTable<T>({
   }
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-7">
+    <main className="flex min-w-0 flex-1 flex-col h-full font-sans p-6">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-[#faf7f0] border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] min-h-0">
         <div className="flex shrink-0 items-center justify-between px-6 pb-4 pt-5">
           <h1 className="m-0 text-xl font-semibold text-[#3a3530]">{title}</h1>

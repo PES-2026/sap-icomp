@@ -27,6 +27,9 @@ export default function TablePagination({
   const pageIndicator = totalPages
     ? `Exibindo página ${page} de ${Math.max(totalPages, 1)}`
     : `Exibindo página ${page}`;
+  const isLastPage = totalPages
+    ? page >= Math.max(totalPages, 1)
+    : lengthData < limit;
 
   const handleLimitChange = (newLimit: string) => {
     setLimit(Number(newLimit));
@@ -50,7 +53,7 @@ export default function TablePagination({
 
       <div className="flex gap-2">
         <button
-          onClick={() => setPage(Math.max(page - 1))}
+          onClick={() => setPage(Math.max(page - 1, 1))}
           disabled={page === 1}
           className="flex items-center gap-1 rounded-lg border border-[#e2ddd5] bg-white px-3 py-1.5 text-[#4a4540] transition-colors hover:bg-[#faf8f4] disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -58,7 +61,7 @@ export default function TablePagination({
         </button>
         <button
           onClick={() => setPage(page + 1)}
-          disabled={lengthData < limit}
+          disabled={isLastPage}
           className="flex items-center gap-1 rounded-lg border border-[#e2ddd5] bg-white px-3 py-1.5 text-[#4a4540] transition-colors hover:bg-[#faf8f4] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Próxima <ChevronRight size={16} />

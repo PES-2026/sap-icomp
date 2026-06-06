@@ -2,6 +2,7 @@
 
 import { Images } from "@/assets";
 import { PATHS } from "@/constants/paths";
+import { useAuthStore } from "@/store/authStore";
 import {
   CalendarFold,
   Home,
@@ -23,33 +24,38 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navItems = [
-    { label: "Início", icon: Home, id: "Início", href: PATHS.pedagogue },
-    {
-      label: "Alunos",
-      icon: Users,
-      id: "Base de Alunos",
-      href: PATHS.students_list,
-    },
-    {
-      label: "Atendimentos",
-      icon: CalendarFold,
-      id: "Envio",
-      href: PATHS.attendances_list,
-    },
-    {
-      label: "Usuários",
-      icon: UserCog,
-      id: "Usuários",
-      href: PATHS.users_list,
-    },
-    {
-      label: "Cadastros Gerais",
-      icon: Settings,
-      id: "Configuração",
-      href: PATHS.visualize_settings,
-    },
-  ];
+  const user = useAuthStore((state) => state.user);
+
+  const navItems =
+    user?.role === "PROFESSOR"
+      ? [{ label: "Início", icon: Home, id: "Início", href: PATHS.professor }]
+      : [
+          { label: "Início", icon: Home, id: "Início", href: PATHS.pedagogue },
+          {
+            label: "Alunos",
+            icon: Users,
+            id: "Base de Alunos",
+            href: PATHS.students_list,
+          },
+          {
+            label: "Atendimentos",
+            icon: CalendarFold,
+            id: "Envio",
+            href: PATHS.attendances_list,
+          },
+          {
+            label: "Usuários",
+            icon: UserCog,
+            id: "Usuários",
+            href: PATHS.users_list,
+          },
+          {
+            label: "Cadastros Gerais",
+            icon: Settings,
+            id: "Configuração",
+            href: PATHS.visualize_settings,
+          },
+        ];
 
   return (
     <>

@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  passwordPatterns,
+} from "./passwordRequirements";
+
 export const registerSchema = z
   .object({
     name: z
@@ -11,7 +17,10 @@ export const registerSchema = z
     registrationNumber: z
       .string()
       .trim()
-      .nonempty({ message: "O número de registro é obrigatório." }),
+      .nonempty({ message: "O número de registro é obrigatório." })
+      .regex(/^\d+$/, "O número de registro deve conter apenas números.")
+      .min(7, "O número de registro deve ter no mínimo 7 dígitos.")
+      .max(10, "O número de registro deve ter no máximo 10 dígitos."),
 
     phoneNumber: z
       .string()
@@ -41,12 +50,23 @@ export const registerSchema = z
       .string()
       .trim()
       .nonempty({ message: "A senha é obrigatória." })
-      .min(8, { message: "A senha deve ter no mínimo 8 caracteres." })
-      .regex(/[A-Z]/, "Deve conter ao menos uma letra maiúscula.")
-      .regex(/[a-z]/, "Deve conter ao menos uma letra minúscula.")
-      .regex(/[0-9]/, "Deve conter ao menos um número.")
+      .min(PASSWORD_MIN_LENGTH, {
+        message: `A senha deve ter no mínimo ${PASSWORD_MIN_LENGTH} caracteres.`,
+      })
+      .max(PASSWORD_MAX_LENGTH, {
+        message: `A senha deve ter no máximo ${PASSWORD_MAX_LENGTH} caracteres.`,
+      })
       .regex(
-        /[^a-zA-Z0-9]/,
+        passwordPatterns.uppercase,
+        "Deve conter ao menos uma letra maiúscula.",
+      )
+      .regex(
+        passwordPatterns.lowercase,
+        "Deve conter ao menos uma letra minúscula.",
+      )
+      .regex(passwordPatterns.number, "Deve conter ao menos um número.")
+      .regex(
+        passwordPatterns.specialCharacter,
         "Deve conter ao menos um caractere especial (@, #, $, etc).",
       ),
 
