@@ -6,8 +6,9 @@ export const publicRoutes = [
   "/login",
   "/register",
   "/forgot-password",
-  "/public",
+  "/appointment",
 ];
+
 const VALID_ROLES = ["PROFESSOR", "PEDAGOGUE"] as const;
 type UserRole = (typeof VALID_ROLES)[number];
 
