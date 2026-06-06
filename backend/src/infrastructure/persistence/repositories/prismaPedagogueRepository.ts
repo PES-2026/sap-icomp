@@ -137,9 +137,9 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     }
   }
 
-  async updatePassword(internalId: number, passwordHash: string): Promise<void> {
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
     await this.prisma.pedagogue.update({
-      where: { internalId },
+      where: { externalId: id },
       data: { password: passwordHash },
     });
   }

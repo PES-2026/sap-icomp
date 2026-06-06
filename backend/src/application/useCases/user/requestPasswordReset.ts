@@ -36,8 +36,8 @@ export class RequestPasswordReset {
     await this.passwordResetRepository.create({
       token,
       expiresAt,
-      professorId: role === RoleEnum.PROFESSOR ? userData.internalId : undefined,
-      pedagogueId: role === RoleEnum.PEDAGOGUE ? userData.internalId : undefined,
+      professorId: role === RoleEnum.PROFESSOR ? userData.id : undefined,
+      pedagogueId: role === RoleEnum.PEDAGOGUE ? userData.id : undefined,
     });
 
     // Send the email

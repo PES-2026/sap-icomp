@@ -99,14 +99,13 @@ app.use(
 );
 
 const courseRepository = new PrismaCourseRepository(prisma);
-const professorRepositoryForCourse = new PrismaProfessorRepository(prisma);
 
 const courseController = new CourseController(
   new CreateCourse(courseRepository),
+  new UpdateCourse(courseRepository),
   new ListCourse(courseRepository),
   new CourseById(courseRepository),
   new RemoveCourse(courseRepository),
-  new UpdateCourse(courseRepository, professorRepositoryForCourse),
 );
 
 const studentRepository = new PrismaStudentRepository(prisma);
@@ -178,7 +177,7 @@ const authController = new AuthController(
   resetPasswordUseCase,
   {
     jwtExpires: env.JWT_TOKEN_EXPIRES,
-    isProduction: env.NODE_ENV === "production",
+    isProduction: env.ENVIRONMENT === "production",
   },
 );
 
@@ -186,9 +185,9 @@ app.use(authRoutes(authController, tokenService));
 
 const attendanceRepository = new PrismaAttendanceRepository(prisma);
 const attendanceController = new AttendanceController(
-  new CreateAttendance(attendanceRepository, studentRepository, pedagogueRepository, attendanceTypeRepository),
-  new UpdateAttendance(attendanceRepository),
+  new CreateAttendance(attendanceRepository, studentRepository),
   new ListAttendances(attendanceRepository),
+  new UpdateAttendance(attendanceRepository),
   new AttendancesByStudent(attendanceRepository),
   new RemoveAttendance(attendanceRepository),
   new AttendanceById(attendanceRepository),
@@ -199,8 +198,8 @@ app.use(attendanceRoutes(attendanceController));
 const diagnosisRepository = new PrismaDiagnosesRepository(prisma);
 const diagnosesController = new DiagnosesController(
   new CreateDiagnosis(diagnosisRepository),
-  new ListDiagnoses(diagnosisRepository),
   new UpdateDiagnosis(diagnosisRepository),
+  new ListDiagnoses(diagnosisRepository),
   new RemoveDiagnosis(diagnosisRepository),
   new DiagnosisById(diagnosisRepository),
 );

@@ -1,4 +1,6 @@
 import { ApplicationError } from "@application/errors/applicationError";
+import { InvalidResetTokenError } from "@application/errors/user/invalidResetTokenError";
+import { UserNotFoundToResetError } from "@application/errors/user/userNotFoundToResetError";
 import { IPasswordResetRepository } from "@domain/repositories/passwordResetRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
@@ -19,7 +21,7 @@ export class ResetPassword {
     const resetRecord = await this.passwordResetRepository.findByToken(input.token);
 
     if (!resetRecord || resetRecord.usedAt || resetRecord.expiresAt < new Date()) {
-      return Result.fail<void>(new ApplicationError("Invalid or expired reset token", 400));
+      return Result.fail<void>(new InvalidResetTokenError());
     }
 
     const hashedPassword = await this.hashService.hash(input.newPassword);
@@ -30,7 +32,7 @@ export class ResetPassword {
     } else if (resetRecord.pedagogueId) {
       await this.pedagogueRepository.updatePassword(resetRecord.pedagogueId, hashedPassword);
     } else {
-      return Result.fail<void>(new ApplicationError("User not found for this reset token", 404));
+      return Result.fail<void>(new UserNotFoundToResetError());
     }
 
     // Mark the token as used

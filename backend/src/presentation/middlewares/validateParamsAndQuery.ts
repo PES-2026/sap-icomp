@@ -9,8 +9,8 @@ export function validateParamsAndQuery(DTOClass: DTOClassWithCreate) {
     try {
       const { id } = req.params;
 
-      if (!id) {
-        throw new Error("Id is required in params");
+      if (!id || typeof id !== "string") {
+        throw new Error("Id is required in params and must be a string");
       }
 
       req.dto = DTOClass.create(id, req.query);

@@ -1,8 +1,8 @@
 export interface PasswordResetData {
   token: string;
   expiresAt: Date;
-  professorId?: number;
-  pedagogueId?: number;
+  professorId?: string | undefined;
+  pedagogueId?: string | undefined;
 }
 
 export interface PasswordResetItem extends PasswordResetData {

@@ -138,9 +138,9 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
   }
 
-  async updatePassword(internalId: number, passwordHash: string): Promise<void> {
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
     await this.prisma.professor.update({
-      where: { internalId },
+      where: { externalId: id },
       data: { password: passwordHash },
     });
   }

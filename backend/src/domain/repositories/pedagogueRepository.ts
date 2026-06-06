@@ -12,7 +12,7 @@ export interface IPedagogueRepository {
   findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>>;
   save(pedagogue: Pedagogue): Promise<void>;
   update(pedagogue: Pedagogue): Promise<void>;
-  updatePassword(internalId: number, passwordHash: string): Promise<void>;
+  updatePassword(id: string, passwordHash: string): Promise<void>;
   findById(id: string): Promise<UserItem | null>;
   findByEmail(email: string): Promise<UserItem | null>;
   findByEmailWithPassword(email: string): Promise<UserAuthResult | null>;

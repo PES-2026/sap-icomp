@@ -2,7 +2,13 @@ import { jwtVerify } from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const publicRoutes = ["/login", "/register", "/forgot-password", "/public"];
+export const publicRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/public",
+];
 const VALID_ROLES = ["PROFESSOR", "PEDAGOGUE"] as const;
 type UserRole = (typeof VALID_ROLES)[number];
 

@@ -2,24 +2,38 @@ import {
   IPasswordResetRepository,
   PasswordResetData,
   PasswordResetItem,
-} from "../../../domain/repositories/passwordResetRepository";
+} from "@domain/repositories/passwordResetRepository";
+import { Prisma } from "@prisma/src/infrastructure/database/generated/client";
+
 import { prisma } from "../../persistence/prisma";
 
 export class PrismaPasswordResetRepository implements IPasswordResetRepository {
   async create(data: PasswordResetData): Promise<void> {
+    const createData: Prisma.PasswordResetCreateInput = {
+      token: data.token,
+      expiresAt: data.expiresAt,
+    };
+
+    if (data.professorId) {
+      createData.professor = { connect: { externalId: data.professorId } };
+    }
+
+    if (data.pedagogueId) {
+      createData.pedagogue = { connect: { externalId: data.pedagogueId } };
+    }
+
     await prisma.passwordReset.create({
-      data: {
-        token: data.token,
-        expiresAt: data.expiresAt,
-        professorId: data.professorId,
-        pedagogueId: data.pedagogueId,
-      },
+      data: createData,
     });
   }
 
   async findByToken(token: string): Promise<PasswordResetItem | null> {
     const reset = await prisma.passwordReset.findUnique({
       where: { token },
+      include: {
+        professor: true,
+        pedagogue: true,
+      },
     });
 
     if (!reset) return null;
@@ -30,8 +44,8 @@ export class PrismaPasswordResetRepository implements IPasswordResetRepository {
       expiresAt: reset.expiresAt,
       createdAt: reset.createdAt,
       usedAt: reset.usedAt,
-      professorId: reset.professorId || undefined,
-      pedagogueId: reset.pedagogueId || undefined,
+      professorId: reset.professor?.externalId || undefined,
+      pedagogueId: reset.pedagogue?.externalId || undefined,
     };
   }
 

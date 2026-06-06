@@ -14,7 +14,6 @@ import { BaseController } from "./baseController";
 export interface AuthControllerConfig {
   jwtExpires: string;
   isProduction: boolean;
-  domain: string;
 }
 
 export class AuthController extends BaseController {
@@ -33,7 +32,6 @@ export class AuthController extends BaseController {
       const dto = ForgotPasswordDTO.create(req.body);
       await this.requestPasswordResetUseCase.execute(dto);
 
-      // Always return 200 to prevent user enumeration
       res.status(200).json({ message: "If this email exists, a reset link has been sent." });
     } catch (error) {
       this.handleError(error, res, `${AuthController.name}:forgotPassword`);
@@ -66,13 +64,12 @@ export class AuthController extends BaseController {
       const expiration = this.config.jwtExpires;
       const maxAge = parseExpirationToMs(expiration);
 
-      const domainEnv = env.ENVIRONMENT === "local" ? undefined : env.BASE_DOMAIN;
       const cookieOptions = {
         httpOnly: true,
         secure: this.config.isProduction,
         sameSite: "lax" as const,
         maxAge: maxAge,
-        domain: this.config.domain,
+        domain: ".nelsul.com",
       };
 
       res.cookie("accessToken", authData.token, cookieOptions);
@@ -104,12 +101,11 @@ export class AuthController extends BaseController {
 
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
-      const domainEnv = env.ENVIRONMENT === "local" ? undefined : env.BASE_DOMAIN;
       res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: env.ENVIRONMENT !== "local",
+        secure: this.config.isProduction,
         sameSite: "lax",
-        domain: domainEnv,
+        domain: ".nelsul.com",
       });
 
       res.status(200).json({ message: "Logout successful." });
