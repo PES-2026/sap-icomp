@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppNavigation } from "@/utils/navigator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +14,6 @@ import { TimeSlot } from "../types/appointment";
 export const useAppointmentForm = () => {
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const { handleNavigation } = useAppNavigation();
 
   const methods = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
@@ -36,6 +34,7 @@ export const useAppointmentForm = () => {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = methods;
 
@@ -75,7 +74,7 @@ export const useAppointmentForm = () => {
       console.log(data);
       await appointmentService.create(data);
       toast.success("Atendimento solicitado com sucesso!");
-      // handleNavigation({ path: PATHS.scheduling });
+      reset();
     } catch (error) {
       console.error(error);
     }
