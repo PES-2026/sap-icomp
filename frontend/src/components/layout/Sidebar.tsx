@@ -5,6 +5,7 @@ import { PATHS } from "@/constants/paths";
 import { useAuthStore } from "@/store/authStore";
 import { useSidebarStore } from "@/store/sidebarStore";
 import {
+  CalendarClock,
   CalendarFold,
   Home,
   PanelLeftClose,
@@ -42,6 +43,12 @@ export default function Sidebar() {
             icon: CalendarFold,
             id: "Envio",
             href: PATHS.attendances_list,
+          },
+          {
+            label: "Gestão de Agendamentos",
+            icon: CalendarClock,
+            id: "Agendamento",
+            href: PATHS.scheduling,
           },
           {
             label: "Usuários",
