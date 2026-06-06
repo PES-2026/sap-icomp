@@ -21,6 +21,13 @@ enum UserStatus {
   DISABLED
 }
 
+enum ScheduleSlotStatus {
+  AVAILABLE
+  PENDING
+  BOOKED
+  CANCELLED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -79,6 +86,7 @@ model Pedagogue {
 
   attendances Attendance[]
   reports     Report[]
+  schedules   Schedule[]
 }
 
 model Professor {
@@ -121,6 +129,8 @@ model Attendance {
   student   Student        @relation(fields: [studentId], references: [internalId])
   pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
   type      AttendanceType @relation(fields: [typeId], references: [internalId])
+
+  scheduleSlots ScheduleSlot[]
 }
 
 model AttendanceType {
@@ -280,4 +290,40 @@ model ClassProfessor {
   class     ClassOffering @relation(fields: [classId], references: [internalId])
 
   @@id([professorId, classId])
+}
+
+model Schedule {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  pedagogueId Int
+  pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
+
+  startDate DateTime
+  endDate   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
+
+  slots ScheduleSlot[]
+}
+
+model ScheduleSlot {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  scheduleId Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [internalId])
+
+  startDateTime DateTime
+  endDateTime   DateTime
+
+  status ScheduleSlotStatus @default(AVAILABLE)
+
+  attendanceId Int?
+  attendance   Attendance? @relation(fields: [attendanceId], references: [internalId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
