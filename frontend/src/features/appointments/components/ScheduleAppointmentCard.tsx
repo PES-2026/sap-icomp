@@ -18,6 +18,7 @@ export default function ScheduleAppointmentCard() {
     control,
     handleSubmit,
     errors,
+    slots,
     isLoadingSlots,
     isSubmitting,
     selectedSlotId,
