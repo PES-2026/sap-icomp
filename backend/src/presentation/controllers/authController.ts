@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
 
 import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateUserDto";
-import { ForgotPasswordDTO } from "@application/dtos/user/forgotPasswordDto";
-import { ResetPasswordDTO } from "@application/dtos/user/resetPasswordDto";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
-import { RequestPasswordReset } from "@application/useCases/user/requestPasswordReset";
-import { ResetPassword } from "@application/useCases/user/resetPassword";
 import { parseExpirationToMs } from "@domain/utils/timeUtils";
+import { env } from "@infrastructure/config/env";
 
 import { BaseController } from "./baseController";
 
@@ -20,9 +17,6 @@ export class AuthController extends BaseController {
   constructor(
     private readonly authenticateUserUseCase: AuthenticateUser,
     private readonly getAuthenticatedUserUseCase: GetAuthenticatedUser,
-    private readonly requestPasswordResetUseCase: RequestPasswordReset,
-    private readonly resetPasswordUseCase: ResetPassword,
-    private readonly config: AuthControllerConfig,
   ) {
     super();
   }
@@ -61,12 +55,12 @@ export class AuthController extends BaseController {
 
       const authData = result.getValue();
 
-      const expiration = this.config.jwtExpires;
+      const expiration = env.JWT_TOKEN_EXPIRES;
       const maxAge = parseExpirationToMs(expiration);
 
       const cookieOptions = {
         httpOnly: true,
-        secure: this.config.isProduction,
+        secure: env.ENVIRONMENT !== "local",
         sameSite: "lax" as const,
         maxAge: maxAge,
         domain: ".nelsul.com",
