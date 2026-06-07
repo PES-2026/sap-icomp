@@ -1,14 +1,16 @@
 "use client";
 
-import { Lock, MailCheck } from "lucide-react";
+import { Eye, EyeOff, Lock, MailCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { useWatch } from "react-hook-form";
 
 import { Images } from "@/assets";
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
+import { cn } from "@/utils/cn";
 import { useAppNavigation } from "@/utils/navigator";
 import { maskPhone } from "@/utils/utils";
 import { useRegister } from "../../hooks/useRegister";
@@ -32,6 +34,9 @@ export default function RegisterForm() {
   } = form;
 
   const password = useWatch({ control, name: "password", defaultValue: "" });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
@@ -74,7 +79,6 @@ export default function RegisterForm() {
   return (
     <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center bg-[#f5f0e8] p-4 sm:p-6 font-['Nunito','Segoe_UI',sans-serif]">
       <div className="flex w-full max-w-5xl overflow-hidden rounded-2xl border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-        {/* Left Panel */}
         <div className="hidden relative lg:flex lg:w-2/5 flex-col justify-between bg-[#1a2e28] border-r border-[#1a2e28] p-10 overflow-hidden">
           <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#2a4a3e] opacity-60" />
           <div className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full bg-[#223d33] opacity-50" />
@@ -112,7 +116,6 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        {/* Right Panel */}
         <div className="flex-1 bg-white flex flex-col">
           <div className="shrink-0 px-8 pt-8 pb-4 flex flex-col items-center border-b border-stone-100 lg:items-start">
             <Image
@@ -205,12 +208,31 @@ export default function RegisterForm() {
 
                 <div className="flex flex-col gap-1">
                   <Field label="Senha:" required>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      {...register("password")}
-                      className={getValidationClass(!!errors.password)}
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        {...register("password")}
+                        className={cn(
+                          getValidationClass(!!errors.password),
+                          "pr-10",
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors focus:outline-none"
+                        aria-label={
+                          showPassword ? "Ocultar senha" : "Mostrar senha"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
                   </Field>
                   {password.trim().length > 0 && (
                     <PasswordRequirements password={password} />
@@ -222,12 +244,33 @@ export default function RegisterForm() {
                   error={errors.confirmPassword?.message}
                   required
                 >
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    {...register("confirmPassword")}
-                    className={getValidationClass(!!errors.confirmPassword)}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...register("confirmPassword")}
+                      className={cn(
+                        getValidationClass(!!errors.confirmPassword),
+                        "pr-10",
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors focus:outline-none"
+                      aria-label={
+                        showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+                  </div>
                 </Field>
               </div>
 
