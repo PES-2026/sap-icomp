@@ -3,10 +3,10 @@
 import { Images } from "@/assets";
 import { PATHS } from "@/constants/paths";
 import { useAuthStore } from "@/store/authStore";
+import { useSidebarStore } from "@/store/sidebarStore";
 import {
   CalendarFold,
   Home,
-  Menu,
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
@@ -22,8 +22,8 @@ import { useState } from "react";
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
+  const { mobileOpen, setMobileOpen } = useSidebarStore();
   const user = useAuthStore((state) => state.user);
 
   const navItems =
@@ -59,17 +59,6 @@ export default function Sidebar() {
 
   return (
     <>
-      <button
-        onClick={() => {
-          setMobileOpen(true);
-          setCollapsed(false);
-        }}
-        className="fixed left-4 top-4 z-40 rounded-lg border border-[#ece7db] bg-[#faf7f0] p-2 text-[#3a3530] shadow-sm transition-colors hover:bg-[#ece7db] md:hidden"
-        aria-label="Abrir menu"
-      >
-        <Menu size={24} />
-      </button>
-
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity md:hidden"
@@ -79,20 +68,29 @@ export default function Sidebar() {
 
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex min-h-screen shrink-0 flex-col border-r border-[#ece7db] bg-[#faf7f0] py-5
+          fixed inset-y-0 left-0 z-50 flex min-h-screen shrink-0 flex-col border-r border-[#ece7db] bg-[#faf7f0]
           transition-all duration-300 ease-in-out md:static
           ${mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:translate-x-0 md:shadow-none"}
           ${collapsed ? "w-64 md:w-17" : "w-64 md:w-64"}
         `}
       >
-        <div className="flex items-center justify-between gap-3 px-4 mb-6 pb-4 border-b">
+        <div
+          className={`
+            flex items-center justify-between gap-3 px-4 border-b border-[#ece7db]
+            shrink-0 transition-all duration-300 h-20 mb-6
+          `}
+        >
           <div
             className={`
               overflow-hidden transition-all duration-300
               ${collapsed ? "hidden w-0 opacity-0 md:w-0 md:opacity-0" : "opacity-100"}
             `}
           >
-            <Image src={Images.logoHorizontal} alt="Logo SAP IComp" />
+            <Image
+              src={Images.logoHorizontal}
+              alt="Logo SAP IComp"
+              className="w-auto object-contain"
+            />
           </div>
 
           <button
@@ -113,7 +111,7 @@ export default function Sidebar() {
 
           <button
             onClick={() => setMobileOpen(false)}
-            className="mt-1 block shrink-0 rounded-lg p-1.5 text-[#8a8075] transition-all duration-200 hover:bg-[#ece7db] hover:text-[#3a3530] md:hidden ml-auto"
+            className="mt-1 block shrink-0 rounded-lg p-1.5 text-[#8a8075] transition-all duration-200 hover:bg-[#ece7db] hover:text-[#3a3530] md:hidden ml-auto cursor-pointer"
             aria-label="Fechar menu"
           >
             <X size={20} />
@@ -136,7 +134,7 @@ export default function Sidebar() {
                 title={collapsed ? item.label : undefined}
                 className={`
                   flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]
-                  transition-all duration-300 ease-in-out
+                  transition-all duration-300 ease-in-out cursor-pointer
                   ${collapsed ? "px-3.5 py-2.5 md:justify-center md:px-2.5" : "px-3.5 py-2.5"}
                   ${
                     isActive
