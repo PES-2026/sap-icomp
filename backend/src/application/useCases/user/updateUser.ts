@@ -118,7 +118,11 @@ export class UpdateUser {
     }
 
     userEntity.update(updateProps);
-    await repository.update(userEntity);
+    if (userEntity instanceof Pedagogue) {
+      await (repository as IPedagogueRepository).update(userEntity);
+    } else {
+      await (repository as IProfessorRepository).update(userEntity as Professor);
+    }
 
     return Result.ok({
       name: userEntity.name.value,

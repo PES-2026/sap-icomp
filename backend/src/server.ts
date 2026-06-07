@@ -72,10 +72,13 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import { publicAttendanceRoutes } from "@presentation/routes/publicAttendanceRoutes";
 
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(publicAttendanceRoutes);
 
 const allowedOrigins = [
   `https://${env.FRONTEND_HOST}`,

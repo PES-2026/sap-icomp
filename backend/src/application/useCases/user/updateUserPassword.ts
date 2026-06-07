@@ -85,7 +85,11 @@ export class UpdateUserPassword {
 
       userEntity.changePassword(newPasswordVO.getValue());
 
-      await repository.update(userEntity);
+      if (userEntity instanceof Pedagogue) {
+        await (repository as IPedagogueRepository).update(userEntity);
+      } else {
+        await (repository as IProfessorRepository).update(userEntity as Professor);
+      }
 
       return Result.ok();
     } else {

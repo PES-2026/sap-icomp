@@ -10,7 +10,7 @@ export type ScheduleSlotProps = {
   startDateTime: DateInput;
   endDateTime: DateInput;
   status: ScheduleSlotStatusEnum;
-  attendanceId?: string;
+  attendanceId?: string | undefined;
 };
 
 export class ScheduleSlot {

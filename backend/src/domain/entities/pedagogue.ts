@@ -15,6 +15,7 @@ export type PedagogueProps = {
   registrationNumber: string;
   userStatus: string;
   password?: string;
+  maxAttendanceTime?: number;
 };
 
 export type PedagogueVOProps = {
@@ -24,6 +25,7 @@ export type PedagogueVOProps = {
   registrationNumber: RegistrationNumberVO;
   userStatus: UserStatusVO;
   password: PasswordVO;
+  maxAttendanceTime: number;
 };
 
 export class Pedagogue {
@@ -35,6 +37,7 @@ export class Pedagogue {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public password?: PasswordVO,
+    public maxAttendanceTime: number = 60,
   ) {}
 
   update(props: Partial<PedagogueVOProps>): void {
@@ -43,6 +46,7 @@ export class Pedagogue {
     if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
     if (props.registrationNumber !== undefined) this.registrationNumber = props.registrationNumber;
     if (props.userStatus !== undefined) this.userStatus = props.userStatus;
+    if (props.maxAttendanceTime !== undefined) this.maxAttendanceTime = props.maxAttendanceTime;
   }
 
   changePassword(newPassword: PasswordVO): void {
@@ -74,6 +78,7 @@ export class Pedagogue {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password?.getValue(),
+        props.maxAttendanceTime ?? 60,
       ),
     );
   }
@@ -87,6 +92,7 @@ export class Pedagogue {
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
       props.password ? PasswordVO.fromTrusted(props.password) : undefined,
+      props.maxAttendanceTime ?? 60,
     );
   }
 }

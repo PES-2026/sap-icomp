@@ -96,6 +96,25 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     };
   }
 
+  async findEntityById(id: string): Promise<Pedagogue | null> {
+    const raw = await this.prisma.pedagogue.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return Pedagogue.rehydrate({
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      password: raw.password,
+      maxAttendanceTime: raw.maxAttendanceTime || 60,
+    });
+  }
+
   async findByEmail(email: string): Promise<UserItem | null> {
     const raw = await this.prisma.pedagogue.findUnique({
       where: { email },
