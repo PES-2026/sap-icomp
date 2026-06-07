@@ -101,6 +101,28 @@ export class CreateScheduleDTO {
       };
     });
 
+    // Validar sobreposição e duplicidade interna
+    const sortedSlots = [...slots].sort(
+      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime(),
+    );
+
+    for (let i = 0; i < sortedSlots.length - 1; i++) {
+      const current = sortedSlots[i]!;
+      const next = sortedSlots[i + 1]!;
+      const currentEnd = new Date(current.endDateTime).getTime();
+      const nextStart = new Date(next.startDateTime).getTime();
+
+      if (currentEnd > nextStart) {
+        throw new Error(
+          `Internal overlap detected between slots starting at ${current.startDateTime} and ${next.startDateTime}.`,
+        );
+      }
+
+      if (current.startDateTime === next.startDateTime && current.endDateTime === next.endDateTime) {
+        throw new Error(`Duplicate slot detected for ${current.startDateTime}.`);
+      }
+    }
+
     return new CreateScheduleDTO(
       pedagogueId,
       startTime,
