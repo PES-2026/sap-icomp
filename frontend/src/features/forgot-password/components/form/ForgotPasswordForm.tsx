@@ -37,8 +37,6 @@ export default function ForgotPasswordForm() {
           <Image
             src={Images.logoHorizontal}
             alt="SAP iComp Logo"
-            width={200}
-            height={48}
             className="mb-6 h-10 md:h-12 w-auto"
             priority
           />
@@ -75,8 +73,6 @@ export default function ForgotPasswordForm() {
           <Image
             src={Images.logoHorizontal}
             alt="SAP iComp Logo"
-            width={200}
-            height={48}
             className="mb-4 h-10 md:h-12 w-auto"
             priority
           />

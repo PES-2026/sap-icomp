@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const forgotPasswordSchema = z.object({
   email: z
-    .string()
     .email({ message: "Formato de e-mail inválido." })
     .trim()
     .nonempty({ message: "O e-mail é obrigatório." }),
@@ -15,7 +14,7 @@ export const resetPasswordSchema = z
       .string()
       .trim()
       .nonempty({ message: "A nova senha é obrigatória." })
-      .min(6, { message: "A senha deve ter no mínimo 6 caracteres." })
+      .min(8, { message: "A senha deve ter no mínimo 8 caracteres." })
       .regex(/^[^%&=+]+$/, {
         message: "A senha contém caracteres inválidos (%, &, = ou +).",
       }),

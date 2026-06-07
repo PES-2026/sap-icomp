@@ -35,9 +35,6 @@ services:
       - BASE_DOMAIN=${BASE_DOMAIN}
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
-      - BASE_DOMAIN=${BASE_DOMAIN}
-      - GMAIL_USER=${GMAIL_USER}
-      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:
