@@ -26,6 +26,7 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CreateSchedule } from "@application/useCases/schedule/createSchedule";
 import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
@@ -49,6 +50,7 @@ import { PrismaCourseRepository } from "@infrastructure/persistence/repositories
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
+import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
@@ -101,6 +103,7 @@ app.use(
 
 const attedanceRepository = new PrismaAttendanceRepository(prisma);
 const studentRepository = new PrismaStudentRepository(prisma);
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 
 const attendanceControler = new AttendanceController(
   new CreateAttendance(attedanceRepository, studentRepository),
@@ -123,7 +126,12 @@ const diagnosesController = new DiagnosesController(
 
 app.use(diagnosesRoutes(diagnosesController));
 
-const scheduleController = new ScheduleController(new CreateSchedulePreviewUseCase());
+const scheduleRepository = new PrismaScheduleRepository(prisma);
+
+const scheduleController = new ScheduleController(
+  new CreateSchedulePreviewUseCase(),
+  new CreateSchedule(scheduleRepository, pedagogueRepository),
+);
 
 app.use(scheduleRoutes(scheduleController));
 
@@ -164,7 +172,6 @@ const attendanceTypeController = new AttendanceTypeController(
 app.use(attendanceTypeRoutes(attendanceTypeController));
 
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
-const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
 const hashService = new BcryptHashService();
 

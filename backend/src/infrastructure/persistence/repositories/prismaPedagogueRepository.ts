@@ -157,6 +157,14 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     return !!account;
   }
 
+  async existsByUUID(externalId: string): Promise<boolean> {
+    const pedagogue = await this.prisma.pedagogue.findUnique({
+      where: { externalId },
+    });
+
+    return !!pedagogue;
+  }
+
   async remove(id: string): Promise<void> {
     await this.prisma.pedagogue.update({
       where: { externalId: id },

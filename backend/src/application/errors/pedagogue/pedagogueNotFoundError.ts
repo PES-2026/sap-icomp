@@ -3,9 +3,9 @@ import { ErrorCategory } from "@domain/errors/domainError";
 import { ApplicationError } from "../applicationError";
 
 export class PedagogueNotFoundError extends ApplicationError {
-  constructor() {
+  constructor(id?: string) {
     super(
-      "No pedagogue was found in the database. An attendance must be linked to a pedagogue.",
+      id ? `Pedagogue with ID ${id} was not found.` : "No pedagogue was found in the database.",
       ErrorCategory.BUSINESS_RULE,
     );
   }

@@ -15,7 +15,7 @@ export interface IPedagogueRepository {
   findById(id: string): Promise<UserItem | null>;
   findByEmail(email: string): Promise<UserItem | null>;
   findByEmailWithPassword(email: string): Promise<UserAuthResult | null>;
-  //existsByUUID(externalId: string): Promise<boolean>;
+  existsByUUID(externalId: string): Promise<boolean>;
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;
   remove(id: string): Promise<void>;
