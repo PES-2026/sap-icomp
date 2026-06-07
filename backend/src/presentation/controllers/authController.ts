@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 
 import { AuthenticateUserRequestDTO } from "@application/dtos/user/authenticateUserDto";
+import { ForgotPasswordDTO } from "@application/dtos/user/forgotPasswordDto";
+import { ResetPasswordDTO } from "@application/dtos/user/resetPasswordDto";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
+import { RequestPasswordReset } from "@application/useCases/user/requestPasswordReset";
+import { ResetPassword } from "@application/useCases/user/resetPassword";
 import { parseExpirationToMs } from "@domain/utils/timeUtils";
 import { env } from "@infrastructure/config/env";
 
@@ -17,6 +21,8 @@ export class AuthController extends BaseController {
   constructor(
     private readonly authenticateUserUseCase: AuthenticateUser,
     private readonly getAuthenticatedUserUseCase: GetAuthenticatedUser,
+    private readonly requestPasswordResetUseCase: RequestPasswordReset,
+    private readonly resetPasswordUseCase: ResetPassword,
   ) {
     super();
   }
@@ -97,7 +103,7 @@ export class AuthController extends BaseController {
     try {
       res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: this.config.isProduction,
+        secure: env.ENVIRONMENT !== "local",
         sameSite: "lax",
         domain: ".nelsul.com",
       });
