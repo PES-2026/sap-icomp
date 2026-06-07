@@ -1,5 +1,4 @@
 import { CircleCheck, CircleX } from "lucide-react";
-
 import { passwordRequirements } from "../../utils/passwordRequirements";
 
 interface PasswordRequirementsProps {
