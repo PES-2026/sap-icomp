@@ -26,6 +26,7 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -57,6 +58,7 @@ import { AttendanceTypeController } from "@presentation/controllers/attendanceTy
 import { AuthController } from "@presentation/controllers/authController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
+import { ScheduleController } from "@presentation/controllers/scheduleController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
@@ -66,6 +68,7 @@ import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes"
 import { authRoutes } from "@presentation/routes/authRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
+import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
 
@@ -119,6 +122,10 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const scheduleController = new ScheduleController(new CreateSchedulePreviewUseCase());
+
+app.use(scheduleRoutes(scheduleController));
 
 const courseRepository = new PrismaCourseRepository(prisma);
 
