@@ -2,6 +2,7 @@ import api from "@/services/api";
 import {
   SchedulePreviewPayload,
   SchedulePreviewResponse,
+  ScheduleSavePayload,
 } from "../types/schedule";
 
 export const scheduleService = {
@@ -18,5 +19,10 @@ export const scheduleService = {
 
     return response.data;
   },
-};
 
+  async save(payload: ScheduleSavePayload): Promise<void> {
+    await api.post("/schedule", payload, {
+      fallbackMsg: "Não foi possível salvar a agenda.",
+    });
+  },
+};

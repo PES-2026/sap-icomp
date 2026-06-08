@@ -1,6 +1,7 @@
 import {
   SchedulePreviewPayload,
   SchedulePreviewResponse,
+  ScheduleSavePayload,
 } from "../types/schedule";
 import { generateSchedulePreview } from "../utils/schedulePreview";
 
@@ -12,5 +13,9 @@ export const scheduleMock = {
       slots: generateSchedulePreview(payload),
     };
   },
-};
 
+  async save(_payload: ScheduleSavePayload): Promise<void> {
+    void _payload;
+    return Promise.resolve();
+  },
+};

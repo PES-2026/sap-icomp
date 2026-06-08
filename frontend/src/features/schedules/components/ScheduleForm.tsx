@@ -1,8 +1,10 @@
 "use client";
 
 import CommonButton from "@/components/ui/CommonButton";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Field } from "@/components/ui/Field";
 import { useSchedulePreview } from "../hooks/useSchedulePreview";
+import ScheduleManualSlotForm from "./ScheduleManualSlotForm";
 import SchedulePreviewList from "./SchedulePreviewList";
 
 const baseInputClass =
@@ -17,13 +19,20 @@ export default function ScheduleForm() {
   const {
     form,
     slots,
+    previewPayload,
     disabledSlotIds,
     isLoading,
+    isSaving,
+    isConfirmOpen,
     hasGeneratedPreview,
+    activeSlotsCount,
     clearPreview,
     invalidatePreview,
     toggleSlot,
+    addManualSlot,
     confirmPreview,
+    cancelSaveConfirmation,
+    saveSchedule,
     onSubmit,
   } = useSchedulePreview();
 
@@ -31,8 +40,6 @@ export default function ScheduleForm() {
     register,
     formState: { errors },
   } = form;
-
-  const activeSlotsCount = slots.length - disabledSlotIds.size;
 
   return (
     <main className="flex min-h-[calc(100vh-100px)] w-full flex-col overflow-auto p-4 font-sans md:p-8">
@@ -179,6 +186,15 @@ export default function ScheduleForm() {
               )}
             </div>
 
+            <ScheduleManualSlotForm
+              disabled={!hasGeneratedPreview || isLoading || isSaving}
+              minDate={previewPayload?.startDate}
+              maxDate={previewPayload?.endDate}
+              minTime={previewPayload?.startTime}
+              maxTime={previewPayload?.endTime}
+              onAddSlot={addManualSlot}
+            />
+
             <SchedulePreviewList
               slots={slots}
               hasGeneratedPreview={hasGeneratedPreview}
@@ -192,18 +208,31 @@ export default function ScheduleForm() {
               label="Cancelar"
               type="button"
               onClick={clearPreview}
-              disabled={isLoading}
+              disabled={isLoading || isSaving}
               className="min-w-30 justify-center bg-[#ffae99] text-white hover:bg-[#f39a84] disabled:cursor-not-allowed disabled:opacity-60"
             />
             <CommonButton
-              label="Confirmar Registro"
+              label={isSaving ? "Salvando..." : "Confirmar Registro"}
               type="button"
               onClick={confirmPreview}
-              disabled={!hasGeneratedPreview || activeSlotsCount === 0}
+              disabled={
+                !hasGeneratedPreview || activeSlotsCount === 0 || isSaving
+              }
               className="min-w-40 justify-center disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </form>
+
+        <ConfirmModal
+          open={isConfirmOpen}
+          title="Salvar agenda"
+          message={`Deseja salvar ${activeSlotsCount} ${
+            activeSlotsCount === 1 ? "horário ativo" : "horários ativos"
+          }? Os horários removidos não serão enviados.`}
+          confirmLabel={isSaving ? "Salvando..." : "Salvar"}
+          onConfirm={isSaving ? () => undefined : saveSchedule}
+          onCancel={cancelSaveConfirmation}
+        />
       </div>
     </main>
   );

@@ -29,6 +29,9 @@ const formatWeekday = (date: string) =>
 
 const getTime = (dateTime: string) => dateTime.slice(11, 16);
 
+const getSlotId = (slot: ScheduleSlot) =>
+  `${slot.startDateTime}|${slot.endDateTime}`;
+
 export default function SchedulePreviewList({
   slots,
   hasGeneratedPreview,
@@ -92,7 +95,7 @@ export default function SchedulePreviewList({
 
             <div>
               {groupedSlots[date].map((slot) => {
-                const slotId = slot.startDateTime;
+                const slotId = getSlotId(slot);
                 const isDisabled = disabledSlotIds.has(slotId);
 
                 return (

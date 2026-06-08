@@ -24,3 +24,6 @@ export interface SchedulePreviewResponse {
   slots: ScheduleSlot[];
 }
 
+export interface ScheduleSavePayload extends SchedulePreviewPayload {
+  slots: ScheduleSlot[];
+}
