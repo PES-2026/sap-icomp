@@ -6,6 +6,7 @@ export const publicRoutes = [
   "/login",
   "/register",
   "/forgot-password",
+  "/reset-password",
   "/public",
 ];
 const VALID_ROLES = ["PROFESSOR", "PEDAGOGUE"] as const;

@@ -36,6 +36,8 @@ import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticate
 import { GetUserById } from "@application/useCases/user/getUserById";
 import { ListUsers } from "@application/useCases/user/listUsers";
 import { RemoveUser } from "@application/useCases/user/removeUser";
+import { RequestPasswordReset } from "@application/useCases/user/requestPasswordReset";
+import { ResetPassword } from "@application/useCases/user/resetPassword";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
 import { UserResolver } from "@application/useCases/user/userResolver";
@@ -46,10 +48,12 @@ import { PrismaAttendanceRepository } from "@infrastructure/persistence/reposito
 import { PrismaAttendanceTypeRepository } from "@infrastructure/persistence/repositories/prismaAttendanceTypeRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
+import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
+import { EmailService } from "@infrastructure/services/emailService";
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
@@ -90,35 +94,9 @@ app.use(
 
       return callback(new Error("Not allowed by CORS"), false);
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
-
-const attedanceRepository = new PrismaAttendanceRepository(prisma);
-const studentRepository = new PrismaStudentRepository(prisma);
-
-const attendanceControler = new AttendanceController(
-  new CreateAttendance(attedanceRepository, studentRepository),
-  new ListAttendances(attedanceRepository),
-  new UpdateAttendance(attedanceRepository),
-  new AttendancesByStudent(attedanceRepository),
-  new RemoveAttendance(attedanceRepository),
-  new AttendanceById(attedanceRepository),
-);
-
-const diagnosesRepository = new PrismaDiagnosesRepository(prisma);
-
-const diagnosesController = new DiagnosesController(
-  new CreateDiagnosis(diagnosesRepository),
-  new UpdateDiagnosis(diagnosesRepository),
-  new ListDiagnoses(diagnosesRepository),
-  new RemoveDiagnosis(diagnosesRepository),
-  new DiagnosisById(diagnosesRepository),
-);
-
-app.use(diagnosesRoutes(diagnosesController));
 
 const courseRepository = new PrismaCourseRepository(prisma);
 
@@ -130,8 +108,7 @@ const courseController = new CourseController(
   new RemoveCourse(courseRepository),
 );
 
-app.use(attendanceRoutes(attendanceControler));
-
+const studentRepository = new PrismaStudentRepository(prisma);
 const studentController = new StudentController(
   new CreateStudent(studentRepository),
   new ListStudents(studentRepository),
@@ -180,12 +157,54 @@ const userController = new UserController(
 app.use(userRoutes(userController));
 
 const tokenService = new JwtTokenService();
+const emailService = new EmailService();
+const passwordResetRepository = new PrismaPasswordResetRepository();
 const userResolver = new UserResolver(professorRepository, pedagogueRepository);
 const authenticateUserUseCase = new AuthenticateUser(userResolver, hashService, tokenService);
 const getAuthenticatedUserUseCase = new GetAuthenticatedUser(userResolver);
-const authController = new AuthController(authenticateUserUseCase, getAuthenticatedUserUseCase);
+const requestPasswordResetUseCase = new RequestPasswordReset(userResolver, emailService, passwordResetRepository);
+const resetPasswordUseCase = new ResetPassword(
+  hashService,
+  professorRepository,
+  pedagogueRepository,
+  passwordResetRepository,
+);
+
+const authController = new AuthController(
+  authenticateUserUseCase,
+  getAuthenticatedUserUseCase,
+  requestPasswordResetUseCase,
+  resetPasswordUseCase,
+  {
+    jwtExpires: env.JWT_TOKEN_EXPIRES,
+    isProduction: env.ENVIRONMENT === "production",
+  },
+);
 
 app.use(authRoutes(authController, tokenService));
+
+const attendanceRepository = new PrismaAttendanceRepository(prisma);
+const attendanceController = new AttendanceController(
+  new CreateAttendance(attendanceRepository, studentRepository),
+  new ListAttendances(attendanceRepository),
+  new UpdateAttendance(attendanceRepository),
+  new AttendancesByStudent(attendanceRepository),
+  new RemoveAttendance(attendanceRepository),
+  new AttendanceById(attendanceRepository),
+);
+
+app.use(attendanceRoutes(attendanceController));
+
+const diagnosisRepository = new PrismaDiagnosesRepository(prisma);
+const diagnosesController = new DiagnosesController(
+  new CreateDiagnosis(diagnosisRepository),
+  new UpdateDiagnosis(diagnosisRepository),
+  new ListDiagnoses(diagnosisRepository),
+  new RemoveDiagnosis(diagnosisRepository),
+  new DiagnosisById(diagnosisRepository),
+);
+
+app.use(diagnosesRoutes(diagnosesController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
