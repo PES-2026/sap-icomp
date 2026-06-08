@@ -95,9 +95,7 @@ export const useSchedulePreview = () => {
       setHasGeneratedPreview(true);
 
       if (response.slots.length === 0) {
-        toast.error(
-          "Nenhum horário completo cabe no período informado.",
-        );
+        toast.error("Nenhum horário completo cabe no período informado.");
       } else {
         toast.success("Prévia da agenda gerada com sucesso.");
       }
@@ -217,8 +215,7 @@ export const useSchedulePreview = () => {
       );
 
       return (
-        newStartMinutes < slotEndMinutes &&
-        newEndMinutes > slotStartMinutes
+        newStartMinutes < slotEndMinutes && newEndMinutes > slotStartMinutes
       );
     });
 
