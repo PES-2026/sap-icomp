@@ -20,7 +20,7 @@ import {
 } from "../utils/validations";
 
 export const SCHEDULE_PREVIEW_MOCK_ENABLED =
-  process.env.NEXT_PUBLIC_SCHEDULE_PREVIEW_MOCK !== "false";
+  process.env.NEXT_PUBLIC_SCHEDULE_PREVIEW_MOCK === "true";
 
 interface ManualSlotData {
   date: string;
