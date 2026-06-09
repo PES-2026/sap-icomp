@@ -25,8 +25,6 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
         attendedAt: attendance.date.value,
         demand: attendance.demand.value,
         observation: attendance.generalObservations?.value ?? "",
-        status: attendance.status as any,
-        token: attendance.token ?? null,
       },
     });
   }
@@ -129,8 +127,6 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
-      status: result.status,
-      token: result.token ?? undefined,
       updatedAt: result.updatedAt,
       createdAt: result.createdAt,
     }));
@@ -201,8 +197,6 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       },
       demand: attendance.demand ?? "",
       generalObservations: attendance.observation ?? "",
-      status: attendance.status,
-      token: attendance.token ?? undefined,
       updatedAt: attendance.updatedAt,
       createdAt: attendance.createdAt,
     };
@@ -298,8 +292,6 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
       },
       demand: result.demand ?? "",
       generalObservations: result.observation ?? "",
-      status: result.status,
-      token: result.token ?? undefined,
       updatedAt: result.updatedAt,
       createdAt: result.createdAt,
     }));

@@ -1,17 +1,17 @@
+import { Pedagogue } from "@domain/entities/pedagogue";
 import { RoleEnum } from "@domain/enum/role";
+import { UserStatusEnum } from "@domain/enum/userStatus";
+import { UserFilters } from "@domain/repositories/filters/userFilters";
+import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
+import { PedagogueResult } from "@domain/repositories/results/pedagogueResult";
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
+import { PaginatedResult } from "@domain/shared/pagination";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
-
-import { Pedagogue } from "../../../domain/entities/pedagogue";
-import { UserFilters } from "../../../domain/repositories/filters/userFilters";
-import { IPedagogueRepository } from "../../../domain/repositories/pedagogueRepository";
-import { UserItem } from "../../../domain/repositories/results/userResult";
-import { PaginatedResult } from "../../../domain/shared/pagination";
 
 export class PrismaPedagogueRepository implements IPedagogueRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>> {
+  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<PedagogueResult>> {
     const skip = (page - 1) * limit;
 
     const where: Prisma.PedagogueWhereInput = {
@@ -36,16 +36,17 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       }),
     ]);
 
-    const items: UserItem[] = pedagogues.map((p) => ({
+    const items: PedagogueResult[] = pedagogues.map((p) => ({
       id: p.externalId,
       name: p.name,
       email: p.email,
-      phoneNumber: p.phoneNumber || "",
+      phoneNumber: p.phoneNumber ?? "",
       registrationNumber: p.registration,
-      role: "PEDAGOGUE",
+      role: RoleEnum.PEDAGOGUE,
       userStatus: p.userStatus,
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
+      maxAttendanceTime: p.maxAttendanceTime ?? undefined,
     }));
 
     return {
@@ -76,7 +77,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
     });
   }
 
-  async findById(id: string): Promise<UserItem | null> {
+  async findById(id: string): Promise<PedagogueResult | null> {
     const raw = await this.prisma.pedagogue.findUnique({
       where: { externalId: id },
     });
@@ -87,35 +88,17 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
-      phoneNumber: raw.phoneNumber || "",
+      phoneNumber: raw.phoneNumber ?? "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
       role: RoleEnum.PEDAGOGUE,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
+      maxAttendanceTime: raw.maxAttendanceTime ?? undefined,
     };
   }
 
-  async findEntityById(id: string): Promise<Pedagogue | null> {
-    const raw = await this.prisma.pedagogue.findUnique({
-      where: { externalId: id },
-    });
-
-    if (!raw) return null;
-
-    return Pedagogue.rehydrate({
-      id: raw.externalId,
-      name: raw.name,
-      email: raw.email,
-      phoneNumber: raw.phoneNumber || "",
-      registrationNumber: raw.registration,
-      userStatus: raw.userStatus,
-      password: raw.password,
-      maxAttendanceTime: raw.maxAttendanceTime || 60,
-    });
-  }
-
-  async findByEmail(email: string): Promise<UserItem | null> {
+  async findByEmail(email: string): Promise<PedagogueResult | null> {
     const raw = await this.prisma.pedagogue.findUnique({
       where: { email },
     });
@@ -126,12 +109,13 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
-      phoneNumber: raw.phoneNumber || "",
+      phoneNumber: raw.phoneNumber ?? "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
       role: RoleEnum.PEDAGOGUE,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
+      maxAttendanceTime: raw.maxAttendanceTime ?? undefined,
     };
   }
 
@@ -188,7 +172,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       where: { externalId: id },
       data: {
         removed: true,
-        userStatus: "DISABLED",
+        userStatus: UserStatusEnum.DISABLED,
       },
     });
   }
@@ -204,7 +188,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       id: raw.externalId,
       name: raw.name,
       email: raw.email,
-      phoneNumber: raw.phoneNumber || "",
+      phoneNumber: raw.phoneNumber ?? "",
       registrationNumber: raw.registration,
       userStatus: raw.userStatus,
       role: RoleEnum.PEDAGOGUE,
