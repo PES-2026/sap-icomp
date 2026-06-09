@@ -29,7 +29,7 @@ export class EmailService implements IEmailService {
   }
 
   private async sendEmail(mailOptions: nodemailer.SendMailOptions): Promise<void> {
-    const logoPath = path.join(__dirname, "../assets/images/SAPICompLogoHorizontal.png");
+    const logoPath = path.join(__dirname, "../../../assets/images/SAPICompLogoHorizontal.png");
 
     mailOptions.from = env.GMAIL_USER;
     mailOptions.attachments = [
