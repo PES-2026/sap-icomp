@@ -26,6 +26,7 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
@@ -208,6 +209,7 @@ app.use(diagnosesRoutes(diagnosesController));
 
 const scheduleRepository = new PrismaScheduleRepository(prisma);
 const scheduleController = new ScheduleController(
+  new CreateSchedulePreviewUseCase(),
   new RequestSchedule(scheduleRepository, pedagogueRepository, courseRepository, emailService),
 );
 
