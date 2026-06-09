@@ -1,4 +1,5 @@
 import { Result } from "@domain/shared/result";
+import { TokenVO } from "@domain/valueObjects/schedule/token";
 
 import { DateInput, DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
@@ -8,6 +9,7 @@ export type ScheduleProps = {
   pedagogueId: string;
   startDate: DateInput;
   endDate: DateInput;
+  token?: string;
   removed?: boolean;
 };
 
@@ -17,6 +19,7 @@ export class Schedule {
     public readonly pedagogueId: ExternalIdVO,
     public startDate: DateVO,
     public endDate: DateVO,
+    public token: TokenVO,
     private _removed: boolean = false,
   ) {}
 
@@ -25,8 +28,9 @@ export class Schedule {
     const pedagogueId = ExternalIdVO.from(props.pedagogueId);
     const startDate = DateVO.create(props.startDate);
     const endDate = DateVO.create(props.endDate);
+    const token = TokenVO.create();
 
-    const results = [externalId, pedagogueId, startDate, endDate];
+    const results = [externalId, pedagogueId, startDate, endDate, token];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -40,6 +44,7 @@ export class Schedule {
         pedagogueId.getValue(),
         startDate.getValue(),
         endDate.getValue(),
+        token.getValue(),
         props.removed ?? false,
       ),
     );
@@ -51,6 +56,7 @@ export class Schedule {
       ExternalIdVO.fromTrusted(props.pedagogueId),
       DateVO.fromTrusted(new Date(props.startDate as string | Date)),
       DateVO.fromTrusted(new Date(props.endDate as string | Date)),
+      TokenVO.fromTrusted(props.token!),
       props.removed ?? false,
     );
   }

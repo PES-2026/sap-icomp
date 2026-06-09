@@ -28,6 +28,13 @@ enum ScheduleSlotStatus {
   CANCELLED
 }
 
+enum ScheduleStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -79,6 +86,8 @@ model Pedagogue {
   password     String
 
   userStatus UserStatus @default(APPROVED)
+
+  maxAttendanceTime Int? @default(60)
 
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -317,6 +326,9 @@ model Schedule {
 
   startDate DateTime
   endDate   DateTime
+
+  status ScheduleStatus @default(PENDING)
+  token  String         @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

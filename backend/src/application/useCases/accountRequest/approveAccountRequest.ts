@@ -60,8 +60,9 @@ export class ApproveAccountRequest {
         return Result.fail(pedagogueOrError.error!);
       }
 
-      createdUser = pedagogueOrError.getValue();
-      await this.pedagogueRepository.save(createdUser);
+      const pedagogue = pedagogueOrError.getValue();
+      await this.pedagogueRepository.save(pedagogue);
+      createdUser = pedagogue;
     } else if (props.role === RoleEnum.PROFESSOR) {
       const professorOrError = Professor.create({
         name: accountRequest.name.value,
