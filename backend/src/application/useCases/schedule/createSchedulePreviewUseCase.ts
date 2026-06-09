@@ -1,7 +1,7 @@
-import { Result } from "@domain/shared/result";
 import { ApplicationError } from "@application/errors/applicationError";
-import { DomainError } from "@domain/errors/domainError";
 import { InvalidScheduleParamsError } from "@application/errors/schedule/invalidScheduleParamsError";
+import { DomainError } from "@domain/errors/domainError";
+import { Result } from "@domain/shared/result";
 
 import {
   CreateSchedulePreviewDTO,

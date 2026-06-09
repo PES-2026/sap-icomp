@@ -62,14 +62,7 @@ export class CreateSchedulePreviewDTO {
       throw new Error("endTime must be greater than startTime.");
     }
 
-    return new CreateSchedulePreviewDTO(
-      pedagogueId,
-      startTime,
-      endTime,
-      attendanceDuration,
-      startDate,
-      endDate,
-    );
+    return new CreateSchedulePreviewDTO(pedagogueId, startTime, endTime, attendanceDuration, startDate, endDate);
   }
 
   private static validateTime(value: unknown, fieldName: string): string {
