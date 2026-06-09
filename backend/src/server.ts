@@ -26,6 +26,7 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -51,9 +52,10 @@ import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositor
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
+import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
-import { EmailService } from "@infrastructure/services/emailService";
+import { EmailService } from "@infrastructure/services/email/providers/gmailService";
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
@@ -61,6 +63,7 @@ import { AttendanceTypeController } from "@presentation/controllers/attendanceTy
 import { AuthController } from "@presentation/controllers/authController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
+import { ScheduleController } from "@presentation/controllers/scheduleController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
@@ -70,15 +73,13 @@ import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes"
 import { authRoutes } from "@presentation/routes/authRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
+import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
-import { publicAttendanceRoutes } from "@presentation/routes/publicAttendanceRoutes";
 
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
-
-app.use(publicAttendanceRoutes);
 
 const allowedOrigins = [
   `https://${env.FRONTEND_HOST}`,
@@ -178,10 +179,6 @@ const authController = new AuthController(
   getAuthenticatedUserUseCase,
   requestPasswordResetUseCase,
   resetPasswordUseCase,
-  {
-    jwtExpires: env.JWT_TOKEN_EXPIRES,
-    isProduction: env.ENVIRONMENT === "production",
-  },
 );
 
 app.use(authRoutes(authController, tokenService));
@@ -208,6 +205,13 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const scheduleRepository = new PrismaScheduleRepository(prisma);
+const scheduleController = new ScheduleController(
+  new RequestSchedule(scheduleRepository, pedagogueRepository, courseRepository, emailService),
+);
+
+app.use(scheduleRoutes(scheduleController));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
