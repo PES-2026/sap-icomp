@@ -9,7 +9,7 @@ import { Professor } from "@domain/entities/professor";
 import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserItem } from "@domain/repositories/results/userResult";
+import { UserResult } from "@domain/repositories/results/userResult";
 import { IHashService } from "@domain/services/hashService";
 import { Result } from "@domain/shared/result";
 import { PasswordVO } from "@domain/valueObjects/shared/password";
@@ -22,7 +22,7 @@ export class UpdateUserPassword {
   ) {}
 
   async execute(dto: UpdateUserPasswordDTO): Promise<Result<void>> {
-    let userItem: UserItem | null = null;
+    let userItem: UserResult | null = null;
     let repository: IPedagogueRepository | IProfessorRepository | null = null;
 
     if (dto.role === RoleEnum.PEDAGOGUE) {
@@ -85,7 +85,11 @@ export class UpdateUserPassword {
 
       userEntity.changePassword(newPasswordVO.getValue());
 
-      await repository.update(userEntity);
+      if (userEntity instanceof Pedagogue) {
+        await (repository as IPedagogueRepository).update(userEntity);
+      } else {
+        await (repository as IProfessorRepository).update(userEntity as Professor);
+      }
 
       return Result.ok();
     } else {

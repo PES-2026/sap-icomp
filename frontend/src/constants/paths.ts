@@ -10,6 +10,7 @@ export const PATHS = {
   login: "/login",
   register: "/register",
   forgot_password: "/forgot-password",
+  reset_password: "/reset-password",
 
   // Main Page Roles
   pedagogue: `/${RoleMap.PEDAGOGUE}`,
@@ -38,6 +39,5 @@ export const PATHS = {
   // Users
   users_list: `/${RoleMap.PEDAGOGUE}/users`,
   users_pending: `/${RoleMap.PEDAGOGUE}/users/pending`,
-
   visualize_settings: `/${RoleMap.PEDAGOGUE}/settings`,
 };

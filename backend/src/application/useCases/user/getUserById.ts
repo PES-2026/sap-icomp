@@ -3,7 +3,7 @@ import { UserNotFoundError } from "@application/errors/user/userNotFound";
 import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserItem } from "@domain/repositories/results/userResult";
+import { UserResult } from "@domain/repositories/results/userResult";
 import { Result } from "@domain/shared/result";
 
 export class GetUserById {
@@ -12,8 +12,8 @@ export class GetUserById {
     private readonly professorRepository: IProfessorRepository,
   ) {}
 
-  async execute(dto: UserByIdDTO): Promise<Result<UserItem>> {
-    let user: UserItem | null = await this.pedagogueRepository.findById(dto.id);
+  async execute(dto: UserByIdDTO): Promise<Result<UserResult>> {
+    let user: UserResult | null = await this.pedagogueRepository.findById(dto.id);
     let roleName = RoleEnum.PEDAGOGUE;
 
     if (!user) {
@@ -26,7 +26,7 @@ export class GetUserById {
     }
 
     // Map entity to the response format
-    const response: UserItem = {
+    const response: UserResult = {
       id: user.id,
       name: user.name,
       email: user.email,

@@ -1,17 +1,16 @@
+import { Professor } from "@domain/entities/professor";
 import { RoleEnum } from "@domain/enum/role";
+import { UserFilters } from "@domain/repositories/filters/userFilters";
+import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
+import { UserResult } from "@domain/repositories/results/userResult";
+import { PaginatedResult } from "@domain/shared/pagination";
 import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
-
-import { Professor } from "../../../domain/entities/professor";
-import { UserFilters } from "../../../domain/repositories/filters/userFilters";
-import { IProfessorRepository } from "../../../domain/repositories/professorRepository";
-import { UserItem } from "../../../domain/repositories/results/userResult";
-import { PaginatedResult } from "../../../domain/shared/pagination";
 
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>> {
+  async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserResult>> {
     const skip = (page - 1) * limit;
 
     const where: Prisma.ProfessorWhereInput = {
@@ -36,7 +35,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       }),
     ]);
 
-    const items: UserItem[] = professors.map((p) => ({
+    const items: UserResult[] = professors.map((p) => ({
       id: p.externalId,
       name: p.name,
       email: p.email,
@@ -75,7 +74,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     });
   }
 
-  async findById(id: string): Promise<UserItem | null> {
+  async findById(id: string): Promise<UserResult | null> {
     const raw = await this.prisma.professor.findUnique({
       where: { externalId: id },
     });
@@ -95,7 +94,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     };
   }
 
-  async findByEmail(email: string): Promise<UserItem | null> {
+  async findByEmail(email: string): Promise<UserResult | null> {
     const raw = await this.prisma.professor.findUnique({
       where: { email },
     });
@@ -136,6 +135,13 @@ export class PrismaProfessorRepository implements IProfessorRepository {
         },
       });
     }
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: id },
+      data: { password: passwordHash },
+    });
   }
 
   async existsByEmail(email: string): Promise<boolean> {

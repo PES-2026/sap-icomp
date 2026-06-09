@@ -28,6 +28,13 @@ enum ScheduleSlotStatus {
   CANCELLED
 }
 
+enum ScheduleStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -80,13 +87,16 @@ model Pedagogue {
 
   userStatus UserStatus @default(APPROVED)
 
+  maxAttendanceTime Int? @default(60)
+
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  attendances Attendance[]
-  reports     Report[]
-  schedules   Schedule[]
+  passwordResets PasswordReset[]
+  attendances    Attendance[]
+  reports        Report[]
+  schedules      Schedule[]
 }
 
 model Professor {
@@ -108,6 +118,7 @@ model Professor {
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
   coordinatedCourses Course[]         @relation("Coordinator")
+  passwordResets     PasswordReset[]
 }
 
 model Attendance {
@@ -292,6 +303,20 @@ model ClassProfessor {
   @@id([professorId, classId])
 }
 
+model PasswordReset {
+  internalId Int       @id @default(autoincrement())
+  token      String    @unique
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  usedAt     DateTime?
+
+  professorId Int?
+  professor   Professor? @relation(fields: [professorId], references: [internalId])
+
+  pedagogueId Int?
+  pedagogue   Pedagogue? @relation(fields: [pedagogueId], references: [internalId])
+}
+
 model Schedule {
   internalId Int    @id @default(autoincrement())
   externalId String @unique
@@ -301,6 +326,9 @@ model Schedule {
 
   startDate DateTime
   endDate   DateTime
+
+  status ScheduleStatus @default(PENDING)
+  token  String         @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
