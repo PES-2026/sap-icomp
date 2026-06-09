@@ -7,7 +7,7 @@ export const appointmentService = {
     date: string,
     pedagogueId: string,
   ): Promise<TimeSlot[]> {
-    const response = await api.get<TimeSlot[]>("/appointments/slots", {
+    const response = await api.get<TimeSlot[]>("/schedules/slots", {
       params: { date, pedagogueId },
       fallbackMsg: "Não foi possível carregar os horários disponíveis.",
     });
@@ -15,7 +15,7 @@ export const appointmentService = {
   },
 
   async createOriginal(data: AppointmentFormData): Promise<void> {
-    await api.post("/appointments", data, {
+    await api.post("/schedules", data, {
       fallbackMsg: "Ocorreu um erro ao tentar agendar o atendimento.",
     });
   },
