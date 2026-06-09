@@ -10,8 +10,6 @@ export interface AttendanceResult extends BaseItem {
   type: AttendanceTypeResult;
   demand: string;
   generalObservations: string;
-  status: string;
-  token?: string | undefined;
 }
 
 export type PaginatedAttendanceResult = PaginatedResult<AttendanceResult>;
