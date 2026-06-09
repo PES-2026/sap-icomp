@@ -1,4 +1,5 @@
 import { Result } from "@domain/shared/result";
+import { TimeVO } from "@domain/valueObjects/schedule/time";
 import { EmailVO } from "@domain/valueObjects/shared/email";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
@@ -25,7 +26,7 @@ export type PedagogueVOProps = {
   registrationNumber: RegistrationNumberVO;
   userStatus: UserStatusVO;
   password: PasswordVO;
-  maxAttendanceTime: number;
+  maxAttendanceTime?: TimeVO;
 };
 
 export class Pedagogue {
@@ -37,7 +38,7 @@ export class Pedagogue {
     public registrationNumber: RegistrationNumberVO,
     public userStatus: UserStatusVO,
     public password?: PasswordVO,
-    public maxAttendanceTime: number = 60,
+    public maxAttendanceTime?: TimeVO,
   ) {}
 
   update(props: Partial<PedagogueVOProps>): void {
@@ -61,8 +62,9 @@ export class Pedagogue {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = props.password ? PasswordVO.create(props.password, props.password) : undefined;
+    const maxAttendanceTime = props.maxAttendanceTime ? TimeVO.create(props.maxAttendanceTime) : undefined;
 
-    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
+    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password, maxAttendanceTime];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -78,7 +80,7 @@ export class Pedagogue {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password?.getValue(),
-        props.maxAttendanceTime ?? 60,
+        maxAttendanceTime?.getValue(),
       ),
     );
   }
@@ -92,7 +94,7 @@ export class Pedagogue {
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
       props.password ? PasswordVO.fromTrusted(props.password) : undefined,
-      props.maxAttendanceTime ?? 60,
+      props.maxAttendanceTime ? TimeVO.fromTrusted(props.maxAttendanceTime) : undefined,
     );
   }
 }
