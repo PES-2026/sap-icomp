@@ -12,6 +12,7 @@ export interface IProfessorRepository {
   findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserItem>>;
   save(professor: Professor): Promise<void>;
   update(professor: Professor): Promise<void>;
+  updatePassword(id: string, passwordHash: string): Promise<void>;
   findById(id: string): Promise<UserItem | null>;
   findByEmail(email: string): Promise<UserItem | null>;
   findByEmailWithPassword(email: string): Promise<UserAuthResult | null>;

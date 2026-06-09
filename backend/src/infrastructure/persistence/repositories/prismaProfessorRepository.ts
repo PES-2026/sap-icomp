@@ -138,6 +138,13 @@ export class PrismaProfessorRepository implements IProfessorRepository {
     }
   }
 
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: id },
+      data: { password: passwordHash },
+    });
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
     const account = await this.prisma.professor.findFirst({
       where: {

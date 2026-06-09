@@ -7,6 +7,9 @@ import { RemoveAttendanceDTO } from "@application/dtos/attendance/removeAttendan
 import { UpdateAttendanceDTO } from "@application/dtos/attendance/updateAttendanceDto";
 import { validateBody } from "@presentation/middlewares/validateBody";
 import { validateParams } from "@presentation/middlewares/validateParams";
+import { validateParamsAndBody } from "@presentation/middlewares/validateParamsAndBody";
+import { validateParamsAndQuery } from "@presentation/middlewares/validateParamsAndQuery";
+import { validateQuery } from "@presentation/middlewares/validateQuery";
 
 import { AttendanceController } from "../controllers/attendanceController";
 
@@ -14,9 +17,9 @@ export function attendanceRoutes(controller: AttendanceController): Router {
   const router = Router();
 
   router.post("/attendances", validateBody(CreateAttendanceDTO), controller.create);
-  router.get("/attendances", validateParams(ListAttendanceDTO), controller.list);
-  router.put("/attendances/:id", validateParams(UpdateAttendanceDTO), controller.update);
-  router.get("/attendances/student/:id", validateParams(AttendancesByStudentDTO), controller.listByStudent);
+  router.get("/attendances", validateQuery(ListAttendanceDTO), controller.list);
+  router.put("/attendances/:id", validateParamsAndBody(UpdateAttendanceDTO), controller.update);
+  router.get("/attendances/student/:id", validateParamsAndQuery(AttendancesByStudentDTO), controller.listByStudent);
   router.post("/attendances/:id/remove", validateParams(RemoveAttendanceDTO), controller.remove);
   router.get("/attendances/:id", validateParams(RemoveAttendanceDTO), controller.getById);
 
