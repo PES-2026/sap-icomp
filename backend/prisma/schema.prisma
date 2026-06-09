@@ -28,7 +28,7 @@ enum ScheduleSlotStatus {
   CANCELLED
 }
 
-enum AttendanceStatus {
+enum ScheduleStatus {
   PENDING
   CONFIRMED
   CANCELLED
@@ -136,9 +136,6 @@ model Attendance {
   demand      String?
   observation String?
   removed     Boolean @default(false)
-
-  status AttendanceStatus @default(PENDING)
-  token  String?          @unique
 
   student   Student        @relation(fields: [studentId], references: [internalId])
   pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
@@ -329,6 +326,9 @@ model Schedule {
 
   startDate DateTime
   endDate   DateTime
+
+  status ScheduleStatus @default(PENDING)
+  token  String         @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
