@@ -10,7 +10,7 @@ export const scheduleRoutes = (controller: ScheduleController) => {
 
   routes.use(scheduleRateLimiter);
 
-  routes.post("/public/attendances/request", validateBody(RequestScheduleDTO), controller.request);
+  routes.post("/schedules/request", validateBody(RequestScheduleDTO), controller.request);
 
   return routes;
 };
