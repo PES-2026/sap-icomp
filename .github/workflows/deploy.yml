@@ -89,6 +89,7 @@ jobs:
           DB_HOST="${{ secrets.SERVER_HOST }}"
           BACKEND_HOST="${{ vars.BACKEND_HOST }}"
           FRONTEND_HOST="${{ vars.FRONTEND_HOST }}"
+          FRONTEND_URL="${{ vars.FRONTEND_URL }}"
           DATABASE_URL="postgresql://${DB_USER_ENC}:${DB_PASSWORD_ENC}@db:5432/${{ secrets.DB_NAME }}?schema=public"
           NEXT_PUBLIC_API_URL="http://${{ vars.BACKEND_HOST }}"
           JWT_SECRET="${{ secrets.JWT_SECRET }}"
