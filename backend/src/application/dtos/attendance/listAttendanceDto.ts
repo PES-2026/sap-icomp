@@ -1,0 +1,60 @@
+import { ListAttendanceFilters } from "@domain/repositories/filters/attendanceFilters";
+import {
+  validateDateField,
+  validateExternalIdField,
+  validateNumberField,
+  validateStringField,
+} from "@domain/utils/validationUtils";
+
+import { validatePageLimitValues } from "../shared/paginationValidationsDto";
+
+export class ListAttendanceDTO {
+  constructor(
+    public readonly page: number,
+    public readonly limit: number,
+    public readonly filters: ListAttendanceFilters,
+  ) {}
+
+  private static validateStartEndDate(startDate?: Date, endDate?: Date) {
+    if (!startDate && !endDate) return;
+
+    if (!startDate || !endDate) {
+      throw new Error(
+        `You must insert a period range with start and end date. The actual values are: start: '${startDate}', end: '${endDate}'`,
+      );
+    }
+
+    if (startDate.getTime() > endDate.getTime()) {
+      throw new Error("Start Date must be before End Date!");
+    }
+  }
+
+  static create(value: unknown): ListAttendanceDTO {
+    if (typeof value !== "object" || value === null) {
+      throw new Error(`Invalid input to ${ListAttendanceDTO.name}`);
+    }
+
+    const raw = value as Record<string, unknown>;
+
+    const page = validateNumberField(raw.page, "page");
+    const limit = validateNumberField(raw.limit, "limit");
+
+    const filters: ListAttendanceFilters = {};
+
+    if (raw.studentName) filters.studentName = validateStringField(raw.studentName, "studentName");
+    if (raw.studentEnrollment)
+      filters.studentEnrollment = validateStringField(raw.studentEnrollment, "studentEnrollment");
+    if (raw.studentCourse) filters.studentCourse = validateStringField(raw.studentCourse, "studentCourse");
+    if (raw.attendanceType) {
+      const attendanceType: string = validateExternalIdField(raw.attendanceType, "attendanceType");
+      filters.attendanceType = attendanceType;
+    }
+    if (raw.startDate) filters.startDate = validateDateField(raw.startDate, "startDate");
+    if (raw.endDate) filters.endDate = validateDateField(raw.endDate, "endDate");
+
+    validatePageLimitValues(page, limit);
+    ListAttendanceDTO.validateStartEndDate(filters.startDate, filters.endDate);
+
+    return new ListAttendanceDTO(page, limit, filters);
+  }
+}
