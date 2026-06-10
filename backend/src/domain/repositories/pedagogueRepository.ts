@@ -11,6 +11,7 @@ export interface IPedagogueRepository {
   update(pedagogue: Pedagogue): Promise<void>;
   updatePassword(id: string, passwordHash: string): Promise<void>;
   findById(id: string): Promise<UserResult | null>;
+  findByIdWithPassword(id: string): Promise<UserAuthResult | null>;
   findByEmail(email: string): Promise<UserResult | null>;
   findByEmailWithPassword(email: string): Promise<UserAuthResult | null>;
   existsByEmail(email: string): Promise<boolean>;
