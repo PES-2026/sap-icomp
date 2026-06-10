@@ -9,9 +9,7 @@ import { validateBody } from "@presentation/middlewares/validateBody";
 export function accountRequestRoutes(controller: AccountRequestController): Router {
   const router = Router();
 
-  router.use(createAccountRateLimiter);
-
-  router.post("/account-requests", validateBody(CreateProfessorDTO), controller.create);
+  router.post("/account-requests", createAccountRateLimiter, validateBody(CreateProfessorDTO), controller.create);
   router.get("/account-requests/pending", controller.listPending);
   router.post("/account-requests/approve-users", validateBody(ApproveUserDTO), controller.approve);
 
