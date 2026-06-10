@@ -18,8 +18,8 @@ export const minutesToDuration = (totalMinutes: number) => {
 
 export const scheduleSchema = z
   .object({
-    startDate: z.string(),
-    endDate: z.string(),
+    startDate: z.string().min(1, "A data é obrigatória"),
+    endDate: z.string().min(1, "A data é obrigatória"),
     startTime: z
       .string()
       .regex(TIME_PATTERN, "Informe um horário de início válido."),
@@ -29,26 +29,7 @@ export const scheduleSchema = z
     durationMinutes: z.string(),
   })
   .superRefine((data, ctx) => {
-    const hasStartDate = DATE_PATTERN.test(data.startDate);
-    const hasEndDate = DATE_PATTERN.test(data.endDate);
-
-    if (!hasStartDate || !hasEndDate) {
-      if (!hasStartDate) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["startDate"],
-          message: "Inclua a data de início e fim.",
-        });
-      }
-
-      if (!hasEndDate) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["endDate"],
-          message: "Inclua a data de início e fim.",
-        });
-      }
-    } else if (data.endDate < data.startDate) {
+    if (data.endDate < data.startDate) {
       ctx.addIssue({
         code: "custom",
         path: ["endDate"],
@@ -89,4 +70,3 @@ export const scheduleSchema = z
       });
     }
   });
-

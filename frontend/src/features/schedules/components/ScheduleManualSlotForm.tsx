@@ -1,6 +1,7 @@
 "use client";
 
 import CommonButton from "@/components/ui/CommonButton";
+import { CustomDatePicker } from "@/components/ui/CustomDatePicker";
 import { Field } from "@/components/ui/Field";
 import { Plus } from "lucide-react";
 import { ChangeEvent, useState } from "react";
@@ -20,8 +21,8 @@ interface ScheduleManualSlotFormProps {
   onAddSlot: (slot: ManualSlotData) => boolean;
 }
 
-const baseInputClass =
-  "w-full rounded-md border-[1.5px] border-[#e9dfc9] bg-white px-4 py-3 text-center text-sm text-stone-700 outline-none transition-colors hover:border-[#d6cbb5] focus:border-[#6bc4a6] disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400";
+const baseInputClass = `w-full px-3.5 py-2.5 bg-white border-[1.5px] rounded-md text-sm outline-none transition-colors font-sans
+  text-stone-800 border-stone-300 hover:border-stone-400 focus:border-teal-400 placeholder:text-stone-400 disabled:opacity-50`;
 
 const initialValues: ManualSlotData = {
   date: "",
@@ -48,6 +49,13 @@ export default function ScheduleManualSlotForm({
     }));
   };
 
+  const handleDateChange = (dateStr: string) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      date: dateStr,
+    }));
+  };
+
   const handleAddClick = () => {
     const wasAdded = onAddSlot(values);
 
@@ -61,18 +69,13 @@ export default function ScheduleManualSlotForm({
       onChange={(event) => event.stopPropagation()}
       className="mb-5 grid grid-cols-1 gap-3 border-b border-[#ece7db] pb-5 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto]"
     >
-      <Field label="Data manual:">
-        <input
-          type="date"
-          name="date"
+      <div className={disabled ? "pointer-events-none opacity-60" : ""}>
+        <CustomDatePicker
+          label="Data manual:"
           value={values.date}
-          min={minDate}
-          max={maxDate}
-          disabled={disabled}
-          onChange={handleChange}
-          className={baseInputClass}
+          onChange={handleDateChange}
         />
-      </Field>
+      </div>
 
       <Field label="Início manual:">
         <input

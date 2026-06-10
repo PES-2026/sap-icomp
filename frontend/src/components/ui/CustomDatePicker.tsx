@@ -113,7 +113,7 @@ export const CustomDatePicker = forwardRef<
 
     const handleDateSelect = (d: number) => {
       const formattedDate = formatToYYYYMMDD(year, month, d);
-      onChange(`${formattedDate}T00:00:00.000Z`);
+      onChange(formattedDate);
       setIsOpen(false);
       setView("days");
     };
