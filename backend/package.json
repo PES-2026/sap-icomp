@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "tsx --watch ./src/server.ts",
     "build": "tsc",
+    "build:noEmit": "tsc --noEmit",
     "start": "node dist/server.js",
     "test": "jest",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "type": "module",
   "keywords": [],
@@ -18,15 +20,21 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
     "eslint": "^10.3.0",
@@ -38,7 +46,7 @@
     "globals": "^17.6.0",
     "prisma": "^7.7.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.59.2"
   },

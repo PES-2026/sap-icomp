@@ -48,7 +48,7 @@ export abstract class BaseController {
    */
   public handleError(error: unknown, res: Response, context?: string): void {
     // Errors retrieveds on try/catch exceptions
-    console.error(`[${context || "BaseController"}] Unhandled Exception:`, error);
+    console.error(`[${context || "BaseController"}] Unhandled Exception:`);
     res.status(500).json({ message: "Internal server error" });
   }
 
@@ -59,7 +59,7 @@ export abstract class BaseController {
   public handleResult<T>(
     res: Response,
     result: Result<T, DomainError | ApplicationError>,
-    successStatusCode: 200 | 201 = 200,
+    successStatusCode: 200 | 201 | 204 = 200,
   ): void {
     if (result.isSuccess) {
       if (successStatusCode === 201) {
@@ -71,12 +71,12 @@ export abstract class BaseController {
     }
 
     const error = result.error;
-    if (error instanceof DomainError || error instanceof ApplicationError) {
+    if (error instanceof DomainError) {
       const { statusCode, body } = HttpErrorMapper.toResponse(error);
       res.status(statusCode).json(body);
     } else {
       // When an use case returns a generical error that hasn't a HTTP Mapping
-      console.error(`[BaseController:handleResult] Unmapped Result Error:`, error);
+      console.error(`[BaseController:handleResult] Unmapped Result Error:`);
       res.status(500).json({ message: "Internal server error", error: error });
     }
   }

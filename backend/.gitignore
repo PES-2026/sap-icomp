@@ -12,6 +12,9 @@
 
 generated/
 
+seed.ts
+sql_user.ts
+
 # testing
 /coverage
 

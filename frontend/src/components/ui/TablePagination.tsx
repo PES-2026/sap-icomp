@@ -13,6 +13,7 @@ interface TablePaginationProps {
   limit: number;
   setLimit: (v: number) => void;
   lengthData: number;
+  totalPages?: number;
 }
 
 export default function TablePagination({
@@ -21,7 +22,12 @@ export default function TablePagination({
   limit,
   setLimit,
   lengthData,
+  totalPages,
 }: TablePaginationProps) {
+  const pageIndicator = totalPages
+    ? `Exibindo página ${page} de ${Math.max(totalPages, 1)}`
+    : `Exibindo página ${page}`;
+
   const handleLimitChange = (newLimit: string) => {
     setLimit(Number(newLimit));
     setPage(1);
@@ -30,7 +36,7 @@ export default function TablePagination({
   return (
     <div className="flex items-center justify-between shrink-0 border-t border-[#f0ebe0] px-6 py-3 text-sm text-[#a0a098]">
       <div className="flex items-center gap-4">
-        <span>Exibindo página {page}</span>
+        <span>{pageIndicator}</span>
 
         <div className="w-40">
           <SelectInput

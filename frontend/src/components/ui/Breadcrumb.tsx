@@ -1,17 +1,16 @@
 "use client";
 
+import { PATHS } from "@/constants/paths";
+import { Role } from "@/features/login/types/login";
+import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Home } from "lucide-react";
 
-type UserRole = "admin" | "student" | "teacher";
+const CURRENT_ROLE: Lowercase<Role> = "pedagogue";
 
-const CURRENT_ROLE: UserRole = "admin";
-
-const ROLE_ROOT_PATHS: Record<UserRole, string> = {
-  admin: "/admin",
-  student: "/aluno",
-  teacher: "/professor",
+const ROLE_ROOT_PATHS: Record<Lowercase<Role>, string> = {
+  professor: PATHS.professor,
+  pedagogue: PATHS.pedagogue,
 };
 
 const routeNames: Record<string, string> = {

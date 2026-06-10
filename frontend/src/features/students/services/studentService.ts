@@ -38,7 +38,7 @@ export const studentService = {
   },
 
   async deleteStudent(id: string): Promise<void> {
-    await api.delete(`/students/${id}`, {
+    await api.post(`/students/${id}/remove`, {
       fallbackMsg: "Não foi possível remover o aluno.",
     });
   },
