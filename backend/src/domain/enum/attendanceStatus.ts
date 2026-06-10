@@ -1,6 +1,0 @@
-export enum AttendanceStatusEnum {
-  PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
-  CANCELLED = "CANCELLED",
-  COMPLETED = "COMPLETED",
-}
