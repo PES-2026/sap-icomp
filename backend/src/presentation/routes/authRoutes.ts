@@ -8,13 +8,11 @@ import { authRateLimiter } from "@presentation/middlewares/rateLimiter";
 export const authRoutes = (authController: AuthController, jwtService: ITokenService) => {
   const routes = Router();
 
-  routes.use(authRateLimiter);
-
-  routes.post("/auth/login", authController.login);
+  routes.post("/auth/login", authRateLimiter, authController.login);
   routes.get("/auth/me", (req, res, next) => authMiddleware(jwtService, req, res, next), authController.me);
-  routes.post("/auth/logout", authController.logout);
-  routes.post("/auth/forgot-password", authController.forgotPassword);
-  routes.post("/auth/reset-password", authController.resetPassword);
+  routes.post("/auth/logout", authRateLimiter, authController.logout);
+  routes.post("/auth/forgot-password", authRateLimiter, authController.forgotPassword);
+  routes.post("/auth/reset-password", authRateLimiter, authController.resetPassword);
 
   return routes;
 };
