@@ -5,7 +5,7 @@ import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 import { UserResult } from "@domain/repositories/results/userResult";
 import { PaginatedResult } from "@domain/shared/pagination";
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaProfessorRepository implements IProfessorRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -91,6 +91,27 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       role: RoleEnum.PROFESSOR,
+    };
+  }
+
+  async findByIdWithPassword(id: string): Promise<UserAuthResult | null> {
+    const raw = await this.prisma.professor.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber || "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      role: RoleEnum.PROFESSOR,
+      password: raw.password,
     };
   }
 

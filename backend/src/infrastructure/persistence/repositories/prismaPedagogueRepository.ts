@@ -6,7 +6,7 @@ import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { PedagogueResult } from "@domain/repositories/results/pedagogueResult";
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
 import { PaginatedResult } from "@domain/shared/pagination";
-import { PrismaClient, Prisma } from "@prisma/src/infrastructure/database/generated/client";
+import { Prisma, PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 
 export class PrismaPedagogueRepository implements IPedagogueRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -95,6 +95,27 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       maxAttendanceTime: raw.maxAttendanceTime ?? undefined,
+    };
+  }
+
+  async findByIdWithPassword(id: string): Promise<UserAuthResult | null> {
+    const raw = await this.prisma.pedagogue.findUnique({
+      where: { externalId: id },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber ?? "",
+      registrationNumber: raw.registration,
+      userStatus: raw.userStatus,
+      role: RoleEnum.PEDAGOGUE,
+      password: raw.password,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
     };
   }
 

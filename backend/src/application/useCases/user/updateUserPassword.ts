@@ -9,7 +9,6 @@ import { Professor } from "@domain/entities/professor";
 import { RoleEnum } from "@domain/enum/role";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
-import { UserResult } from "@domain/repositories/results/userResult";
 import { IHashService } from "@domain/services/hashService";
 import { Result } from "@domain/shared/result";
 import { PasswordVO } from "@domain/valueObjects/shared/password";
@@ -22,78 +21,61 @@ export class UpdateUserPassword {
   ) {}
 
   async execute(dto: UpdateUserPasswordDTO): Promise<Result<void>> {
-    let userItem: UserResult | null = null;
-    let repository: IPedagogueRepository | IProfessorRepository | null = null;
-
-    if (dto.role === RoleEnum.PEDAGOGUE) {
-      userItem = await this.pedagogueRepository.findById(dto.id);
-      repository = this.pedagogueRepository;
-    } else if (dto.role === RoleEnum.PROFESSOR) {
-      userItem = await this.professorRepository.findById(dto.id);
-      repository = this.professorRepository;
+    if (dto.oldPassword === dto.newPassword) {
+      return Result.fail(new NewPasswordEqualToOldError());
     }
 
-    if (repository === null) {
+    const repository = this.getRepositoryByRole(dto.role);
+    if (!repository) {
       return Result.fail(new RoleIsRequiredError());
     }
 
+    const userItem = await repository.findByIdWithPassword(dto.id);
     if (!userItem) {
       return Result.fail(new UserNotFoundError(dto.id));
     }
 
-    let userEntity: Pedagogue | Professor;
-    if (userItem.role === RoleEnum.PEDAGOGUE) {
-      userEntity = Pedagogue.rehydrate({
-        id: userItem.id,
-        name: userItem.name,
-        email: userItem.email,
-        phoneNumber: userItem.phoneNumber ?? "",
-        registrationNumber: userItem.registrationNumber,
-        userStatus: userItem.userStatus,
-      });
-    } else if (userItem.role === RoleEnum.PROFESSOR) {
-      userEntity = Professor.rehydrate({
-        id: userItem.id,
-        name: userItem.name,
-        email: userItem.email,
-        phoneNumber: userItem.phoneNumber ?? "",
-        registrationNumber: userItem.registrationNumber,
-        userStatus: userItem.userStatus,
-      });
-    } else {
-      return Result.fail(new RoleIsRequiredError());
-    }
-
-    const userPassword = userEntity.password?.value;
-
-    if (!userPassword) {
+    const currentHashedPassword = userItem.password;
+    if (!currentHashedPassword) {
       return Result.fail(new OldPasswordNotDefinedError());
     }
 
-    const isOldPasswordCorrect = await this.hashService.compare(dto.oldPassword, userPassword);
-
+    const isOldPasswordCorrect = await this.hashService.compare(dto.oldPassword, currentHashedPassword);
     if (!isOldPasswordCorrect) {
       return Result.fail(new InvalidPasswordError());
     }
 
-    if (dto.oldPassword !== dto.newPassword) {
-      const hashedPassword = await this.hashService.hash(dto.newPassword);
-      const newPasswordVO = PasswordVO.create(dto.newPassword, hashedPassword);
-      if (newPasswordVO.isFailure) {
-        return Result.fail(newPasswordVO.error!);
-      }
-
-      userEntity.changePassword(newPasswordVO.getValue());
-
-      if (userEntity instanceof Pedagogue) {
-        await (repository as IPedagogueRepository).update(userEntity);
-      } else {
-        await (repository as IProfessorRepository).update(userEntity as Professor);
-      }
-
-      return Result.ok();
-    } else {
-      return Result.fail(new NewPasswordEqualToOldError());
+    const hashedNewPassword = await this.hashService.hash(dto.newPassword);
+    const newPasswordVO = PasswordVO.create(dto.newPassword, hashedNewPassword);
+    if (newPasswordVO.isFailure) {
+      return Result.fail(newPasswordVO.error!);
     }
+
+    const commonProps = {
+      id: userItem.id,
+      name: userItem.name,
+      email: userItem.email,
+      phoneNumber: userItem.phoneNumber ?? "",
+      registrationNumber: userItem.registrationNumber,
+      userStatus: userItem.userStatus,
+    };
+
+    if (userItem.role === RoleEnum.PEDAGOGUE) {
+      const pedagogue = Pedagogue.rehydrate(commonProps);
+      pedagogue.changePassword(newPasswordVO.getValue());
+      await (repository as IPedagogueRepository).update(pedagogue);
+    } else {
+      const professor = Professor.rehydrate(commonProps);
+      professor.changePassword(newPasswordVO.getValue());
+      await (repository as IProfessorRepository).update(professor);
+    }
+
+    return Result.ok();
+  }
+
+  private getRepositoryByRole(role: string): IPedagogueRepository | IProfessorRepository | null {
+    if (role === RoleEnum.PEDAGOGUE) return this.pedagogueRepository;
+    if (role === RoleEnum.PROFESSOR) return this.professorRepository;
+    return null;
   }
 }
