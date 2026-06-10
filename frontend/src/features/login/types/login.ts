@@ -1,4 +1,4 @@
-export type Role = "Pedagogue" | "Professor";
+export type Role = "PEDAGOGUE" | "PROFESSOR";
 
 export type UserStatus = "Active" | "Inactive" | "Pending";
 

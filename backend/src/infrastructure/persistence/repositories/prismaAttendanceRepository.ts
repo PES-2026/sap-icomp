@@ -12,7 +12,9 @@ export class PrismaAttendanceRepository implements IAttendanceRepository {
   constructor(private prisma: PrismaClient) {}
 
   async save(attendance: Attendance): Promise<void> {
-    const pedagogue = await this.prisma.pedagogue.findFirst();
+    const pedagogue = attendance.pedagogueId
+      ? await this.prisma.pedagogue.findUnique({ where: { externalId: attendance.pedagogueId.value } })
+      : await this.prisma.pedagogue.findFirst();
 
     await this.prisma.attendance.create({
       data: {

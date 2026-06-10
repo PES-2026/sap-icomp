@@ -2,7 +2,14 @@ import { jwtVerify } from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const publicRoutes = ["/login", "/register", "/forgot-password", "/public"];
+export const publicRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/appointment",
+  "/reset-password",
+];
+
 const VALID_ROLES = ["PROFESSOR", "PEDAGOGUE"] as const;
 type UserRole = (typeof VALID_ROLES)[number];
 
@@ -12,14 +19,10 @@ function isValidRole(role: unknown): role is UserRole {
 
 async function getSession(token: string): Promise<{ role: UserRole } | null> {
   try {
-    console.log("JWT_SECRET EXISTS:", !!process.env.JWT_SECRET);
-
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
 
     if (!isValidRole(payload.role)) return null;
-
-    console.log("JWT VERIFIED", payload);
 
     return { role: payload.role };
   } catch (err) {
@@ -39,13 +42,10 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get("accessToken")?.value;
   const { pathname } = request.nextUrl;
 
-  console.log("TOKEN:", request.cookies.get("accessToken")?.value);
-
   const isPublicRoute = publicRoutes.includes(pathname);
   const isLoginPage = pathname === "/login";
 
   const session = token ? await getSession(token) : null;
-  console.log({ session, isPublicRoute, isLoginPage });
 
   if (!session && !isPublicRoute) {
     return redirectToLogin(request);
@@ -61,7 +61,6 @@ export async function proxy(request: NextRequest) {
   }
 
   if (session) {
-    console.log("Verificando se está redirecionando correto");
     if (pathname.startsWith("/professor") && session.role !== "PROFESSOR") {
       const redirectUrl =
         session.role === "PEDAGOGUE" ? "/pedagogue" : "/public";

@@ -27,4 +27,10 @@ export const userService = {
 
     return response.data;
   },
+
+  async remove(id: string): Promise<void> {
+    await api.post(`/users/${id}/remove`, {
+      fallbackMsg: "Não foi possível remover o usuário.",
+    });
+  },
 };

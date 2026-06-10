@@ -21,6 +21,20 @@ enum UserStatus {
   DISABLED
 }
 
+enum ScheduleSlotStatus {
+  AVAILABLE
+  PENDING
+  BOOKED
+  CANCELLED
+}
+
+enum ScheduleStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model Student {
   internalId   Int      @id @default(autoincrement())
   externalId   String   @unique
@@ -73,12 +87,16 @@ model Pedagogue {
 
   userStatus UserStatus @default(APPROVED)
 
+  maxAttendanceTime Int? @default(60)
+
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  attendances Attendance[]
-  reports     Report[]
+  passwordResets PasswordReset[]
+  attendances    Attendance[]
+  reports        Report[]
+  schedules      Schedule[]
 }
 
 model Professor {
@@ -100,6 +118,7 @@ model Professor {
   feedbacks          Feedback[]
   classProfessors    ClassProfessor[]
   coordinatedCourses Course[]         @relation("Coordinator")
+  passwordResets     PasswordReset[]
 }
 
 model Attendance {
@@ -121,6 +140,8 @@ model Attendance {
   student   Student        @relation(fields: [studentId], references: [internalId])
   pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
   type      AttendanceType @relation(fields: [typeId], references: [internalId])
+
+  scheduleSlots ScheduleSlot[]
 }
 
 model AttendanceType {
@@ -280,4 +301,57 @@ model ClassProfessor {
   class     ClassOffering @relation(fields: [classId], references: [internalId])
 
   @@id([professorId, classId])
+}
+
+model PasswordReset {
+  internalId Int       @id @default(autoincrement())
+  token      String    @unique
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  usedAt     DateTime?
+
+  professorId Int?
+  professor   Professor? @relation(fields: [professorId], references: [internalId])
+
+  pedagogueId Int?
+  pedagogue   Pedagogue? @relation(fields: [pedagogueId], references: [internalId])
+}
+
+model Schedule {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  pedagogueId Int
+  pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
+
+  startDate DateTime
+  endDate   DateTime
+
+  status ScheduleStatus @default(PENDING)
+  token  String         @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
+
+  slots ScheduleSlot[]
+}
+
+model ScheduleSlot {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  scheduleId Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [internalId])
+
+  startDateTime DateTime
+  endDateTime   DateTime
+
+  status ScheduleSlotStatus @default(AVAILABLE)
+
+  attendanceId Int?
+  attendance   Attendance? @relation(fields: [attendanceId], references: [internalId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

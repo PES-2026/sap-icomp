@@ -94,6 +94,8 @@ jobs:
           JWT_SECRET="${{ secrets.JWT_SECRET }}"
           JWT_TOKEN_EXPIRES="${{ vars.JWT_TOKEN_EXPIRES }}"
           BASE_DOMAIN="${{ vars.BASE_DOMAIN }}"
+          GMAIL_USER="${{ secrets.GMAIL_USER }}"
+          GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}"
           EOF
           echo ".env file generated successfully"
 

@@ -1,11 +1,5 @@
-export interface PedagogueResult {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  phoneNumber: string | null;
-  registrationNumber: string;
-  userStatus: string;
-  createdAt: Date;
-  updatedAt: Date;
+import { UserResult } from "./userResult";
+
+export interface PedagogueResult extends UserResult {
+  maxAttendanceTime?: number | undefined;
 }
