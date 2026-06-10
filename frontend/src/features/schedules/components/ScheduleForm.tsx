@@ -42,7 +42,7 @@ export default function ScheduleForm() {
   } = form;
 
   return (
-    <main className="flex min-h-[calc(100vh-100px)] w-full flex-col overflow-auto p-4 font-sans md:p-8">
+    <main className="flex min-h-[calc(100vh-100px)] w-full flex-col overflow-auto p-4 font-sans md:p-6">
       <div className="w-full">
         <form
           onSubmit={onSubmit}
