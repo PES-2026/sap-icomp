@@ -1,4 +1,4 @@
-export type UserRole = "PEDAGOGUE" | "PROFESSOR" | string;
+export type UserRole = "PEDAGOGUE" | "PROFESSOR";
 
 export type UserStatus =
   | "ENABLED"

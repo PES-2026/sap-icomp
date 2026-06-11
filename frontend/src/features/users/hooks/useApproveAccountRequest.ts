@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { accountRequestService } from "../services/accountRequestService";
+import { UserRole } from "../types/user";
 
 interface UseApproveAccountRequestOptions {
   onSuccess?: () => void;
@@ -15,7 +16,7 @@ export const useApproveAccountRequest = (
   const approveRequest = async (
     id: string,
     isApproved: boolean,
-    role?: string,
+    role?: UserRole,
   ) => {
     try {
       setIsLoading(true);
