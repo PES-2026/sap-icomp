@@ -3,16 +3,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { useAuthStore } from "@/store/authStore";
 import { maskPhone } from "@/utils/utils";
-import toast from "react-hot-toast";
 import { userService } from "../services/userService";
+import { ProfileUpdateResponse } from "../types/profile";
 import { buildUpdatePayloads } from "../utils/profileHelpers";
 import { profileSchema, type ProfileFormData } from "../utils/validations";
 
 export const useProfileEdit = () => {
   const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -27,10 +29,12 @@ export const useProfileEdit = () => {
     },
   });
 
+  const { reset } = form;
+
   const resetForm = useCallback(() => {
     if (!user) return;
 
-    form.reset({
+    reset({
       name: user.name ?? "",
       email: user.email ?? "",
       registrationNumber: user.registrationNumber ?? "",
@@ -39,7 +43,7 @@ export const useProfileEdit = () => {
       newPassword: "",
       newPasswordConfirmation: "",
     });
-  }, [user, form]);
+  }, [user, reset]);
 
   useEffect(() => {
     resetForm();
@@ -64,24 +68,43 @@ export const useProfileEdit = () => {
       if (!hasBasicChanges && !hasPasswordChanges) return;
 
       try {
-        const promises = [];
+        let updatedProfileData: ProfileUpdateResponse | undefined;
 
-        if (hasBasicChanges) {
-          promises.push(
+        if (hasBasicChanges && hasPasswordChanges) {
+          const [profileRes] = await Promise.all([
             userService.updateProfile(basicPayload.id, basicPayload),
-          );
-        }
-
-        if (hasPasswordChanges) {
-          promises.push(
             userService.updatePassword(passwordPayload.id, passwordPayload),
+          ]);
+          updatedProfileData = profileRes;
+        } else if (hasBasicChanges) {
+          updatedProfileData = await userService.updateProfile(
+            basicPayload.id,
+            basicPayload,
           );
+        } else if (hasPasswordChanges) {
+          await userService.updatePassword(passwordPayload.id, passwordPayload);
         }
 
-        await Promise.all(promises);
+        toast.success("Perfil atualizado com sucesso!");
 
-        form.reset({
-          ...data,
+        if (hasBasicChanges && updatedProfileData) {
+          setUser({
+            ...user,
+            name: updatedProfileData.name,
+            email: updatedProfileData.email,
+            phoneNumber: updatedProfileData.phoneNumber,
+            registrationNumber: updatedProfileData.registrationNumber,
+          });
+        }
+
+        reset({
+          name: updatedProfileData?.name ?? data.name,
+          email: updatedProfileData?.email ?? data.email,
+          registrationNumber:
+            updatedProfileData?.registrationNumber ?? data.registrationNumber,
+          phoneNumber: updatedProfileData?.phoneNumber
+            ? maskPhone(updatedProfileData.phoneNumber)
+            : data.phoneNumber,
           oldPassword: "",
           newPassword: "",
           newPasswordConfirmation: "",
@@ -91,7 +114,7 @@ export const useProfileEdit = () => {
         if (error instanceof Error) toast.error(error.message);
       }
     },
-    [form, user],
+    [form.formState.dirtyFields, user, setUser, reset],
   );
 
   return {
