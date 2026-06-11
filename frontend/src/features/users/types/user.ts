@@ -1,5 +1,7 @@
 export type UserRole = "PEDAGOGUE" | "PROFESSOR" | string;
 
+export type ApprovalRole = "PEDAGOGUE" | "PROFESSOR";
+
 export type UserStatus =
   | "ENABLED"
   | "DISABLED"
