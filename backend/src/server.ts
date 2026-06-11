@@ -79,6 +79,7 @@ import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(express.json());
 
