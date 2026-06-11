@@ -18,14 +18,19 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { mobileOpen, setMobileOpen } = useSidebarStore();
   const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navItems =
     user?.role === "PROFESSOR"
@@ -130,42 +135,43 @@ export default function Sidebar() {
             collapsed ? "px-5 md:px-3" : "px-5"
           }`}
         >
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
+          {isMounted &&
+            navItems.map((item) => {
+              const isActive = pathname === item.href;
 
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                title={collapsed ? item.label : undefined}
-                className={`
-                  flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]
-                  transition-all duration-300 ease-in-out cursor-pointer
-                  ${collapsed ? "px-3.5 py-2.5 md:justify-center md:px-2.5" : "px-3.5 py-2.5"}
-                  ${
-                    isActive
-                      ? "scale-[1.02] bg-[#6bc4a6] font-bold text-[#3a3530] shadow-md shadow-[#6bc4a6]/30"
-                      : "bg-transparent font-medium text-[#6a6560] hover:translate-x-1 hover:bg-[#ece7db]/60 hover:text-[#3a3530]"
-                  }
-                `}
-              >
-                <span
-                  className={`shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  title={collapsed ? item.label : undefined}
+                  className={`
+                    flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]
+                    transition-all duration-300 ease-in-out cursor-pointer
+                    ${collapsed ? "px-3.5 py-2.5 md:justify-center md:px-2.5" : "px-3.5 py-2.5"}
+                    ${
+                      isActive
+                        ? "scale-[1.02] bg-[#6bc4a6] font-bold text-[#3a3530] shadow-md shadow-[#6bc4a6]/30"
+                        : "bg-transparent font-medium text-[#6a6560] hover:translate-x-1 hover:bg-[#ece7db]/60 hover:text-[#3a3530]"
+                    }
+                  `}
                 >
-                  <item.icon size={20} />
-                </span>
+                  <span
+                    className={`shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
+                  >
+                    <item.icon size={20} />
+                  </span>
 
-                <span
-                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
-                    collapsed ? "hidden" : "w-auto opacity-100"
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+                  <span
+                    className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
+                      collapsed ? "hidden" : "w-auto opacity-100"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
         </nav>
       </aside>
     </>
