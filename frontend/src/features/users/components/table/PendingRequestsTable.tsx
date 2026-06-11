@@ -7,10 +7,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import ApproveAccountRequestModal from "../ApproveAccountRequestModal";
 import { useApproveAccountRequest } from "../../hooks/useApproveAccountRequest";
 import { usePendingAccountRequests } from "../../hooks/usePendingAccountRequests";
-import {
-  ApprovalRole,
-  PendingAccountRequestItem,
-} from "../../types/user";
+import { PendingAccountRequestItem, UserRole } from "../../types/user";
 import {
   getPendingRequestsColumns,
   PendingRequestAction,
@@ -81,7 +78,7 @@ export default function PendingRequestsTable() {
     setRequestToApprove(request);
   };
 
-  const handleApprove = async (role: ApprovalRole) => {
+  const handleApprove = async (role: UserRole) => {
     if (!requestToApprove) return;
 
     const requestId = requestToApprove.id;

@@ -5,17 +5,17 @@ import { useState } from "react";
 
 import CommonButton from "@/components/ui/CommonButton";
 
-import { ApprovalRole, PendingAccountRequestItem } from "../types/user";
+import { PendingAccountRequestItem, UserRole } from "../types/user";
 
 interface ApproveAccountRequestModalProps {
   request: PendingAccountRequestItem;
   isLoading: boolean;
   onClose: () => void;
-  onConfirm: (role: ApprovalRole) => void;
+  onConfirm: (role: UserRole) => void;
 }
 
 const roleOptions: {
-  value: ApprovalRole;
+  value: UserRole;
   label: string;
   description: string;
 }[] = [
@@ -37,7 +37,7 @@ export default function ApproveAccountRequestModal({
   onClose,
   onConfirm,
 }: ApproveAccountRequestModalProps) {
-  const [selectedRole, setSelectedRole] = useState<ApprovalRole>("PROFESSOR");
+  const [selectedRole, setSelectedRole] = useState<UserRole>("PROFESSOR");
 
   const selectedRoleLabel = roleOptions.find(
     (option) => option.value === selectedRole,
