@@ -10,7 +10,7 @@ export interface SchedulePreviewPayload {
   pedagogueId: string;
   startTime: string;
   endTime: string;
-  appointmentDuration: string;
+  attendanceDuration: string;
   startDate: string;
   endDate: string;
 }
