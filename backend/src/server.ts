@@ -16,6 +16,7 @@ import { CreateAttendanceType } from "@application/useCases/attendanceType/creat
 import { ListAttendanceTypes } from "@application/useCases/attendanceType/listAttendanceType";
 import { RemoveAttendanceType } from "@application/useCases/attendanceType/removeAttendanceType";
 import { UpdateAttendanceType } from "@application/useCases/attendanceType/updateAttendanceType";
+import { PreviewAvailability } from "@application/useCases/availability/previewAvailability";
 import { CourseById } from "@application/useCases/course/courseById";
 import { CreateCourse } from "@application/useCases/course/createCourse";
 import { ListCourse } from "@application/useCases/course/listCourse";
@@ -26,8 +27,6 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
-import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
-import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -48,12 +47,12 @@ import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
 import { PrismaAttendanceTypeRepository } from "@infrastructure/persistence/repositories/prismaAttendanceTypeRepository";
+import { PrismaAvailabilityRepository } from "@infrastructure/persistence/repositories/prismaAvailabilityRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
-import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { EmailService } from "@infrastructure/services/email/providers/gmailService";
@@ -62,9 +61,9 @@ import { AccountRequestController } from "@presentation/controllers/accountReque
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
 import { AuthController } from "@presentation/controllers/authController";
+import { AvailabilityController } from "@presentation/controllers/availabilityController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
-import { ScheduleController } from "@presentation/controllers/scheduleController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
@@ -72,9 +71,9 @@ import { accountRequestRoutes } from "@presentation/routes/accountRequestRoutes"
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
 import { authRoutes } from "@presentation/routes/authRoutes";
+import { availabilityRoutes } from "@presentation/routes/availabilityRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
-import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
 
@@ -140,8 +139,8 @@ const attendanceTypeController = new AttendanceTypeController(
 app.use(attendanceTypeRoutes(attendanceTypeController));
 
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
-const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const hashService = new BcryptHashService();
 
 const accountRequestController = new AccountRequestController(
@@ -208,13 +207,13 @@ const diagnosesController = new DiagnosesController(
 
 app.use(diagnosesRoutes(diagnosesController));
 
-const scheduleRepository = new PrismaScheduleRepository(prisma);
-const scheduleController = new ScheduleController(
-  new CreateSchedulePreviewUseCase(),
-  new RequestSchedule(scheduleRepository, pedagogueRepository, courseRepository, emailService),
-);
+const availabilityRepository = new PrismaAvailabilityRepository(prisma);
 
-app.use(scheduleRoutes(scheduleController));
+const previewAvailabilityUseCase = new PreviewAvailability(availabilityRepository);
+
+const availabilityController = new AvailabilityController(previewAvailabilityUseCase);
+
+app.use(availabilityRoutes(availabilityController, tokenService));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);
