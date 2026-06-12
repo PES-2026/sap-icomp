@@ -174,6 +174,21 @@ export default function ScheduleAppointmentCard() {
             </div>
           </div>
 
+          <div className="shrink-0">
+            <Field label="Motivo:" error={errors.reason?.message} required>
+              <textarea
+                placeholder="Descreva brevemente o motivo do atendimento (máx. 100 caracteres)"
+                maxLength={300}
+                rows={3}
+                {...register("reason")}
+                className={cn(
+                  getValidationClass(!!errors.reason),
+                  "resize-none",
+                )}
+              />
+            </Field>
+          </div>
+
           {errors.slotId && (
             <p className="shrink-0 text-center text-sm text-red-500">
               {errors.slotId.message}
@@ -228,7 +243,7 @@ export default function ScheduleAppointmentCard() {
           <CommonButton
             label="Cancelar"
             type="button"
-            className="w-full sm:w-auto justify-center bg-[#f4a598]  hover:bg-[#f0a195]"
+            className="w-full sm:w-auto justify-center bg-[#f4a598] hover:bg-[#f0a195]"
           />
           <CommonButton
             label={isSubmitting ? "Enviando..." : "Confirmar Solicitação"}

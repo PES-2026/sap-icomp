@@ -50,10 +50,10 @@ export default function Sidebar() {
             href: PATHS.attendances_list,
           },
           {
-            label: "Gestão de Agendamentos",
+            label: "Disponibilidade",
             icon: CalendarClock,
-            id: "Agendamento",
-            href: PATHS.scheduling,
+            id: "Disponibilidade",
+            href: PATHS.scheduling_settings,
           },
           {
             label: "Usuários",

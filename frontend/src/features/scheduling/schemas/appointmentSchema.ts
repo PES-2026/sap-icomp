@@ -10,6 +10,11 @@ export const appointmentSchema = z.object({
   pedagogueId: z.string().min(1, "Selecione um pedagogo"),
   date: z.string().min(1, "A data é obrigatória"),
   courseId: z.string().min(1, "Selecione um curso"),
+  reason: z
+    .string()
+    .trim()
+    .min(1, "O motivo é obrigatório")
+    .max(300, "O motivo deve ter no máximo 100 caracteres"),
   slotId: z.string().min(1, "Você precisa selecionar um horário disponível"),
 });
 
