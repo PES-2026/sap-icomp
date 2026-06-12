@@ -115,7 +115,25 @@ export function validateComparativeField(value: unknown, validatedValue: unknown
   return true;
 }
 
+export function validateTime(value: unknown, fieldName: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${fieldName} is required and must be a string in HH:mm format.`);
+  }
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!timeRegex.test(value)) {
+    throw new Error(`${fieldName} must be in HH:mm format (00:00 to 23:59).`);
+  }
+  return value;
+}
+
 function isUUID(value: string): boolean {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);
+}
+
+export function validateArrayField(value: unknown, fieldName: string) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${fieldName} must be a non-empty array.`);
+  }
+  return value as Array<unknown>;
 }
