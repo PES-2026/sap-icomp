@@ -11,11 +11,13 @@ export interface Column<T> {
 interface DataTableProps<T> {
   title: string;
   headerAction?: ReactNode;
+  toolbar?: ReactNode;
   columns: Column<T>[];
   data: T[];
   isLoading?: boolean;
   loadingComponent?: ReactNode;
   emptyMessage?: string;
+  emptyComponent?: ReactNode;
   page: number;
   setPage: (page: number) => void;
   limit: number;
@@ -27,11 +29,13 @@ interface DataTableProps<T> {
 export function DataTable<T>({
   title,
   headerAction,
+  toolbar,
   columns,
   data,
   isLoading,
   loadingComponent,
   emptyMessage = "Nenhum registro encontrado.",
+  emptyComponent,
   page,
   setPage,
   limit,
@@ -50,6 +54,11 @@ export function DataTable<T>({
           <h1 className="m-0 text-xl font-semibold text-[#3a3530]">{title}</h1>
           {headerAction && <div>{headerAction}</div>}
         </div>
+        {toolbar && (
+          <div className="shrink-0 border-t border-[#ece7db] px-6 py-4">
+            {toolbar}
+          </div>
+        )}
         <div className="flex-1 overflow-auto">
           <table className="w-full border-separate border-spacing-0 text-sm">
             <thead className="sticky top-0 z-10">
@@ -85,7 +94,7 @@ export function DataTable<T>({
                     colSpan={columns.length}
                     className="px-4 py-8 text-center text-[#a0a0a0]"
                   >
-                    {emptyMessage}
+                    {emptyComponent ?? emptyMessage}
                   </td>
                 </tr>
               ) : (

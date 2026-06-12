@@ -1,5 +1,5 @@
-import ScheduleForm from "@/features/schedules/components/ScheduleForm";
+import SchedulingTabs from "@/features/schedules/components/SchedulingTabs";
 
 export default function SchedulingPage() {
-  return <ScheduleForm />;
+  return <SchedulingTabs />;
 }
