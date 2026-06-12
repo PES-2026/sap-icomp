@@ -79,7 +79,7 @@ export const useSchedulePreview = () => {
       endDate: data.endDate,
       startTime: data.startTime,
       endTime: data.endTime,
-      appointmentDuration: minutesToDuration(Number(data.durationMinutes)),
+      attendanceDuration: minutesToDuration(Number(data.durationMinutes)),
     };
 
     try {

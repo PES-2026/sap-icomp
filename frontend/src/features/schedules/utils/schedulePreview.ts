@@ -23,7 +23,7 @@ export const generateSchedulePreview = (
   const slots: ScheduleSlot[] = [];
   const startMinutes = timeToMinutes(payload.startTime);
   const endMinutes = timeToMinutes(payload.endTime);
-  const durationMinutes = timeToMinutes(payload.appointmentDuration);
+  const durationMinutes = timeToMinutes(payload.attendanceDuration);
 
   if (durationMinutes <= 0) return slots;
 
@@ -51,4 +51,3 @@ export const generateSchedulePreview = (
 
   return slots;
 };
-
