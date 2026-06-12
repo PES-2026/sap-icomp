@@ -6,6 +6,7 @@ import {
   validateStringField,
 } from "@domain/utils/validationUtils";
 
+import { validateStartEndDate } from "../shared/datesValidationsDto";
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
 export class ListAttendanceDTO {
@@ -14,20 +15,6 @@ export class ListAttendanceDTO {
     public readonly limit: number,
     public readonly filters: ListAttendanceFilters,
   ) {}
-
-  private static validateStartEndDate(startDate?: Date, endDate?: Date) {
-    if (!startDate && !endDate) return;
-
-    if (!startDate || !endDate) {
-      throw new Error(
-        `You must insert a period range with start and end date. The actual values are: start: '${startDate}', end: '${endDate}'`,
-      );
-    }
-
-    if (startDate.getTime() > endDate.getTime()) {
-      throw new Error("Start Date must be before End Date!");
-    }
-  }
 
   static create(value: unknown): ListAttendanceDTO {
     if (typeof value !== "object" || value === null) {
@@ -53,7 +40,7 @@ export class ListAttendanceDTO {
     if (raw.endDate) filters.endDate = validateDateField(raw.endDate, "endDate");
 
     validatePageLimitValues(page, limit);
-    ListAttendanceDTO.validateStartEndDate(filters.startDate, filters.endDate);
+    validateStartEndDate(filters.startDate, filters.endDate);
 
     return new ListAttendanceDTO(page, limit, filters);
   }
