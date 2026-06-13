@@ -1,7 +1,4 @@
-import {
-  SchedulePreviewPayload,
-  ScheduleSlot,
-} from "../types/schedule";
+import { SchedulingPreviewPayload, SchedulingSlot } from "../types/scheduling";
 import { timeToMinutes } from "./validations";
 
 const padTime = (value: number) => String(value).padStart(2, "0");
@@ -17,10 +14,11 @@ const parseDate = (date: string) => {
   return new Date(Date.UTC(year, month - 1, day));
 };
 
-export const generateSchedulePreview = (
-  payload: SchedulePreviewPayload,
-): ScheduleSlot[] => {
-  const slots: ScheduleSlot[] = [];
+export const generateSchedulingPreview = (
+  payload: SchedulingPreviewPayload,
+  pedagogueId: string = "preview-pedagogue-id", // Adicionado para satisfazer a interface
+): SchedulingSlot[] => {
+  const slots: SchedulingSlot[] = [];
   const startMinutes = timeToMinutes(payload.startTime);
   const endMinutes = timeToMinutes(payload.endTime);
   const durationMinutes = timeToMinutes(payload.attendanceDuration);
@@ -31,7 +29,8 @@ export const generateSchedulePreview = (
   const finalDate = parseDate(payload.endDate);
 
   while (currentDate <= finalDate) {
-    const date = currentDate.toISOString().slice(0, 10);
+    const dateStr = currentDate.toISOString().slice(0, 10);
+    const weekday = "Monday";
 
     for (
       let slotStart = startMinutes;
@@ -40,9 +39,18 @@ export const generateSchedulePreview = (
     ) {
       const slotEnd = slotStart + durationMinutes;
 
+      const startDateTime = `${dateStr}T${minutesToTime(slotStart)}:00.000Z`;
+      const endDateTime = `${dateStr}T${minutesToTime(slotEnd)}:00.000Z`;
+
       slots.push({
-        startDateTime: `${date}T${minutesToTime(slotStart)}:00`,
-        endDateTime: `${date}T${minutesToTime(slotEnd)}:00`,
+        id: `preview-${dateStr}-${slotStart}`,
+        pedagogueId,
+        startDateTime,
+        endDateTime,
+        status: "CREATED",
+        date: new Date(startDateTime),
+        weekday,
+        attendanceTime: durationMinutes,
       });
     }
 

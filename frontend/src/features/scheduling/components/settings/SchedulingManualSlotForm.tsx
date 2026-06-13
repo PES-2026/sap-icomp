@@ -12,7 +12,7 @@ interface ManualSlotData {
   endTime: string;
 }
 
-interface ScheduleManualSlotFormProps {
+interface SchedulingManualSlotFormProps {
   disabled: boolean;
   minDate?: string;
   maxDate?: string;
@@ -30,14 +30,14 @@ const initialValues: ManualSlotData = {
   endTime: "",
 };
 
-export default function ScheduleManualSlotForm({
+export default function SchedulingManualSlotForm({
   disabled,
   minDate,
   maxDate,
   minTime,
   maxTime,
   onAddSlot,
-}: ScheduleManualSlotFormProps) {
+}: SchedulingManualSlotFormProps) {
   const [values, setValues] = useState(initialValues);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

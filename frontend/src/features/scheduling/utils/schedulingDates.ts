@@ -1,4 +1,4 @@
-import { ManagedSchedulePeriod } from "../types/scheduleManagement";
+import { ManagedSchedulingPeriod } from "../types/schedulingManagement";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
@@ -11,7 +11,7 @@ export const formatDateInput = (date: Date) => {
 };
 
 export const getPeriodDates = (
-  period: Exclude<ManagedSchedulePeriod, "CUSTOM">,
+  period: Exclude<ManagedSchedulingPeriod, "CUSTOM">,
   referenceDate = new Date(),
 ) => {
   const today = new Date(
@@ -45,20 +45,20 @@ export const getPeriodDates = (
   };
 };
 
-export const formatScheduleDate = (dateTime: string) =>
+export const formatSchedulingDate = (dateTime: string) =>
   new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   }).format(new Date(dateTime));
 
-export const formatScheduleTime = (dateTime: string) =>
+export const formatSchedulingTime = (dateTime: string) =>
   new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(dateTime));
 
-export const formatScheduleDateTime = (dateTime: string) =>
+export const formatSchedulingDateTime = (dateTime: string) =>
   new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",

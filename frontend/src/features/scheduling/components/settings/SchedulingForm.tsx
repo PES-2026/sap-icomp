@@ -5,9 +5,8 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { CustomDatePicker } from "@/components/ui/CustomDatePicker";
 import { Field } from "@/components/ui/Field";
 import { Controller } from "react-hook-form";
-import { useSchedulePreview } from "../hooks/useSchedulePreview";
-import ScheduleManualSlotForm from "./ScheduleManualSlotForm";
-import SchedulePreviewList from "./SchedulePreviewList";
+import { useSchedulingPreview } from "../../hooks/useSchedulingPreview";
+import SchedulingPreviewList from "./SchedulingPreviewList";
 
 const baseInputClass =
   "w-full px-3.5 py-2.5 bg-white border-[1.5px] rounded-md text-sm outline-none transition-colors font-sans text-stone-800";
@@ -17,7 +16,7 @@ const getValidationClass = (hasError: boolean) =>
     ? `${baseInputClass} border-red-400 text-red-900 focus:border-red-500`
     : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400 placeholder:text-stone-400`;
 
-export default function ScheduleForm() {
+export default function SchedulingForm() {
   const {
     form,
     slots,
@@ -31,12 +30,11 @@ export default function ScheduleForm() {
     clearPreview,
     invalidatePreview,
     toggleSlot,
-    addManualSlot,
     confirmPreview,
     cancelSaveConfirmation,
-    saveSchedule,
+    saveScheduling,
     onSubmit,
-  } = useSchedulePreview();
+  } = useSchedulingPreview();
 
   const {
     register,
@@ -208,16 +206,7 @@ export default function ScheduleForm() {
                 )}
               </div>
 
-              <ScheduleManualSlotForm
-                disabled={!hasGeneratedPreview || isLoading || isSaving}
-                minDate={previewPayload?.startDate}
-                maxDate={previewPayload?.endDate}
-                minTime={previewPayload?.startTime}
-                maxTime={previewPayload?.endTime}
-                onAddSlot={addManualSlot}
-              />
-
-              <SchedulePreviewList
+              <SchedulingPreviewList
                 slots={slots}
                 hasGeneratedPreview={hasGeneratedPreview}
                 disabledSlotIds={disabledSlotIds}
@@ -253,7 +242,7 @@ export default function ScheduleForm() {
             activeSlotsCount === 1 ? "horário ativo" : "horários ativos"
           }? Os horários removidos não serão enviados.`}
           confirmLabel={isSaving ? "Salvando..." : "Salvar"}
-          onConfirm={isSaving ? () => undefined : saveSchedule}
+          onConfirm={isSaving ? () => undefined : saveScheduling}
           onCancel={cancelSaveConfirmation}
         />
       </div>

@@ -3,21 +3,21 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { FormModal } from "@/components/ui/FormModal";
 import { useState } from "react";
-import { ManagedSchedule } from "../../types/scheduleManagement";
+import { ManagedScheduling } from "../../types/schedulingManagement";
 
-interface ScheduleRejectionModalProps {
-  schedule: ManagedSchedule;
+interface SchedulingRejectionModalProps {
+  scheduling: ManagedScheduling;
   isSubmitting: boolean;
   onClose: () => void;
   onConfirm: (justification: string) => Promise<void>;
 }
 
-export default function ScheduleRejectionModal({
-  schedule,
+export default function SchedulingRejectionModal({
+  scheduling,
   isSubmitting,
   onClose,
   onConfirm,
-}: ScheduleRejectionModalProps) {
+}: SchedulingRejectionModalProps) {
   const [justification, setJustification] = useState("");
   const [error, setError] = useState("");
 
@@ -57,8 +57,8 @@ export default function ScheduleRejectionModal({
     >
       <p className="text-sm leading-relaxed text-stone-600">
         Informe ao aluno por que a solicitação de{" "}
-        <strong>{schedule.student.name}</strong> não poderá ser atendida
-        neste horário.
+        <strong>{scheduling.studentName}</strong> não poderá ser atendida neste
+        horário.
       </p>
 
       <label className="flex flex-col gap-2 text-sm font-semibold text-[#4a4540]">

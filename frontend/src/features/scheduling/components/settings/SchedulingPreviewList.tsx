@@ -2,10 +2,10 @@
 
 import { CalendarDays, Check, Clock3, X } from "lucide-react";
 
-import { ScheduleSlot } from "../types/schedule";
+import { SchedulingSlot } from "../../types/scheduling";
 
-interface SchedulePreviewListProps {
-  slots: ScheduleSlot[];
+interface SchedulingPreviewListProps {
+  slots: SchedulingSlot[];
   hasGeneratedPreview: boolean;
   disabledSlotIds: Set<string>;
   onToggleSlot: (slotId: string) => void;
@@ -29,16 +29,16 @@ const formatWeekday = (date: string) =>
 
 const getTime = (dateTime: string) => dateTime.slice(11, 16);
 
-const getSlotId = (slot: ScheduleSlot) =>
+const getSlotId = (slot: SchedulingSlot) =>
   `${slot.startDateTime}|${slot.endDateTime}`;
 
-export default function SchedulePreviewList({
+export default function SchedulingPreviewList({
   slots,
   hasGeneratedPreview,
   disabledSlotIds,
   onToggleSlot,
-}: SchedulePreviewListProps) {
-  const groupedSlots = slots.reduce<Record<string, ScheduleSlot[]>>(
+}: SchedulingPreviewListProps) {
+  const groupedSlots = slots.reduce<Record<string, SchedulingSlot[]>>(
     (groups, slot) => {
       const date = slot.startDateTime.slice(0, 10);
       groups[date] = [...(groups[date] ?? []), slot];

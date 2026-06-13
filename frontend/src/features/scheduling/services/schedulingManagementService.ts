@@ -1,24 +1,22 @@
 import api from "@/services/api";
 import {
-  ManagedSchedule,
-  ManagedScheduleActionResult,
-  ManagedScheduleFilters,
-} from "../types/scheduleManagement";
-import { scheduleManagementMock } from "./scheduleManagementMock";
+  ManagedScheduling,
+  ManagedSchedulingActionResult,
+  ManagedSchedulingFilters,
+} from "../types/schedulingManagement";
+import { scheduleManagementMock } from "./schedulingManagementMock";
 
 const shouldUseMocks =
-  process.env.NEXT_PUBLIC_SCHEDULE_MANAGEMENT_MOCK !== "false";
+  process.env.NEXT_PUBLIC_SCHEDULING_MANAGEMENT_MOCK !== "false";
 
 export const scheduleManagementService = {
-  async list(
-    filters: ManagedScheduleFilters,
-  ): Promise<ManagedSchedule[]> {
+  async list(filters: ManagedSchedulingFilters): Promise<ManagedScheduling[]> {
     if (shouldUseMocks) {
       return scheduleManagementMock.list(filters);
     }
 
-    const response = await api.get<{ items: ManagedSchedule[] }>(
-      "/schedules/appointments",
+    const response = await api.get<{ items: ManagedScheduling[] }>(
+      "/schedulings/appointments",
       {
         params: {
           startDate: filters.startDate,
@@ -32,13 +30,13 @@ export const scheduleManagementService = {
     return response.data.items;
   },
 
-  async listPending(pedagogueId: string): Promise<ManagedSchedule[]> {
+  async listPending(pedagogueId: string): Promise<ManagedScheduling[]> {
     if (shouldUseMocks) {
       return scheduleManagementMock.listPending(pedagogueId);
     }
 
-    const response = await api.get<{ items: ManagedSchedule[] }>(
-      "/schedules/appointments/pending",
+    const response = await api.get<{ items: ManagedScheduling[] }>(
+      "/schedulings/appointments/pending",
       {
         fallbackMsg: "Não foi possível carregar as solicitações pendentes.",
       },
@@ -50,13 +48,13 @@ export const scheduleManagementService = {
   async confirm(
     scheduleId: string,
     pedagogueId: string,
-  ): Promise<ManagedScheduleActionResult> {
+  ): Promise<ManagedSchedulingActionResult> {
     if (shouldUseMocks) {
       return scheduleManagementMock.confirm(scheduleId, pedagogueId);
     }
 
-    const response = await api.patch<ManagedScheduleActionResult>(
-      `/schedules/appointments/${scheduleId}/confirm`,
+    const response = await api.patch<ManagedSchedulingActionResult>(
+      `/schedulings/appointments/${scheduleId}/confirm`,
       undefined,
       {
         fallbackMsg: "Não foi possível confirmar o atendimento.",
@@ -70,7 +68,7 @@ export const scheduleManagementService = {
     scheduleId: string,
     pedagogueId: string,
     justification: string,
-  ): Promise<ManagedScheduleActionResult> {
+  ): Promise<ManagedSchedulingActionResult> {
     if (shouldUseMocks) {
       return scheduleManagementMock.reject(
         scheduleId,
@@ -79,8 +77,8 @@ export const scheduleManagementService = {
       );
     }
 
-    const response = await api.patch<ManagedScheduleActionResult>(
-      `/schedules/appointments/${scheduleId}/reject`,
+    const response = await api.patch<ManagedSchedulingActionResult>(
+      `/schedulings/appointments/${scheduleId}/reject`,
       { justification },
       {
         fallbackMsg: "Não foi possível recusar o atendimento.",

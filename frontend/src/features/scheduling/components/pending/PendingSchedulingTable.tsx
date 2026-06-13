@@ -3,55 +3,56 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { usePendingSchedules } from "@/features/schedules/hooks/usePendingSchedules";
+import { usePendingSchedulings } from "@/features/scheduling/hooks/usePendingScheduling";
 import { AlertTriangle, Check, Eye, Loader2, RefreshCw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { ManagedSchedule } from "../../types/scheduleManagement";
+import { ManagedScheduling } from "../../types/schedulingManagement";
 import {
-  formatScheduleDate,
-  formatScheduleTime,
-} from "../../utils/scheduleDates";
-import ScheduleDetailsModal from "../list/ScheduleDetailsModal";
-import ScheduleStatusBadge from "../list/ScheduleStatusBadge";
-import PendingScheduleEmptyState from "./PendingScheduleEmptyState";
-import ScheduleRejectionModal from "./ScheduleRejectionModal";
+  formatSchedulingDate,
+  formatSchedulingTime,
+} from "../../utils/schedulingDates";
+import SchedulingDetailsModal from "../list/SchedulingDetailsModal";
+import SchedulingStatusBadge from "../list/SchedulingStatusBadge";
+import PendingSchedulingEmptyState from "./PendingSchedulingEmptyState";
+import SchedulingRejectionModal from "./SchedulingRejectionModal";
 
-export default function PendingScheduleTable() {
+export default function PendingSchedulingTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [detailsSchedule, setDetailsSchedule] =
-    useState<ManagedSchedule | null>(null);
-  const [confirmationSchedule, setConfirmationSchedule] =
-    useState<ManagedSchedule | null>(null);
-  const [rejectionSchedule, setRejectionSchedule] =
-    useState<ManagedSchedule | null>(null);
+
+  const [detailsScheduling, setDetailsScheduling] =
+    useState<ManagedScheduling | null>(null);
+  const [confirmationScheduling, setConfirmationScheduling] =
+    useState<ManagedScheduling | null>(null);
+  const [rejectionScheduling, setRejectionScheduling] =
+    useState<ManagedScheduling | null>(null);
 
   const {
-    schedules,
+    schedulings,
     isLoading,
     processingId,
     error,
-    confirmSchedule,
-    rejectSchedule,
+    confirmScheduling,
+    rejectScheduling,
     reload,
-  } = usePendingSchedules();
+  } = usePendingSchedulings();
 
-  const totalItems = schedules.length;
+  const totalItems = schedulings.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));
-  const paginatedSchedules = useMemo(() => {
+  const paginatedSchedulings = useMemo(() => {
     const startIndex = (page - 1) * limit;
-    return schedules.slice(startIndex, startIndex + limit);
-  }, [schedules, limit, page]);
+    return schedulings.slice(startIndex, startIndex + limit);
+  }, [schedulings, limit, page]);
 
   const handleConfirm = async () => {
-    if (!confirmationSchedule) return;
+    if (!confirmationScheduling) return;
 
     try {
-      const result = await confirmSchedule(confirmationSchedule.id);
-      setConfirmationSchedule(null);
+      const result = await confirmScheduling(confirmationScheduling.id);
+      setConfirmationScheduling(null);
 
-      if (result.outcome === "CANCELLED") {
+      if (result.outcome === "CANCELED") {
         toast.error(
           "A data deste atendimento passou. A solicitação foi cancelada e o horário foi liberado.",
           { duration: 5500 },
@@ -74,14 +75,14 @@ export default function PendingScheduleTable() {
   };
 
   const handleReject = async (justification: string) => {
-    if (!rejectionSchedule) return;
+    if (!rejectionScheduling) return;
 
     try {
-      const result = await rejectSchedule(
-        rejectionSchedule.id,
+      const result = await rejectScheduling(
+        rejectionScheduling.id,
         justification,
       );
-      setRejectionSchedule(null);
+      setRejectionScheduling(null);
 
       toast.success(
         result.emailNotificationQueued
@@ -98,17 +99,17 @@ export default function PendingScheduleTable() {
     }
   };
 
-  const columns: Column<ManagedSchedule>[] = [
+  const columns: Column<ManagedScheduling>[] = [
     {
       label: "Aluno",
       width: "min-w-[230px]",
-      renderCell: (schedule) => (
+      renderCell: (scheduling) => (
         <div className="flex flex-col items-center gap-1">
           <span className="font-semibold text-[#3a3530]">
-            {schedule.student.name}
+            {scheduling.studentName}
           </span>
           <span className="text-xs text-stone-400">
-            {schedule.student.enrollmentId}
+            {scheduling.enrollmentId}
           </span>
         </div>
       ),
@@ -116,24 +117,24 @@ export default function PendingScheduleTable() {
     {
       label: "E-mail",
       width: "min-w-[260px]",
-      renderCell: (schedule) => schedule.student.email,
+      renderCell: (scheduling) => scheduling.email,
     },
     {
       label: "Curso",
       width: "min-w-[190px]",
-      renderCell: (schedule) => schedule.course.name,
+      renderCell: (scheduling) => scheduling.course.name,
     },
     {
       label: "Horário solicitado",
       width: "min-w-[160px]",
-      renderCell: (schedule) => (
+      renderCell: (scheduling) => (
         <div className="flex flex-col gap-1">
           <span className="font-medium text-[#4a4540]">
-            {formatScheduleDate(schedule.startDateTime)}
+            {formatSchedulingDate(scheduling.slot.startDateTime)}
           </span>
           <span>
-            {formatScheduleTime(schedule.startDateTime)} às{" "}
-            {formatScheduleTime(schedule.endDateTime)}
+            {formatSchedulingTime(scheduling.slot.startDateTime)} às{" "}
+            {formatSchedulingTime(scheduling.slot.endDateTime)}
           </span>
         </div>
       ),
@@ -141,38 +142,38 @@ export default function PendingScheduleTable() {
     {
       label: "Status",
       width: "min-w-[130px]",
-      renderCell: (schedule) => (
-        <ScheduleStatusBadge status={schedule.status} />
+      renderCell: (scheduling) => (
+        <SchedulingStatusBadge status={scheduling.status} />
       ),
     },
     {
       label: "Ações",
       width: "min-w-[150px]",
-      renderCell: (schedule) => {
-        const isProcessing = processingId === schedule.id;
+      renderCell: (scheduling) => {
+        const isProcessing = processingId === scheduling.id;
 
         return (
           <div className="flex items-center justify-center gap-1.5">
             <CommonButton
               label=""
               type="button"
-              aria-label={`Visualizar solicitação de ${schedule.student.name}`}
+              aria-label={`Visualizar solicitação de ${scheduling.studentName}`}
               title="Visualizar detalhes"
               startIcon={Eye}
               sizeIcon={19}
               disabled={isProcessing}
-              onClick={() => setDetailsSchedule(schedule)}
+              onClick={() => setDetailsScheduling(scheduling)}
               className="gap-0 border-0 bg-transparent p-1.5 text-stone-500 hover:bg-stone-100"
             />
             <CommonButton
               label=""
               type="button"
-              aria-label={`Confirmar atendimento de ${schedule.student.name}`}
+              aria-label={`Confirmar atendimento de ${scheduling.studentName}`}
               title="Confirmar Atendimento"
               startIcon={isProcessing ? Loader2 : Check}
               sizeIcon={20}
               disabled={isProcessing}
-              onClick={() => setConfirmationSchedule(schedule)}
+              onClick={() => setConfirmationScheduling(scheduling)}
               className={`gap-0 rounded-full border border-emerald-200 bg-emerald-100 p-1.5 text-emerald-700 hover:bg-emerald-200 ${
                 isProcessing ? "[&_svg]:animate-spin" : ""
               }`}
@@ -180,12 +181,12 @@ export default function PendingScheduleTable() {
             <CommonButton
               label=""
               type="button"
-              aria-label={`Recusar atendimento de ${schedule.student.name}`}
+              aria-label={`Recusar atendimento de ${scheduling.studentName}`}
               title="Recusar Atendimento"
               startIcon={X}
               sizeIcon={20}
               disabled={isProcessing}
-              onClick={() => setRejectionSchedule(schedule)}
+              onClick={() => setRejectionScheduling(scheduling)}
               className="gap-0 rounded-full border border-red-200 bg-red-100 p-1.5 text-red-600 hover:bg-red-200"
             />
           </div>
@@ -239,7 +240,7 @@ export default function PendingScheduleTable() {
         }
         isLoading={isLoading}
         loadingComponent={loadingComponent}
-        data={paginatedSchedules}
+        data={paginatedSchedulings}
         columns={columns}
         page={page}
         setPage={setPage}
@@ -251,44 +252,44 @@ export default function PendingScheduleTable() {
         totalItems={totalItems}
         totalPages={totalPages}
         emptyMessage={error || undefined}
-        emptyComponent={error ? undefined : <PendingScheduleEmptyState />}
+        emptyComponent={error ? undefined : <PendingSchedulingEmptyState />}
       />
 
-      <ScheduleDetailsModal
-        schedule={detailsSchedule}
-        onClose={() => setDetailsSchedule(null)}
+      <SchedulingDetailsModal
+        scheduling={detailsScheduling}
+        onClose={() => setDetailsScheduling(null)}
       />
 
       <ConfirmModal
-        open={Boolean(confirmationSchedule)}
+        open={Boolean(confirmationScheduling)}
         title="Confirmar atendimento"
         message={
-          confirmationSchedule
-            ? `Deseja confirmar o atendimento de ${confirmationSchedule.student.name}? O aluno será notificado por e-mail.`
+          confirmationScheduling
+            ? `Deseja confirmar o atendimento de ${confirmationScheduling.studentName}? O aluno será notificado por e-mail.`
             : ""
         }
         confirmLabel={
-          processingId === confirmationSchedule?.id
+          processingId === confirmationScheduling?.id
             ? "Confirmando..."
             : "Confirmar Atendimento"
         }
         onConfirm={
-          processingId === confirmationSchedule?.id
+          processingId === confirmationScheduling?.id
             ? () => undefined
             : handleConfirm
         }
         onCancel={() => {
-          if (!processingId) setConfirmationSchedule(null);
+          if (!processingId) setConfirmationScheduling(null);
         }}
       />
 
-      {rejectionSchedule && (
-        <ScheduleRejectionModal
-          key={rejectionSchedule.id}
-          schedule={rejectionSchedule}
-          isSubmitting={processingId === rejectionSchedule.id}
+      {rejectionScheduling && (
+        <SchedulingRejectionModal
+          key={rejectionScheduling.id}
+          scheduling={rejectionScheduling}
+          isSubmitting={processingId === rejectionScheduling.id}
           onClose={() => {
-            if (!processingId) setRejectionSchedule(null);
+            if (!processingId) setRejectionScheduling(null);
           }}
           onConfirm={handleReject}
         />

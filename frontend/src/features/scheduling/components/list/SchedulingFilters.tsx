@@ -4,17 +4,17 @@ import CommonButton from "@/components/ui/CommonButton";
 import { CalendarRange, Filter } from "lucide-react";
 import { useState } from "react";
 import {
-  ManagedScheduleFilters,
-  ManagedSchedulePeriod,
-} from "../../types/scheduleManagement";
-import { getPeriodDates } from "../../utils/scheduleDates";
+  ManagedSchedulingFilters,
+  ManagedSchedulingPeriod,
+} from "../../types/schedulingManagement";
+import { getPeriodDates } from "../../utils/schedulingDates";
 
-interface ScheduleFiltersProps {
-  onApply: (filters: ManagedScheduleFilters) => void;
+interface SchedulingFiltersProps {
+  onApply: (filters: ManagedSchedulingFilters) => void;
 }
 
 const periodOptions: {
-  value: ManagedSchedulePeriod;
+  value: ManagedSchedulingPeriod;
   label: string;
 }[] = [
   { value: "UPCOMING", label: "A partir de hoje" },
@@ -26,17 +26,14 @@ const periodOptions: {
 const inputClass =
   "rounded-lg border border-[#e2ddd5] bg-[#faf8f4] px-3 py-2 text-sm text-[#4a4540] outline-none transition-colors focus:border-[#6bc4a6]";
 
-export default function ScheduleFilters({
-  onApply,
-}: ScheduleFiltersProps) {
+export default function SchedulingFilters({ onApply }: SchedulingFiltersProps) {
   const upcomingDates = getPeriodDates("UPCOMING");
-  const [period, setPeriod] =
-    useState<ManagedSchedulePeriod>("UPCOMING");
+  const [period, setPeriod] = useState<ManagedSchedulingPeriod>("UPCOMING");
   const [startDate, setStartDate] = useState(upcomingDates.startDate);
   const [endDate, setEndDate] = useState("");
   const [error, setError] = useState("");
 
-  const handlePeriodChange = (nextPeriod: ManagedSchedulePeriod) => {
+  const handlePeriodChange = (nextPeriod: ManagedSchedulingPeriod) => {
     setPeriod(nextPeriod);
     setError("");
 
@@ -62,8 +59,7 @@ export default function ScheduleFilters({
     onApply({
       startDate,
       endDate: endDate || undefined,
-      statuses:
-        period === "UPCOMING" ? ["PENDING", "CONFIRMED"] : ["CONFIRMED"],
+      statuses: period === "UPCOMING" ? ["PENDING", "APPROVED"] : ["APPROVED"],
     });
   };
 
@@ -81,7 +77,7 @@ export default function ScheduleFilters({
               value={period}
               onChange={(event) =>
                 handlePeriodChange(
-                  event.target.value as ManagedSchedulePeriod,
+                  event.target.value as ManagedSchedulingPeriod,
                 )
               }
               className={`${inputClass} w-full cursor-pointer pl-9`}

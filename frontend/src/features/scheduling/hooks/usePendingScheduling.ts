@@ -2,22 +2,22 @@
 
 import { useAuthStore } from "@/store/authStore";
 import { useCallback, useEffect, useState } from "react";
-import { scheduleManagementService } from "../services/scheduleManagementService";
+import { scheduleManagementService } from "../services/schedulingManagementService";
 import {
-  ManagedSchedule,
-  ManagedScheduleActionResult,
-} from "../types/scheduleManagement";
+  ManagedScheduling,
+  ManagedSchedulingActionResult,
+} from "../types/schedulingManagement";
 
-export const usePendingSchedules = () => {
+export const usePendingSchedulings = () => {
   const pedagogueId = useAuthStore((state) => state.user?.id);
-  const [schedules, setSchedules] = useState<ManagedSchedule[]>([]);
+  const [schedulings, setSchedulings] = useState<ManagedScheduling[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const loadPendingSchedules = useCallback(async () => {
+  const loadPendingSchedulings = useCallback(async () => {
     if (!pedagogueId) {
-      setSchedules([]);
+      setSchedulings([]);
       setError("Não foi possível identificar a pedagoga responsável.");
       setIsLoading(false);
       return;
@@ -26,11 +26,9 @@ export const usePendingSchedules = () => {
     try {
       setIsLoading(true);
       setError("");
-      setSchedules(
-        await scheduleManagementService.listPending(pedagogueId),
-      );
+      setSchedulings(await scheduleManagementService.listPending(pedagogueId));
     } catch (loadError) {
-      setSchedules([]);
+      setSchedulings([]);
       setError(
         loadError instanceof Error
           ? loadError.message
@@ -42,19 +40,19 @@ export const usePendingSchedules = () => {
   }, [pedagogueId]);
 
   useEffect(() => {
-    loadPendingSchedules();
-  }, [loadPendingSchedules]);
+    loadPendingSchedulings();
+  }, [loadPendingSchedulings]);
 
   const runAction = async (
     scheduleId: string,
-    action: () => Promise<ManagedScheduleActionResult>,
+    action: () => Promise<ManagedSchedulingActionResult>,
   ) => {
     try {
       setProcessingId(scheduleId);
       setError("");
       const result = await action();
-      setSchedules((current) =>
-        current.filter((schedule) => schedule.id !== scheduleId),
+      setSchedulings((current) =>
+        current.filter((scheduling) => scheduling.id !== scheduleId),
       );
       return result;
     } finally {
@@ -62,7 +60,7 @@ export const usePendingSchedules = () => {
     }
   };
 
-  const confirmSchedule = async (scheduleId: string) => {
+  const confirmScheduling = async (scheduleId: string) => {
     if (!pedagogueId) {
       throw new Error("Não foi possível identificar a pedagoga responsável.");
     }
@@ -72,7 +70,7 @@ export const usePendingSchedules = () => {
     );
   };
 
-  const rejectSchedule = async (
+  const rejectScheduling = async (
     scheduleId: string,
     justification: string,
   ) => {
@@ -81,21 +79,17 @@ export const usePendingSchedules = () => {
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.reject(
-        scheduleId,
-        pedagogueId,
-        justification,
-      ),
+      scheduleManagementService.reject(scheduleId, pedagogueId, justification),
     );
   };
 
   return {
-    schedules,
+    schedulings,
     isLoading,
     processingId,
     error,
-    confirmSchedule,
-    rejectSchedule,
-    reload: loadPendingSchedules,
+    confirmScheduling,
+    rejectScheduling,
+    reload: loadPendingSchedulings,
   };
 };

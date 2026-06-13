@@ -1,31 +1,27 @@
-import { ManagedScheduleStatus } from "../../types/scheduleManagement";
+import { ManagedSchedulingStatus } from "../../types/schedulingManagement";
 
 const statusConfig: Record<
-  ManagedScheduleStatus,
+  ManagedSchedulingStatus,
   { label: string; className: string }
 > = {
   PENDING: {
     label: "Pendente",
     className: "bg-amber-100 text-amber-700",
   },
-  CONFIRMED: {
+  APPROVED: {
     label: "Confirmado",
     className: "bg-emerald-100 text-emerald-700",
   },
-  CANCELLED: {
+  CANCELED: {
     label: "Cancelado",
-    className: "bg-red-100 text-red-700",
-  },
-  REJECTED: {
-    label: "Recusado",
     className: "bg-red-100 text-red-700",
   },
 };
 
-export default function ScheduleStatusBadge({
+export default function SchedulingStatusBadge({
   status,
 }: {
-  status: ManagedScheduleStatus;
+  status: ManagedSchedulingStatus;
 }) {
   const config = statusConfig[status];
 

@@ -2,14 +2,14 @@
 
 import { CalendarDays, CalendarPlus, ClipboardClock } from "lucide-react";
 import { useState } from "react";
-import ScheduleTable from "./list/ScheduleTable";
-import PendingScheduleTable from "./pending/PendingScheduleTable";
-import ScheduleForm from "./ScheduleForm";
+import SchedulingTable from "./list/SchedulingTable";
+import PendingSchedulingTable from "./pending/PendingSchedulingTable";
+import SchedulingForm from "./settings/SchedulingForm";
 
-type SchedulingTab = "pending" | "schedules" | "availability";
+type SchedulingTab = "pending" | "schedulings" | "availability";
 
 export default function SchedulingTabs() {
-  const [activeTab, setActiveTab] = useState<SchedulingTab>("schedules");
+  const [activeTab, setActiveTab] = useState<SchedulingTab>("schedulings");
 
   const tabClass = (tab: SchedulingTab) => `
     flex w-50 cursor-pointer items-center justify-center gap-3 whitespace-nowrap border-b-3 py-3 text-sm font-medium
@@ -29,8 +29,8 @@ export default function SchedulingTabs() {
         >
           <button
             type="button"
-            onClick={() => setActiveTab("schedules")}
-            className={tabClass("schedules")}
+            onClick={() => setActiveTab("schedulings")}
+            className={tabClass("schedulings")}
           >
             <CalendarDays className="h-4.5 w-4.5" />
             Agendamentos
@@ -58,11 +58,11 @@ export default function SchedulingTabs() {
 
       <div className="min-h-0 w-full flex-1">
         {activeTab === "pending" ? (
-          <PendingScheduleTable />
-        ) : activeTab === "schedules" ? (
-          <ScheduleTable />
+          <PendingSchedulingTable />
+        ) : activeTab === "schedulings" ? (
+          <SchedulingTable />
         ) : (
-          <ScheduleForm />
+          <SchedulingForm />
         )}
       </div>
     </div>

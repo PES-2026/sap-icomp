@@ -1,41 +1,41 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { scheduleManagementService } from "../services/scheduleManagementService";
+import { useCallback, useEffect, useState } from "react";
+import { scheduleManagementService } from "../services/schedulingManagementService";
 import {
-  ManagedSchedule,
-  ManagedScheduleFilters,
-} from "../types/scheduleManagement";
-import { getPeriodDates } from "../utils/scheduleDates";
+  ManagedScheduling,
+  ManagedSchedulingFilters,
+} from "../types/schedulingManagement";
+import { getPeriodDates } from "../utils/schedulingDates";
 
 const defaultDates = getPeriodDates("UPCOMING");
 
-const defaultFilters: ManagedScheduleFilters = {
+const defaultFilters: ManagedSchedulingFilters = {
   startDate: defaultDates.startDate,
-  statuses: ["PENDING", "CONFIRMED"],
+  statuses: ["PENDING", "APPROVED"],
 };
 
-export const useManagedSchedules = () => {
+export const useManagedSchedulings = () => {
   const pedagogueId = useAuthStore((state) => state.user?.id);
-  const [schedules, setSchedules] = useState<ManagedSchedule[]>([]);
+  const [schedulings, setSchedulings] = useState<ManagedScheduling[]>([]);
   const [filters, setFilters] =
-    useState<ManagedScheduleFilters>(defaultFilters);
+    useState<ManagedSchedulingFilters>(defaultFilters);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadSchedules = useCallback(async () => {
+  const loadSchedulings = useCallback(async () => {
     try {
       setIsLoading(true);
       setError("");
-      setSchedules(
+      setSchedulings(
         await scheduleManagementService.list({
           ...filters,
           pedagogueId,
         }),
       );
     } catch (loadError) {
-      setSchedules([]);
+      setSchedulings([]);
       setError(
         loadError instanceof Error
           ? loadError.message
@@ -47,15 +47,15 @@ export const useManagedSchedules = () => {
   }, [filters, pedagogueId]);
 
   useEffect(() => {
-    loadSchedules();
-  }, [loadSchedules]);
+    loadSchedulings();
+  }, [loadSchedulings]);
 
   return {
-    schedules,
+    schedulings,
     filters,
     isLoading,
     error,
     setFilters,
-    reload: loadSchedules,
+    reload: loadSchedulings,
   };
 };
