@@ -1,19 +1,21 @@
 import {
   PreviewAvailabilityDTO,
   PreviewAvailabilityItemResponse,
-  ScheduleSlot,
+  ScheduleSlotItem,
 } from "@application/dtos/availability/previewAvailability";
 import { ApplicationError } from "@application/errors/applicationError";
 import { AttendanceTimeGreatherThanZeroError } from "@application/errors/availability/attendanceTimeGreatherThanZeroError";
 import { EndHourLowerThanStartHourError } from "@application/errors/availability/endHourLowerThanStartHourError";
+import { ScheduleSlotPreview } from "@domain/entities/scheduleSlotPreview";
 import { DaysOfWeekEnum } from "@domain/enum/daysOfWeek";
-import { ScheduleSlotStatusEnum } from "@domain/enum/scheduleSlotStatus";
+import { ScheduleSlotPreviewStatus } from "@domain/enum/scheduleSlotStatus";
 import { DomainError } from "@domain/errors/domainError";
-import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
+import { ScheduleSlotResult } from "@domain/repositories/results/scheduleSlotResult";
+import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
 import { Result } from "@domain/shared/result";
 
 export class PreviewAvailability {
-  constructor(private repository: IAvailabilityRepository) {}
+  constructor(private readonly scheduleSlotRepository: IScheduleSlotRepository) {}
 
   async execute(
     dto: PreviewAvailabilityDTO,
@@ -26,26 +28,40 @@ export class PreviewAvailability {
       return Result.fail(new EndHourLowerThanStartHourError(dto.startHour, dto.endHour));
     }
 
-    const previewItems: Array<PreviewAvailabilityItemResponse> = PreviewAvailability.getAvailabilitySlots(
+    const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(
+      dto.pedagogueId,
+      dto.startDate,
+      dto.endDate,
+    );
+
+    const previewItems = this.getAvailabilitySlots(
+      dto.pedagogueId,
       dto.startDate,
       dto.endDate,
       dto.attendanceTime,
       dto.breakTime,
       dto.startHour,
       dto.endHour,
+      existingSlots,
     );
 
-    return Result.ok<Array<PreviewAvailabilityItemResponse>>(previewItems);
+    if (previewItems.isFailure) {
+      return Result.fail(previewItems.error!);
+    }
+
+    return Result.ok(previewItems.getValue());
   }
 
-  private static getAvailabilitySlots(
+  private getAvailabilitySlots(
+    pedagogueId: string,
     startDate: Date,
     endDate: Date,
     attendanceTime: number,
     breakTime: number,
     startHour: number,
     endHour: number,
-  ): Array<PreviewAvailabilityItemResponse> {
+    existingSlots: ScheduleSlotResult[],
+  ): Result<Array<PreviewAvailabilityItemResponse>> {
     const previewItems: Array<PreviewAvailabilityItemResponse> = [];
 
     const weekdayMap: Record<number, DaysOfWeekEnum> = {
@@ -58,24 +74,52 @@ export class PreviewAvailability {
       6: DaysOfWeekEnum.SATURDAY,
     };
 
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(0, 0, 0, 0);
+    const tempStartDate = new Date(startDate);
+    const tempEndDate = new Date(endDate);
+    tempStartDate.setHours(0, 0, 0, 0);
+    tempEndDate.setHours(0, 0, 0, 0);
 
-    const currentDate = new Date(startDate);
+    const currentDate = new Date(tempStartDate);
 
-    while (currentDate <= endDate) {
-      const slots: Array<ScheduleSlot> = [];
-      let currentStart = startHour;
+    while (currentDate <= tempEndDate) {
+      const slots: Array<ScheduleSlotItem> = [];
+      let currentStartMinutes = startHour;
 
-      while (currentStart + attendanceTime <= endHour) {
-        slots.push({
-          start: currentStart,
-          end: currentStart + attendanceTime,
-          attendanceTime: attendanceTime,
-          status: ScheduleSlotStatusEnum.AVAILABLE,
+      while (currentStartMinutes + attendanceTime <= endHour) {
+        const startDateTime = new Date(currentDate);
+        startDateTime.setMinutes(startDateTime.getMinutes() + currentStartMinutes);
+
+        const endDateTime = new Date(currentDate);
+        endDateTime.setMinutes(endDateTime.getMinutes() + currentStartMinutes + attendanceTime);
+
+        const existingSlot = existingSlots.find(
+          (s) =>
+            s.startDateTime.getTime() === startDateTime.getTime() && s.endDateTime.getTime() === endDateTime.getTime(),
+        );
+
+        const previewEntityResult = ScheduleSlotPreview.create({
+          pedagogueId,
+          startDateTime,
+          endDateTime,
+          attendanceTime,
+          status: existingSlot ? existingSlot.status : ScheduleSlotPreviewStatus.AVAILABLE,
         });
 
-        currentStart += attendanceTime + breakTime;
+        if (previewEntityResult.isFailure) {
+          return Result.fail(previewEntityResult.error!);
+        }
+
+        const previewEntity = previewEntityResult.getValue();
+
+        slots.push({
+          id: previewEntity.id?.value ?? undefined,
+          start: currentStartMinutes,
+          end: currentStartMinutes + attendanceTime,
+          attendanceTime: previewEntity.attendanceTime.value,
+          status: previewEntity.status.value,
+        });
+
+        currentStartMinutes += attendanceTime + breakTime;
       }
 
       previewItems.push({
@@ -87,6 +131,6 @@ export class PreviewAvailability {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return previewItems;
+    return Result.ok(previewItems);
   }
 }
