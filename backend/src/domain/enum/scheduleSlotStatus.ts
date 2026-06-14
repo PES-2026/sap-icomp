@@ -2,7 +2,6 @@ export enum ScheduleSlotStatusEnum {
   CREATED = "CREATED",
   PENDING = "PENDING",
   BOOKED = "BOOKED",
-  CANCELLED = "CANCELLED",
 }
 
 export const ScheduleSlotPreviewStatus = {
