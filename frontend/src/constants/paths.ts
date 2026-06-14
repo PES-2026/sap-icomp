@@ -17,7 +17,7 @@ export const PATHS = {
   professor: `/${RoleMap.PROFESSOR}`,
 
   // Scheduling
-  scheduling: `/${RoleMap.PEDAGOGUE}/scheduling`,
+  scheduling_settings: `/${RoleMap.PEDAGOGUE}/scheduling/settings`,
 
   // Students
   students_list: `/${RoleMap.PEDAGOGUE}/students`,

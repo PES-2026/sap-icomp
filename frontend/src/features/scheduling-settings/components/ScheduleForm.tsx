@@ -188,7 +188,7 @@ export default function ScheduleForm() {
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <h2 className="m-0 text-xl font-bold text-[#3a3530]">
-                    Prévia da disponibilidade
+                    Prévia da Disponibilidade
                   </h2>
                   <p className="mt-1 text-sm text-stone-500">
                     Clique em um horário para marcá-lo como disponível ou

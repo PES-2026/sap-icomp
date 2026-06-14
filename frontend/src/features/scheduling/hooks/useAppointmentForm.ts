@@ -24,6 +24,7 @@ export const useAppointmentForm = () => {
       pedagogueId: "",
       date: "",
       courseId: "",
+      reason: "",
       slotId: "",
     },
   });
