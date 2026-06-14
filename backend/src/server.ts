@@ -26,8 +26,9 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
-import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
-import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
+import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
+import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
+import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -53,7 +54,7 @@ import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositor
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
-import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
+import { PrismaScheduleSlotRepository } from "@infrastructure/persistence/repositories/prismaScheduleSlotRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { EmailService } from "@infrastructure/services/email/providers/gmailService";
@@ -140,8 +141,8 @@ const attendanceTypeController = new AttendanceTypeController(
 app.use(attendanceTypeRoutes(attendanceTypeController));
 
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
-const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const hashService = new BcryptHashService();
 
 const accountRequestController = new AccountRequestController(
@@ -208,13 +209,24 @@ const diagnosesController = new DiagnosesController(
 
 app.use(diagnosesRoutes(diagnosesController));
 
-const scheduleRepository = new PrismaScheduleRepository(prisma);
+const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
+
+const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
+const previewScheduleAvailabilityUseCase = new PreviewScheduleAvailability(
+  scheduleSlotRepository,
+  getWeekdayFromDateUseCase,
+);
+const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
+  scheduleSlotRepository,
+  pedagogueRepository,
+  getWeekdayFromDateUseCase,
+);
 const scheduleController = new ScheduleController(
-  new CreateSchedulePreviewUseCase(),
-  new RequestSchedule(scheduleRepository, pedagogueRepository, courseRepository, emailService),
+  previewScheduleAvailabilityUseCase,
+  createScheduleAvailabilityUseCase,
 );
 
-app.use(scheduleRoutes(scheduleController));
+app.use(scheduleRoutes(scheduleController, tokenService));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

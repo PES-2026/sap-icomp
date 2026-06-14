@@ -21,11 +21,19 @@ export function validateOptionalStringField(value: unknown, fieldName: string): 
 }
 
 export function validateDateField(value: unknown, fieldName: string): Date {
-  if (typeof value !== "string" || !value.trim()) {
-    throw new Error(`${fieldName} is required and must be a string. Please verify it!`);
-  }
+  let parsedDate: Date;
 
-  const parsedDate = new Date(value);
+  if (typeof value === "string") {
+    parsedDate = new Date(value);
+    if (!isNaN(parsedDate.getTime()) && (/T00:00:00(\.000)?Z$/.test(value) || /^\d{4}-\d{2}-\d{2}$/.test(value))) {
+      const userTimezoneOffset = parsedDate.getTimezoneOffset() * 60000;
+      parsedDate = new Date(parsedDate.getTime() + userTimezoneOffset);
+    }
+  } else if (value instanceof Date) {
+    parsedDate = new Date(value);
+  } else {
+    throw new Error(`${fieldName} has an invalid date format: '${value}'. Please verify it!`);
+  }
 
   if (isNaN(parsedDate.getTime())) {
     throw new Error(`${fieldName} has an invalid date format: '${value}'. Please verify it!`);
@@ -115,7 +123,25 @@ export function validateComparativeField(value: unknown, validatedValue: unknown
   return true;
 }
 
+export function validateTime(value: unknown, fieldName: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${fieldName} is required and must be a string in HH:mm format.`);
+  }
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!timeRegex.test(value)) {
+    throw new Error(`${fieldName} must be in HH:mm format (00:00 to 23:59).`);
+  }
+  return value;
+}
+
 function isUUID(value: string): boolean {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);
+}
+
+export function validateArrayField(value: unknown, fieldName: string) {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${fieldName} must be a non-empty array.`);
+  }
+  return value as Array<unknown>;
 }
