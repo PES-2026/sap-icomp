@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
 
-import { CreateSchedulePreviewDTO } from "@application/dtos/schedule/createSchedulePreviewDto";
-import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
-import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
-import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
+import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
+import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
+import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
+import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
 
 import { BaseController } from "./baseController";
 
 export class ScheduleController extends BaseController {
   constructor(
-    private createSchedulePreview: CreateSchedulePreviewUseCase,
-    private readonly requestSchedule: RequestSchedule,
+    private previewScheduleAvailability: PreviewScheduleAvailability,
+    private createScheduleAvailability: CreateScheduleAvailability,
   ) {
     super();
   }
 
   preview = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = CreateSchedulePreviewDTO.create(req.body);
-      const result = await this.createSchedulePreview.execute(dto);
+      const dto = PreviewScheduleAvailabilityDTO.create(req.body);
+      const result = await this.previewScheduleAvailability.execute(dto);
 
       this.handleResult(res, result);
     } catch (error) {
@@ -26,10 +26,14 @@ export class ScheduleController extends BaseController {
     }
   };
 
-  request = async (req: Request, res: Response): Promise<void> => {
-    const dtoResult = RequestScheduleDTO.create(req.body);
-    const result = await this.requestSchedule.execute(dtoResult);
+  create = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = CreateScheduleAvailabilityDTO.create(req.body);
+      const result = await this.createScheduleAvailability.execute(dto);
 
-    this.handleResult(res, result);
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:create`);
+    }
   };
 }
