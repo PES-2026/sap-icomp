@@ -6,7 +6,7 @@ import { DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
 export type ScheduleSlotPreviewProps = {
-  id?: string;
+  id?: string | undefined;
   pedagogueId: string;
   startDateTime: Date;
   endDateTime: Date;
