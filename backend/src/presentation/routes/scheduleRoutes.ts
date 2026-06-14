@@ -22,7 +22,7 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
   routes.post(
     "/schedule/create-availability",
     auth,
-    // scheduleRateLimiter,
+    scheduleRateLimiter,
     validateBody(CreateScheduleAvailabilityDTO),
     controller.create,
   );
