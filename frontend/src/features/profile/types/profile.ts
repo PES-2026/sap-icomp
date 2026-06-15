@@ -11,10 +11,3 @@ export interface UpdateProfilePayload {
   newPassword?: string;
   newPasswordConfirmation?: string;
 }
-
-export interface ProfileUpdateResponse {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  registrationNumber: string;
-}

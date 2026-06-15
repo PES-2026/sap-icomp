@@ -4,10 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { DataTable } from "@/components/ui/DataTable";
 
-import ApproveAccountRequestModal from "../ApproveAccountRequestModal";
 import { useApproveAccountRequest } from "../../hooks/useApproveAccountRequest";
 import { usePendingAccountRequests } from "../../hooks/usePendingAccountRequests";
-import { PendingAccountRequestItem, UserRole } from "../../types/user";
 import {
   getPendingRequestsColumns,
   PendingRequestAction,
@@ -19,8 +17,6 @@ export default function PendingRequestsTable() {
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
-  const [requestToApprove, setRequestToApprove] =
-    useState<PendingAccountRequestItem | null>(null);
   const [processingAction, setProcessingAction] = useState<{
     id: string;
     action: PendingRequestAction;
@@ -74,22 +70,14 @@ export default function PendingRequestsTable() {
     });
   };
 
-  const handleOpenApprovalModal = (request: PendingAccountRequestItem) => {
-    setRequestToApprove(request);
-  };
+  const handleApprove = async (id: string, role?: string) => {
+    setProcessingAction({ id, action: "approve" });
 
-  const handleApprove = async (role: UserRole) => {
-    if (!requestToApprove) return;
-
-    const requestId = requestToApprove.id;
-    setProcessingAction({ id: requestId, action: "approve" });
-
-    const wasApproved = await approveRequest(requestId, true, role);
+    const wasApproved = await approveRequest(id, true, role || "PROFESSOR");
 
     if (wasApproved) {
-      removeRequest(requestId);
+      removeRequest(id);
       adjustPageAfterRemoval();
-      setRequestToApprove(null);
     }
 
     setProcessingAction(null);
@@ -118,39 +106,24 @@ export default function PendingRequestsTable() {
     onNameFilterChange: handleNameFilterChange,
     emailFilter,
     onEmailFilterChange: handleEmailFilterChange,
-    onApprove: handleOpenApprovalModal,
+    onApprove: handleApprove,
     onReject: handleReject,
     processingAction,
   });
 
-  const isApproving =
-    processingAction?.id === requestToApprove?.id &&
-    processingAction?.action === "approve";
-
   return (
-    <>
-      <DataTable
-        title="Solicitações Pendentes"
-        isLoading={isLoading}
-        data={paginatedRequests}
-        columns={columns}
-        page={page}
-        setPage={setPage}
-        limit={limit}
-        setLimit={setLimit}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        emptyMessage="Nenhuma solicitação pendente encontrada."
-      />
-
-      {requestToApprove && (
-        <ApproveAccountRequestModal
-          request={requestToApprove}
-          isLoading={isApproving}
-          onClose={() => setRequestToApprove(null)}
-          onConfirm={handleApprove}
-        />
-      )}
-    </>
+    <DataTable
+      title="Solicitações Pendentes"
+      isLoading={isLoading}
+      data={paginatedRequests}
+      columns={columns}
+      page={page}
+      setPage={setPage}
+      limit={limit}
+      setLimit={setLimit}
+      totalItems={totalItems}
+      totalPages={totalPages}
+      emptyMessage="Nenhuma solicitação pendente encontrada."
+    />
   );
 }
