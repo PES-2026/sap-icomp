@@ -378,4 +378,5 @@ model ScheduleSlot {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
 }
