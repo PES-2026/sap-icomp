@@ -9,6 +9,7 @@ const categoryToStatus: Record<ErrorCategory, number> = {
   [ErrorCategory.FORBIDDEN]: 403,
   [ErrorCategory.NOT_FOUND]: 404,
   [ErrorCategory.BUSINESS_RULE]: 422,
+  [ErrorCategory.SYSTEM_ERROR]: 500,
 };
 
 export class HttpErrorMapper {
