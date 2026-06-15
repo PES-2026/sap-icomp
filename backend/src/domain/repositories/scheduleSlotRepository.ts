@@ -12,6 +12,9 @@ export interface IScheduleSlotRepository {
   findAvailableSlotsInInterval(pedagogueId: string, startDate: Date, endDate: Date): Promise<ScheduleSlotResult[]>;
   findById(id: string): Promise<ScheduleSlotResult | null>;
   findAll(params: ScheduleSlotListParams): Promise<PaginatedScheduleSlotResult>;
+  remove(id: string): Promise<boolean>;
+  removeMany(ids: string[]): Promise<number>;
+  existsByUUID(id: string): Promise<boolean>;
   updateStatusMany(ids: string[], status: string, scheduleId: string): Promise<void>;
   updateStatusUnique(id: string, status: string, scheduleId: string): Promise<void>;
 }

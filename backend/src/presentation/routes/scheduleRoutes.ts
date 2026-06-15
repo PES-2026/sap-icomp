@@ -29,6 +29,8 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
   );
   routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
   routes.get("/schedule/availability", auth, controller.list);
+  routes.put("/schedule/availability/remove-many", auth, controller.removeMany);
+  routes.put("/schedule/availability/:id/remove", auth, controller.remove);
 
   return routes;
 };

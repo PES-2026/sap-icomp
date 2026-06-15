@@ -30,6 +30,8 @@ import { CreateScheduleAvailability } from "@application/useCases/schedule/creat
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
 import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
+import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
+import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
@@ -229,6 +231,10 @@ const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
 
 const listScheduleSlotsUseCase = new ListScheduleAvailability(scheduleSlotRepository);
 
+const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository);
+
+const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
+
 const requestScheduleUseCase = new RequestSchedule(
   scheduleRepository,
   pedagogueRepository,
@@ -243,6 +249,8 @@ const scheduleController = new ScheduleController(
   createScheduleAvailabilityUseCase,
   requestScheduleUseCase,
   listScheduleSlotsUseCase,
+  removeScheduleSlotUseCase,
+  removeManyScheduleSlotsUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));

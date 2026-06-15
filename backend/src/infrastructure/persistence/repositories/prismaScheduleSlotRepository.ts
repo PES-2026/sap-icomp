@@ -71,7 +71,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
 
   async findBookedSlotsByRange(pedagogueId: string, startDate: Date, endDate: Date): Promise<ScheduleSlotResult[]> {
     const pedagogue = await this.prisma.pedagogue.findUnique({
-      where: { externalId: pedagogueId },
+      where: { externalId: pedagogueId, removed: false },
       select: { internalId: true },
     });
 
@@ -112,7 +112,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
 
   async findAllSlotsByRange(pedagogueId: string, startDate: Date, endDate: Date): Promise<ScheduleSlotResult[]> {
     const pedagogue = await this.prisma.pedagogue.findUnique({
-      where: { externalId: pedagogueId },
+      where: { externalId: pedagogueId, removed: false },
       select: { internalId: true },
     });
 
@@ -154,7 +154,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
     endDate: Date,
   ): Promise<ScheduleSlotResult[]> {
     const pedagogue = await this.prisma.pedagogue.findUnique({
-      where: { externalId: pedagogueId },
+      where: { externalId: pedagogueId, removed: false },
     });
 
     if (!pedagogue) return [];
@@ -185,6 +185,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
     const slot = await this.prisma.scheduleSlot.findUnique({
       where: {
         externalId: id,
+        removed: false,
       },
       include: { pedagogue: { select: { externalId: true } } },
     });
@@ -227,6 +228,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
       }),
       ...(filters.startDate && { startDateTime: { gte: filters.startDate } }),
       ...(filters.endDate && { endDateTime: { lte: filters.endDate } }),
+      removed: false,
     };
 
     const [totalItems, results] = await Promise.all([
@@ -261,6 +263,41 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
       currentPage: page,
       items,
     };
+  }
+
+  async remove(id: string): Promise<boolean> {
+    try {
+      await this.prisma.scheduleSlot.update({
+        where: { externalId: id },
+        data: { removed: true },
+      });
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
+
+  async removeMany(ids: string[]): Promise<number> {
+    if (ids.length === 0) return 0;
+
+    const result = await this.prisma.scheduleSlot.updateMany({
+      where: {
+        externalId: { in: ids },
+      },
+      data: {
+        removed: true,
+      },
+    });
+
+    return result.count;
+  }
+
+  async existsByUUID(id: string): Promise<boolean> {
+    const slot = await this.prisma.scheduleSlot.findUnique({
+      where: { externalId: id, removed: false },
+      select: { internalId: true },
+    });
+    return !!slot;
   }
 
   async updateStatusMany(ids: string[], status: string, scheduleId: string): Promise<void> {
@@ -298,6 +335,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
     await this.prisma.scheduleSlot.update({
       where: {
         externalId: id,
+        removed: false,
       },
       data: {
         status: status as ScheduleSlotStatus,
@@ -305,7 +343,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
     });
 
     const schedule = await this.prisma.schedule.findUnique({
-      where: { externalId: scheduleId },
+      where: { externalId: scheduleId, removed: false },
       select: { internalId: true },
     });
 
@@ -318,6 +356,8 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
           scheduleId: schedule.internalId,
         },
       });
+    } else {
+      throw new Error(`Schedule not found for id: ${scheduleId}`);
     }
   }
 }
