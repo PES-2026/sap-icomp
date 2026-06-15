@@ -123,6 +123,7 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
         pedagogueId: pedagogue.internalId,
         startDateTime: { gte: startDate },
         endDateTime: { lte: endDate },
+        removed: false,
       },
       include: {
         schedule: {
