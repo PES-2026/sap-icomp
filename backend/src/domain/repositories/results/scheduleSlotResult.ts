@@ -6,6 +6,6 @@ export interface ScheduleSlotResult extends BaseItem {
   startDateTime: Date;
   endDateTime: Date;
   attendanceTime: number;
-  appointmentId?: string | undefined;
+  scheduleId?: string | undefined;
   status: ScheduleSlotStatusEnum;
 }

@@ -15,6 +15,50 @@ export class PrismaStudentRepository implements IStudentRepository {
     return !!row;
   }
 
+  async findByEmail(email: string): Promise<StudentResult | null> {
+    const raw = await this.prisma.student.findUnique({
+      where: { email },
+      include: {
+        course: { include: { coordinator: true } },
+        diagnoses: { include: { diagnosis: true } },
+        attendances: { orderBy: { attendedAt: "desc" }, take: 1 },
+      },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      name: raw.name,
+      enrollmentId: raw.enrollmentId,
+      dtBirth: raw.dtBirth,
+      email: raw.email,
+      phoneNumber: raw.phoneNumber,
+      course: {
+        id: raw.course.externalId,
+        name: raw.course.name,
+        acronym: raw.course.acronym,
+        coordinatorId: raw.course.coordinator?.externalId ?? "",
+        coordinatorName: raw.course.coordinator?.name ?? "",
+        createdAt: raw.course.createdAt,
+        updatedAt: raw.course.updatedAt,
+      },
+      diagnoses: raw.diagnoses.map((d) => ({
+        id: d.diagnosis.externalId,
+        name: d.diagnosis.name,
+        acronym: d.diagnosis.acronym ?? "",
+        cid: d.diagnosis.CID ?? "",
+        createdAt: d.diagnosis.createdAt,
+        updatedAt: d.diagnosis.updatedAt,
+      })),
+      potential: raw.potential ?? "",
+      difficulties: raw.difficulties ?? "",
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      lastAttendance: raw.attendances[0]?.attendedAt ?? null,
+    };
+  }
+
   async existsByEnrollmentId(enrollmentId: string): Promise<boolean> {
     const row = await this.prisma.student.findUnique({
       where: { enrollmentId },
