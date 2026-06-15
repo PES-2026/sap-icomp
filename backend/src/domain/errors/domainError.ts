@@ -4,6 +4,7 @@ export enum ErrorCategory {
   UNAUTHORIZED = "UNAUTHORIZED",
   FORBIDDEN = "FORBIDDEN",
   BUSINESS_RULE = "BUSINESS_RULE",
+  SYSTEM_ERROR = "SYSTEM_ERROR",
 }
 export abstract class DomainError {
   constructor(
