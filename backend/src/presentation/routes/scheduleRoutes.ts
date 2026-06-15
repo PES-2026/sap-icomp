@@ -28,6 +28,7 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
     controller.create,
   );
   routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
+  routes.get("/schedule/availability", auth, controller.list);
 
   return routes;
 };
