@@ -62,8 +62,7 @@ export class ScheduleController extends BaseController {
 
   list = async (req: Request, res: Response): Promise<void> => {
     try {
-      const pedagogueId = req.userId;
-      const dto = ListScheduleAvailabilityDTO.create(req.query, pedagogueId);
+      const dto = ListScheduleAvailabilityDTO.create(req.params.id, req.query);
       const result = await this.listScheduleAvailability.execute(dto);
 
       this.handleResult(res, result);
@@ -74,7 +73,7 @@ export class ScheduleController extends BaseController {
 
   remove = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = RemoveScheduleSlotDTO.create(req.params);
+      const dto = RemoveScheduleSlotDTO.create(req.params.id);
       const result = await this.removeScheduleSlot.execute(dto);
 
       this.handleResult(res, result);
