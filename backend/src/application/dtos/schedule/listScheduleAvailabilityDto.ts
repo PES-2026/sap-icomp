@@ -28,8 +28,8 @@ export class ListScheduleAvailabilityDTO {
 
     const raw = value as Record<string, unknown>;
 
-    const page = raw.page ? validateNumberField(raw.page, "page") : 1;
-    const limit = raw.limit ? validateNumberField(raw.limit, "limit") : 10;
+    const page = validateNumberField(raw.page, "page");
+    const limit = validateNumberField(raw.limit, "limit");
 
     const filters: ListScheduleSlotFilters = {};
 

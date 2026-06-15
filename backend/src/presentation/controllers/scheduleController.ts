@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 
 import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
 import { ListScheduleAvailabilityDTO } from "@application/dtos/schedule/listScheduleAvailabilityDto";
+import { ListSchedulesDTO } from "@application/dtos/schedule/listSchedulesDto";
 import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
 import { RemoveScheduleSlotDTO } from "@application/dtos/schedule/removeScheduleSlotDto";
 import { RemoveScheduleSlotsDTO } from "@application/dtos/schedule/removeScheduleSlotsDto";
 import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
+import { ListSchedules } from "@application/useCases/schedule/listSchedules";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
 import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
 import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
@@ -23,6 +25,7 @@ export class ScheduleController extends BaseController {
     private listScheduleAvailability: ListScheduleAvailability,
     private removeScheduleSlot: RemoveScheduleSlot,
     private removeManyScheduleSlots: RemoveManyScheduleSlots,
+    private listSchedulesUseCase: ListSchedules,
   ) {
     super();
   }
@@ -90,6 +93,17 @@ export class ScheduleController extends BaseController {
       this.handleResult(res, result);
     } catch (error) {
       this.handleError(error, res, `${ScheduleController.name}:removeMany`);
+    }
+  };
+
+  listSchedules = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = ListSchedulesDTO.create(req.params.id, req.query);
+      const result = await this.listSchedulesUseCase.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:listSchedules`);
     }
   };
 }

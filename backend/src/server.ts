@@ -29,6 +29,7 @@ import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
 import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
+import { ListSchedules } from "@application/useCases/schedule/listSchedules";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
 import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
 import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
@@ -231,6 +232,8 @@ const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
 
 const listScheduleSlotsUseCase = new ListScheduleAvailability(scheduleSlotRepository);
 
+const listSchedulesUseCase = new ListSchedules(scheduleRepository);
+
 const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository);
 
 const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
@@ -251,6 +254,7 @@ const scheduleController = new ScheduleController(
   listScheduleSlotsUseCase,
   removeScheduleSlotUseCase,
   removeManyScheduleSlotsUseCase,
+  listSchedulesUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));
