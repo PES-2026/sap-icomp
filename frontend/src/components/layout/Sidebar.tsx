@@ -6,11 +6,11 @@ import { useAuthStore } from "@/store/authStore";
 import { useSidebarStore } from "@/store/sidebarStore";
 import {
   CalendarClock,
-  CalendarFold,
+  Database,
+  FolderOpen,
   Home,
   PanelLeftClose,
   PanelLeftOpen,
-  Settings,
   UserCog,
   Users,
   X,
@@ -18,19 +18,14 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
   const { mobileOpen, setMobileOpen } = useSidebarStore();
   const user = useAuthStore((state) => state.user);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const navItems =
     user?.role === "PROFESSOR"
@@ -40,20 +35,20 @@ export default function Sidebar() {
           {
             label: "Alunos",
             icon: Users,
-            id: "Base de Alunos",
+            id: "Alunos",
             href: PATHS.students_list,
           },
           {
             label: "Atendimentos",
-            icon: CalendarFold,
-            id: "Envio",
+            icon: FolderOpen,
+            id: "Atendimentos",
             href: PATHS.attendances_list,
           },
           {
-            label: "Disponibilidade",
+            label: "Agendamentos",
             icon: CalendarClock,
-            id: "Disponibilidade",
-            href: PATHS.scheduling_settings,
+            id: "Agendamentos",
+            href: PATHS.scheduling,
           },
           {
             label: "Usuários",
@@ -63,7 +58,7 @@ export default function Sidebar() {
           },
           {
             label: "Cadastros Gerais",
-            icon: Settings,
+            icon: Database,
             id: "Configuração",
             href: PATHS.visualize_settings,
           },
@@ -135,43 +130,42 @@ export default function Sidebar() {
             collapsed ? "px-5 md:px-3" : "px-5"
           }`}
         >
-          {isMounted &&
-            navItems.map((item) => {
-              const isActive = pathname === item.href;
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
 
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  title={collapsed ? item.label : undefined}
-                  className={`
-                    flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]
-                    transition-all duration-300 ease-in-out cursor-pointer
-                    ${collapsed ? "px-3.5 py-2.5 md:justify-center md:px-2.5" : "px-3.5 py-2.5"}
-                    ${
-                      isActive
-                        ? "scale-[1.02] bg-[#6bc4a6] font-bold text-[#3a3530] shadow-md shadow-[#6bc4a6]/30"
-                        : "bg-transparent font-medium text-[#6a6560] hover:translate-x-1 hover:bg-[#ece7db]/60 hover:text-[#3a3530]"
-                    }
-                  `}
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                title={collapsed ? item.label : undefined}
+                className={`
+                  flex items-center gap-2.5 rounded-[10px] text-left text-sm leading-[1.35]
+                  transition-all duration-300 ease-in-out cursor-pointer
+                  ${collapsed ? "px-3.5 py-2.5 md:justify-center md:px-2.5" : "px-3.5 py-2.5"}
+                  ${
+                    isActive
+                      ? "scale-[1.02] bg-[#6bc4a6] font-bold text-[#3a3530] shadow-md shadow-[#6bc4a6]/30"
+                      : "bg-transparent font-medium text-[#6a6560] hover:translate-x-1 hover:bg-[#ece7db]/60 hover:text-[#3a3530]"
+                  }
+                `}
+              >
+                <span
+                  className={`shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
                 >
-                  <span
-                    className={`shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
-                  >
-                    <item.icon size={20} />
-                  </span>
+                  <item.icon size={20} />
+                </span>
 
-                  <span
-                    className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
-                      collapsed ? "hidden" : "w-auto opacity-100"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              );
-            })}
+                <span
+                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
+                    collapsed ? "hidden" : "w-auto opacity-100"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </nav>
       </aside>
     </>

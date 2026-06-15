@@ -6,7 +6,7 @@ import { SearchInput } from "@/components/ui/SearchInput";
 
 import { UserRole, UserStatus, UserStatusFilter } from "../../types/user";
 
-const roleLabelMap: Record<UserRole, string> = {
+const roleLabelMap: Record<string, string> = {
   PEDAGOGUE: "Pedagoga",
   PROFESSOR: "Professor",
 };
@@ -22,8 +22,8 @@ const statusLabelMap: Record<string, string> = {
 export const formatStatus = (status: string) =>
   statusLabelMap[status] ?? status;
 
-export const formatRole = (role?: UserRole) =>
-  role ? roleLabelMap[role] : "";
+export const formatRole = (role?: string) =>
+  roleLabelMap[role ?? ""] ?? role ?? "";
 
 export function StatusBadge({ status }: { status: UserStatus }) {
   const isActive = status === "ENABLED" || status === "APPROVED";

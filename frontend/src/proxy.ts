@@ -6,7 +6,7 @@ export const publicRoutes = [
   "/login",
   "/register",
   "/forgot-password",
-  "/scheduling",
+  "/appointment",
   "/reset-password",
 ];
 
