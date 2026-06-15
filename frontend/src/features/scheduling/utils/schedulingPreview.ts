@@ -1,9 +1,13 @@
-import { SchedulingPreviewPayload, SchedulingSlot } from "../types/scheduling";
+import {
+  SchedulingDayPreview,
+  SchedulingPreviewPayload,
+  SchedulingSlot,
+} from "../types/scheduling";
 import { timeToMinutes } from "./validations";
 
 const padTime = (value: number) => String(value).padStart(2, "0");
 
-const minutesToTime = (totalMinutes: number) => {
+export const minutesToTime = (totalMinutes: number) => {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return `${padTime(hours)}:${padTime(minutes)}`;
@@ -16,46 +20,62 @@ const parseDate = (date: string) => {
 
 export const generateSchedulingPreview = (
   payload: SchedulingPreviewPayload,
-  pedagogueId: string = "preview-pedagogue-id", // Adicionado para satisfazer a interface
-): SchedulingSlot[] => {
-  const slots: SchedulingSlot[] = [];
-  const startMinutes = timeToMinutes(payload.startTime);
-  const endMinutes = timeToMinutes(payload.endTime);
-  const durationMinutes = timeToMinutes(payload.attendanceDuration);
+): SchedulingDayPreview[] => {
+  const days: SchedulingDayPreview[] = [];
+  const startMinutes = payload.startHour;
+  const endMinutes = payload.endHour;
+  const attendanceTime = payload.attendanceTime;
+  const breakTime = payload.breakTime;
 
-  if (durationMinutes <= 0) return slots;
+  if (attendanceTime <= 0) return days;
 
   const currentDate = parseDate(payload.startDate);
   const finalDate = parseDate(payload.endDate);
 
+  const weekdays = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+  ];
+
   while (currentDate <= finalDate) {
     const dateStr = currentDate.toISOString().slice(0, 10);
-    const weekday = "Monday";
+    const slots: SchedulingSlot[] = [];
 
     for (
       let slotStart = startMinutes;
-      slotStart + durationMinutes <= endMinutes;
-      slotStart += durationMinutes
+      slotStart + attendanceTime <= endMinutes;
+      slotStart += attendanceTime + breakTime
     ) {
-      const slotEnd = slotStart + durationMinutes;
+      const slotEnd = slotStart + attendanceTime;
 
       const startDateTime = `${dateStr}T${minutesToTime(slotStart)}:00.000Z`;
       const endDateTime = `${dateStr}T${minutesToTime(slotEnd)}:00.000Z`;
 
       slots.push({
-        id: `preview-${dateStr}-${slotStart}`,
-        pedagogueId,
+        start: slotStart,
+        end: slotEnd,
+        attendanceTime,
+        status: "CREATED",
         startDateTime,
         endDateTime,
-        status: "CREATED",
-        date: new Date(startDateTime),
-        weekday,
-        attendanceTime: durationMinutes,
+      });
+    }
+
+    if (slots.length > 0) {
+      days.push({
+        date: currentDate.toISOString(),
+        weekday: weekdays[currentDate.getUTCDay()]!,
+        slots,
       });
     }
 
     currentDate.setUTCDate(currentDate.getUTCDate() + 1);
   }
 
-  return slots;
+  return days;
 };

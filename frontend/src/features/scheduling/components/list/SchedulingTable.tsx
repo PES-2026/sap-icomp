@@ -2,10 +2,10 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { Eye, Loader2, RefreshCw } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, Eye, Loader2, RefreshCw, X } from "lucide-react";
+import { useState } from "react";
 import { useManagedSchedulings } from "../../hooks/useManagedScheduling";
-import { ManagedScheduling } from "../../types/schedulingManagement";
+import { ScheduleItem } from "../../types/schedulingManagement";
 import {
   formatSchedulingDate,
   formatSchedulingTime,
@@ -14,23 +14,32 @@ import SchedulingDetailsModal from "./SchedulingDetailsModal";
 import SchedulingEmptyState from "./SchedulingEmptyState";
 import SchedulingFilters from "./SchedulingFilters";
 import SchedulingStatusBadge from "./SchedulingStatusBadge";
+import { useCallback } from "react";
 
 export default function SchedulingTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [selectedScheduling, setSelectedScheduling] =
-    useState<ManagedScheduling | null>(null);
-  const { schedulings, isLoading, error, setFilters, reload } =
-    useManagedSchedulings();
+    useState<ScheduleItem | null>(null);
 
-  const totalItems = schedulings.length;
+  const {
+    schedulings,
+    totalItems,
+    isLoading,
+    processingId,
+    error,
+    setFilters,
+    reload,
+  } = useManagedSchedulings(page, limit);
+
+  const handleApplyFilters = useCallback((filters: any) => {
+    setPage(1);
+    setFilters(filters);
+  }, [setFilters]);
+
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));
-  const paginatedSchedulings = useMemo(() => {
-    const startIndex = (page - 1) * limit;
-    return schedulings.slice(startIndex, startIndex + limit);
-  }, [schedulings, limit, page]);
 
-  const columns: Column<ManagedScheduling>[] = [
+  const columns: Column<ScheduleItem>[] = [
     {
       label: "Aluno",
       width: "min-w-[220px]",
@@ -43,35 +52,33 @@ export default function SchedulingTable() {
     {
       label: "Matrícula",
       width: "min-w-[130px]",
-      renderCell: (scheduling) => scheduling.enrollmentId,
+      renderCell: (scheduling) => scheduling.studentEnrollment,
     },
     {
       label: "E-mail",
       width: "min-w-[250px]",
-      renderCell: (scheduling) => scheduling.email,
+      renderCell: (scheduling) => scheduling.studentEmail,
     },
     {
       label: "Curso",
       width: "min-w-[220px]",
-      renderCell: (scheduling) => scheduling.course.name,
+      renderCell: (scheduling) => scheduling.studentCourse,
     },
     {
       label: "Data",
       width: "min-w-[120px]",
       renderCell: (scheduling) =>
-        formatSchedulingDate(scheduling.slot.startDateTime),
+        formatSchedulingDate(scheduling.startDate),
     },
     {
-      label: "Início",
-      width: "min-w-[100px]",
-      renderCell: (scheduling) =>
-        formatSchedulingTime(scheduling.slot.startDateTime),
-    },
-    {
-      label: "Término",
-      width: "min-w-[100px]",
-      renderCell: (scheduling) =>
-        formatSchedulingTime(scheduling.slot.endDateTime),
+      label: "Horário",
+      width: "min-w-[150px]",
+      renderCell: (scheduling) => (
+        <span className="text-sm">
+          {formatSchedulingTime(scheduling.startDate)} -{" "}
+          {formatSchedulingTime(scheduling.endDate)}
+        </span>
+      ),
     },
     {
       label: "Status",
@@ -81,22 +88,55 @@ export default function SchedulingTable() {
       ),
     },
     {
-      label: "",
-      width: "min-w-[70px]",
-      renderCell: (scheduling) => (
-        <div className="flex justify-center">
-          <CommonButton
-            label=""
-            type="button"
-            aria-label={`Visualizar agendamento de ${scheduling.studentId}`}
-            title="Visualizar detalhes"
-            startIcon={Eye}
-            sizeIcon={20}
-            onClick={() => setSelectedScheduling(scheduling)}
-            className="gap-0 border-0 bg-transparent p-1 text-[#6bc4a6] hover:bg-[#e8f7f2]"
-          />
-        </div>
-      ),
+      label: "Ações",
+      width: "min-w-[140px]",
+      renderCell: (scheduling) => {
+        const isProcessing = processingId === scheduling.id;
+        const canAction = scheduling.status === "CONFIRMED"; // Assuming APPROVED is now CONFIRMED
+
+        return (
+          <div className="flex items-center justify-center gap-1">
+            <CommonButton
+              label=""
+              type="button"
+              aria-label={`Visualizar agendamento de ${scheduling.studentName}`}
+              title="Visualizar detalhes"
+              startIcon={Eye}
+              sizeIcon={19}
+              disabled={isProcessing}
+              onClick={() => setSelectedScheduling(scheduling)}
+              className="gap-0 rounded-md p-1 text-[#b0a898] bg-transparent hover:bg-[#f0ebe2]"
+            />
+
+            {canAction && (
+              <>
+                <CommonButton
+                  label=""
+                  type="button"
+                  aria-label={`Finalizar atendimento de ${scheduling.studentName}`}
+                  title="Marcar como Concluído"
+                  startIcon={isProcessing ? Loader2 : Check}
+                  sizeIcon={20}
+                  disabled={true}
+                  className={`gap-0 rounded-md p-1 text-[#6bc4a6] bg-transparent hover:bg-[#e8f7f2] ${
+                    isProcessing ? "[&_svg]:animate-spin" : ""
+                  }`}
+                />
+                <CommonButton
+                  label=""
+                  type="button"
+                  aria-label={`Cancelar agendamento de ${scheduling.studentName}`}
+                  title="Cancelar Agendamento"
+                  startIcon={X}
+                  sizeIcon={20}
+                  disabled={true}
+                  className="gap-0 rounded-md p-1 text-red-600 bg-transparent hover:bg-red-100"
+                />
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -123,16 +163,11 @@ export default function SchedulingTable() {
           ) : undefined
         }
         toolbar={
-          <SchedulingFilters
-            onApply={(filters) => {
-              setPage(1);
-              setFilters(filters);
-            }}
-          />
+          <SchedulingFilters onApply={handleApplyFilters} />
         }
         isLoading={isLoading}
         loadingComponent={loadingComponent}
-        data={paginatedSchedulings}
+        data={schedulings}
         columns={columns}
         page={page}
         setPage={setPage}

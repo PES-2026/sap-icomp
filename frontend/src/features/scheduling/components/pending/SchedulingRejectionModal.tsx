@@ -3,10 +3,10 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { FormModal } from "@/components/ui/FormModal";
 import { useState } from "react";
-import { ManagedScheduling } from "../../types/schedulingManagement";
+import { ScheduleItem } from "../../types/schedulingManagement";
 
 interface SchedulingRejectionModalProps {
-  scheduling: ManagedScheduling;
+  scheduling: ScheduleItem;
   isSubmitting: boolean;
   onClose: () => void;
   onConfirm: (justification: string) => Promise<void>;

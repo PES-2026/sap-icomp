@@ -1,12 +1,61 @@
 import { Course } from "@/features/courses/types/course";
 import { SchedulingSlot } from "./scheduling";
 
-export type ManagedSchedulingStatus = "PENDING" | "APPROVED" | "CANCELED";
+export enum ScheduleStatusEnum {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  CANCELED = "CANCELED",
+  DONE = "DONE",
+  ABSENT = "ABSENT",
+}
+
+export interface ListScheduleFilters {
+  status?: ScheduleStatusEnum;
+  startDate?: string;
+  endDate?: string;
+  pedagogueId?: string;
+  studentName?: string;
+  studentEmail?: string;
+  studentCourse?: string;
+  studentEnrollment?: string;
+  guestName?: string;
+  guestEmail?: string;
+  date?: string;
+}
+
+export interface ScheduleItem {
+  id: string;
+  pedagogueId: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  studentEnrollment: string;
+  studentCourse: string;
+  startDate: string;
+  endDate: string;
+  status: ScheduleStatusEnum;
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedScheduleResponse {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  items: ScheduleItem[];
+}
+
+export type ManagedSchedulingStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "CANCELED"
+  | "FINISHED";
 
 export type ManagedSchedulingPeriod =
-  | "UPCOMING"
+  | "TODAY"
   | "THIS_WEEK"
-  | "NEXT_15_DAYS"
+  | "THIS_MONTH"
   | "CUSTOM";
 
 export interface ManagedScheduling {
@@ -23,6 +72,7 @@ export interface ManagedScheduling {
   reason: string;
   slot: SchedulingSlot;
   rejectionReason?: string;
+  cancellationReason?: string;
 
   createdAt: string;
   updatedAt: string;
@@ -33,11 +83,12 @@ export interface ManagedSchedulingFilters {
   endDate?: string;
   statuses: ManagedSchedulingStatus[];
   pedagogueId?: string;
+  search?: string;
 }
 
 export interface ManagedSchedulingActionResult {
-  scheduling: ManagedScheduling;
-  outcome: "CONFIRMED" | "REJECTED" | "CANCELED";
+  scheduling: ScheduleItem;
+  outcome: "CONFIRMED" | "REJECTED" | "CANCELED" | "FINISHED";
   emailNotificationQueued: boolean;
   slotReleased: boolean;
 }

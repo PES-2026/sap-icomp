@@ -6,44 +6,33 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { useAuthStore } from "@/store/authStore";
-import { scheduleMock } from "../services/schedulingMock";
 import { scheduleService } from "../services/schedulingService";
 import {
+  SchedulingDayPreview,
   SchedulingFormData,
   SchedulingPreviewPayload,
+  SchedulingSavePayload,
   SchedulingSlot,
 } from "../types/scheduling";
 import {
-  minutesToDuration,
-  scheduleSchema,
-  timeToMinutes,
-} from "../utils/validations";
+  generateSchedulingPreview,
+  minutesToTime,
+} from "../utils/schedulingPreview";
+import { scheduleSchema, timeToMinutes } from "../utils/validations";
 
 export const SCHEDULING_PREVIEW_MOCK_ENABLED =
   process.env.NEXT_PUBLIC_SCHEDULING_PREVIEW_MOCK === "true";
 
-interface ManualSlotData {
-  date: string;
-  startTime: string;
-  endTime: string;
-}
-
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-const getSlotId = (slot: SchedulingSlot) =>
-  `${slot.startDateTime}|${slot.endDateTime}`;
-
-const getDateFromDateTime = (dateTime: string) => dateTime.slice(0, 10);
-
-const getTimeFromDateTime = (dateTime: string) => dateTime.slice(11, 16);
-
-const sortSlotsByStart = (slots: SchedulingSlot[]) =>
-  [...slots].sort((a, b) => a.startDateTime.localeCompare(b.startDateTime));
+const getSlotId = (slot: SchedulingSlot & { dayDate?: string }) => {
+  if (slot.startDateTime && slot.endDateTime) {
+    return `${slot.startDateTime}|${slot.endDateTime}`;
+  }
+  return `${slot.dayDate}|${slot.start}|${slot.end}`;
+};
 
 export const useSchedulingPreview = () => {
   const pedagogueId = useAuthStore((state) => state.user?.id);
-  const [slots, setSlots] = useState<SchedulingSlot[]>([]);
+  const [days, setDays] = useState<SchedulingDayPreview[]>([]);
   const [disabledSlotIds, setDisabledSlotIds] = useState<Set<string>>(
     new Set(),
   );
@@ -64,6 +53,7 @@ export const useSchedulingPreview = () => {
       startTime: "",
       endTime: "",
       durationMinutes: "50",
+      breakTime: "0",
     },
   });
 
@@ -77,24 +67,25 @@ export const useSchedulingPreview = () => {
       pedagogueId,
       startDate: data.startDate,
       endDate: data.endDate,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      attendanceDuration: minutesToDuration(Number(data.durationMinutes)),
+      startHour: timeToMinutes(data.startTime),
+      endHour: timeToMinutes(data.endTime),
+      attendanceTime: Number(data.durationMinutes),
+      breakTime: Number(data.breakTime),
     };
 
     try {
       setIsLoading(true);
 
       const response = SCHEDULING_PREVIEW_MOCK_ENABLED
-        ? await scheduleMock.preview(payload)
+        ? generateSchedulingPreview(payload)
         : await scheduleService.preview(payload);
 
-      setSlots(response.slots);
+      setDays(response);
       setDisabledSlotIds(new Set());
       setPreviewPayload(payload);
       setHasGeneratedPreview(true);
 
-      if (response.slots.length === 0) {
+      if (response.length === 0) {
         toast.error("Nenhum horário completo cabe no período informado.");
       } else {
         toast.success("Prévia da agenda gerada com sucesso.");
@@ -106,7 +97,7 @@ export const useSchedulingPreview = () => {
           : "Não foi possível gerar a prévia da agenda.";
 
       toast.error(message);
-      setSlots([]);
+      setDays([]);
       setDisabledSlotIds(new Set());
       setPreviewPayload(null);
       setHasGeneratedPreview(false);
@@ -117,7 +108,7 @@ export const useSchedulingPreview = () => {
 
   const clearPreview = () => {
     form.reset();
-    setSlots([]);
+    setDays([]);
     setDisabledSlotIds(new Set());
     setPreviewPayload(null);
     setIsConfirmOpen(false);
@@ -127,7 +118,7 @@ export const useSchedulingPreview = () => {
   const invalidatePreview = () => {
     if (!hasGeneratedPreview) return;
 
-    setSlots([]);
+    setDays([]);
     setDisabledSlotIds(new Set());
     setPreviewPayload(null);
     setIsConfirmOpen(false);
@@ -148,8 +139,36 @@ export const useSchedulingPreview = () => {
     });
   };
 
-  const getActiveSlots = () =>
-    slots.filter((slot) => !disabledSlotIds.has(getSlotId(slot)));
+  const isSlotGreen = (slot: SchedulingSlot, dayDate: string) => {
+    const slotId = getSlotId({ ...slot, dayDate });
+    const isToggled = disabledSlotIds.has(slotId);
+
+    if (slot.status === "AVAILABLE") {
+      return isToggled;
+    }
+    return !isToggled;
+  };
+
+  const getActiveSlots = () => {
+    const activeSlots: (SchedulingSlot & {
+      dayDate: string;
+      weekday: string;
+    })[] = [];
+
+    days.forEach((day) => {
+      day.slots.forEach((slot) => {
+        if (isSlotGreen(slot, day.date)) {
+          activeSlots.push({
+            ...slot,
+            dayDate: day.date,
+            weekday: day.weekday,
+          });
+        }
+      });
+    });
+
+    return activeSlots;
+  };
 
   const confirmPreview = () => {
     if (!previewPayload) {
@@ -157,10 +176,8 @@ export const useSchedulingPreview = () => {
       return;
     }
 
-    const activeSlots = getActiveSlots();
-
-    if (activeSlots.length === 0) {
-      toast.error("Selecione pelo menos um horário para salvar.");
+    if (!hasChanges) {
+      toast.error("Realize alguma alteração para salvar.");
       return;
     }
 
@@ -174,52 +191,129 @@ export const useSchedulingPreview = () => {
   };
 
   const saveScheduling = async () => {
-    if (!previewPayload) {
+    if (!previewPayload || days.length === 0) {
       toast.error("Gere a prévia antes de salvar a agenda.");
+      return;
+    }
+
+    if (!pedagogueId) {
+      toast.error("Não foi possível identificar a pedagoga.");
       return;
     }
 
     const activeSlots = getActiveSlots();
 
-    if (activeSlots.length === 0) {
-      toast.error("Selecione pelo menos um horário para salvar.");
+    // Identifica os IDs para remoção (apenas os que já existem/CREATED e foram desmarcados)
+    const idsToRemove: string[] = [];
+    days.forEach((day) => {
+      day.slots.forEach((slot) => {
+        if (
+          slot.status === "CREATED" &&
+          slot.id &&
+          disabledSlotIds.has(getSlotId({ ...slot, dayDate: day.date }))
+        ) {
+          idsToRemove.push(slot.id);
+        }
+      });
+    });
+
+    const createPayload: SchedulingSavePayload = activeSlots
+      .filter((slot) => slot.status === "AVAILABLE") // Somente os novos que foram marcados
+      .map((slot) => ({
+        date: slot.dayDate.slice(0, 10),
+        weekday: slot.weekday,
+        pedagogueId,
+        start: minutesToTime(slot.start),
+        end: minutesToTime(slot.end),
+        attendanceTime: slot.attendanceTime,
+      }));
+
+    if (createPayload.length === 0 && idsToRemove.length === 0) {
+      toast.error("Nenhuma alteração detectada para salvar.");
       return;
     }
 
     try {
       setIsSaving(true);
 
-      if (SCHEDULING_PREVIEW_MOCK_ENABLED) {
-        await scheduleMock.save({
-          ...previewPayload,
-          slots: activeSlots,
-        });
-      } else {
-        await scheduleService.save({
-          ...previewPayload,
-          slots: activeSlots,
-        });
+      const results = await Promise.allSettled([
+        createPayload.length > 0
+          ? scheduleService.save(createPayload)
+          : Promise.resolve(),
+        idsToRemove.length > 0
+          ? scheduleService.removeSlots(idsToRemove)
+          : Promise.resolve(),
+      ]);
+
+      const [createResult, removeResult] = results;
+
+      if (createResult.status === "fulfilled" && createPayload.length > 0) {
+        toast.success(
+          `${createPayload.length} horários criados/mantidos com sucesso.`,
+        );
+      } else if (
+        createResult.status === "rejected" &&
+        createPayload.length > 0
+      ) {
+        toast.error(
+          `Falha ao criar horários: ${createResult.reason.message || "Erro desconhecido"}`,
+        );
       }
 
-      toast.success("Agenda salva com sucesso.");
-      setIsConfirmOpen(false);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Não foi possível salvar a agenda.";
+      if (removeResult.status === "fulfilled" && idsToRemove.length > 0) {
+        toast.success(`${idsToRemove.length} horários removidos com sucesso.`);
+      } else if (removeResult.status === "rejected" && idsToRemove.length > 0) {
+        toast.error(
+          `Falha ao remover horários: ${removeResult.reason.message || "Erro desconhecido"}`,
+        );
+      }
 
-      toast.error(message);
+      setIsConfirmOpen(false);
+
+      // Re-fetch preview to sync statuses and IDs
+      const currentFormData = form.getValues();
+      await generatePreview(currentFormData);
+    } catch (error: unknown) {
+      toast.error("Ocorreu um erro inesperado ao processar a agenda.");
     } finally {
       setIsSaving(false);
     }
   };
 
+  const getAllSlots = () =>
+    days.flatMap((day) =>
+      day.slots.map((slot) => ({ ...slot, dayDate: day.date })),
+    );
+
   const activeSlotsCount = getActiveSlots().length;
+
+  const getRemovedSlotsCount = () => {
+    let count = 0;
+    days.forEach((day) => {
+      day.slots.forEach((slot) => {
+        if (
+          slot.status === "CREATED" &&
+          slot.id &&
+          disabledSlotIds.has(getSlotId({ ...slot, dayDate: day.date }))
+        ) {
+          count++;
+        }
+      });
+    });
+    return count;
+  };
+
+  const removedSlotsCount = getRemovedSlotsCount();
+  const hasChanges = days.some((day) =>
+    day.slots.some((slot) =>
+      disabledSlotIds.has(getSlotId({ ...slot, dayDate: day.date })),
+    ),
+  );
 
   return {
     form,
-    slots,
+    days,
+    slots: getAllSlots(),
     previewPayload,
     disabledSlotIds,
     isLoading,
@@ -227,6 +321,8 @@ export const useSchedulingPreview = () => {
     isConfirmOpen,
     hasGeneratedPreview,
     activeSlotsCount,
+    removedSlotsCount,
+    hasChanges,
     isMockMode: SCHEDULING_PREVIEW_MOCK_ENABLED,
     clearPreview,
     invalidatePreview,

@@ -2,7 +2,7 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { X } from "lucide-react";
-import { ManagedScheduling } from "../../types/schedulingManagement";
+import { ScheduleItem } from "../../types/schedulingManagement";
 import {
   formatSchedulingDate,
   formatSchedulingDateTime,
@@ -11,7 +11,7 @@ import {
 import SchedulingStatusBadge from "./SchedulingStatusBadge";
 
 interface SchedulingDetailsModalProps {
-  scheduling: ManagedScheduling | null;
+  scheduling: ScheduleItem | null;
   onClose: () => void;
 }
 
@@ -73,11 +73,11 @@ export default function SchedulingDetailsModal({
         <div className="mb-6 flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 p-4">
           <div>
             <p className="font-semibold text-[#3a3530]">
-              {formatSchedulingDate(scheduling.slot.startDateTime)}
+              {formatSchedulingDate(scheduling.startDate)}
             </p>
             <p className="mt-1 text-sm text-stone-500">
-              {formatSchedulingTime(scheduling.slot.startDateTime)} às{" "}
-              {formatSchedulingTime(scheduling.slot.endDateTime)}
+              {formatSchedulingTime(scheduling.startDate)} às{" "}
+              {formatSchedulingTime(scheduling.endDate)}
             </p>
           </div>
           <SchedulingStatusBadge status={scheduling.status} />
@@ -85,11 +85,11 @@ export default function SchedulingDetailsModal({
 
         <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Detail label="Aluno" value={scheduling.studentName} />
-          <Detail label="Matrícula" value={scheduling.enrollmentId} />
-          <Detail label="E-mail" value={scheduling.email} />
+          <Detail label="Matrícula" value={scheduling.studentEnrollment} />
+          <Detail label="E-mail" value={scheduling.studentEmail} />
           <Detail
             label="Curso"
-            value={`${scheduling.course.name} (${scheduling.course.acronym})`}
+            value={scheduling.studentCourse}
           />
           <Detail
             label="Solicitado em"
@@ -98,14 +98,6 @@ export default function SchedulingDetailsModal({
           <div className="sm:col-span-2">
             <Detail label="Motivo do atendimento" value={scheduling.reason} />
           </div>
-          {scheduling.rejectionReason && (
-            <div className="sm:col-span-2">
-              <Detail
-                label="Justificativa da recusa"
-                value={scheduling.rejectionReason}
-              />
-            </div>
-          )}
         </dl>
 
         <footer className="mt-8 flex justify-end">

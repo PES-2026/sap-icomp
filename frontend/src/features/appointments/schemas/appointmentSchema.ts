@@ -11,6 +11,13 @@ export const appointmentSchema = z.object({
   date: z.string().min(1, "A data é obrigatória"),
   courseId: z.string().min(1, "Selecione um curso"),
   slotId: z.string().min(1, "Você precisa selecionar um horário disponível"),
+  reason: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 15, {
+      message: "O motivo deve ter pelo menos 15 caracteres",
+    }),
+  durationMinutes: z.number(),
 });
 
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;

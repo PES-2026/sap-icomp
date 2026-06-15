@@ -20,14 +20,16 @@ export const getPeriodDates = (
     referenceDate.getDate(),
   );
 
-  if (period === "UPCOMING") {
-    return { startDate: formatDateInput(today), endDate: "" };
+  if (period === "TODAY") {
+    const formattedToday = formatDateInput(today);
+    return { startDate: formattedToday, endDate: formattedToday };
   }
 
-  if (period === "NEXT_15_DAYS") {
-    const endDate = new Date(today.getTime() + 14 * DAY_IN_MILLISECONDS);
+  if (period === "THIS_MONTH") {
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     return {
-      startDate: formatDateInput(today),
+      startDate: formatDateInput(startDate),
       endDate: formatDateInput(endDate),
     };
   }

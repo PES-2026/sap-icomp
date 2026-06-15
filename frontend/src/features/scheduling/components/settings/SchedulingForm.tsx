@@ -19,6 +19,7 @@ const getValidationClass = (hasError: boolean) =>
 export default function SchedulingForm() {
   const {
     form,
+    days,
     slots,
     previewPayload,
     disabledSlotIds,
@@ -27,6 +28,8 @@ export default function SchedulingForm() {
     isConfirmOpen,
     hasGeneratedPreview,
     activeSlotsCount,
+    removedSlotsCount,
+    hasChanges,
     clearPreview,
     invalidatePreview,
     toggleSlot,
@@ -164,15 +167,20 @@ export default function SchedulingForm() {
                   </div>
                 </Field>
 
-                <Field label="Pausa entre atendimentos:">
+                <Field 
+                  label="Pausa entre atendimentos:"
+                  error={errors.breakTime?.message}
+                >
                   <div className="relative">
                     <input
-                      type="text"
-                      value="0"
-                      disabled
-                      className={`${baseInputClass} cursor-not-allowed border-stone-200 bg-stone-50 pr-12 text-stone-400 opacity-75`}
-                      aria-label="Pausa entre atendimentos indisponível"
-                      title="Aguardando definição do contrato do backend"
+                      type="number"
+                      min="0"
+                      max="1439"
+                      step="1"
+                      placeholder="0"
+                      {...register("breakTime")}
+                      className={`${getValidationClass(!!errors.breakTime)} pr-12`}
+                      aria-invalid={!!errors.breakTime}
                     />
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-stone-400">
                       min
@@ -207,7 +215,7 @@ export default function SchedulingForm() {
               </div>
 
               <SchedulingPreviewList
-                slots={slots}
+                days={days}
                 hasGeneratedPreview={hasGeneratedPreview}
                 disabledSlotIds={disabledSlotIds}
                 onToggleSlot={toggleSlot}
@@ -228,7 +236,7 @@ export default function SchedulingForm() {
               type="button"
               onClick={confirmPreview}
               disabled={
-                !hasGeneratedPreview || activeSlotsCount === 0 || isSaving
+                !hasGeneratedPreview || !hasChanges || isSaving
               }
               className="w-full sm:w-auto justify-center"
             />
@@ -238,10 +246,12 @@ export default function SchedulingForm() {
         <ConfirmModal
           open={isConfirmOpen}
           title="Salvar agenda"
-          message={`Deseja salvar ${activeSlotsCount} ${
-            activeSlotsCount === 1 ? "horário ativo" : "horários ativos"
-          }? Os horários removidos não serão enviados.`}
-          confirmLabel={isSaving ? "Salvando..." : "Salvar"}
+          message={`Deseja salvar as alterações na agenda? ${
+            activeSlotsCount > 0 ? `${activeSlotsCount} horários serão mantidos/criados.` : ""
+          } ${
+            removedSlotsCount > 0 ? `${removedSlotsCount} horários serão removidos.` : ""
+          }`}
+          confirmLabel={isSaving ? "Salvando..." : "Confirmar"}
           onConfirm={isSaving ? () => undefined : saveScheduling}
           onCancel={cancelSaveConfirmation}
         />

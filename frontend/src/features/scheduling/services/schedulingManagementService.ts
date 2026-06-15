@@ -1,60 +1,59 @@
 import api from "@/services/api";
 import {
-  ManagedScheduling,
+  ListScheduleFilters,
   ManagedSchedulingActionResult,
-  ManagedSchedulingFilters,
+  PaginatedScheduleResponse,
+  ScheduleStatusEnum,
 } from "../types/schedulingManagement";
-import { scheduleManagementMock } from "./schedulingManagementMock";
-
-const shouldUseMocks =
-  process.env.NEXT_PUBLIC_SCHEDULING_MANAGEMENT_MOCK !== "false";
 
 export const scheduleManagementService = {
-  async list(filters: ManagedSchedulingFilters): Promise<ManagedScheduling[]> {
-    if (shouldUseMocks) {
-      return scheduleManagementMock.list(filters);
-    }
-
-    const response = await api.get<{ items: ManagedScheduling[] }>(
-      "/schedulings/appointments",
+  async list(
+    userId: string,
+    page: number,
+    limit: number,
+    filters?: ListScheduleFilters,
+  ): Promise<PaginatedScheduleResponse> {
+    const response = await api.get<PaginatedScheduleResponse>(
+      `/schedule/${userId}`,
       {
         params: {
-          startDate: filters.startDate,
-          endDate: filters.endDate || undefined,
-          status: filters.statuses.join(","),
+          page,
+          limit,
+          ...filters,
         },
         fallbackMsg: "Não foi possível carregar os agendamentos.",
       },
     );
 
-    return response.data.items;
+    return response.data;
   },
 
-  async listPending(pedagogueId: string): Promise<ManagedScheduling[]> {
-    if (shouldUseMocks) {
-      return scheduleManagementMock.listPending(pedagogueId);
-    }
-
-    const response = await api.get<{ items: ManagedScheduling[] }>(
-      "/schedulings/appointments/pending",
+  async listPending(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedScheduleResponse> {
+    const response = await api.get<PaginatedScheduleResponse>(
+      `/schedule/${userId}`,
       {
+        params: {
+          page,
+          limit,
+          status: ScheduleStatusEnum.PENDING,
+        },
         fallbackMsg: "Não foi possível carregar as solicitações pendentes.",
       },
     );
 
-    return response.data.items;
+    return response.data;
   },
 
   async confirm(
     scheduleId: string,
     pedagogueId: string,
   ): Promise<ManagedSchedulingActionResult> {
-    if (shouldUseMocks) {
-      return scheduleManagementMock.confirm(scheduleId, pedagogueId);
-    }
-
-    const response = await api.patch<ManagedSchedulingActionResult>(
-      `/schedulings/appointments/${scheduleId}/confirm`,
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/confirm`,
       undefined,
       {
         fallbackMsg: "Não foi possível confirmar o atendimento.",
@@ -69,19 +68,42 @@ export const scheduleManagementService = {
     pedagogueId: string,
     justification: string,
   ): Promise<ManagedSchedulingActionResult> {
-    if (shouldUseMocks) {
-      return scheduleManagementMock.reject(
-        scheduleId,
-        pedagogueId,
-        justification,
-      );
-    }
-
-    const response = await api.patch<ManagedSchedulingActionResult>(
-      `/schedulings/appointments/${scheduleId}/reject`,
-      { justification },
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/cancel`,
+      { reason: justification },
       {
         fallbackMsg: "Não foi possível recusar o atendimento.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async cancel(
+    scheduleId: string,
+    pedagogueId: string,
+    justification: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/cancel`,
+      { reason: justification },
+      {
+        fallbackMsg: "Não foi possível cancelar o agendamento.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async finish(
+    scheduleId: string,
+    pedagogueId: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.patch<ManagedSchedulingActionResult>(
+      `/schedulings/appointments/${scheduleId}/finish`,
+      undefined,
+      {
+        fallbackMsg: "Não foi possível finalizar o atendimento.",
       },
     );
 

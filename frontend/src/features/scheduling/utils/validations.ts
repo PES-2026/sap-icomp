@@ -27,6 +27,7 @@ export const scheduleSchema = z
       .string()
       .regex(TIME_PATTERN, "Informe um horário de término válido."),
     durationMinutes: z.string(),
+    breakTime: z.string(),
   })
   .superRefine((data, ctx) => {
     if (data.endDate < data.startDate) {
@@ -67,6 +68,20 @@ export const scheduleSchema = z
         code: "custom",
         path: ["durationMinutes"],
         message: "A duração deve ser menor que 24 horas.",
+      });
+    }
+
+    const breakDuration = Number(data.breakTime);
+
+    if (
+      data.breakTime.trim() === "" ||
+      !Number.isInteger(breakDuration) ||
+      breakDuration < 0
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["breakTime"],
+        message: "A pausa não pode ser negativa.",
       });
     }
   });
