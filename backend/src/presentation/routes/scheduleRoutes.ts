@@ -33,7 +33,7 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
     controller.create,
   );
   routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
-  routes.get("/schedule/availability/:id", validateParamsAndQuery(ListScheduleAvailabilityDTO), auth, controller.list);
+  routes.get("/schedule/availability/:id", validateParamsAndQuery(ListScheduleAvailabilityDTO), controller.list);
   routes.put("/schedule/availability/remove-many", auth, validateBody(RemoveScheduleSlotsDTO), controller.removeMany);
   routes.put("/schedule/availability/:id/remove", auth, validateParams(RemoveScheduleSlotDTO), controller.remove);
 
