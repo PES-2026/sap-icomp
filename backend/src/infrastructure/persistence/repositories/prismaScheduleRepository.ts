@@ -28,6 +28,33 @@ export class PrismaScheduleRepository implements IScheduleRepository {
       startDate: raw.startDate,
       endDate: raw.endDate,
       status: findValueInEnum(ScheduleStatusEnum, raw.status),
+      token: raw.token,
+      reason: raw.reason ?? "",
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    };
+  }
+
+  async findByToken(token: string): Promise<ScheduleResult | null> {
+    const raw = await this.prisma.schedule.findUnique({
+      where: { token: token },
+      include: { pedagogue: true, student: { include: { course: true } } },
+    });
+
+    if (!raw) return null;
+
+    return {
+      id: raw.externalId,
+      pedagogueId: raw.pedagogue.externalId,
+      studentId: raw.student?.externalId ?? "",
+      studentName: raw.student?.name ?? raw.guestName!,
+      studentEmail: raw.student?.email ?? raw.guestEmail!,
+      studentEnrollment: raw.student?.enrollmentId ?? "",
+      studentCourse: raw.student?.course?.name ?? "",
+      startDate: raw.startDate,
+      endDate: raw.endDate,
+      status: findValueInEnum(ScheduleStatusEnum, raw.status),
+      token: raw.token,
       reason: raw.reason ?? "",
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,

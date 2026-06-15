@@ -26,6 +26,9 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CancelSchedule } from "@application/useCases/schedule/cancelSchedule";
+import { CancelScheduleByToken } from "@application/useCases/schedule/cancelScheduleByToken";
+import { ConfirmSchedule } from "@application/useCases/schedule/confirmSchedule";
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
 import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
@@ -34,6 +37,8 @@ import { PreviewScheduleAvailability } from "@application/useCases/schedule/prev
 import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
 import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
+import { RescheduleSchedule } from "@application/useCases/schedule/rescheduleSchedule";
+import { RescheduleScheduleByToken } from "@application/useCases/schedule/rescheduleScheduleByToken";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -238,6 +243,47 @@ const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository)
 
 const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
 
+const confirmScheduleUseCase = new ConfirmSchedule(
+  scheduleRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const cancelScheduleUseCase = new CancelSchedule(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const rescheduleScheduleUseCase = new RescheduleSchedule(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+  env.FRONTEND_URL,
+);
+
+const cancelScheduleByTokenUseCase = new CancelScheduleByToken(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const rescheduleScheduleByTokenUseCase = new RescheduleScheduleByToken(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+  env.FRONTEND_URL,
+);
+
 const requestScheduleUseCase = new RequestSchedule(
   scheduleRepository,
   pedagogueRepository,
@@ -255,6 +301,11 @@ const scheduleController = new ScheduleController(
   removeScheduleSlotUseCase,
   removeManyScheduleSlotsUseCase,
   listSchedulesUseCase,
+  confirmScheduleUseCase,
+  cancelScheduleUseCase,
+  rescheduleScheduleUseCase,
+  cancelScheduleByTokenUseCase,
+  rescheduleScheduleByTokenUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));
