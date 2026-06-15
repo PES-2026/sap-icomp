@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
 import { ListScheduleAvailabilityDTO } from "@application/dtos/schedule/listScheduleAvailabilityDto";
-// import { ListSchedulesDTO } from "@application/dtos/schedule/listSchedulesDto";
+import { ListSchedulesDTO } from "@application/dtos/schedule/listSchedulesDto";
 import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
 import { RemoveScheduleSlotDTO } from "@application/dtos/schedule/removeScheduleSlotDto";
 import { RemoveScheduleSlotsDTO } from "@application/dtos/schedule/removeScheduleSlotsDto";
@@ -34,7 +34,7 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
     controller.create,
   );
   routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
-  // routes.get("/schedule", validateParamsAndQuery(ListSchedulesDTO), auth, controller.listSchedules);
+  routes.get("/schedule/:id", validateParamsAndQuery(ListSchedulesDTO), auth, controller.listSchedules);
   routes.get("/schedule/availability/:id", validateParamsAndQuery(ListScheduleAvailabilityDTO), controller.list);
   routes.put("/schedule/availability/remove-many", validateBody(RemoveScheduleSlotsDTO), auth, controller.removeMany);
   routes.put("/schedule/availability/:id/remove", validateParams(RemoveScheduleSlotDTO), auth, controller.remove);
