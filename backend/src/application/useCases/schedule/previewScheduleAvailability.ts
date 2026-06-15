@@ -32,11 +32,13 @@ export class PreviewScheduleAvailability {
       return Result.fail(new EndHourLowerThanStartHourError(dto.startHour, dto.endHour));
     }
 
-    const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(
-      dto.pedagogueId,
-      dto.startDate,
-      dto.endDate,
-    );
+    const startRange = new Date(dto.startDate);
+    startRange.setHours(0, 0, 0, 0);
+
+    const endRange = new Date(dto.endDate);
+    endRange.setHours(23, 59, 59, 999);
+
+    const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(dto.pedagogueId, startRange, endRange);
 
     const previewItems = this.getAvailabilitySlots(
       dto.pedagogueId,
