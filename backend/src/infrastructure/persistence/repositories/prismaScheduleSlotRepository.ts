@@ -1,6 +1,7 @@
 import { ScheduleSlot } from "@domain/entities/scheduleSlot";
 import { ScheduleSlotStatusEnum } from "@domain/enum/scheduleSlotStatus";
-import { ScheduleSlotResult } from "@domain/repositories/results/scheduleSlotResult";
+import { ScheduleSlotListParams } from "@domain/repositories/filters/scheduleSlotFilters";
+import { PaginatedScheduleSlotResult, ScheduleSlotResult } from "@domain/repositories/results/scheduleSlotResult";
 import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import { Prisma, PrismaClient, ScheduleSlotStatus } from "@prisma/src/infrastructure/database/generated/client";
@@ -200,6 +201,65 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
       status: findValueInEnum(ScheduleSlotStatusEnum, slot.status),
       createdAt: slot.createdAt,
       updatedAt: slot.updatedAt,
+    };
+  }
+
+  async findAll(params: ScheduleSlotListParams): Promise<PaginatedScheduleSlotResult> {
+    const { page, limit, filters } = params;
+    const offset = (page - 1) * limit;
+
+    const pedagogue = filters.pedagogueId
+      ? await this.prisma.pedagogue.findUnique({
+          where: { externalId: filters.pedagogueId },
+          select: { internalId: true },
+        })
+      : null;
+
+    const where: Prisma.ScheduleSlotWhereInput = {
+      ...(pedagogue && { pedagogueId: pedagogue.internalId }),
+      ...(filters.status && { status: filters.status as ScheduleSlotStatus }),
+      ...(filters.attendanceTime && { attendanceTime: filters.attendanceTime }),
+      ...(filters.date && {
+        startDateTime: {
+          gte: new Date(new Date(filters.date).setHours(0, 0, 0, 0)),
+          lte: new Date(new Date(filters.date).setHours(23, 59, 59, 999)),
+        },
+      }),
+      ...(filters.startDate && { startDateTime: { gte: filters.startDate } }),
+      ...(filters.endDate && { endDateTime: { lte: filters.endDate } }),
+    };
+
+    const [totalItems, results] = await Promise.all([
+      this.prisma.scheduleSlot.count({ where }),
+      this.prisma.scheduleSlot.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { startDateTime: "asc" },
+        include: {
+          pedagogue: { select: { externalId: true } },
+          schedule: { select: { externalId: true } },
+        },
+      }),
+    ]);
+
+    const items: ScheduleSlotResult[] = results.map((record) => ({
+      id: record.externalId,
+      pedagogueId: record.pedagogue.externalId,
+      startDateTime: record.startDateTime,
+      endDateTime: record.endDateTime,
+      attendanceTime: record.attendanceTime,
+      scheduleId: record.schedule?.externalId,
+      status: findValueInEnum(ScheduleSlotStatusEnum, record.status),
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    }));
+
+    return {
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
+      items,
     };
   }
 
