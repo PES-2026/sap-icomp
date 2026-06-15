@@ -113,10 +113,15 @@ export class CreateScheduleAvailability {
   }
 
   private async validateSlotOverlap(item: CreateScheduleAvailabilityItemDTO, startDateTime: Date, endDateTime: Date) {
+    const startOfDay = new Date(startDateTime);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startDateTime);
+    endOfDay.setHours(23, 59, 59, 999);
+
     const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(
       item.pedagogueId,
-      startDateTime,
-      endDateTime,
+      startOfDay,
+      endOfDay,
     );
 
     const hasConflict = existingSlots.some(
