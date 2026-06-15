@@ -28,6 +28,7 @@ import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
+import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
@@ -226,6 +227,8 @@ const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
   getWeekdayFromDateUseCase,
 );
 
+const listScheduleSlotsUseCase = new ListScheduleAvailability(scheduleSlotRepository);
+
 const requestScheduleUseCase = new RequestSchedule(
   scheduleRepository,
   pedagogueRepository,
@@ -239,6 +242,7 @@ const scheduleController = new ScheduleController(
   previewScheduleAvailabilityUseCase,
   createScheduleAvailabilityUseCase,
   requestScheduleUseCase,
+  listScheduleSlotsUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));
