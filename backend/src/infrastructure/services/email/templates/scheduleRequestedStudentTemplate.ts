@@ -107,23 +107,23 @@ export function buildScheduleStudentTemplate(data: StudentAppointmentEmailData):
             </table>
 
             <!-- Management buttons -->
-            // <p style="margin:0 0 10px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.4px;">Gerenciar agendamento</p>
-            // <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-            //   <tr>
-            //     <td style="padding-right:8px;">
-            //       <a href="${data}"
-            //          style="display:inline-block;background:#4ecba4;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;">
-            //         Remarcar
-            //       </a>
-            //     </td>
-            //     <td>
-            //       <a href="${data}"
-            //          style="display:inline-block;background:#ffffff;color:#c0392b;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;border:1px solid #f5c4b3;">
-            //         Cancelar agendamento
-            //       </a>
-            //     </td>
-            //   </tr>
-            // </table>
+            <p style="margin:0 0 10px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.4px;">Gerenciar agendamento</p>
+            <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+              <tr>
+                <td style="padding-right:8px;">
+                  <a href="${data}"
+                     style="display:inline-block;background:#4ecba4;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;">
+                    Remarcar
+                  </a>
+                </td>
+                <td>
+                  <a href="${data}"
+                     style="display:inline-block;background:#ffffff;color:#c0392b;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;border:1px solid #f5c4b3;">
+                    Cancelar agendamento
+                  </a>
+                </td>
+              </tr>
+            </table>
 
             <!-- Warning -->
             <table width="100%" cellpadding="0" cellspacing="0">
