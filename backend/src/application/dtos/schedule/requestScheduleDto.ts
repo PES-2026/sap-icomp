@@ -1,5 +1,5 @@
 import {
-  validateDateField,
+  validateExternalIdField,
   validateNumberField,
   validateOptionalStringField,
   validateStringField,
@@ -16,7 +16,7 @@ export class RequestScheduleDTO {
     public readonly email: string,
     public readonly pedagogueId: string,
     public readonly courseId: string,
-    public readonly startTime: Date,
+    public readonly slotId: string,
     public readonly durationMinutes: number,
     public readonly reason?: string,
   ) {}
@@ -32,10 +32,10 @@ export class RequestScheduleDTO {
     const email: string = validateStringField(raw.email, "email");
     const pedagogueId: string = validateStringField(raw.pedagogueId, "pedagogueId");
     const courseId: string = validateStringField(raw.courseId, "courseId");
-    const startTime: Date = validateDateField(raw.startTime, "startTime");
+    const slotId: string = validateExternalIdField(raw.slotId, "slotId");
     const durationMinutes: number = validateNumberField(raw.durationMinutes, "durationMinutes");
     const reason: string | undefined = validateOptionalStringField(raw.reason, "reason");
 
-    return new RequestScheduleDTO(name, email, pedagogueId, courseId, startTime, durationMinutes, reason);
+    return new RequestScheduleDTO(name, email, pedagogueId, courseId, slotId, durationMinutes, reason);
   }
 }
