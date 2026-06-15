@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
 import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
+import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
 import { ITokenService } from "@domain/services/tokenService";
 import { ScheduleController } from "@presentation/controllers/scheduleController";
 import { authMiddleware } from "@presentation/middlewares/auth";
@@ -26,6 +27,7 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
     validateBody(CreateScheduleAvailabilityDTO),
     controller.create,
   );
+  routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
 
   return routes;
 };

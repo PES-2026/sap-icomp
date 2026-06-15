@@ -27,7 +27,7 @@ export class CourseVO {
 
   private static validate(value: string): Result<void> {
     if (typeof value !== "string" || value.trim() === "") {
-      return Result.fail<void>(new RequiredFieldError("demand"));
+      return Result.fail<void>(new RequiredFieldError("course"));
     }
     return Result.ok<void>();
   }

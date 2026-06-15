@@ -13,7 +13,7 @@ export type ScheduleSlotProps = {
   status: ScheduleSlotStatusEnum;
   attendanceTime: number;
   pedagogueId: string;
-  appointmentId?: string | undefined;
+  scheduleId?: string | undefined;
 };
 
 export class ScheduleSlot {
@@ -24,7 +24,7 @@ export class ScheduleSlot {
     public endDateTime: DateVO,
     public attendanceTime: DurationVO,
     public status: ScheduleSlotStatusVO,
-    public appointmentId?: ExternalIdVO,
+    public scheduleId?: ExternalIdVO,
   ) {}
 
   static create(props: ScheduleSlotProps): Result<ScheduleSlot> {
@@ -34,9 +34,9 @@ export class ScheduleSlot {
     const endDateTime = DateVO.create(props.endDateTime);
     const attendanceTime = DurationVO.create(props.attendanceTime);
     const status = ScheduleSlotStatusVO.from(props.status);
-    const appointmentId = props.appointmentId ? ExternalIdVO.from(props.appointmentId) : undefined;
+    const scheduleId = props.scheduleId ? ExternalIdVO.from(props.scheduleId) : undefined;
 
-    const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime, appointmentId];
+    const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime, scheduleId];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -52,7 +52,7 @@ export class ScheduleSlot {
         endDateTime.getValue(),
         attendanceTime.getValue(),
         status.getValue(),
-        appointmentId?.getValue() ?? undefined,
+        scheduleId?.getValue() ?? undefined,
       ),
     );
   }
@@ -65,7 +65,7 @@ export class ScheduleSlot {
       DateVO.fromTrusted(props.endDateTime),
       DurationVO.fromTrusted(props.attendanceTime),
       ScheduleSlotStatusVO.fromTrusted(props.status),
-      props.appointmentId ? ExternalIdVO.fromTrusted(props.appointmentId) : undefined,
+      props.scheduleId ? ExternalIdVO.fromTrusted(props.scheduleId) : undefined,
     );
   }
 }

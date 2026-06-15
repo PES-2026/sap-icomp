@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 
 import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
 import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
+import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
+import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 
 import { BaseController } from "./baseController";
 
@@ -11,6 +13,7 @@ export class ScheduleController extends BaseController {
   constructor(
     private previewScheduleAvailability: PreviewScheduleAvailability,
     private createScheduleAvailability: CreateScheduleAvailability,
+    private requestSchedule: RequestSchedule,
   ) {
     super();
   }
@@ -34,6 +37,17 @@ export class ScheduleController extends BaseController {
       this.handleResult(res, result, 201);
     } catch (error) {
       this.handleError(error, res, `${ScheduleController.name}:create`);
+    }
+  };
+
+  request = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RequestScheduleDTO.create(req.body);
+      const result = await this.requestSchedule.execute(dto);
+
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:request`);
     }
   };
 }

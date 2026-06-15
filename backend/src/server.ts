@@ -29,6 +29,7 @@ import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
 import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
+import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -54,6 +55,7 @@ import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositor
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
+import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
 import { PrismaScheduleSlotRepository } from "@infrastructure/persistence/repositories/prismaScheduleSlotRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
@@ -211,6 +213,8 @@ app.use(diagnosesRoutes(diagnosesController));
 
 const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 
+const scheduleRepository = new PrismaScheduleRepository(prisma);
+
 const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
 const previewScheduleAvailabilityUseCase = new PreviewScheduleAvailability(
   scheduleSlotRepository,
@@ -221,9 +225,20 @@ const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
   pedagogueRepository,
   getWeekdayFromDateUseCase,
 );
+
+const requestScheduleUseCase = new RequestSchedule(
+  scheduleRepository,
+  pedagogueRepository,
+  studentRepository,
+  scheduleSlotRepository,
+  courseRepository,
+  emailService,
+);
+
 const scheduleController = new ScheduleController(
   previewScheduleAvailabilityUseCase,
   createScheduleAvailabilityUseCase,
+  requestScheduleUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));
