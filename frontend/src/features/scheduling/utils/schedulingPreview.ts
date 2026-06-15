@@ -3,7 +3,6 @@ import {
   SchedulingPreviewPayload,
   SchedulingSlot,
 } from "../types/scheduling";
-import { timeToMinutes } from "./validations";
 
 const padTime = (value: number) => String(value).padStart(2, "0");
 
