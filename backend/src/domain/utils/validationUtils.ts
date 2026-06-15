@@ -25,10 +25,8 @@ export function validateDateField(value: unknown, fieldName: string): Date {
 
   if (typeof value === "string") {
     parsedDate = new Date(value);
-    if (!isNaN(parsedDate.getTime()) && (/T00:00:00(\.000)?Z$/.test(value) || /^\d{4}-\d{2}-\d{2}$/.test(value))) {
-      const userTimezoneOffset = parsedDate.getTimezoneOffset() * 60000;
-      parsedDate = new Date(parsedDate.getTime() + userTimezoneOffset);
-    }
+    const userTimezoneOffset = parsedDate.getTimezoneOffset() * 60000;
+    parsedDate = new Date(parsedDate.getTime() + userTimezoneOffset);
   } else if (value instanceof Date) {
     parsedDate = new Date(value);
   } else {
