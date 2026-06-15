@@ -1,15 +1,24 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { CourseNotFoundError } from "@application/errors/course/courseNotFoundError";
 import { PedagogueNotFoundError } from "@application/errors/pedagogue/pedagogueNotFoundError";
-import { MaxAttendanceTimeExceededError } from "@application/errors/schedule/maxAttendanceTimeExceededError";
-import { MaxAttendanceTimeNotDefinedError } from "@application/errors/schedule/maxAttendanceTimeNotDefinedError";
+import { EmailToPedagogueNotSendError } from "@application/errors/schedule/emailToPedagogueNotSendError";
+import { EmailToStudentNotSendError } from "@application/errors/schedule/emailToStudentNotSendError";
+import { NoAvailableSlotsError } from "@application/errors/schedule/noAvailableSlotsError";
+import { RequestedScheduleUncoveredError } from "@application/errors/schedule/requestScheduleUncoveredError";
 import { RetroactiveDateError } from "@application/errors/schedule/retroactiveDateError";
+import { SlotNotAvailableForScheduleError } from "@application/errors/schedule/slotNotAvailableForScheduleError";
 import { Schedule } from "@domain/entities/schedule";
+import { ScheduleSlotStatusEnum } from "@domain/enum/scheduleSlotStatus";
+import { ScheduleStatusEnum } from "@domain/enum/scheduleStatus";
+import { DomainError } from "@domain/errors/domainError";
 import { ICourseRepository } from "@domain/repositories/courseRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { CourseItem } from "@domain/repositories/results/courseResult";
 import { PedagogueResult } from "@domain/repositories/results/pedagogueResult";
+import { ScheduleSlotResult } from "@domain/repositories/results/scheduleSlotResult";
 import { IScheduleRepository } from "@domain/repositories/scheduleRepository";
+import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
+import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { IEmailService } from "@domain/services/emailService";
 import { Result } from "@domain/shared/result";
 
@@ -19,97 +28,96 @@ export class RequestSchedule {
   constructor(
     private scheduleRepository: IScheduleRepository,
     private pedagogueRepository: IPedagogueRepository,
+    private studentRepository: IStudentRepository,
+    private scheduleSlotRepository: IScheduleSlotRepository,
     private courseRepository: ICourseRepository,
     private emailService: IEmailService,
   ) {}
 
   async execute(dto: RequestScheduleDTO): Promise<Result<RequestAttendanceResponse, ApplicationError>> {
-    const retroactiveDateResult = this.validateRetroactiveDate(dto.startTime);
+    const availableSlotValidation = await this.getAvailableSlot(dto.slotId);
+    if (availableSlotValidation?.isFailure) {
+      return Result.fail(availableSlotValidation.error!);
+    }
+
+    const slot = availableSlotValidation.getValue();
+    const retroactiveDateResult = this.validateRetroactiveDate(slot);
 
     if (retroactiveDateResult.isFailure) {
       return Result.fail(retroactiveDateResult.error!);
     }
 
-    const pedagogue = await this.getPedagogue(dto.pedagogueId);
+    const pedagogueResult = await this.getPedagogue(dto.pedagogueId);
+    if (pedagogueResult.isFailure) {
+      return Result.fail(pedagogueResult.error!);
+    }
+    const pedagogue = pedagogueResult.getValue();
 
-    if (pedagogue.isFailure) {
-      return Result.fail(pedagogue.error!);
+    const uncoveredScheduleValidation = this.validateUncoveredSlot(
+      dto.pedagogueId,
+      slot.startDateTime,
+      slot.endDateTime,
+      slot,
+    );
+    if (uncoveredScheduleValidation.isFailure) {
+      return Result.fail(uncoveredScheduleValidation.error!);
     }
 
-    const schedulingConflictResult = await this.validateSchedulingConflict(pedagogue.getValue(), dto.durationMinutes);
-
-    if (schedulingConflictResult.isFailure) {
-      return Result.fail(schedulingConflictResult.error!);
+    const scheduleEntityValidation = await this.createScheduleEntity(dto, slot.startDateTime, slot.endDateTime);
+    if (scheduleEntityValidation.isFailure) {
+      return Result.fail(scheduleEntityValidation.error!);
     }
 
-    const course = await this.getCourse(dto.courseId);
-    if (course.isFailure) {
-      return Result.fail(course.error!);
+    const scheduleEntity = scheduleEntityValidation.getValue();
+
+    await this.scheduleRepository.save(scheduleEntity);
+
+    await this.scheduleSlotRepository.updateStatusUnique(
+      slot.id,
+      ScheduleSlotStatusEnum.PENDING,
+      scheduleEntity.id.value,
+    );
+
+    const courseValidation = await this.getCourse(dto.courseId);
+    if (courseValidation.isFailure) {
+      return Result.fail(courseValidation.error!);
     }
 
-    const endDate = this.calculateEndTime(dto.startTime, dto.durationMinutes);
+    const courseName = courseValidation.getValue().name;
+    const studentName = dto.name;
 
-    // It's necessary to adapt to the logical of the schedule slots, I'll to it since the implementation is concluded
-    // const availableSlotsResult = await this.validateAvailableSlots(
-    //   dto.startTime,
-    //   dto.durationMinutes,
-    //   dto.pedagogueId,
-    // );
+    await this.sendStudentEmail(
+      dto.email,
+      studentName,
+      pedagogue.name,
+      slot.startDateTime,
+      slot.endDateTime,
+      dto.durationMinutes,
+      courseName,
+      dto.reason ?? undefined,
+    );
 
-    // if (availableSlotsResult.isFailure) {
-    //   return Result.fail(availableSlotsResult.error!);
-    // }
-
-    // try {
-    //   await this.scheduleSlotRepository.updateStatusMany(
-    //     availableSlots.map((s) => s.id.value),
-    //     ScheduleSlotStatusEnum.PENDING,
-    //     attendance.id.value,
-    //   );
-    // } catch (error: any) {
-    //   return Result.fail(new ScheduleConflictError());
-    // }
-
-    const scheduleEntity = Schedule.create({
-      pedagogueId: dto.pedagogueId,
-      startDate: dto.startTime,
-      endDate: endDate,
-    });
-
-    await this.scheduleRepository.save(scheduleEntity.getValue());
-
-    await this.emailService.sendScheduleRequestedStudentEmail(dto.email, {
-      name: dto.name,
-      pedagogue: pedagogue.getValue().name,
-      date: dto.startTime.toLocaleDateString(),
-      startTime: dto.startTime.toLocaleTimeString(),
-      endTime: endDate.toLocaleTimeString(),
-      duration: `${dto.durationMinutes} minutos`,
-      course: course.getValue().name,
-      reason: dto.reason ?? "Não informada",
-    });
-    await this.emailService.sendScheduleRequestedPedagogueEmail(pedagogue.getValue().email, {
-      pedagogueName: pedagogue.getValue().name,
-      studentName: dto.name,
-      course: course.getValue().name,
-      email: dto.email,
-      date: dto.startTime.toLocaleDateString(),
-      startTime: dto.startTime.toLocaleTimeString(),
-      endTime: endDate.toLocaleTimeString(),
-      duration: `${dto.durationMinutes} minutos`,
-      reason: dto.reason ?? "Não informada",
-      dashboardLink: "https://example.com/dashboard", // Verify when implemented the dashboard route and adapt this link
-    });
+    await this.sendPedagogueEmail(
+      pedagogue.email,
+      pedagogue.name,
+      studentName,
+      courseName,
+      dto.email,
+      slot.startDateTime,
+      slot.endDateTime,
+      dto.durationMinutes,
+      dto.reason ?? undefined,
+    );
 
     return Result.ok({
-      scheduleId: scheduleEntity.getValue().id.value,
+      scheduleId: scheduleEntity.id.value,
       message: "The schedule was successfully requested and is pending approval from the pedagogue.",
     });
   }
 
-  private validateRetroactiveDate(startTime: Date): Result<void, RetroactiveDateError> {
+  private validateRetroactiveDate(slot: ScheduleSlotResult): Result<void, RetroactiveDateError> {
     const now = new Date();
-    if (startTime < now) {
+    if (slot.startDateTime < now) {
       return Result.fail(new RetroactiveDateError());
     }
     return Result.ok();
@@ -123,51 +131,132 @@ export class RequestSchedule {
     return Result.ok<PedagogueResult>(pedagogue);
   }
 
-  private async validateSchedulingConflict(
-    pedagogue: PedagogueResult,
-    durationMinutes: number,
-  ): Promise<Result<void, MaxAttendanceTimeExceededError | MaxAttendanceTimeNotDefinedError>> {
-    if (pedagogue.maxAttendanceTime === undefined) {
-      return Result.fail(new MaxAttendanceTimeNotDefinedError());
+  private async getAvailableSlot(slotId: string): Promise<Result<ScheduleSlotResult>> {
+    const availableSlot = await this.scheduleSlotRepository.findById(slotId);
+
+    if (!availableSlot) {
+      return Result.fail(new NoAvailableSlotsError(slotId));
     }
-    if (durationMinutes > pedagogue.maxAttendanceTime) {
-      return Result.fail(new MaxAttendanceTimeExceededError(pedagogue.maxAttendanceTime));
+    if (availableSlot.status !== ScheduleSlotStatusEnum.CREATED) {
+      return Result.fail(new SlotNotAvailableForScheduleError(slotId));
+    }
+    return Result.ok(availableSlot);
+  }
+
+  private validateUncoveredSlot(
+    pedagogueId: string,
+    startTime: Date,
+    endDate: Date,
+    availableSlot: ScheduleSlotResult,
+  ): Result<void, RequestedScheduleUncoveredError> {
+    const totalDurationMs = endDate.getTime() - startTime.getTime();
+    let slotsDurationMs = 0;
+
+    slotsDurationMs += availableSlot.endDateTime.getTime() - availableSlot.startDateTime.getTime();
+
+    if (slotsDurationMs < totalDurationMs) {
+      return Result.fail(
+        new RequestedScheduleUncoveredError(
+          pedagogueId,
+          startTime.toISOString(),
+          endDate.toISOString(),
+          startTime.toDateString(),
+        ),
+      );
     }
     return Result.ok();
   }
 
-  private async getCourse(courseId: string): Promise<Result<CourseItem, CourseNotFoundError>> {
+  private async createScheduleEntity(
+    dto: RequestScheduleDTO,
+    startTime: Date,
+    endDate: Date,
+  ): Promise<Result<Schedule, DomainError>> {
+    const student = await this.studentRepository.findByEmail(dto.email);
+
+    const scheduleEntityResult = Schedule.create({
+      pedagogueId: dto.pedagogueId,
+      studentId: student?.id,
+      guestName: !student ? dto.name : undefined,
+      guestEmail: !student ? dto.email : undefined,
+      startDate: startTime,
+      endDate: endDate,
+      status: ScheduleStatusEnum.PENDING,
+      reason: dto.reason ?? undefined,
+    });
+
+    if (scheduleEntityResult.isFailure) {
+      return Result.fail(scheduleEntityResult.error!);
+    }
+
+    return Result.ok(scheduleEntityResult.getValue());
+  }
+
+  private async getCourse(courseId: string): Promise<Result<CourseItem>> {
     const course = await this.courseRepository.findById(courseId);
+
     if (!course) {
       return Result.fail(new CourseNotFoundError(courseId));
     }
-    return Result.ok<CourseItem>(course);
+
+    return Result.ok(course);
   }
 
-  // It's necessary to adapt to the logical of the schedule slots, I'll to it since the implementation is concluded
-  // private async validateAvailableSlots(
-  //   startTime: Date,
-  //   durationMinutes: number,
-  //   pedagogueId: string,
-  // ): Promise<Result<void, ScheduleConflictError>> {
-  //   const endTime = new Date(startTime.getTime() + durationMinutes * 60000);
-  //   const availableSlots = await this.scheduleSlotRepository.findAvailableInInterval(pedagogueId, startTime, endTime);
+  private async sendStudentEmail(
+    email: string,
+    studentName: string,
+    pedagogueName: string,
+    startTime: Date,
+    endDate: Date,
+    durationMinutes: number,
+    courseName: string,
+    reason?: string | undefined,
+  ) {
+    try {
+      await this.emailService.sendScheduleRequestedStudentEmail(email, {
+        name: studentName,
+        pedagogue: pedagogueName,
+        date: startTime.toLocaleDateString(),
+        startTime: startTime.toLocaleTimeString(),
+        endTime: endDate.toLocaleTimeString(),
+        duration: `${durationMinutes} minutos`,
+        course: courseName,
+        reason: reason ?? "Não informada",
+      });
+    } catch (error) {
+      console.error(`An error occurred to send the email to the student: ${error}`);
+      return Result.fail(new EmailToStudentNotSendError());
+    }
+  }
 
-  //   if (availableSlots.length === 0) {
-  //     return Result.fail(new ScheduleConflictError());
-  //   }
-
-  //   const firstSlot = availableSlots[0];
-  //   const lastSlot = availableSlots[availableSlots.length - 1];
-
-  //   if (!firstSlot || !lastSlot || firstSlot.startDateTime.value > startTime || lastSlot.endDateTime.value < endTime) {
-  //     return Result.fail(new ScheduleConflictError());
-  //   }
-
-  //   return Result.ok();
-  // }
-
-  private calculateEndTime(startTime: Date, durationMinutes: number): Date {
-    return new Date(startTime.getTime() + durationMinutes * 60000);
+  private async sendPedagogueEmail(
+    email: string,
+    pedagogueName: string,
+    studentName: string,
+    courseName: string,
+    studentEmail: string,
+    startTime: Date,
+    endDate: Date,
+    durationMinutes: number,
+    reason?: string | undefined,
+  ) {
+    try {
+      await this.emailService.sendScheduleRequestedPedagogueEmail(email, {
+        pedagogueName: pedagogueName,
+        studentName: studentName,
+        course: courseName,
+        email: studentEmail,
+        date: startTime.toLocaleDateString(),
+        startTime: startTime.toLocaleTimeString(),
+        endTime: endDate.toLocaleTimeString(),
+        duration: `${durationMinutes} minutos`,
+        reason: reason ?? "Não informada",
+        dashboardLink: "https://example.com/dashboard",
+      });
+      return Result.ok();
+    } catch (error) {
+      console.error(`An error occurred to send the email to the pedagogue: ${error}`);
+      return Result.fail(new EmailToPedagogueNotSendError());
+    }
   }
 }

@@ -4,11 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
+import { scheduleService } from "@/features/scheduling/services/schedulingService";
+import { RequestSchedulePayload } from "@/features/scheduling/types/scheduling";
+
 import {
   AppointmentFormData,
   appointmentSchema,
 } from "../schemas/appointmentSchema";
-import { appointmentService } from "../services/appointmentService";
 import { TimeSlot } from "../types/appointment";
 
 export const useAppointmentForm = () => {
@@ -25,6 +28,8 @@ export const useAppointmentForm = () => {
       date: "",
       courseId: "",
       slotId: "",
+      durationMinutes: 60,
+      reason: "",
     },
   });
 
@@ -51,7 +56,7 @@ export const useAppointmentForm = () => {
 
       setIsLoadingSlots(true);
       try {
-        const data = await appointmentService.getSlots(date, pedagogueId);
+        const data = await scheduleService.getAvailability(pedagogueId, date);
         setSlots(data);
       } catch (error) {
         setSlots([]);
@@ -64,15 +69,33 @@ export const useAppointmentForm = () => {
   }, [date, pedagogueId]);
 
   const handleSelectSlot = (id: string) => {
-    setValue("slotId", selectedSlotId === id ? "" : id, {
+    const isDeselecting = selectedSlotId === id;
+    setValue("slotId", isDeselecting ? "" : id, {
       shouldValidate: true,
     });
+
+    if (!isDeselecting) {
+      const slot = slots.find((s) => s.id === id);
+      if (slot) {
+        setValue("durationMinutes", slot.attendanceTime);
+      }
+    }
   };
 
   const onSubmit = async (data: AppointmentFormData) => {
     try {
-      console.log(data);
-      await appointmentService.create(data);
+      const payload: RequestSchedulePayload = {
+        name: data.studentName,
+        email: data.email,
+        pedagogueId: data.pedagogueId,
+        courseId: data.courseId,
+        slotId: data.slotId,
+        durationMinutes: data.durationMinutes,
+        reason: data.reason,
+      };
+
+      await scheduleService.request(payload);
+
       toast.success("Atendimento solicitado com sucesso!");
       reset();
     } catch (error) {
@@ -84,6 +107,7 @@ export const useAppointmentForm = () => {
     register,
     control,
     handleSubmit: handleSubmit(onSubmit),
+    reset,
     errors,
     slots,
     isLoadingSlots,

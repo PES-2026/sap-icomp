@@ -1,0 +1,112 @@
+import api from "@/services/api";
+import {
+  ListScheduleFilters,
+  ManagedSchedulingActionResult,
+  PaginatedScheduleResponse,
+  ScheduleStatusEnum,
+} from "../types/schedulingManagement";
+
+export const scheduleManagementService = {
+  async list(
+    userId: string,
+    page: number,
+    limit: number,
+    filters?: ListScheduleFilters,
+  ): Promise<PaginatedScheduleResponse> {
+    const response = await api.get<PaginatedScheduleResponse>(
+      `/schedule/${userId}`,
+      {
+        params: {
+          page,
+          limit,
+          ...filters,
+        },
+        fallbackMsg: "Não foi possível carregar os agendamentos.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async listPending(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedScheduleResponse> {
+    const response = await api.get<PaginatedScheduleResponse>(
+      `/schedule/${userId}`,
+      {
+        params: {
+          page,
+          limit,
+          status: ScheduleStatusEnum.PENDING,
+        },
+        fallbackMsg: "Não foi possível carregar as solicitações pendentes.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async confirm(
+    scheduleId: string,
+    pedagogueId: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/confirm`,
+      undefined,
+      {
+        fallbackMsg: "Não foi possível confirmar o atendimento.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async reject(
+    scheduleId: string,
+    pedagogueId: string,
+    justification: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/cancel`,
+      { reason: justification },
+      {
+        fallbackMsg: "Não foi possível recusar o atendimento.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async cancel(
+    scheduleId: string,
+    pedagogueId: string,
+    justification: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.put<ManagedSchedulingActionResult>(
+      `/schedule/${scheduleId}/cancel`,
+      { reason: justification },
+      {
+        fallbackMsg: "Não foi possível cancelar o agendamento.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async finish(
+    scheduleId: string,
+    pedagogueId: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.patch<ManagedSchedulingActionResult>(
+      `/schedulings/appointments/${scheduleId}/finish`,
+      undefined,
+      {
+        fallbackMsg: "Não foi possível finalizar o atendimento.",
+      },
+    );
+
+    return response.data;
+  },
+};

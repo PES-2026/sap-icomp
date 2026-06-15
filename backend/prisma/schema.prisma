@@ -22,17 +22,29 @@ enum UserStatus {
 }
 
 enum ScheduleSlotStatus {
-  AVAILABLE
+  CREATED
   PENDING
   BOOKED
-  CANCELLED
 }
 
 enum ScheduleStatus {
   PENDING
   CONFIRMED
-  CANCELLED
+  CANCELED_BY_STUDENT
+  CANCELED_BY_PEDAGOGUE
+  EXPIRED
   COMPLETED
+  MISSED
+}
+
+enum DaysOfWeek {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
 }
 
 model Student {
@@ -57,6 +69,7 @@ model Student {
   reports     Report[]
   diagnoses   StudentDiagnosis[]
   enrollments Enrollment[]
+  schedules   Schedule[]
 }
 
 model AccountRequest {
@@ -97,6 +110,7 @@ model Pedagogue {
   attendances    Attendance[]
   reports        Report[]
   schedules      Schedule[]
+  scheduleSlots  ScheduleSlot[]
 }
 
 model Professor {
@@ -140,8 +154,7 @@ model Attendance {
   student   Student        @relation(fields: [studentId], references: [internalId])
   pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
   type      AttendanceType @relation(fields: [typeId], references: [internalId])
-
-  scheduleSlots ScheduleSlot[]
+  schedules Schedule[]
 }
 
 model AttendanceType {
@@ -324,11 +337,21 @@ model Schedule {
   pedagogueId Int
   pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
 
+  studentId Int?
+  student   Student? @relation(fields: [studentId], references: [internalId])
+
+  guestName  String?
+  guestEmail String?
+
   startDate DateTime
   endDate   DateTime
 
   status ScheduleStatus @default(PENDING)
   token  String         @unique
+  reason String?
+
+  attendanceId Int?
+  attendance   Attendance? @relation(fields: [attendanceId], references: [internalId])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -341,17 +364,19 @@ model ScheduleSlot {
   internalId Int    @id @default(autoincrement())
   externalId String @unique
 
-  scheduleId Int
-  schedule   Schedule @relation(fields: [scheduleId], references: [internalId])
+  pedagogueId Int
+  pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
 
-  startDateTime DateTime
-  endDateTime   DateTime
+  scheduleId Int?
+  schedule   Schedule? @relation(fields: [scheduleId], references: [internalId])
 
-  status ScheduleSlotStatus @default(AVAILABLE)
+  startDateTime  DateTime
+  endDateTime    DateTime
+  attendanceTime Int
 
-  attendanceId Int?
-  attendance   Attendance? @relation(fields: [attendanceId], references: [internalId])
+  status ScheduleSlotStatus @default(CREATED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  removed   Boolean  @default(false)
 }

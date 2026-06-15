@@ -26,7 +26,13 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
-import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
+import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
+import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
+import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
+import { ListSchedules } from "@application/useCases/schedule/listSchedules";
+import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
+import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
+import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
@@ -54,6 +60,7 @@ import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repos
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
 import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
+import { PrismaScheduleSlotRepository } from "@infrastructure/persistence/repositories/prismaScheduleSlotRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { EmailService } from "@infrastructure/services/email/providers/gmailService";
@@ -140,8 +147,8 @@ const attendanceTypeController = new AttendanceTypeController(
 app.use(attendanceTypeRoutes(attendanceTypeController));
 
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
-const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const hashService = new BcryptHashService();
 
 const accountRequestController = new AccountRequestController(
@@ -208,13 +215,49 @@ const diagnosesController = new DiagnosesController(
 
 app.use(diagnosesRoutes(diagnosesController));
 
+const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
+
 const scheduleRepository = new PrismaScheduleRepository(prisma);
-const scheduleController = new ScheduleController(
-  new CreateSchedulePreviewUseCase(),
-  new RequestSchedule(scheduleRepository, pedagogueRepository, courseRepository, emailService),
+
+const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
+const previewScheduleAvailabilityUseCase = new PreviewScheduleAvailability(
+  scheduleSlotRepository,
+  getWeekdayFromDateUseCase,
+);
+const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
+  scheduleSlotRepository,
+  pedagogueRepository,
+  getWeekdayFromDateUseCase,
 );
 
-app.use(scheduleRoutes(scheduleController));
+const listScheduleSlotsUseCase = new ListScheduleAvailability(scheduleSlotRepository);
+
+const listSchedulesUseCase = new ListSchedules(scheduleRepository);
+
+const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository);
+
+const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
+
+const requestScheduleUseCase = new RequestSchedule(
+  scheduleRepository,
+  pedagogueRepository,
+  studentRepository,
+  scheduleSlotRepository,
+  courseRepository,
+  emailService,
+);
+
+const scheduleController = new ScheduleController(
+  previewScheduleAvailabilityUseCase,
+  createScheduleAvailabilityUseCase,
+  requestScheduleUseCase,
+  listScheduleSlotsUseCase,
+  removeScheduleSlotUseCase,
+  removeManyScheduleSlotsUseCase,
+  listSchedulesUseCase,
+);
+
+app.use(scheduleRoutes(scheduleController, tokenService));
 
 // Global error handler should be the last middleware registered
 app.use(errorHandler);

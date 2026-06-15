@@ -1,19 +1,43 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 
-import { CreateSchedulePreviewDTO } from "@application/dtos/schedule/createSchedulePreviewDto";
+import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
+import { ListScheduleAvailabilityDTO } from "@application/dtos/schedule/listScheduleAvailabilityDto";
+import { ListSchedulesDTO } from "@application/dtos/schedule/listSchedulesDto";
+import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
+import { RemoveScheduleSlotDTO } from "@application/dtos/schedule/removeScheduleSlotDto";
+import { RemoveScheduleSlotsDTO } from "@application/dtos/schedule/removeScheduleSlotsDto";
 import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
+import { ITokenService } from "@domain/services/tokenService";
+import { ScheduleController } from "@presentation/controllers/scheduleController";
+import { authMiddleware } from "@presentation/middlewares/auth";
 import { scheduleRateLimiter } from "@presentation/middlewares/rateLimiter";
 import { validateBody } from "@presentation/middlewares/validateBody";
+import { validateParams } from "@presentation/middlewares/validateParams";
+import { validateParamsAndQuery } from "@presentation/middlewares/validateParamsAndQuery";
 
-import { ScheduleController } from "../controllers/scheduleController";
-
-export const scheduleRoutes = (controller: ScheduleController) => {
+export const scheduleRoutes = (controller: ScheduleController, tokenService: ITokenService) => {
   const routes = Router();
 
-  routes.use(scheduleRateLimiter);
+  const auth = (req: Request, res: Response, next: NextFunction) => authMiddleware(tokenService, req, res, next);
 
-  routes.post("/schedules/request", validateBody(RequestScheduleDTO), controller.request);
-  routes.post("/schedule/preview", validateBody(CreateSchedulePreviewDTO), controller.preview);
+  routes.post(
+    "/schedule/preview-availability",
+    auth,
+    validateBody(PreviewScheduleAvailabilityDTO),
+    controller.preview,
+  );
+  routes.post(
+    "/schedule/create-availability",
+    auth,
+    scheduleRateLimiter,
+    validateBody(CreateScheduleAvailabilityDTO),
+    controller.create,
+  );
+  routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
+  routes.get("/schedule/:id", validateParamsAndQuery(ListSchedulesDTO), auth, controller.listSchedules);
+  routes.get("/schedule/availability/:id", validateParamsAndQuery(ListScheduleAvailabilityDTO), controller.list);
+  routes.put("/schedule/availability/remove-many", validateBody(RemoveScheduleSlotsDTO), auth, controller.removeMany);
+  routes.put("/schedule/availability/:id/remove", validateParams(RemoveScheduleSlotDTO), auth, controller.remove);
 
   return routes;
 };

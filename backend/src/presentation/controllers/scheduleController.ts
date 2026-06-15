@@ -1,24 +1,39 @@
 import { Request, Response } from "express";
 
-import { CreateSchedulePreviewDTO } from "@application/dtos/schedule/createSchedulePreviewDto";
+import { CreateScheduleAvailabilityDTO } from "@application/dtos/schedule/createScheduleAvailability";
+import { ListScheduleAvailabilityDTO } from "@application/dtos/schedule/listScheduleAvailabilityDto";
+import { ListSchedulesDTO } from "@application/dtos/schedule/listSchedulesDto";
+import { PreviewScheduleAvailabilityDTO } from "@application/dtos/schedule/previewScheduleAvailability";
+import { RemoveScheduleSlotDTO } from "@application/dtos/schedule/removeScheduleSlotDto";
+import { RemoveScheduleSlotsDTO } from "@application/dtos/schedule/removeScheduleSlotsDto";
 import { RequestScheduleDTO } from "@application/dtos/schedule/requestScheduleDto";
-import { CreateSchedulePreviewUseCase } from "@application/useCases/schedule/createSchedulePreviewUseCase";
+import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
+import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
+import { ListSchedules } from "@application/useCases/schedule/listSchedules";
+import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
+import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
+import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
 
 import { BaseController } from "./baseController";
 
 export class ScheduleController extends BaseController {
   constructor(
-    private createSchedulePreview: CreateSchedulePreviewUseCase,
-    private readonly requestSchedule: RequestSchedule,
+    private previewScheduleAvailability: PreviewScheduleAvailability,
+    private createScheduleAvailability: CreateScheduleAvailability,
+    private requestSchedule: RequestSchedule,
+    private listScheduleAvailability: ListScheduleAvailability,
+    private removeScheduleSlot: RemoveScheduleSlot,
+    private removeManyScheduleSlots: RemoveManyScheduleSlots,
+    private listSchedulesUseCase: ListSchedules,
   ) {
     super();
   }
 
   preview = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = CreateSchedulePreviewDTO.create(req.body);
-      const result = await this.createSchedulePreview.execute(dto);
+      const dto = PreviewScheduleAvailabilityDTO.create(req.body);
+      const result = await this.previewScheduleAvailability.execute(dto);
 
       this.handleResult(res, result);
     } catch (error) {
@@ -26,10 +41,69 @@ export class ScheduleController extends BaseController {
     }
   };
 
-  request = async (req: Request, res: Response): Promise<void> => {
-    const dtoResult = RequestScheduleDTO.create(req.body);
-    const result = await this.requestSchedule.execute(dtoResult);
+  create = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = CreateScheduleAvailabilityDTO.create(req.body);
+      const result = await this.createScheduleAvailability.execute(dto);
 
-    this.handleResult(res, result);
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:create`);
+    }
+  };
+
+  request = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RequestScheduleDTO.create(req.body);
+      const result = await this.requestSchedule.execute(dto);
+
+      this.handleResult(res, result, 201);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:request`);
+    }
+  };
+
+  list = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = ListScheduleAvailabilityDTO.create(req.params.id, req.query);
+      const result = await this.listScheduleAvailability.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:list`);
+    }
+  };
+
+  remove = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RemoveScheduleSlotDTO.create(req.params.id);
+      const result = await this.removeScheduleSlot.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:remove`);
+    }
+  };
+
+  removeMany = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = RemoveScheduleSlotsDTO.create(req.body);
+      const result = await this.removeManyScheduleSlots.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:removeMany`);
+    }
+  };
+
+  listSchedules = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = ListSchedulesDTO.create(req.params.id, req.query);
+      const result = await this.listSchedulesUseCase.execute(dto);
+
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${ScheduleController.name}:listSchedules`);
+    }
   };
 }

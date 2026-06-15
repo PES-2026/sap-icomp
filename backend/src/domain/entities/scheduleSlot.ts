@@ -1,36 +1,42 @@
 import { Result } from "@domain/shared/result";
+import { DurationVO } from "@domain/valueObjects/scheduleSlot/duration";
+import { ScheduleSlotStatusVO } from "@domain/valueObjects/scheduleSlot/scheduleSlotStatus";
 
 import { ScheduleSlotStatusEnum } from "../enum/scheduleSlotStatus";
-import { DateInput, DateVO } from "../valueObjects/shared/date";
+import { DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
 export type ScheduleSlotProps = {
-  id?: string;
-  scheduleId: string;
-  startDateTime: DateInput;
-  endDateTime: DateInput;
+  id?: string | undefined;
+  startDateTime: Date;
+  endDateTime: Date;
   status: ScheduleSlotStatusEnum;
-  attendanceId?: string | undefined;
+  attendanceTime: number;
+  pedagogueId: string;
+  scheduleId?: string | undefined;
 };
 
 export class ScheduleSlot {
   constructor(
     public readonly id: ExternalIdVO,
-    public readonly scheduleId: ExternalIdVO,
+    public readonly pedagogueId: ExternalIdVO,
     public startDateTime: DateVO,
     public endDateTime: DateVO,
-    public status: ScheduleSlotStatusEnum,
-    public attendanceId?: ExternalIdVO,
+    public attendanceTime: DurationVO,
+    public status: ScheduleSlotStatusVO,
+    public scheduleId?: ExternalIdVO,
   ) {}
 
   static create(props: ScheduleSlotProps): Result<ScheduleSlot> {
     const externalId = ExternalIdVO.create();
-    const scheduleId = ExternalIdVO.from(props.scheduleId);
+    const pedagogueId = ExternalIdVO.from(props.pedagogueId);
     const startDateTime = DateVO.create(props.startDateTime);
     const endDateTime = DateVO.create(props.endDateTime);
-    const attendanceId = props.attendanceId ? ExternalIdVO.from(props.attendanceId) : undefined;
+    const attendanceTime = DurationVO.create(props.attendanceTime);
+    const status = ScheduleSlotStatusVO.from(props.status);
+    const scheduleId = props.scheduleId ? ExternalIdVO.from(props.scheduleId) : undefined;
 
-    const results = [externalId, scheduleId, startDateTime, endDateTime, attendanceId];
+    const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime, scheduleId];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -41,11 +47,12 @@ export class ScheduleSlot {
     return Result.ok<ScheduleSlot>(
       new ScheduleSlot(
         externalId.getValue(),
-        scheduleId.getValue(),
+        pedagogueId.getValue(),
         startDateTime.getValue(),
         endDateTime.getValue(),
-        props.status,
-        attendanceId?.getValue() ?? undefined,
+        attendanceTime.getValue(),
+        status.getValue(),
+        scheduleId?.getValue() ?? undefined,
       ),
     );
   }
@@ -53,11 +60,12 @@ export class ScheduleSlot {
   static rehydrate(props: ScheduleSlotProps): ScheduleSlot {
     return new ScheduleSlot(
       ExternalIdVO.fromTrusted(props.id!),
-      ExternalIdVO.fromTrusted(props.scheduleId),
-      DateVO.fromTrusted(new Date(props.startDateTime as string | Date)),
-      DateVO.fromTrusted(new Date(props.endDateTime as string | Date)),
-      props.status,
-      props.attendanceId ? ExternalIdVO.fromTrusted(props.attendanceId) : undefined,
+      ExternalIdVO.fromTrusted(props.pedagogueId),
+      DateVO.fromTrusted(props.startDateTime),
+      DateVO.fromTrusted(props.endDateTime),
+      DurationVO.fromTrusted(props.attendanceTime),
+      ScheduleSlotStatusVO.fromTrusted(props.status),
+      props.scheduleId ? ExternalIdVO.fromTrusted(props.scheduleId) : undefined,
     );
   }
 }

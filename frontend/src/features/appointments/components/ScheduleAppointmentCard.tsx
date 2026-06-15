@@ -17,6 +17,7 @@ export default function ScheduleAppointmentCard() {
     register,
     control,
     handleSubmit,
+    reset,
     errors,
     slots,
     isLoadingSlots,
@@ -27,13 +28,6 @@ export default function ScheduleAppointmentCard() {
 
   const { coursesOptions } = useCoursesOptions();
   const { pedagogueOptions } = usePedagogueOptions();
-
-  const validDatesForPedagogue = [
-    "2026-06-15",
-    "2026-06-16",
-    "2026-06-25",
-    "2026-07-02",
-  ];
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md text-sm outline-none transition-colors font-sans text-stone-800";
@@ -166,12 +160,21 @@ export default function ScheduleAppointmentCard() {
                     onBlur={onBlur}
                     label="Data:"
                     error={error?.message}
-                    availableDates={validDatesForPedagogue}
                     required
                   />
                 )}
               />
             </div>
+          </div>
+
+          <div className="shrink-0">
+            <Field label="Motivo do agendamento (opcional):" error={errors.reason?.message}>
+              <textarea
+                placeholder="Descreva brevemente o motivo do atendimento (mínimo 15 caracteres)"
+                {...register("reason")}
+                className={`${getValidationClass(!!errors.reason)} min-h-24 resize-none`}
+              />
+            </Field>
           </div>
 
           {errors.slotId && (
@@ -228,6 +231,7 @@ export default function ScheduleAppointmentCard() {
           <CommonButton
             label="Cancelar"
             type="button"
+            onClick={() => reset()}
             className="w-full sm:w-auto justify-center bg-[#f4a598]  hover:bg-[#f0a195]"
           />
           <CommonButton

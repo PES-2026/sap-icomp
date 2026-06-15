@@ -6,11 +6,11 @@ import { useAuthStore } from "@/store/authStore";
 import { useSidebarStore } from "@/store/sidebarStore";
 import {
   CalendarClock,
-  CalendarFold,
+  Database,
+  FolderOpen,
   Home,
   PanelLeftClose,
   PanelLeftOpen,
-  Settings,
   UserCog,
   Users,
   X,
@@ -35,19 +35,19 @@ export default function Sidebar() {
           {
             label: "Alunos",
             icon: Users,
-            id: "Base de Alunos",
+            id: "Alunos",
             href: PATHS.students_list,
           },
           {
             label: "Atendimentos",
-            icon: CalendarFold,
-            id: "Envio",
+            icon: FolderOpen,
+            id: "Atendimentos",
             href: PATHS.attendances_list,
           },
           {
-            label: "Gestão de Agendamentos",
+            label: "Agendamentos",
             icon: CalendarClock,
-            id: "Agendamento",
+            id: "Agendamentos",
             href: PATHS.scheduling,
           },
           {
@@ -58,7 +58,7 @@ export default function Sidebar() {
           },
           {
             label: "Cadastros Gerais",
-            icon: Settings,
+            icon: Database,
             id: "Configuração",
             href: PATHS.visualize_settings,
           },
