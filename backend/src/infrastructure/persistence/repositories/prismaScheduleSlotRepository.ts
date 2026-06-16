@@ -301,6 +301,25 @@ export class PrismaScheduleSlotRepository implements IScheduleSlotRepository {
     return !!slot;
   }
 
+  async releaseSlotsByScheduleId(scheduleId: string): Promise<void> {
+    const schedule = await this.prisma.schedule.findUnique({
+      where: { externalId: scheduleId },
+      select: { internalId: true },
+    });
+
+    if (!schedule) return;
+
+    await this.prisma.scheduleSlot.updateMany({
+      where: {
+        scheduleId: schedule.internalId,
+      },
+      data: {
+        status: ScheduleSlotStatus.CREATED,
+        scheduleId: null,
+      },
+    });
+  }
+
   async updateStatusMany(ids: string[], status: string, scheduleId: string): Promise<void> {
     if (ids.length === 0) return;
 

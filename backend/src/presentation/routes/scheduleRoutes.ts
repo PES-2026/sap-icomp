@@ -34,6 +34,18 @@ export const scheduleRoutes = (controller: ScheduleController, tokenService: ITo
     controller.create,
   );
   routes.post("/schedule/request", scheduleRateLimiter, validateBody(RequestScheduleDTO), controller.request);
+
+  // Schedules (Appointments)
+  routes.get("/schedule", auth, controller.listSchedules);
+  routes.put("/schedule/:id/confirm", auth, controller.confirm);
+  routes.put("/schedule/:id/cancel", auth, controller.cancel);
+  routes.put("/schedule/:id/reschedule", auth, controller.reschedule);
+
+  // Schedules by Token (Student)
+  routes.put("/schedule/token/:token/cancel", controller.cancelByToken);
+  routes.put("/schedule/token/:token/reschedule", controller.rescheduleByToken);
+
+  // Availability (Slots)
   routes.get("/schedule/:id", validateParamsAndQuery(ListSchedulesDTO), auth, controller.listSchedules);
   routes.get("/schedule/availability/:id", validateParamsAndQuery(ListScheduleAvailabilityDTO), controller.list);
   routes.put("/schedule/availability/remove-many", validateBody(RemoveScheduleSlotsDTO), auth, controller.removeMany);

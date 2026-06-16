@@ -15,6 +15,7 @@ export interface IScheduleSlotRepository {
   remove(id: string): Promise<boolean>;
   removeMany(ids: string[]): Promise<number>;
   existsByUUID(id: string): Promise<boolean>;
+  releaseSlotsByScheduleId(scheduleId: string): Promise<void>;
   updateStatusMany(ids: string[], status: string, scheduleId: string): Promise<void>;
   updateStatusUnique(id: string, status: string, scheduleId: string): Promise<void>;
 }

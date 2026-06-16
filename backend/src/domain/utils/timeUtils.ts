@@ -25,3 +25,12 @@ export function parseExpirationToMs(expiration: string | number): number {
       return value * 1000;
   }
 }
+
+export function formatTime(date: Date): string {
+  return date.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "America/Manaus",
+  });
+}

@@ -1,6 +1,6 @@
-import { PedagogueScheduleEmailData } from "@domain/services/interfaces/pedagogueScheduleEmailData";
+import { CancelledPedagogueEmailData } from "@domain/services/interfaces/scheduleCancelledPedagogueData";
 
-export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData, dashboardLink: string): string {
+export function buildCancelledPedagogueTemplate(data: CancelledPedagogueEmailData): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -23,7 +23,7 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
             </div>
           </td>
           <td style="vertical-align:middle;">
-            <span style="font-size:18px;font-weight:bold;color:#1a1a1a;">SAP <span style="color:#4ecba4;">ICOMP</span></span><br/>
+            <span style="font-size:18px;font-weight:bold;color:#1a1a1a;">SAP<span style="color:#4ecba4;">ICOMP</span></span><br/>
             <span style="font-size:10px;color:#888888;letter-spacing:0.5px;text-transform:uppercase;">Serviço de Apoio Pedagógico</span>
           </td>
         </tr></table>
@@ -32,11 +32,11 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
       <!-- Card -->
       <tr><td style="background-color:#ffffff;border-radius:16px;border:1px solid #d8d4cc;">
 
-        <!-- Header escuro (diferencia do e-mail do aluno) -->
+        <!-- Header -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="background-color:#085041;padding:24px 28px;border-radius:16px 16px 0 0;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.8);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px;">Novo agendamento</div>
-            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Solicitação recebida em sua agenda</div>
+            <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.8);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px;">Agendamento cancelado</div>
+            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Um atendimento foi cancelado</div>
           </td></tr>
         </table>
 
@@ -48,8 +48,7 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
             <p style="margin:0 0 16px;font-size:15px;font-weight:bold;color:#1a1a1a;">${data.pedagogueName}</p>
 
             <p style="margin:0 0 20px;font-size:14px;color:#555555;line-height:1.7;">
-              Um novo agendamento foi solicitado para você no <strong style="color:#1a1a1a;">SAP IComp</strong>.
-              O horário está reservado e aguarda sua confirmação pelo sistema.
+              O aluno cancelou um agendamento que estava em sua agenda no <strong style="color:#1a1a1a;">SAP-IComp</strong>. O horário foi liberado automaticamente.
             </p>
 
             <!-- Dados do aluno -->
@@ -62,49 +61,35 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
                     <td style="color:#1a1a1a;font-weight:500;padding:5px 0;">${data.studentName}</td>
                   </tr>
                   <tr>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Matrícula</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.enrollment}</td>
+                  </tr>
+                  <tr>
                     <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Curso</td>
                     <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.course}</td>
                   </tr>
-                  <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">E-mail</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.email}</td>
-                  </tr>
                 </table>
               </td></tr>
             </table>
 
-            <!-- Schedule Details -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-              <tr><td style="background-color:#f7f5f0;border-radius:10px;border:1px solid #d8d4cc;padding:16px 18px;">
-                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Detalhes do agendamento</p>
+            <!-- Horário liberado -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr><td style="background-color:#fdf2f2;border-radius:10px;border:1px solid #f5c4b3;padding:16px 18px;">
+                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#c0392b;text-transform:uppercase;letter-spacing:0.5px;">Horário liberado</p>
                 <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
                   <tr>
                     <td style="color:#888888;padding:5px 0;width:44%;">Data</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;">${data.date}</td>
+                    <td style="color:#aaaaaa;padding:5px 0;text-decoration:line-through;">${data.date}</td>
                   </tr>
                   <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Horário</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.startTime} — ${data.endTime}</td>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #f5c4b3;">Horário</td>
+                    <td style="color:#aaaaaa;padding:5px 0;border-top:1px solid #f5c4b3;text-decoration:line-through;">${data.startTime} &#8212; ${data.endTime}</td>
                   </tr>
                   <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Duração</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.duration}</td>
-                  </tr>
-                  <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Motivo</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.reason}</td>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #f5c4b3;">Motivo</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #f5c4b3;">${data.reason}</td>
                   </tr>
                 </table>
-              </td></tr>
-            </table>
-
-            <!-- CTA -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-              <tr><td align="center">
-                <a href="${dashboardLink}"
-                   style="display:inline-block;background:#085041;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:11px 28px;border-radius:7px;">
-                  Acessar painel e confirmar
-                </a>
               </td></tr>
             </table>
 
@@ -112,7 +97,7 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr><td style="background-color:#f0f9f6;border:1px solid #a0ddc5;border-radius:8px;padding:11px 14px;">
                 <p style="margin:0;font-size:12px;color:#085041;line-height:1.6;">
-                  O horário está bloqueado e não aparecerá para outros alunos. Acesse o sistema para confirmar ou recusar o atendimento.
+                  O horário está novamente disponível na grade de agendamentos.
                 </p>
               </td></tr>
             </table>
@@ -120,23 +105,20 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData,
           </td></tr>
         </table>
 
-        <!-- Card's footer -->
+        <!-- Footer -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="border-top:1px solid #e8e4dc;padding:14px 28px;background-color:#faf9f6;border-radius:0 0 16px 16px;">
             <table width="100%" cellpadding="0" cellspacing="0"><tr>
               <td style="font-size:11px;color:#aaaaaa;">Instituto de Computação — UFAM</td>
-              <td align="right" style="font-size:12px;font-weight:bold;color:#4ecba4;">SAP <span style="color:#555555;">ICOMP</span></td>
+              <td align="right" style="font-size:12px;font-weight:bold;color:#4ecba4;">SAP<span style="color:#555555;">ICOMP</span></td>
             </tr></table>
           </td></tr>
         </table>
 
       </td></tr>
-
-      <!-- Footer -->
       <tr><td align="center" style="padding-top:16px;">
         <p style="margin:0;font-size:11px;color:#aaaaaa;">Este é um e-mail automático. Por favor, não responda.</p>
       </td></tr>
-
     </table>
   </td></tr>
 </table>

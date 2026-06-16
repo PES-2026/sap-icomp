@@ -1,11 +1,10 @@
-export interface PedagogueScheduleEmailData {
+export interface CancelledPedagogueEmailData {
   pedagogueName: string;
   studentName: string;
+  enrollment: string;
   course: string;
-  email: string;
   date: string;
   startTime: string;
   endTime: string;
-  duration: string;
   reason: string;
 }
