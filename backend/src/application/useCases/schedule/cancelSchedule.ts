@@ -5,6 +5,7 @@ import { ScheduleNotFoundError } from "@application/errors/schedule/scheduleNotF
 import { Schedule } from "@domain/entities/schedule";
 import { ScheduleStatusEnum } from "@domain/enum/scheduleStatus";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
+import { ScheduleResult } from "@domain/repositories/results/scheduleResult";
 import { IScheduleRepository } from "@domain/repositories/scheduleRepository";
 import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
@@ -33,38 +34,56 @@ export class CancelSchedule {
       return Result.fail(new PedagogueNotFoundError());
     }
 
+    const scheduleEntityValidation = this.generateScheduleEntity(scheduleResult, dto.reason);
+    if (scheduleEntityValidation.isFailure) {
+      return Result.fail(scheduleEntityValidation.error!);
+    }
+
+    const scheduleEntity = scheduleEntityValidation.getValue();
+
+    await this.scheduleRepository.update(scheduleEntity);
+    await this.scheduleSlotRepository.releaseSlotsByScheduleId(dto.id);
+
+    const studentName = scheduleResult.studentName ?? scheduleResult.guestName;
+    const studentEmail = scheduleResult.studentEmail ?? scheduleResult.guestEmail;
+
+    await this.sendStudentEmail(
+      studentEmail,
+      studentName,
+      pedagogue.name,
+      scheduleEntity.startDate.value,
+      scheduleEntity.endDate.value,
+      dto.reason,
+    );
+
+    return Result.ok();
+  }
+
+  private generateScheduleEntity(scheduleResult: ScheduleResult, reason?: string): Result<Schedule> {
     const schedule = Schedule.rehydrate({
       ...scheduleResult,
       status: ScheduleStatusEnum.CANCELED_BY_PEDAGOGUE,
-      reason: dto.reason || scheduleResult.reason,
+      reason: reason,
     });
 
-    await this.scheduleRepository.update(schedule);
-    await this.scheduleSlotRepository.releaseSlotsByScheduleId(dto.id);
+    return Result.ok(schedule);
+  }
 
-    // Email Data
-    let studentName = scheduleResult.guestName || "Estudante";
-    let studentEmail = scheduleResult.guestEmail;
-
-    if (scheduleResult.studentId) {
-      const student = await this.studentRepository.findByUUID(scheduleResult.studentId);
-      if (student) {
-        studentName = student.name;
-        studentEmail = student.email;
-      }
-    }
-
-    if (studentEmail) {
-      await this.emailService.sendScheduleCancelledStudentEmail(studentEmail, {
-        name: studentName,
-        pedagogue: pedagogue.name,
-        date: scheduleResult.startDate.toLocaleDateString("pt-BR"),
-        startTime: formatTime(scheduleResult.startDate),
-        endTime: formatTime(scheduleResult.endDate),
-        reason: dto.reason || "Não informado",
-      });
-    }
-
-    return Result.ok();
+  private async sendStudentEmail(
+    email: string,
+    name: string,
+    pedagogueName: string,
+    startDate: Date,
+    endDate: Date,
+    reason?: string,
+  ) {
+    await this.emailService.sendScheduleCancelledStudentEmail(email, {
+      name: name,
+      pedagogue: pedagogueName,
+      date: startDate.toLocaleDateString("pt-BR"),
+      startTime: formatTime(startDate),
+      endTime: formatTime(endDate),
+      reason: reason ?? "Não informado",
+    });
   }
 }

@@ -5,6 +5,7 @@ import { ScheduleNotFoundError } from "@application/errors/schedule/scheduleNotF
 import { Schedule } from "@domain/entities/schedule";
 import { ScheduleStatusEnum } from "@domain/enum/scheduleStatus";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
+import { ScheduleResult } from "@domain/repositories/results/scheduleResult";
 import { IScheduleRepository } from "@domain/repositories/scheduleRepository";
 import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
@@ -33,30 +34,21 @@ export class CancelScheduleByToken {
       return Result.fail(new PedagogueNotFoundError());
     }
 
-    const schedule = Schedule.rehydrate({
-      ...scheduleResult,
-      status: ScheduleStatusEnum.CANCELED_BY_STUDENT,
-      reason: dto.reason || scheduleResult.reason,
-    });
+    const scheduleEntityValidation = this.generateScheduleEntity(scheduleResult, dto.reason);
+    if (scheduleEntityValidation.isFailure) {
+      return Result.fail(scheduleEntityValidation.error!);
+    }
 
-    await this.scheduleRepository.update(schedule);
+    const scheduleEntity = scheduleEntityValidation.getValue();
+
+    await this.scheduleRepository.update(scheduleEntity);
     await this.scheduleSlotRepository.releaseSlotsByScheduleId(scheduleResult.id);
 
     // Email Data
-    let studentName = scheduleResult.guestName || "Estudante";
-    let studentEmail = scheduleResult.guestEmail;
-    let studentEnrollment = "Convidado";
-    let courseName = "Não informado";
-
-    if (scheduleResult.studentId) {
-      const student = await this.studentRepository.findByUUID(scheduleResult.studentId);
-      if (student) {
-        studentName = student.name;
-        studentEmail = student.email;
-        studentEnrollment = student.enrollmentId;
-        courseName = student.course.name;
-      }
-    }
+    const studentName = scheduleResult.studentName ?? scheduleResult.guestName;
+    const studentEmail = scheduleResult.studentEmail ?? scheduleResult.guestEmail;
+    const studentEnrollment = "Convidado";
+    const courseName = "Não informado ";
 
     const dateStr = scheduleResult.startDate.toLocaleDateString("pt-BR");
     const startTimeStr = formatTime(scheduleResult.startDate);
@@ -86,5 +78,15 @@ export class CancelScheduleByToken {
     });
 
     return Result.ok();
+  }
+
+  private generateScheduleEntity(scheduleResult: ScheduleResult, reason?: string): Result<Schedule> {
+    const schedule = Schedule.rehydrate({
+      ...scheduleResult,
+      status: ScheduleStatusEnum.CANCELED_BY_STUDENT,
+      reason: reason,
+    });
+
+    return Result.ok(schedule);
   }
 }
