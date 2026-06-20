@@ -48,10 +48,7 @@ export const scheduleManagementService = {
     return response.data;
   },
 
-  async confirm(
-    scheduleId: string,
-    pedagogueId: string,
-  ): Promise<ManagedSchedulingActionResult> {
+  async confirm(scheduleId: string): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
       `/schedule/${scheduleId}/confirm`,
       undefined,
@@ -65,7 +62,6 @@ export const scheduleManagementService = {
 
   async reject(
     scheduleId: string,
-    pedagogueId: string,
     justification: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
@@ -81,7 +77,6 @@ export const scheduleManagementService = {
 
   async cancel(
     scheduleId: string,
-    pedagogueId: string,
     justification: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
@@ -95,10 +90,7 @@ export const scheduleManagementService = {
     return response.data;
   },
 
-  async finish(
-    scheduleId: string,
-    pedagogueId: string,
-  ): Promise<ManagedSchedulingActionResult> {
+  async finish(scheduleId: string): Promise<ManagedSchedulingActionResult> {
     const response = await api.patch<ManagedSchedulingActionResult>(
       `/schedulings/appointments/${scheduleId}/finish`,
       undefined,
