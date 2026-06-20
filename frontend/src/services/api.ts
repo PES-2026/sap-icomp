@@ -17,8 +17,8 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// mudança opcional feita para o interceptors diferenciar os diferentes erros de status
-// Agora o frontend diferencia corretamente os status 40x.
+// An optional change made to the interceptors to distinguish between different status errors
+// Now the frontend correctly distinguishes between 40x statuses.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,8 +27,9 @@ api.interceptors.response.use(
       | { message?: string; code?: string; details?: unknown }
       | undefined;
 
-    // o status 403 representa uma autorização negada para um recurso específico e não
-    // invalida a sessão. assim somente 401 (senha incorreta) limpa o usuário autenticado.
+    // A 403 status code indicates that access to a specific resource has been denied
+    // and does not invalidate the session. Therefore, only a 401 (incorrect password) status
+    // error logs out the authenticated user.
     if (status === 401 && !error.config?.preserveSessionOn401) {
       useAuthStore.getState().clearUser();
     }
