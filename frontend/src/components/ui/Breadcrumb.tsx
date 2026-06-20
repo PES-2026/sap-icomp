@@ -18,6 +18,8 @@ const routeTranslations: Record<string, string> = {
   pending: "Pendentes",
   settings: "Configurações",
   scheduling: "Agendamentos",
+  reports: "Relatórios",
+  new: "Criar",
 };
 
 const isIdSegment = (segment: string) => {
