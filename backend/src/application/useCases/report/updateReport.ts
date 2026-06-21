@@ -1,27 +1,33 @@
 import { ApplicationError } from "@application/errors/applicationError";
-import { CreateReportDTO } from "@application/dtos/report/createReportDto";
+import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
 import { Report } from "@domain/entities/report";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
-import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
+import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
+import { ReportOwnershipError } from "@application/errors/report/ReportOwnershipError";
 import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
 import { ReportTransformerService } from "@domain/services/reportTransformerService";
 
 export class UpdateReport {
   constructor(private readonly reportRepository: IReportRepository) {}
 
-  async execute(
-    reportId: string,
-    dto: CreateReportDTO,
-  ): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
-    const reportData = await this.reportRepository.findById(reportId);
+  async execute(dto: UpdateReportDTO): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
+    const reportData = await this.reportRepository.findById(dto.reportId);
 
     if (!reportData) {
-      return Result.fail<GetReportByIdResponseDTO>(new StudentNotFoundError()); // Should be ReportNotFoundError
+      return Result.fail<GetReportByIdResponseDTO>(new ReportNotFoundError(dto.reportId));
+    }
+
+    if (reportData.student.externalId !== dto.studentId) {
+      return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("student"));
+    }
+
+    if (reportData.pedagogueId !== dto.pedagogueId) {
+      return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("pedagogue"));
     }
 
     const report = Report.rehydrate({
-      id: reportId,
+      id: reportData.id,
       studentId: reportData.student.externalId,
       pedagogueId: reportData.pedagogueId,
       ...reportData,
@@ -41,22 +47,6 @@ export class UpdateReport {
 
     await this.reportRepository.update(report);
 
-    const studentInformation = ReportTransformerService.transformStudentInformation(
-      reportData.student.name,
-      reportData.student.enrollmentId,
-      reportData.student.courseName,
-    );
-
-    return Result.ok<GetReportByIdResponseDTO>({
-      studentInformation,
-      pedagogueName: reportData.pedagogueName,
-      condition: report.condition.value,
-      potential: report.potential.value,
-      difficulties: report.difficulties.value,
-      recommendation: report.recommendation.value,
-      conclusion: report.conclusion.value,
-      createdAt: report.createdAt!,
-      updatedAt: report.updatedAt!,
-    });
+    return Result.ok();
   }
 }
