@@ -4,15 +4,20 @@ import { Result } from "@domain/shared/result";
 import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
 import { ReportTransformerService } from "@domain/services/reportTransformerService";
 import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
+import { RequiredFieldError } from "@domain/errors/requiredFieldError";
+import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
 
 export class GetReportById {
   constructor(private readonly reportRepository: IReportRepository) {}
 
-  async execute(reportId: string): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
+  async execute(reportId: any): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
+    if (!reportId || typeof reportId !== "string" || reportId.trim() === "") {
+      return Result.fail<GetReportByIdResponseDTO>(new RequiredFieldError("reportId"));
+    }
     const reportData = await this.reportRepository.findById(reportId);
 
     if (!reportData) {
-      return Result.fail<GetReportByIdResponseDTO>(new StudentNotFoundError());
+      return Result.fail<GetReportByIdResponseDTO>(new ReportNotFoundError(reportId));
     }
 
     const studentInformation = ReportTransformerService.transformStudentInformation(
