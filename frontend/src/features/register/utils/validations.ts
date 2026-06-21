@@ -19,8 +19,7 @@ export const registerSchema = z
       .trim()
       .nonempty({ message: "O número de registro é obrigatório." })
       .regex(/^\d+$/, "O número de registro deve conter apenas números.")
-      .min(7, "O número de registro deve ter no mínimo 7 dígitos.")
-      .max(10, "O número de registro deve ter no máximo 10 dígitos."),
+      .length(8, "O número de registro deve ter exatamente 8 dígitos."),
 
     phoneNumber: z
       .string()

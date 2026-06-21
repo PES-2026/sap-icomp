@@ -159,9 +159,10 @@ export default function RegisterForm() {
                   error={errors.registrationNumber?.message}
                   required
                 >
-                  <input
+                  <input  
                     type="text"
-                    placeholder="1234567"
+                    placeholder="12345678"
+                    maxLength={8}
                     {...register("registrationNumber")}
                     className={getValidationClass(!!errors.registrationNumber)}
                   />

@@ -13,11 +13,14 @@ const routeTranslations: Record<string, string> = {
   students: "Alunos",
   register: "Cadastrar",
   edit: "Editar",
-  attendance: "Atendimentos",
+  attendances: "Atendimentos",
+  attendance: "Atendimento",
   users: "Usuários",
   pending: "Pendentes",
   settings: "Configurações",
   scheduling: "Agendamentos",
+  appointment: "Agendamento",
+  profile: "Perfil",
 };
 
 const isIdSegment = (segment: string) => {
