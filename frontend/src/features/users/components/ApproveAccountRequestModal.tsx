@@ -17,16 +17,19 @@ const roleOptions: {
   value: UserRole;
   label: string;
   description: string;
+  isAvailable: boolean;
 }[] = [
   {
     value: "PROFESSOR",
     label: "Professor(a)",
     description: "Tem acesso aos relatórios dos alunos vinculados a ele.",
+    isAvailable: false,
   },
   {
     value: "PEDAGOGUE",
     label: "Pedagogo(a)",
     description: "Tem acesso às funcionalidades de administrador do sistema.",
+    isAvailable: true,
   },
 ];
 
@@ -36,7 +39,7 @@ export default function ApproveAccountRequestModal({
   onClose,
   onConfirm,
 }: ApproveAccountRequestModalProps) {
-  const [selectedRole, setSelectedRole] = useState<UserRole>("PROFESSOR");
+  const [selectedRole, setSelectedRole] = useState<UserRole>("PEDAGOGUE");
 
   const handleClose = () => {
     if (!isLoading) {
@@ -46,7 +49,7 @@ export default function ApproveAccountRequestModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 transition-opacity"
       onClick={handleClose}
     >
       <section
@@ -74,22 +77,28 @@ export default function ApproveAccountRequestModal({
 
             {roleOptions.map((option) => {
               const isSelected = selectedRole === option.value;
+              const isDisabled = !option.isAvailable || isLoading;
 
               return (
                 <label
                   key={option.value}
-                  className={`group relative flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-offset-2 ${
+                  className={`group relative flex items-center justify-between rounded-xl border p-4 transition-all focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-offset-2 ${
                     isSelected
                       ? "border-teal-500 bg-teal-50/50 ring-1 ring-teal-500"
-                      : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
-                  } ${isLoading ? "cursor-not-allowed opacity-60" : ""}`}
+                      : isDisabled
+                        ? "border-stone-200 bg-stone-50"
+                        : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
+                  } ${isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                 >
                   <input
                     type="radio"
                     name="approval-role"
                     value={option.value}
                     checked={isSelected}
-                    onChange={() => setSelectedRole(option.value)}
+                    disabled={isDisabled}
+                    onChange={() => {
+                      if (!isDisabled) setSelectedRole(option.value);
+                    }}
                     className="sr-only"
                   />
 
@@ -133,7 +142,7 @@ export default function ApproveAccountRequestModal({
             label="Cancelar"
             onClick={handleClose}
             disabled={isLoading}
-            className="w-full justify-center bg-[#f4a598] text-white hover:bg-[#f0a195] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[120px]"
+            className="w-full justify-center bg-[#f4a598] text-white hover:bg-[#f0a195] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-30"
           />
 
           <CommonButton
@@ -142,7 +151,7 @@ export default function ApproveAccountRequestModal({
             startIcon={isLoading ? Loader2 : undefined}
             onClick={() => onConfirm(selectedRole)}
             disabled={isLoading}
-            className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[160px] [&_svg]:animate-spin"
+            className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-40 [&_svg]:animate-spin"
           />
         </div>
       </section>

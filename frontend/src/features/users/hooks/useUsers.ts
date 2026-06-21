@@ -53,5 +53,27 @@ export const useUsers = (
     [fetchUsers],
   );
 
-  return { users, totalItems, totalPages, isLoading, fetchUsers, removeUser };
+  const activateUser = useCallback(
+    async (id: string) => {
+      try {
+        await userService.activate(id);
+        toast.success("Usuário ativado com sucesso.");
+        fetchUsers();
+      } catch (error) {
+        console.error("Error activating user:", error);
+        toast.error("Não foi possível ativar o usuário.");
+      }
+    },
+    [fetchUsers],
+  );
+
+  return {
+    users,
+    totalItems,
+    totalPages,
+    isLoading,
+    fetchUsers,
+    removeUser,
+    activateUser,
+  };
 };
