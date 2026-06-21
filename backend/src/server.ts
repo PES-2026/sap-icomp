@@ -90,11 +90,13 @@ import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
 import { ReportController } from "@presentation/controllers/reportController";
-import { reportRoutes } from "@presentation/routes/reportRoutes";
-
-// ... (existing imports, keep existing)
 import { userRoutes } from "@presentation/routes/userRoutes";
-import { reportRoutes } from "@presentation/routes/reportRoutes"; // ADD THIS
+import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
+import { reportRoutes } from "@presentation/routes/reportRoutes";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { UpdateReport } from "@application/useCases/report/updateReport";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -180,16 +182,6 @@ const userController = new UserController(
 
 app.use(userRoutes(userController));
 
-const reportRepository = new PrismaReportRepository(prisma);
-const reportController = new ReportController(
-  new GetReportInitialData(studentRepository),
-  new CreateReport(reportRepository, attendanceRepository),
-  new UpdateReport(reportRepository),
-  new ListReportsByStudent(reportRepository),
-  new GetReportById(reportRepository),
-);
-app.use(reportRoutes(reportController, tokenService));
-
 const tokenService = new JwtTokenService();
 const emailService = new EmailService();
 const passwordResetRepository = new PrismaPasswordResetRepository();
@@ -235,6 +227,16 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const reportRepository = new PrismaReportRepository(prisma);
+const reportController = new ReportController(
+  new GetReportInitialData(studentRepository),
+  new CreateReport(reportRepository, attendanceRepository),
+  new UpdateReport(reportRepository),
+  new ListReportsByStudent(reportRepository),
+  new GetReportById(reportRepository),
+);
+app.use(reportRoutes(reportController));
 
 const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 

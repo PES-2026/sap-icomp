@@ -4,38 +4,18 @@ import { ReportController } from "../controllers/reportController";
 import { authMiddleware } from "../middlewares/auth";
 import { ITokenService } from "@domain/services/tokenService";
 
-export function reportRoutes(controller: ReportController, tokenService: ITokenService): Router {
+export function reportRoutes(controller: ReportController): Router {
   const router = Router();
 
-  router.get(
-    "/students/:studentId/reports/new",
-    (req, res, next) => authMiddleware(tokenService, req, res, next),
-    controller.getInitialData,
-  );
+  router.get("/pedagogue/students/:studentId/reports/new", controller.getInitialData);
 
-  router.post(
-    "/students/:studentId/reports/new",
-    (req, res, next) => authMiddleware(tokenService, req, res, next),
-    controller.create,
-  );
+  router.post("/pedagogue/students/:studentId/reports/new", controller.create);
 
-  router.get(
-    "/students/:studentId/reports/:reportId",
-    (req, res, next) => authMiddleware(tokenService, req, res, next),
-    controller.getById,
-  );
+  router.get("/pedagogue/students/:studentId/reports/:reportId", controller.getById);
 
-  router.get(
-    "/students/:studentId/reports",
-    (req, res, next) => authMiddleware(tokenService, req, res, next),
-    controller.listByStudent,
-  );
+  router.get("/pedagogue/students/:studentId/reports", controller.listByStudent);
 
-  router.post(
-    "/students/:studentId/reports/:reportId/edit",
-    (req, res, next) => authMiddleware(tokenService, req, res, next),
-    controller.edit,
-  );
+  router.post("/pedagogue/students/:studentId/reports/:reportId/edit", controller.edit);
 
   return router;
 }
