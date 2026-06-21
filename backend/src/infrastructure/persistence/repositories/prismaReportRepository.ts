@@ -2,6 +2,7 @@ import { Report } from "@domain/entities/report";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { PrismaClient } from "@prisma/src/infrastructure/database/generated/client";
 import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
+import { ListReportItemDTO } from "@application/dtos/report/listReportDto";
 
 export class PrismaReportRepository implements IReportRepository {
   constructor(private prisma: PrismaClient) {}
