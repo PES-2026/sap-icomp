@@ -3,7 +3,6 @@ import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
 import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
 import { ReportTransformerService } from "@domain/services/reportTransformerService";
-import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
 

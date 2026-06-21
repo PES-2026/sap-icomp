@@ -6,7 +6,6 @@ import { Result } from "@domain/shared/result";
 import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
 import { ReportOwnershipError } from "@application/errors/report/ReportOwnershipError";
 import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
-import { ReportTransformerService } from "@domain/services/reportTransformerService";
 
 export class UpdateReport {
   constructor(private readonly reportRepository: IReportRepository) {}
