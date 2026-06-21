@@ -186,7 +186,7 @@ export default function StudentForm({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-3.5 mb-3.5">
-                <Field label="Email:" error={errors.email} required>
+                <Field label="E-mail:" error={errors.email} required>
                   <input
                     type="email"
                     placeholder="Insira o e-mail do aluno"
