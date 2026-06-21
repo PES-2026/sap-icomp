@@ -1,5 +1,6 @@
 import { Professor } from "@domain/entities/professor";
 import { RoleEnum } from "@domain/enum/role";
+import { UserStatusEnum } from "@domain/enum/userStatus";
 import { UserFilters } from "@domain/repositories/filters/userFilters";
 import { IProfessorRepository } from "@domain/repositories/professorRepository";
 import { UserAuthResult } from "@domain/repositories/results/userAuthResult";
@@ -13,9 +14,7 @@ export class PrismaProfessorRepository implements IProfessorRepository {
   async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<UserResult>> {
     const skip = (page - 1) * limit;
 
-    const where: Prisma.ProfessorWhereInput = {
-      removed: false,
-    };
+    const where: Prisma.ProfessorWhereInput = {};
 
     if (filters.name) {
       where.name = { contains: filters.name, mode: "insensitive" };
@@ -190,7 +189,17 @@ export class PrismaProfessorRepository implements IProfessorRepository {
       where: { externalId: id },
       data: {
         removed: true,
-        userStatus: "DISABLED",
+        userStatus: UserStatusEnum.DISABLED,
+      },
+    });
+  }
+
+  async activate(id: string): Promise<void> {
+    await this.prisma.professor.update({
+      where: { externalId: id },
+      data: {
+        removed: false,
+        userStatus: UserStatusEnum.ENABLED,
       },
     });
   }

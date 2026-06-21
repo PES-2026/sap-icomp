@@ -21,7 +21,8 @@ export const useManagedSchedulings = (page: number, limit: number) => {
   const userId = useAuthStore((state) => state.user?.id);
   const [schedulings, setSchedulings] = useState<ScheduleItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFiltersInternal] = useState<ListScheduleFilters>(defaultFilters);
+  const [filters, setFiltersInternal] =
+    useState<ListScheduleFilters>(defaultFilters);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -66,11 +67,7 @@ export const useManagedSchedulings = (page: number, limit: number) => {
 
     try {
       setProcessingId(id);
-      const result = await scheduleManagementService.cancel(
-        id,
-        userId,
-        justification,
-      );
+      const result = await scheduleManagementService.cancel(id, justification);
       await loadSchedulings();
       return result;
     } finally {
@@ -83,7 +80,7 @@ export const useManagedSchedulings = (page: number, limit: number) => {
 
     try {
       setProcessingId(id);
-      const result = await scheduleManagementService.finish(id, userId);
+      const result = await scheduleManagementService.finish(id);
       await loadSchedulings();
       return result;
     } finally {
