@@ -17,19 +17,14 @@ export class CreateReport {
     pedagogueId: string,
     dto: CreateReportDTO,
   ): Promise<Result<Report, ApplicationError>> {
-    // Validate that student has at least one realized attendance
     const attendances = await this.attendanceRepository.findByStudentId({
       page: 1,
       limit: 1,
       studentId,
     });
 
-    // Assuming "REALIZED" status check as per requirements. 
-    // Since existing project uses PENDING/CREATED/BOOKED in enum, 
-    // I will check if any attendance exists. 
-    // If specific status 'REALIZED' is needed, it should be in AttendanceStatusEnum.
-    const hasRealizedAttendance = attendances.items.length > 0; 
-    
+    const hasRealizedAttendance = attendances.items.length > 0;
+
     if (!hasRealizedAttendance) {
       return Result.fail<Report>(new NoAttendanceRealizedError());
     }
