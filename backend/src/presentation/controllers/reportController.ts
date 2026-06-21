@@ -6,6 +6,7 @@ import { UpdateReport } from "@application/useCases/report/updateReport";
 import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
 import { GetReportById } from "@application/useCases/report/getReportById";
 import { CreateReportDTO } from "@application/dtos/report/createReportDto";
+import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
 import { BaseController } from "./baseController";
 
 export class ReportController extends BaseController {
@@ -33,24 +34,9 @@ export class ReportController extends BaseController {
   create = async (req: Request, res: Response): Promise<void> => {
     try {
       const { studentId } = req.params;
-      const pedagogueId = req.userId;
+      const dtoResult = CreateReportDTO.create(studentId, req.body);
 
-      if (!pedagogueId) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-
-      const dtoResult = CreateReportDTO.create(req.body);
-      if (dtoResult.isFailure) {
-        this.clientError(res, dtoResult.error?.message);
-        return;
-      }
-
-      const result = await this.createReportUseCase.execute(
-        studentId,
-        pedagogueId,
-        dtoResult.getValue(),
-      );
+      const result = await this.createReportUseCase.execute(dtoResult.getValue());
 
       this.handleResult(res, result, 201);
     } catch (error) {
@@ -60,18 +46,11 @@ export class ReportController extends BaseController {
 
   edit = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { reportId } = req.params;
+      const { studentId, reportId } = req.params;
 
-      const dtoResult = CreateReportDTO.create(req.body);
-      if (dtoResult.isFailure) {
-        this.clientError(res, dtoResult.error?.message);
-        return;
-      }
+      const dtoResult = UpdateReportDTO.create(studentId, reportId, req.body);
 
-      const result = await this.updateReportUseCase.execute(
-        reportId,
-        dtoResult.getValue(),
-      );
+      const result = await this.updateReportUseCase.execute(dtoResult.getValue());
 
       this.handleResult(res, result);
     } catch (error) {

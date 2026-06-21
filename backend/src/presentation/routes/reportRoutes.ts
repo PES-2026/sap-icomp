@@ -1,8 +1,6 @@
 import { Router } from "express";
 
 import { ReportController } from "../controllers/reportController";
-import { authMiddleware } from "../middlewares/auth";
-import { ITokenService } from "@domain/services/tokenService";
 
 export function reportRoutes(controller: ReportController): Router {
   const router = Router();
