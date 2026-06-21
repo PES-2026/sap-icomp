@@ -88,7 +88,13 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ReportController } from "@presentation/controllers/reportController";
+import { reportRoutes } from "@presentation/routes/reportRoutes";
+
+// ... (existing imports, keep existing)
 import { userRoutes } from "@presentation/routes/userRoutes";
+import { reportRoutes } from "@presentation/routes/reportRoutes"; // ADD THIS
 
 const app = express();
 app.set("trust proxy", 1);
@@ -173,6 +179,16 @@ const userController = new UserController(
 );
 
 app.use(userRoutes(userController));
+
+const reportRepository = new PrismaReportRepository(prisma);
+const reportController = new ReportController(
+  new GetReportInitialData(studentRepository),
+  new CreateReport(reportRepository, attendanceRepository),
+  new UpdateReport(reportRepository),
+  new ListReportsByStudent(reportRepository),
+  new GetReportById(reportRepository),
+);
+app.use(reportRoutes(reportController, tokenService));
 
 const tokenService = new JwtTokenService();
 const emailService = new EmailService();
