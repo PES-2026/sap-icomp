@@ -1,6 +1,16 @@
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { Result } from "@domain/shared/result";
 
+export interface CreateReportResponseDTO {
+  id: string;
+  studentId: string;
+  pedagogueId: string;
+  condition: string;
+  potential: string;
+  difficulties: string;
+  recommendation: string;
+  conclusion: string;
+}
 export class CreateReportDTO {
   constructor(
     public readonly studentId: string,

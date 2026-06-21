@@ -12,7 +12,7 @@ export class UpdateReport {
   constructor(private readonly reportRepository: IReportRepository) {}
 
   async execute(dto: UpdateReportDTO): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
-    const reportData = await this.reportRepository.findById(dto.reportId);
+    const reportData = await this.reportRepository.findByIdWithDetails(dto.reportId);
 
     if (!reportData) {
       return Result.fail<GetReportByIdResponseDTO>(new ReportNotFoundError(dto.reportId));
@@ -22,14 +22,14 @@ export class UpdateReport {
       return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("student"));
     }
 
-    if (reportData.pedagogueId !== dto.pedagogueId) {
+    if (reportData.pedagogue.externalId !== dto.pedagogueId) {
       return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("pedagogue"));
     }
 
     const report = Report.rehydrate({
-      id: reportData.id,
+      id: reportData.reportExternalId,
       studentId: reportData.student.externalId,
-      pedagogueId: reportData.pedagogueId,
+      pedagogueId: reportData.pedagogue.externalId,
       ...reportData,
     });
 

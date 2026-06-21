@@ -83,4 +83,46 @@ export class PrismaReportRepository implements IReportRepository {
       updatedAt: report.updatedAt,
     };
   }
+  async findByIdWithDetails(id: string): Promise<any | null> {
+    const report = await this.prisma.report.findUnique({
+      where: { externalId: id },
+      include: {
+        student: {
+          include: {
+            course: true,
+          },
+        },
+        pedagogue: true,
+      },
+    });
+
+    if (!report) {
+      return null;
+    }
+
+    return {
+      reportExternalId: report.externalId,
+
+      student: {
+        externalId: report.student.externalId,
+        name: report.student.name,
+        enrollmentId: report.student.enrollmentId,
+        courseName: report.student.course.name,
+      },
+
+      pedagogue: {
+        externalId: report.pedagogue.externalId,
+        name: report.pedagogue.name,
+      },
+
+      condition: report.condition,
+      potential: report.potential,
+      difficulties: report.difficulties,
+      recommendation: report.recommendation,
+      conclusion: report.conclusion,
+
+      createdAt: report.createdAt,
+      updatedAt: report.updatedAt,
+    };
+  }
 }
