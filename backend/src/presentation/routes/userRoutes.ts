@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import { ActivateUserDTO } from "@application/dtos/user/activateUserDto";
 import { ListUsersDTO } from "@application/dtos/user/listUsersDto";
 import { RemoveUserDTO } from "@application/dtos/user/removeUserDto";
 import { UpdateUserDTO } from "@application/dtos/user/updateUserDto";
@@ -24,6 +25,7 @@ export function userRoutes(controller: UserController): Router {
   );
   router.get("/users/:id", validateParams(UserByIdDTO), controller.getById);
   router.post("/users/:id/remove", validateParams(RemoveUserDTO), controller.remove);
+  router.post("/users/:id/activate", validateParams(ActivateUserDTO), controller.activate);
 
   return router;
 }

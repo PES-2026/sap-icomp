@@ -44,6 +44,7 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { ActivateUser } from "@application/useCases/user/activateUser";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { GetUserById } from "@application/useCases/user/getUserById";
@@ -170,6 +171,7 @@ const userController = new UserController(
   new UpdateUserPassword(pedagogueRepository, professorRepository, hashService),
   new GetUserById(pedagogueRepository, professorRepository),
   new RemoveUser(pedagogueRepository, professorRepository),
+  new ActivateUser(pedagogueRepository, professorRepository),
 );
 
 app.use(userRoutes(userController));

@@ -12,12 +12,6 @@ export class ListUsers {
   ) {}
 
   async execute(dto: ListUsersDTO): Promise<Result<PaginatedResult<UserResult>>> {
-    // To provide true global pagination across two tables without a base table,
-    // we fetch matching records from both. For performance at small-medium scales,
-    // we can merge and paginate in memory.
-
-    // Fetch a large limit or use a dedicated method for all filtered users if needed.
-    // For now, we'll fetch with a very large limit to ensure we get all matches for merging.
     const MAX_ITEMS = 10000;
 
     const [pedagoguesResult, professorsResult] = await Promise.all([
@@ -27,7 +21,6 @@ export class ListUsers {
 
     const allUsers: UserResult[] = [...pedagoguesResult.items, ...professorsResult.items];
 
-    // Sort by name as a default
     allUsers.sort((a, b) => a.name.localeCompare(b.name));
 
     const totalItems = allUsers.length;
