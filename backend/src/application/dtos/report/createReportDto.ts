@@ -3,6 +3,8 @@ import { Result } from "@domain/shared/result";
 
 export class CreateReportDTO {
   constructor(
+    public readonly studentId: string,
+    public readonly pedagogueId: string,
     public readonly condition: string,
     public readonly potential: string,
     public readonly difficulties: string,
@@ -10,9 +12,14 @@ export class CreateReportDTO {
     public readonly conclusion: string,
   ) {}
 
-  static create(data: any): Result<CreateReportDTO, RequiredFieldError> {
-    const { condition, potential, difficulties, recommendation, conclusion } = data;
-
+  static create(studentId: any, data: any): Result<CreateReportDTO, RequiredFieldError> {
+    const { pedagogueId, condition, potential, difficulties, recommendation, conclusion } = data;
+    if (!studentId || typeof studentId !== "string" || studentId.trim() === "") {
+      return Result.fail<CreateReportDTO>(new RequiredFieldError("studentId"));
+    }
+    if (!pedagogueId || typeof pedagogueId !== "string" || pedagogueId.trim() === "") {
+      return Result.fail<CreateReportDTO>(new RequiredFieldError("pedagogueId"));
+    }
     if (!condition || typeof condition !== "string" || condition.trim() === "") {
       return Result.fail<CreateReportDTO>(new RequiredFieldError("condition"));
     }
@@ -23,14 +30,14 @@ export class CreateReportDTO {
       return Result.fail<CreateReportDTO>(new RequiredFieldError("difficulties"));
     }
     if (!recommendation || typeof recommendation !== "string" || recommendation.trim() === "") {
-      return Result.fail<RequiredFieldError>(new RequiredFieldError("recommendation"));
+      return Result.fail<CreateReportDTO>(new RequiredFieldError("recommendation"));
     }
     if (!conclusion || typeof conclusion !== "string" || conclusion.trim() === "") {
-      return Result.fail<RequiredFieldError>(new RequiredFieldError("conclusion"));
+      return Result.fail<CreateReportDTO>(new RequiredFieldError("conclusion"));
     }
 
     return Result.ok<CreateReportDTO>(
-      new CreateReportDTO(condition, potential, difficulties, recommendation, conclusion),
+      new CreateReportDTO(studentId, pedagogueId, condition, potential, difficulties, recommendation, conclusion),
     );
   }
 }

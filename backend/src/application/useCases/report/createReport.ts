@@ -12,15 +12,11 @@ export class CreateReport {
     private readonly attendanceRepository: IAttendanceRepository,
   ) {}
 
-  async execute(
-    studentId: string,
-    pedagogueId: string,
-    dto: CreateReportDTO,
-  ): Promise<Result<Report, ApplicationError>> {
+  async execute(dto: CreateReportDTO): Promise<Result<Report, ApplicationError>> {
     const attendances = await this.attendanceRepository.findByStudentId({
       page: 1,
       limit: 1,
-      studentId,
+      studentId: dto.studentId,
     });
 
     const hasRealizedAttendance = attendances.items.length > 0;
@@ -30,8 +26,6 @@ export class CreateReport {
     }
 
     const reportResult = Report.create({
-      studentId,
-      pedagogueId,
       ...dto,
     });
 
