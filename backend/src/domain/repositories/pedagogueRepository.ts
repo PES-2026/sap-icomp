@@ -18,4 +18,5 @@ export interface IPedagogueRepository {
   existsByEmail(email: string): Promise<boolean>;
   existsByRegistrationNumber(registrationNumber: string): Promise<boolean>;
   remove(id: string): Promise<void>;
+  activate(id: string): Promise<void>;
 }
