@@ -217,9 +217,11 @@ model Report {
   studentId   Int
   pedagogueId Int
 
-  condition      String?
-  recommendation String?
-  conclusion     String?
+  condition      String
+  potential      String
+  difficulties   String
+  recommendation String
+  conclusion     String
   status         String?
 
   createdAt DateTime @default(now())
