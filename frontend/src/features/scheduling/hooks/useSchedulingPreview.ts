@@ -139,6 +139,40 @@ export const useSchedulingPreview = () => {
     });
   };
 
+  const getAllSlots = () =>
+    days.flatMap((day) =>
+      day.slots.map((slot) => ({ ...slot, dayDate: day.date })),
+    );
+
+  const toggleAllDaySlots = (daySlotIds: string[], isEnablingAll: boolean) => {
+    setDisabledSlotIds((current) => {
+      const next = new Set(current);
+      const allSlots = getAllSlots();
+
+      daySlotIds.forEach((slotId) => {
+        const slot = allSlots.find((s) => getSlotId(s) === slotId);
+
+        if (!slot) return;
+
+        if (isEnablingAll) {
+          if (slot.status === "AVAILABLE") {
+            next.add(slotId);
+          } else if (slot.status === "CREATED") {
+            next.delete(slotId);
+          }
+        } else {
+          if (slot.status === "AVAILABLE") {
+            next.delete(slotId);
+          } else if (slot.status === "CREATED") {
+            next.add(slotId);
+          }
+        }
+      });
+
+      return next;
+    });
+  };
+
   const isSlotGreen = (slot: SchedulingSlot, dayDate: string) => {
     const slotId = getSlotId({ ...slot, dayDate });
     const isToggled = disabledSlotIds.has(slotId);
@@ -203,7 +237,6 @@ export const useSchedulingPreview = () => {
 
     const activeSlots = getActiveSlots();
 
-    // Identifica os IDs para remoção (apenas os que já existem/CREATED e foram desmarcados)
     const idsToRemove: string[] = [];
     days.forEach((day) => {
       day.slots.forEach((slot) => {
@@ -218,7 +251,7 @@ export const useSchedulingPreview = () => {
     });
 
     const createPayload: SchedulingSavePayload = activeSlots
-      .filter((slot) => slot.status === "AVAILABLE") // Somente os novos que foram marcados
+      .filter((slot) => slot.status === "AVAILABLE")
       .map((slot) => ({
         date: slot.dayDate.slice(0, 10),
         weekday: slot.weekday,
@@ -270,7 +303,6 @@ export const useSchedulingPreview = () => {
 
       setIsConfirmOpen(false);
 
-      // Re-fetch preview to sync statuses and IDs
       const currentFormData = form.getValues();
       await generatePreview(currentFormData);
     } catch (error: unknown) {
@@ -279,11 +311,6 @@ export const useSchedulingPreview = () => {
       setIsSaving(false);
     }
   };
-
-  const getAllSlots = () =>
-    days.flatMap((day) =>
-      day.slots.map((slot) => ({ ...slot, dayDate: day.date })),
-    );
 
   const activeSlotsCount = getActiveSlots().length;
 
@@ -327,6 +354,7 @@ export const useSchedulingPreview = () => {
     clearPreview,
     invalidatePreview,
     toggleSlot,
+    toggleAllDaySlots,
     confirmPreview,
     cancelSaveConfirmation,
     saveScheduling,

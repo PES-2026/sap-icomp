@@ -38,10 +38,10 @@ export default function ScheduleAppointmentCard() {
       : `${baseInputClass} bg-white border-stone-300 hover:border-stone-400 focus:border-teal-400 placeholder:text-stone-400`;
 
   return (
-    <div className="flex flex-col w-full h-full font-sans bg-[#f5f0e8] p-4 sm:p-7">
+    <div className="flex flex-col w-full h-full min-w-[320px] font-sans bg-[#f5f0e8] p-4 sm:p-7">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col flex-1 h-full max-h-full overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+        className="flex flex-col flex-1 h-full max-h-full min-w-0 overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
       >
         <div className="shrink-0 px-4 pt-5 pb-3 sm:px-7 sm:pt-7 sm:pb-4">
           <h1 className="m-0 text-xl sm:text-2xl text-center sm:text-left font-bold text-stone-800">
@@ -219,7 +219,7 @@ export default function ScheduleAppointmentCard() {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {slots.map((slot) => (
                     <AppointmentSlot
                       key={slot.id}

@@ -33,6 +33,7 @@ export default function SchedulingForm() {
     clearPreview,
     invalidatePreview,
     toggleSlot,
+    toggleAllDaySlots, // <-- Extraído do hook
     confirmPreview,
     cancelSaveConfirmation,
     saveScheduling,
@@ -167,7 +168,7 @@ export default function SchedulingForm() {
                   </div>
                 </Field>
 
-                <Field 
+                <Field
                   label="Pausa entre atendimentos:"
                   error={errors.breakTime?.message}
                 >
@@ -219,6 +220,7 @@ export default function SchedulingForm() {
                 hasGeneratedPreview={hasGeneratedPreview}
                 disabledSlotIds={disabledSlotIds}
                 onToggleSlot={toggleSlot}
+                onToggleAllDaySlots={toggleAllDaySlots} // <-- Repassado para a lista
               />
             </div>
           </div>
@@ -235,9 +237,7 @@ export default function SchedulingForm() {
               label={isSaving ? "Salvando..." : "Confirmar Registro"}
               type="button"
               onClick={confirmPreview}
-              disabled={
-                !hasGeneratedPreview || !hasChanges || isSaving
-              }
+              disabled={!hasGeneratedPreview || !hasChanges || isSaving}
               className="w-full sm:w-auto justify-center"
             />
           </div>
@@ -247,9 +247,13 @@ export default function SchedulingForm() {
           open={isConfirmOpen}
           title="Salvar agenda"
           message={`Deseja salvar as alterações na agenda? ${
-            activeSlotsCount > 0 ? `${activeSlotsCount} horários serão mantidos/criados.` : ""
+            activeSlotsCount > 0
+              ? `${activeSlotsCount} horários serão mantidos/criados.`
+              : ""
           } ${
-            removedSlotsCount > 0 ? `${removedSlotsCount} horários serão removidos.` : ""
+            removedSlotsCount > 0
+              ? `${removedSlotsCount} horários serão removidos.`
+              : ""
           }`}
           confirmLabel={isSaving ? "Salvando..." : "Confirmar"}
           onConfirm={isSaving ? () => undefined : saveScheduling}
