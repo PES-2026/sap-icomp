@@ -219,22 +219,19 @@ export default function ReportForm({ mode }: ReportFormProps) {
 
           <div className="custom-scroll flex-1 space-y-7 overflow-y-auto px-6 py-5 md:px-8">
             <section className="space-y-5">
-              <h2 className="text-base font-bold text-stone-800">
-                Parecer Técnico
-              </h2>
               <Controller
                 name="condition"
                 control={control}
                 render={({ field }) => (
                   <Field
-                    label="Condição do estudante"
+                    label="Deficiência/Condição"
                     error={errors.condition?.message}
                     required
                   >
                     <LexicalReportEditor
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="Descreva a condição do estudante"
+                      placeholder="Descreva a deficiência ou condição do estudante"
                       hasError={Boolean(errors.condition)}
                     />
                   </Field>
@@ -283,14 +280,14 @@ export default function ReportForm({ mode }: ReportFormProps) {
               control={control}
               render={({ field }) => (
                 <Field
-                  label="Intervenções Estratégicas"
+                  label="Recomendações metodológicas"
                   error={errors.recommendation?.message}
                   required
                 >
                   <LexicalReportEditor
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Insira as intervenções estratégicas"
+                    placeholder="Insira as recomendações metodológicas"
                     hasError={Boolean(errors.recommendation)}
                   />
                 </Field>
@@ -302,14 +299,14 @@ export default function ReportForm({ mode }: ReportFormProps) {
               control={control}
               render={({ field }) => (
                 <Field
-                  label="Orientações aos Docentes"
+                  label="Considerações finais"
                   error={errors.conclusion?.message}
                   required
                 >
                   <LexicalReportEditor
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Insira as orientações aos docentes"
+                    placeholder="Insira as considerações finais"
                     hasError={Boolean(errors.conclusion)}
                   />
                 </Field>

@@ -9,10 +9,10 @@ export const reportSchema = z.object({
   potential: requiredReportContent("As potencialidades são obrigatórias"),
   difficulties: requiredReportContent("As dificuldades são obrigatórias"),
   recommendation: requiredReportContent(
-    "As intervenções estratégicas são obrigatórias",
+    "As recomendações metodológicas são obrigatórias",
   ),
   conclusion: requiredReportContent(
-    "As orientações aos docentes são obrigatórias",
+    "As considerações finais são obrigatórias",
   ),
 });
 

@@ -12,6 +12,7 @@ export interface ReportDetailsResponse extends ReportContent {
   externalId?: string;
   studentInformation: string;
   pedagogueName: string;
+  pedagogueRegistrationNumber?: string;
   createdAt: string;
   updatedAt: string;
   version?: number;

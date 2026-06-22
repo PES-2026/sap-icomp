@@ -163,6 +163,7 @@ export const reportMockService = {
         `${student.name} · ${student.enrollmentId} · ${student.course?.name ?? "Curso não informado"}`,
       ),
       pedagogueName: authenticatedUser?.name ?? "Pedagoga responsável",
+      pedagogueRegistrationNumber: authenticatedUser?.registrationNumber,
       condition: data.condition,
       potential: data.potential,
       difficulties: data.difficulties,

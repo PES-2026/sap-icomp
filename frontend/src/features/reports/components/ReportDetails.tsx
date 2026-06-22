@@ -3,17 +3,19 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
+import { useAuthStore } from "@/store/authStore";
 import { FileDown, Loader2, Pencil, Printer } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { REPORT_TEMPLATE } from "../constants/reportTemplate";
 import { useReportById } from "../hooks/useReportById";
-import { isLexicalEmpty } from "../utils/lexicalState";
-import { formatReportDate } from "../utils/reportDates";
+import { formatReportLongDate } from "../utils/reportDates";
 import { LexicalReportEditor } from "./LexicalReportEditor";
 import { ReportErrorState } from "./ReportErrorState";
 
 export default function ReportDetails() {
   const params = useParams();
   const router = useRouter();
+  const authenticatedUser = useAuthStore((state) => state.user);
   const studentId = decodeURIComponent((params.studentId as string) ?? "");
   const reportId = decodeURIComponent((params.reportId as string) ?? "");
   const { report, isLoading, error } = useReportById(studentId, reportId);
@@ -32,9 +34,15 @@ export default function ReportDetails() {
     return <ReportErrorState error={error} studentId={studentId} />;
   }
 
+  const pedagogueRegistrationNumber =
+    report.pedagogueRegistrationNumber ??
+    (authenticatedUser?.name === report.pedagogueName
+      ? authenticatedUser.registrationNumber
+      : undefined);
+
   return (
     <main className="report-view min-h-full p-4 font-sans md:p-7">
-      <div className="report-screen-only mx-auto mb-4 flex w-full max-w-5xl flex-wrap items-center justify-between gap-3">
+      <div className="report-screen-only mx-auto mb-4 flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-stone-800">
             Visualizar Relatório
@@ -53,129 +61,102 @@ export default function ReportDetails() {
           <CommonButton
             label="Imprimir"
             startIcon={Printer}
-            onClick={() => window.print()}
-            className="border border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+            disabled
+            title="Funcionalidade pendente"
+            className="border border-stone-200 bg-white text-stone-400 hover:scale-100 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
           />
           <CommonButton
             label="Gerar PDF"
             startIcon={FileDown}
-            onClick={() => window.print()}
+            disabled
+            title="Funcionalidade pendente"
+            className="hover:scale-100 disabled:cursor-not-allowed disabled:opacity-60"
           />
         </div>
       </div>
 
-      <article className="report-document mx-auto w-full max-w-5xl rounded-2xl border border-[#e8e0d5] bg-white px-6 py-7 shadow-sm md:px-10 md:py-9">
-        <header className="report-document-header border-b-2 border-[#6bc4a6] pb-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#319878]">
-            SAP IComp · Serviço de Apoio Pedagógico
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-stone-900">
-            Relatório de Intervenção Pedagógica
+      <article className="report-document mx-auto min-h-[297mm] w-full max-w-[210mm] border border-stone-200 bg-white px-6 py-10 font-['Arial',sans-serif] text-black shadow-sm sm:px-[20mm] sm:py-[16mm]">
+        <header className="report-document-header text-center">
+          <div className="text-[9.5pt] font-normal uppercase leading-[1.25]">
+            {REPORT_TEMPLATE.institution.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+          <h1 className="mt-9 text-[13pt] font-bold">
+            {REPORT_TEMPLATE.title}
           </h1>
         </header>
 
-        <section className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 rounded-xl bg-[#faf7f0] p-5 sm:grid-cols-2">
-          <DocumentInformation label="Aluno" value={student.name} />
-          <DocumentInformation
-            label="Matrícula"
-            value={student.enrollmentId}
-          />
-          <DocumentInformation
-            label="Curso"
-            value={student.course?.name ?? "Curso não informado"}
-          />
-          <DocumentInformation
-            label="Data de criação"
-            value={formatReportDate(report.createdAt)}
-          />
-          <DocumentInformation
-            label="Pedagoga responsável"
-            value={report.pedagogueName}
-            className="sm:col-span-2"
-          />
+        <section className="mt-7 text-[10.5pt] leading-[1.4]">
+          <p>
+            <span className="font-medium">Aluno:</span> {student.name}
+          </p>
+          <p>
+            <span className="font-medium">Matrícula:</span>{" "}
+            {student.enrollmentId}
+          </p>
+          <p>
+            <span className="font-medium">Curso:</span>{" "}
+            {student.course?.name ?? "Curso não informado"}
+          </p>
         </section>
 
-        <div className="mt-8 space-y-8">
-          {!isLexicalEmpty(report.studentInformation) && (
-            <ReportSection
-              title="Informações do Estudante"
-              content={report.studentInformation}
-            />
-          )}
-          <section>
-            <h2 className="text-base font-bold text-stone-800">
-              Parecer Técnico
-            </h2>
-            <div className="mt-3 space-y-4">
-              <ReportSection
-                title="Condição do estudante"
-                content={report.condition}
-              />
-              <ReportSection
-                title="Potencialidades"
-                content={report.potential}
-              />
-              <ReportSection
-                title="Dificuldades"
-                content={report.difficulties}
-              />
-            </div>
-          </section>
+        <div className="mt-5 space-y-4">
           <ReportSection
-            title="Intervenções Estratégicas"
+            title="Deficiência/Condição:"
+            content={report.condition}
+          />
+          <ReportSection title="Potencialidades:" content={report.potential} />
+          <ReportSection title="Dificuldades:" content={report.difficulties} />
+          <ReportSection
+            title="Recomendações metodológicas:"
             content={report.recommendation}
           />
           <ReportSection
-            title="Orientações aos Docentes"
+            title="Considerações finais:"
             content={report.conclusion}
           />
         </div>
 
-        <footer className="mt-10 border-t border-stone-200 pt-4 text-xs text-stone-400">
-          <p>Última atualização: {formatReportDate(report.updatedAt)}.</p>
-          {report.version != null && (
-            <p className="mt-1">Versão {report.version}.</p>
+        <section className="mt-5 text-justify text-[10.5pt] leading-[1.45]">
+          <p>
+            {REPORT_TEMPLATE.contactIntroduction}{" "}
+            <a
+              href={`mailto:${REPORT_TEMPLATE.supportEmail}`}
+              className="text-sky-700 underline"
+            >
+              {REPORT_TEMPLATE.supportEmail}
+            </a>
+          </p>
+        </section>
+
+        <p className="mt-9 text-center text-[10.5pt]">
+          {formatReportLongDate(
+            report.createdAt,
+            REPORT_TEMPLATE.location,
           )}
-          {report.includedAttendancesCount != null && (
-            <p className="mt-1">
-              Consolidado a partir de {report.includedAttendancesCount}{" "}
-              atendimento
-              {report.includedAttendancesCount !== 1 ? "s" : ""} realizado
-              {report.includedAttendancesCount !== 1 ? "s" : ""}.
-            </p>
-          )}
+        </p>
+
+        <footer className="report-signature mt-14 text-center text-[10.5pt] leading-[1.45]">
+          <p>{report.pedagogueName}</p>
+          <p>
+            {REPORT_TEMPLATE.signatureRole}
+            {pedagogueRegistrationNumber
+              ? ` – SIAPE ${pedagogueRegistrationNumber}`
+              : ""}
+          </p>
+          <p>{REPORT_TEMPLATE.signatureUnit}</p>
         </footer>
       </article>
     </main>
   );
 }
 
-function DocumentInformation({
-  label,
-  value,
-  className = "",
-}: {
-  label: string;
-  value: string;
-  className?: string;
-}) {
-  return (
-    <div className={className}>
-      <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-        {label}
-      </p>
-      <p className="mt-1 text-sm font-semibold text-stone-800">{value}</p>
-    </div>
-  );
-}
-
 function ReportSection({ title, content }: { title: string; content: string }) {
   return (
-    <section>
-      <h3 className="text-sm font-bold text-stone-700">{title}</h3>
-      <div className="mt-2">
-        <LexicalReportEditor value={content} readOnly />
-      </div>
+    <section className="text-[10.5pt] leading-[1.45]">
+      <h2 className="mb-1 font-bold">{title}</h2>
+      <LexicalReportEditor value={content} readOnly appearance="document" />
     </section>
   );
 }
