@@ -2,7 +2,6 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
-import { MOCK_DELETE_PASSWORD } from "../services/reportMockService";
 import { useState } from "react";
 
 interface DeleteReportModalProps {
@@ -64,9 +63,6 @@ export function DeleteReportModal({
               }`}
             />
           </Field>
-          <p className="mt-2 text-xs text-stone-400">
-            Ambiente mock: utilize <strong>{MOCK_DELETE_PASSWORD}</strong>.
-          </p>
         </div>
 
         <div className="mt-7 flex justify-end gap-3">

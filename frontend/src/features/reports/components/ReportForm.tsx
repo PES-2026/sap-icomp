@@ -3,7 +3,6 @@
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
-import { useAttendancesByStudent } from "@/features/attendances/hooks/useAttendancesByStudent";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { ApiError } from "@/services/apiError";
 import { useAuthStore } from "@/store/authStore";
@@ -11,11 +10,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useReportById } from "../hooks/useReportById";
 import { ReportSchemaData, reportSchema } from "../schemas/reportSchema";
-import { reportService } from "../services/reportService";
+import { getReportId, reportService } from "../services/reportService";
+import {
+  EMPTY_LEXICAL_STATE,
+  normalizeLexicalState,
+  plainTextToLexical,
+} from "../utils/lexicalState";
+import { LexicalReportEditor } from "./LexicalReportEditor";
 import { ReportConflictModal } from "./ReportConflictModal";
 import { ReportErrorState } from "./ReportErrorState";
 import { ReportMessageModal } from "./ReportMessageModal";
@@ -25,9 +30,11 @@ interface ReportFormProps {
 }
 
 const EMPTY_FORM: ReportSchemaData = {
-  technicalOpinion: "",
-  strategicInterventions: "",
-  teacherGuidance: "",
+  condition: EMPTY_LEXICAL_STATE,
+  potential: EMPTY_LEXICAL_STATE,
+  difficulties: EMPTY_LEXICAL_STATE,
+  recommendation: EMPTY_LEXICAL_STATE,
+  conclusion: EMPTY_LEXICAL_STATE,
 };
 
 export default function ReportForm({ mode }: ReportFormProps) {
@@ -38,19 +45,19 @@ export default function ReportForm({ mode }: ReportFormProps) {
   const isEditMode = mode === "edit";
   const user = useAuthStore((state) => state.user);
   const { student, isLoadingStudent } = useStudentById(studentId);
-  const { attendancesByStudent, isLoadingAttendancesByStudent } =
-    useAttendancesByStudent(studentId);
   const {
     report,
     isLoading: isLoadingReport,
     error: reportError,
     fetchReport,
-  } = useReportById(reportId);
+  } = useReportById(studentId, isEditMode ? reportId : "");
   const [eligibilityMessage, setEligibilityMessage] = useState("");
+  const [initialLoadError, setInitialLoadError] = useState("");
+  const [isLoadingInitialData, setIsLoadingInitialData] = useState(!isEditMode);
   const [hasConflict, setHasConflict] = useState(false);
 
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting, isDirty },
@@ -60,14 +67,55 @@ export default function ReportForm({ mode }: ReportFormProps) {
   });
 
   useEffect(() => {
-    if (isEditMode && report) {
-      reset({
-        technicalOpinion: report.technicalOpinion,
-        strategicInterventions: report.strategicInterventions,
-        teacherGuidance: report.teacherGuidance,
-      });
-    }
+    if (!isEditMode || !report) return;
+
+    reset({
+      condition: normalizeLexicalState(report.condition),
+      potential: normalizeLexicalState(report.potential),
+      difficulties: normalizeLexicalState(report.difficulties),
+      recommendation: normalizeLexicalState(report.recommendation),
+      conclusion: normalizeLexicalState(report.conclusion),
+    });
   }, [isEditMode, report, reset]);
+
+  useEffect(() => {
+    if (isEditMode || !studentId) return;
+
+    let active = true;
+    const loadInitialData = async () => {
+      try {
+        setIsLoadingInitialData(true);
+        setInitialLoadError("");
+        const initialData = await reportService.getInitialData(studentId);
+        if (!active) return;
+
+        reset({
+          ...EMPTY_FORM,
+          potential: plainTextToLexical(initialData.potential),
+          difficulties: plainTextToLexical(initialData.difficulties),
+        });
+      } catch (error) {
+        if (!active) return;
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Não foi possível iniciar a criação do relatório.";
+
+        if (error instanceof ApiError && error.status === 422) {
+          setEligibilityMessage(message);
+        } else {
+          setInitialLoadError(message);
+        }
+      } finally {
+        if (active) setIsLoadingInitialData(false);
+      }
+    };
+
+    void loadInitialData();
+    return () => {
+      active = false;
+    };
+  }, [isEditMode, reset, studentId]);
 
   const reloadAfterConflict = async () => {
     setHasConflict(false);
@@ -75,57 +123,32 @@ export default function ReportForm({ mode }: ReportFormProps) {
   };
 
   const submit = async (data: ReportSchemaData) => {
-    if (!student) return;
+    if (!student || !user) {
+      toast.error("Não foi possível identificar a pedagoga autenticada.");
+      return;
+    }
 
     try {
+      const requestData = { ...data, pedagogueId: user.id };
+
       if (isEditMode) {
-        if (!report) return;
-        const updated = await reportService.update(report.id, {
-          ...data,
-          version: report.version,
-          lastModifiedBy: {
-            id: user?.id ?? "mock-pedagogue",
-            name: user?.name ?? "Pedagoga responsável",
-          },
-        });
+        await reportService.update(studentId, reportId, requestData);
         toast.success("Relatório atualizado com sucesso.");
-        router.push(PATHS.visualize_report(studentId, updated.id));
+        router.push(PATHS.visualize_report(studentId, reportId));
         return;
       }
 
-      const eligibility = await reportService.getEligibility(
-        studentId,
-        attendancesByStudent,
-      );
-      if (!eligibility.canCreate) {
-        setEligibilityMessage(
-          "Não é possível gerar um relatório consolidado para alunos sem histórico de atendimentos realizados.",
-        );
-        return;
-      }
-
-      const created = await reportService.create(studentId, {
-        ...data,
-        student: {
-          id: student.id,
-          name: student.name,
-          enrollmentId: student.enrollmentId,
-          course: {
-            id: student.course?.id ?? "",
-            name: student.course?.name ?? "Curso não informado",
-          },
-        },
-        author: {
-          id: user?.id ?? "mock-pedagogue",
-          name: user?.name ?? "Pedagoga responsável",
-        },
-        includedAttendancesCount: eligibility.completedAttendancesCount,
-      });
+      const created = await reportService.create(studentId, requestData);
+      const createdReportId = getReportId(created);
       toast.success("Relatório criado com sucesso.");
-      router.push(PATHS.visualize_report(studentId, created.id));
+      router.push(PATHS.visualize_report(studentId, createdReportId));
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         setHasConflict(true);
+        return;
+      }
+      if (error instanceof ApiError && error.status === 422) {
+        setEligibilityMessage(error.message);
         return;
       }
       toast.error(
@@ -138,7 +161,7 @@ export default function ReportForm({ mode }: ReportFormProps) {
 
   const isLoading =
     isLoadingStudent ||
-    isLoadingAttendancesByStudent ||
+    (!isEditMode && isLoadingInitialData) ||
     (isEditMode && isLoadingReport);
 
   if (isLoading) {
@@ -150,10 +173,7 @@ export default function ReportForm({ mode }: ReportFormProps) {
     );
   }
 
-  if (
-    isEditMode &&
-    (reportError || !report || report.student.id !== studentId)
-  ) {
+  if (isEditMode && (reportError || !report)) {
     return <ReportErrorState error={reportError} studentId={studentId} />;
   }
 
@@ -161,12 +181,23 @@ export default function ReportForm({ mode }: ReportFormProps) {
     return <ReportErrorState studentId={studentId} />;
   }
 
-  const inputClass = (hasError: boolean) =>
-    `min-h-32 w-full resize-y rounded-xl border-[1.5px] px-4 py-3 text-sm leading-relaxed text-stone-800 outline-none transition-colors ${
-      hasError
-        ? "border-red-300 bg-red-50 focus:border-red-400"
-        : "border-[#e8e0d5] bg-[#faf9f5] hover:border-stone-300 focus:border-[#6bc4a6] focus:bg-white"
-    }`;
+  if (initialLoadError) {
+    return (
+      <div className="flex h-full min-h-96 items-center justify-center p-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-xl font-bold text-stone-800">
+            Não foi possível criar o relatório
+          </h1>
+          <p className="mt-2 text-sm text-stone-500">{initialLoadError}</p>
+          <CommonButton
+            label="Voltar ao aluno"
+            onClick={() => router.push(PATHS.visualize_student(studentId))}
+            className="mx-auto mt-6"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -186,40 +217,104 @@ export default function ReportForm({ mode }: ReportFormProps) {
             </p>
           </div>
 
-          <div className="custom-scroll flex-1 space-y-5 overflow-y-auto px-6 py-5 md:px-8">
-            <Field
-              label="Parecer Técnico"
-              error={errors.technicalOpinion?.message}
-              required
-            >
-              <textarea
-                {...register("technicalOpinion")}
-                placeholder="Insira o parecer técnico"
-                className={inputClass(Boolean(errors.technicalOpinion))}
+          <div className="custom-scroll flex-1 space-y-7 overflow-y-auto px-6 py-5 md:px-8">
+            <section className="space-y-5">
+              <h2 className="text-base font-bold text-stone-800">
+                Parecer Técnico
+              </h2>
+              <Controller
+                name="condition"
+                control={control}
+                render={({ field }) => (
+                  <Field
+                    label="Condição do estudante"
+                    error={errors.condition?.message}
+                    required
+                  >
+                    <LexicalReportEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Descreva a condição do estudante"
+                      hasError={Boolean(errors.condition)}
+                    />
+                  </Field>
+                )}
               />
-            </Field>
-            <Field
-              label="Intervenções Estratégicas"
-              error={errors.strategicInterventions?.message}
-              required
-            >
-              <textarea
-                {...register("strategicInterventions")}
-                placeholder="Insira as intervenções estratégicas"
-                className={inputClass(Boolean(errors.strategicInterventions))}
+              <Controller
+                name="potential"
+                control={control}
+                render={({ field }) => (
+                  <Field
+                    label="Potencialidades"
+                    error={errors.potential?.message}
+                    required
+                  >
+                    <LexicalReportEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Descreva as potencialidades"
+                      hasError={Boolean(errors.potential)}
+                    />
+                  </Field>
+                )}
               />
-            </Field>
-            <Field
-              label="Orientações aos Docentes"
-              error={errors.teacherGuidance?.message}
-              required
-            >
-              <textarea
-                {...register("teacherGuidance")}
-                placeholder="Insira as orientações aos docentes"
-                className={inputClass(Boolean(errors.teacherGuidance))}
+              <Controller
+                name="difficulties"
+                control={control}
+                render={({ field }) => (
+                  <Field
+                    label="Dificuldades"
+                    error={errors.difficulties?.message}
+                    required
+                  >
+                    <LexicalReportEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Descreva as dificuldades"
+                      hasError={Boolean(errors.difficulties)}
+                    />
+                  </Field>
+                )}
               />
-            </Field>
+            </section>
+
+            <Controller
+              name="recommendation"
+              control={control}
+              render={({ field }) => (
+                <Field
+                  label="Intervenções Estratégicas"
+                  error={errors.recommendation?.message}
+                  required
+                >
+                  <LexicalReportEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Insira as intervenções estratégicas"
+                    hasError={Boolean(errors.recommendation)}
+                  />
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="conclusion"
+              control={control}
+              render={({ field }) => (
+                <Field
+                  label="Orientações aos Docentes"
+                  error={errors.conclusion?.message}
+                  required
+                >
+                  <LexicalReportEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Insira as orientações aos docentes"
+                    hasError={Boolean(errors.conclusion)}
+                  />
+                </Field>
+              )}
+            />
           </div>
 
           <div className="flex shrink-0 justify-end gap-3 border-t border-stone-200 bg-stone-50/50 px-6 py-4 md:px-8">

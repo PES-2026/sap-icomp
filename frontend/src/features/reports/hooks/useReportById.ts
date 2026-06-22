@@ -3,20 +3,23 @@
 import { ApiError } from "@/services/apiError";
 import { useCallback, useEffect, useState } from "react";
 import { reportService } from "../services/reportService";
-import { InterventionReport } from "../types/report";
+import { ReportDetailsResponse } from "../types/report";
 
-export const useReportById = (reportId: string) => {
-  const [report, setReport] = useState<InterventionReport>();
+export const useReportById = (studentId: string, reportId: string) => {
+  const [report, setReport] = useState<ReportDetailsResponse>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ApiError>();
 
   const fetchReport = useCallback(async () => {
-    if (!reportId) return;
+    if (!studentId || !reportId) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       setIsLoading(true);
       setError(undefined);
-      setReport(await reportService.getById(reportId));
+      setReport(await reportService.getById(studentId, reportId));
     } catch (caughtError) {
       setReport(undefined);
       setError(
@@ -31,7 +34,7 @@ export const useReportById = (reportId: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [reportId]);
+  }, [reportId, studentId]);
 
   useEffect(() => {
     void fetchReport();

@@ -2,7 +2,6 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
-import { useAttendancesByStudent } from "@/features/attendances/hooks/useAttendancesByStudent";
 import { Student } from "@/features/students/types/student";
 import { ApiError } from "@/services/apiError";
 import { FilePlus2, FileText, Loader2, Pencil, Trash2 } from "lucide-react";
@@ -12,7 +11,8 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useReportsByStudent } from "../hooks/useReportsByStudent";
 import { reportService } from "../services/reportService";
-import { InterventionReport } from "../types/report";
+import { ReportSummary } from "../types/report";
+import { formatReportDate } from "../utils/reportDates";
 import { DeleteReportModal } from "./DeleteReportModal";
 import { ReportMessageModal } from "./ReportMessageModal";
 
@@ -23,39 +23,34 @@ interface ReportHistoryCardProps {
 export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
   const router = useRouter();
   const { reports, isLoading, fetchReports } = useReportsByStudent(student.id);
-  const { attendancesByStudent, isLoadingAttendancesByStudent } =
-    useAttendancesByStudent(student.id);
+  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
   const [eligibilityMessage, setEligibilityMessage] = useState("");
-  const [reportToDelete, setReportToDelete] = useState<InterventionReport>();
+  const [reportToDelete, setReportToDelete] = useState<ReportSummary>();
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [sharedMessage, setSharedMessage] = useState("");
 
   const handleCreate = async () => {
     try {
-      const eligibility = await reportService.getEligibility(
-        student.id,
-        attendancesByStudent,
-      );
-
-      if (!eligibility.canCreate) {
-        setEligibilityMessage(
-          "Não é possível gerar um relatório consolidado para alunos sem histórico de atendimentos realizados.",
-        );
-        return;
-      }
-
+      setIsCheckingEligibility(true);
+      await reportService.getInitialData(student.id);
       router.push(PATHS.create_report(student.id));
     } catch (error) {
+      if (error instanceof ApiError && error.status === 422) {
+        setEligibilityMessage(error.message);
+        return;
+      }
       toast.error(
         error instanceof Error
           ? error.message
           : "Não foi possível iniciar a criação do relatório.",
       );
+    } finally {
+      setIsCheckingEligibility(false);
     }
   };
 
-  const requestDelete = (report: InterventionReport) => {
+  const requestDelete = (report: ReportSummary) => {
     if (report.shared) {
       setSharedMessage(
         "Este relatório já foi compartilhado com docentes e não pode ser excluído. Você ainda pode retificá-lo por meio da edição.",
@@ -73,13 +68,16 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
     try {
       setIsDeleting(true);
       setDeleteError("");
-      await reportService.remove(reportToDelete.id, password);
+      await reportService.remove(student.id, reportToDelete.id, password);
       setReportToDelete(undefined);
       await fetchReports();
       toast.success("Relatório excluído com sucesso.");
     } catch (error) {
-      if (error instanceof ApiError && error.code === "INVALID_PASSWORD") {
+      if (error instanceof ApiError && error.status === 401) {
         setDeleteError(error.message);
+      } else if (error instanceof ApiError && error.status === 409) {
+        setReportToDelete(undefined);
+        setSharedMessage(error.message);
       } else {
         setReportToDelete(undefined);
         toast.error(
@@ -107,10 +105,12 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
             </p>
           </div>
           <CommonButton
-            label="Criar Relatório"
+            label={
+              isCheckingEligibility ? "Verificando..." : "Criar Relatório"
+            }
             startIcon={FilePlus2}
             onClick={handleCreate}
-            disabled={isLoadingAttendancesByStudent}
+            disabled={isCheckingEligibility}
             className="disabled:cursor-wait disabled:opacity-60"
           />
         </div>
@@ -139,12 +139,16 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
                   className="min-w-0 flex-1"
                 >
                   <p className="truncate text-sm font-semibold text-stone-800">
-                    Relatório de {report.createdAt}
+                    Relatório de {formatReportDate(report.createdAt)}
                   </p>
                   <p className="mt-0.5 text-xs text-stone-500">
-                    Responsável: {report.author.name} ·{" "}
-                    {report.includedAttendancesCount} atendimento
-                    {report.includedAttendancesCount !== 1 ? "s" : ""}
+                    Responsável: {report.pedagogueName}
+                    {report.includedAttendancesCount != null && (
+                      <>
+                        {" "}· {report.includedAttendancesCount} atendimento
+                        {report.includedAttendancesCount !== 1 ? "s" : ""}
+                      </>
+                    )}
                   </p>
                 </Link>
 

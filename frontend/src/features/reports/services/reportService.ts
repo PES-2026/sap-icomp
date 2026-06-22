@@ -1,41 +1,62 @@
-import { Attendance } from "@/features/attendances/types/attendance";
 import api from "@/services/api";
 import {
   CreateReportData,
-  InterventionReport,
-  ReportEligibility,
+  ReportDetailsResponse,
+  ReportInitialData,
+  ReportMutationResponse,
+  ReportSummary,
   UpdateReportData,
 } from "../types/report";
-import { reportMockService } from "./reportMockService";
 
-const useMock = process.env.NEXT_PUBLIC_REPORTS_MOCK !== "false";
+const studentReportsPath = (studentId: string) =>
+  `/pedagogue/students/${encodeURIComponent(studentId)}/reports`;
+
+export const getReportId = (report: ReportMutationResponse): string => {
+  const id = report.id ?? report.reportId ?? report.externalId;
+  if (!id) {
+    throw new Error("O backend não retornou o identificador do relatório.");
+  }
+  return id;
+};
 
 export const reportService = {
-  async listByStudent(studentId: string): Promise<InterventionReport[]> {
-    if (useMock) return reportMockService.listByStudent(studentId);
-    const response = await api.get<InterventionReport[]>(
-      `/students/${studentId}/reports`,
-      { fallbackMsg: "Não foi possível carregar os relatórios." },
+  async listByStudent(studentId: string): Promise<ReportSummary[]> {
+    const response = await api.get<
+      ReportMutationResponse[] | { items: ReportMutationResponse[] }
+    >(studentReportsPath(studentId), {
+      fallbackMsg: "Não foi possível carregar os relatórios.",
+    });
+    const reports = Array.isArray(response.data)
+      ? response.data
+      : response.data.items;
+
+    return reports.map((report) => ({
+      id: getReportId(report),
+      pedagogueName: report.pedagogueName ?? "Pedagoga não informada",
+      createdAt: report.createdAt ?? "",
+      updatedAt: report.updatedAt ?? report.createdAt ?? "",
+      shared: report.shared,
+      includedAttendancesCount: report.includedAttendancesCount,
+    }));
+  },
+
+  async getById(
+    studentId: string,
+    reportId: string,
+  ): Promise<ReportDetailsResponse> {
+    const response = await api.get<ReportDetailsResponse>(
+      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}`,
+      { fallbackMsg: "Não foi possível carregar o relatório." },
     );
     return response.data;
   },
 
-  async getById(reportId: string): Promise<InterventionReport> {
-    if (useMock) return reportMockService.getById(reportId);
-    const response = await api.get<InterventionReport>(`/reports/${reportId}`, {
-      fallbackMsg: "Não foi possível carregar o relatório.",
-    });
-    return response.data;
-  },
-
-  async getEligibility(
-    studentId: string,
-    attendances: Attendance[],
-  ): Promise<ReportEligibility> {
-    if (useMock) return reportMockService.getEligibility(attendances);
-    const response = await api.get<ReportEligibility>(
-      `/students/${studentId}/reports/eligibility`,
-      { fallbackMsg: "Não foi possível verificar a geração do relatório." },
+  async getInitialData(studentId: string): Promise<ReportInitialData> {
+    const response = await api.get<ReportInitialData>(
+      `${studentReportsPath(studentId)}/new`,
+      {
+        fallbackMsg: "Não foi possível iniciar a criação do relatório.",
+      },
     );
     return response.data;
   },
@@ -43,42 +64,35 @@ export const reportService = {
   async create(
     studentId: string,
     data: CreateReportData,
-  ): Promise<InterventionReport> {
-    if (useMock) return reportMockService.create(data);
-    const response = await api.post<InterventionReport>(
-      `/students/${studentId}/reports`,
-      {
-        technicalOpinion: data.technicalOpinion,
-        strategicInterventions: data.strategicInterventions,
-        teacherGuidance: data.teacherGuidance,
-      },
+  ): Promise<ReportMutationResponse> {
+    const response = await api.post<ReportMutationResponse>(
+      `${studentReportsPath(studentId)}/new`,
+      data,
       { fallbackMsg: "Não foi possível criar o relatório." },
     );
     return response.data;
   },
 
   async update(
+    studentId: string,
     reportId: string,
     data: UpdateReportData,
-  ): Promise<InterventionReport> {
-    if (useMock) return reportMockService.update(reportId, data);
-    const response = await api.patch<InterventionReport>(
-      `/reports/${reportId}`,
-      {
-        technicalOpinion: data.technicalOpinion,
-        strategicInterventions: data.strategicInterventions,
-        teacherGuidance: data.teacherGuidance,
-        version: data.version,
-      },
+  ): Promise<ReportMutationResponse> {
+    const response = await api.post<ReportMutationResponse>(
+      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/edit`,
+      data,
       { fallbackMsg: "Não foi possível atualizar o relatório." },
     );
     return response.data;
   },
 
-  async remove(reportId: string, password: string): Promise<void> {
-    if (useMock) return reportMockService.remove(reportId, password);
+  async remove(
+    studentId: string,
+    reportId: string,
+    password: string,
+  ): Promise<void> {
     await api.post(
-      `/reports/${reportId}/remove`,
+      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/remove`,
       { password },
       {
         fallbackMsg: "Não foi possível excluir o relatório.",

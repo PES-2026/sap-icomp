@@ -1,53 +1,46 @@
-export interface ReportStudentSnapshot {
-  id: string;
-  name: string;
-  enrollmentId: string;
-  course: {
-    id: string;
-    name: string;
-  };
+export interface ReportContent {
+  condition: string;
+  potential: string;
+  difficulties: string;
+  recommendation: string;
+  conclusion: string;
 }
 
-export interface ReportPedagogueSnapshot {
-  id: string;
-  name: string;
-}
-
-export interface InterventionReport {
-  id: string;
-  student: ReportStudentSnapshot;
-  author: ReportPedagogueSnapshot;
-  lastModifiedBy: ReportPedagogueSnapshot;
-  technicalOpinion: string;
-  strategicInterventions: string;
-  teacherGuidance: string;
+export interface ReportDetailsResponse extends ReportContent {
+  id?: string;
+  reportId?: string;
+  externalId?: string;
+  studentInformation: string;
+  pedagogueName: string;
   createdAt: string;
   updatedAt: string;
-  version: number;
-  shared: boolean;
-  includedAttendancesCount: number;
-  deletedAt?: string;
+  version?: number;
+  shared?: boolean;
+  includedAttendancesCount?: number;
 }
 
-export interface ReportFormData {
-  technicalOpinion: string;
-  strategicInterventions: string;
-  teacherGuidance: string;
+export interface ReportSummary {
+  id: string;
+  pedagogueName: string;
+  createdAt: string;
+  updatedAt: string;
+  shared?: boolean;
+  includedAttendancesCount?: number;
 }
 
-export interface CreateReportData extends ReportFormData {
-  student: ReportStudentSnapshot;
-  author: ReportPedagogueSnapshot;
-  includedAttendancesCount: number;
+export interface ReportInitialData {
+  potential: string;
+  difficulties: string;
 }
 
-export interface UpdateReportData extends ReportFormData {
-  version: number;
-  lastModifiedBy: ReportPedagogueSnapshot;
+export interface CreateReportData extends ReportContent {
+  pedagogueId: string;
 }
 
-export interface ReportEligibility {
-  canCreate: boolean;
-  completedAttendancesCount: number;
-  reason?: "NO_COMPLETED_ATTENDANCES";
+export type UpdateReportData = CreateReportData;
+
+export interface ReportMutationResponse extends Partial<ReportDetailsResponse> {
+  id?: string;
+  reportId?: string;
+  externalId?: string;
 }

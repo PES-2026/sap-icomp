@@ -2,9 +2,13 @@
 
 import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
+import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { FileDown, Loader2, Pencil, Printer } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useReportById } from "../hooks/useReportById";
+import { isLexicalEmpty } from "../utils/lexicalState";
+import { formatReportDate } from "../utils/reportDates";
+import { LexicalReportEditor } from "./LexicalReportEditor";
 import { ReportErrorState } from "./ReportErrorState";
 
 export default function ReportDetails() {
@@ -12,9 +16,10 @@ export default function ReportDetails() {
   const router = useRouter();
   const studentId = decodeURIComponent((params.studentId as string) ?? "");
   const reportId = decodeURIComponent((params.reportId as string) ?? "");
-  const { report, isLoading, error } = useReportById(reportId);
+  const { report, isLoading, error } = useReportById(studentId, reportId);
+  const { student, isLoadingStudent } = useStudentById(studentId);
 
-  if (isLoading) {
+  if (isLoading || isLoadingStudent) {
     return (
       <div className="flex h-full items-center justify-center gap-3 text-stone-500">
         <Loader2 className="animate-spin text-[#6bc4a6]" size={28} />
@@ -23,7 +28,7 @@ export default function ReportDetails() {
     );
   }
 
-  if (error || !report || report.student.id !== studentId) {
+  if (error || !report || !student) {
     return <ReportErrorState error={error} studentId={studentId} />;
   }
 
@@ -40,11 +45,9 @@ export default function ReportDetails() {
         </div>
         <div className="flex flex-wrap gap-2">
           <CommonButton
-            label="Editar"
+            label="Voltar para Edição"
             startIcon={Pencil}
-            onClick={() =>
-              router.push(PATHS.edit_report(studentId, report.id))
-            }
+            onClick={() => router.push(PATHS.edit_report(studentId, reportId))}
             className="bg-sky-100 text-sky-700 hover:bg-sky-200"
           />
           <CommonButton
@@ -72,96 +75,106 @@ export default function ReportDetails() {
         </header>
 
         <section className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 rounded-xl bg-[#faf7f0] p-5 sm:grid-cols-2">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-              Aluno
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">
-              {report.student.name}
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-              Matrícula
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">
-              {report.student.enrollmentId}
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-              Curso
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">
-              {report.student.course.name}
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-              Data de criação
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">
-              {report.createdAt}
-            </p>
-          </div>
-          <div className="sm:col-span-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-              Pedagoga responsável
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">
-              {report.author.name}
-            </p>
-          </div>
+          <DocumentInformation label="Aluno" value={student.name} />
+          <DocumentInformation
+            label="Matrícula"
+            value={student.enrollmentId}
+          />
+          <DocumentInformation
+            label="Curso"
+            value={student.course?.name ?? "Curso não informado"}
+          />
+          <DocumentInformation
+            label="Data de criação"
+            value={formatReportDate(report.createdAt)}
+          />
+          <DocumentInformation
+            label="Pedagoga responsável"
+            value={report.pedagogueName}
+            className="sm:col-span-2"
+          />
         </section>
 
         <div className="mt-8 space-y-8">
-          <ReportSection title="Parecer Técnico" content={report.technicalOpinion} />
+          {!isLexicalEmpty(report.studentInformation) && (
+            <ReportSection
+              title="Informações do Estudante"
+              content={report.studentInformation}
+            />
+          )}
+          <section>
+            <h2 className="text-base font-bold text-stone-800">
+              Parecer Técnico
+            </h2>
+            <div className="mt-3 space-y-4">
+              <ReportSection
+                title="Condição do estudante"
+                content={report.condition}
+              />
+              <ReportSection
+                title="Potencialidades"
+                content={report.potential}
+              />
+              <ReportSection
+                title="Dificuldades"
+                content={report.difficulties}
+              />
+            </div>
+          </section>
           <ReportSection
             title="Intervenções Estratégicas"
-            content={report.strategicInterventions}
+            content={report.recommendation}
           />
           <ReportSection
             title="Orientações aos Docentes"
-            content={report.teacherGuidance}
+            content={report.conclusion}
           />
         </div>
 
         <footer className="mt-10 border-t border-stone-200 pt-4 text-xs text-stone-400">
-          <p>
-            Última atualização: {report.updatedAt} por {report.lastModifiedBy.name}
-            . Versão {report.version}.
-          </p>
-          <p className="mt-1">
-            Consolidado a partir de {report.includedAttendancesCount}{" "}
-            atendimento{report.includedAttendancesCount !== 1 ? "s" : ""}
-            realizado{report.includedAttendancesCount !== 1 ? "s" : ""}.
-          </p>
+          <p>Última atualização: {formatReportDate(report.updatedAt)}.</p>
+          {report.version != null && (
+            <p className="mt-1">Versão {report.version}.</p>
+          )}
+          {report.includedAttendancesCount != null && (
+            <p className="mt-1">
+              Consolidado a partir de {report.includedAttendancesCount}{" "}
+              atendimento
+              {report.includedAttendancesCount !== 1 ? "s" : ""} realizado
+              {report.includedAttendancesCount !== 1 ? "s" : ""}.
+            </p>
+          )}
         </footer>
       </article>
-
-      <div className="report-screen-only mx-auto mt-4 flex w-full max-w-5xl justify-end gap-3">
-        <CommonButton
-          label="Voltar"
-          onClick={() => router.push(PATHS.visualize_student(studentId))}
-          className="bg-[#f4a598] hover:bg-[#f0a195]"
-        />
-        <CommonButton
-          label="Voltar para Edição"
-          onClick={() => router.push(PATHS.edit_report(studentId, report.id))}
-        />
-      </div>
     </main>
+  );
+}
+
+function DocumentInformation({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
+        {label}
+      </p>
+      <p className="mt-1 text-sm font-semibold text-stone-800">{value}</p>
+    </div>
   );
 }
 
 function ReportSection({ title, content }: { title: string; content: string }) {
   return (
     <section>
-      <h2 className="text-base font-bold text-stone-800">{title}</h2>
-      <div className="mt-2 min-h-20 rounded-xl border border-stone-200 bg-stone-50/40 p-4">
-        <p className="whitespace-pre-wrap text-sm leading-7 text-stone-700">
-          {content}
-        </p>
+      <h3 className="text-sm font-bold text-stone-700">{title}</h3>
+      <div className="mt-2">
+        <LexicalReportEditor value={content} readOnly />
       </div>
     </section>
   );
