@@ -7,6 +7,10 @@ import {
   ReportSummary,
   UpdateReportData,
 } from "../types/report";
+import { reportMockService } from "./reportMockService";
+
+export const REPORTS_MOCK_ENABLED =
+  process.env.NEXT_PUBLIC_REPORTS_MOCK === "true";
 
 const studentReportsPath = (studentId: string) =>
   `/pedagogue/students/${encodeURIComponent(studentId)}/reports`;
@@ -21,6 +25,10 @@ export const getReportId = (report: ReportMutationResponse): string => {
 
 export const reportService = {
   async listByStudent(studentId: string): Promise<ReportSummary[]> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.listByStudent(studentId);
+    }
+
     const response = await api.get<
       ReportMutationResponse[] | { items: ReportMutationResponse[] }
     >(studentReportsPath(studentId), {
@@ -44,6 +52,10 @@ export const reportService = {
     studentId: string,
     reportId: string,
   ): Promise<ReportDetailsResponse> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.getById(studentId, reportId);
+    }
+
     const response = await api.get<ReportDetailsResponse>(
       `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}`,
       { fallbackMsg: "Não foi possível carregar o relatório." },
@@ -52,6 +64,10 @@ export const reportService = {
   },
 
   async getInitialData(studentId: string): Promise<ReportInitialData> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.getInitialData(studentId);
+    }
+
     const response = await api.get<ReportInitialData>(
       `${studentReportsPath(studentId)}/new`,
       {
@@ -65,6 +81,10 @@ export const reportService = {
     studentId: string,
     data: CreateReportData,
   ): Promise<ReportMutationResponse> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.create(studentId, data);
+    }
+
     const response = await api.post<ReportMutationResponse>(
       `${studentReportsPath(studentId)}/new`,
       data,
@@ -78,6 +98,10 @@ export const reportService = {
     reportId: string,
     data: UpdateReportData,
   ): Promise<ReportMutationResponse> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.update(studentId, reportId, data);
+    }
+
     const response = await api.post<ReportMutationResponse>(
       `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/edit`,
       data,
@@ -91,6 +115,10 @@ export const reportService = {
     reportId: string,
     password: string,
   ): Promise<void> {
+    if (REPORTS_MOCK_ENABLED) {
+      return reportMockService.remove(studentId, reportId, password);
+    }
+
     await api.post(
       `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/remove`,
       { password },
