@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@lexical/list": "^0.45.0",
     "@lexical/react": "^0.45.0",
     "@lexical/rich-text": "^0.45.0",
+    "@lexical/utils": "^0.45.0",
     "@types/js-cookie": "^3.0.6",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
