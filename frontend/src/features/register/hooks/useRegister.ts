@@ -28,6 +28,8 @@ export const useRegister = () => {
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: "onBlur",
+    reValidateMode: "onChange",
     defaultValues: {
       name: "",
       registrationNumber: "",

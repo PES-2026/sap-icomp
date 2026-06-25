@@ -27,6 +27,17 @@ export interface UserListItem {
   updatedAt: string;
 }
 
+export interface PendingAccountRequestItem {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  registrationNumber: string;
+  role?: UserRole;
+  userStatus: UserStatus;
+  createdAt?: string;
+}
+
 export interface UsersResponse {
   totalItems: number;
   totalPages: number;

@@ -1,0 +1,12 @@
+export interface StudentScheduleEmailData {
+  name: string;
+  pedagogue: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+  course: string;
+  reason: string;
+  // rescheduleLink: string;
+  // cancelLink: string;
+}

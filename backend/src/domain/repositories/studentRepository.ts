@@ -6,7 +6,9 @@ import { PaginatedStudentResult, StudentResult } from "./results/studentResult";
 export interface IStudentRepository {
   findAll(params: StudentListParams): Promise<PaginatedStudentResult>;
   existsByEmail(email: string): Promise<boolean>;
+  findByEmail(email: string): Promise<StudentResult | null>;
   existsByEnrollmentId(enrollmentId: string): Promise<boolean>;
+  findByEnrollmentId(enrollmentId: string): Promise<StudentResult | null>;
   save(student: Student): Promise<void>;
   update(student: Student): Promise<void>;
   existsByUUID(externaID: string): Promise<boolean>;

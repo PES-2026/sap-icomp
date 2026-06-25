@@ -1,15 +1,20 @@
 "use client";
 
-import { MailCheck } from "lucide-react";
+import { Eye, EyeOff, Lock, MailCheck } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useWatch } from "react-hook-form";
 
 import { Images } from "@/assets";
 import CommonButton from "@/components/ui/CommonButton";
 import { Field } from "@/components/ui/Field";
 import { PATHS } from "@/constants/paths";
+import { cn } from "@/utils/cn";
 import { useAppNavigation } from "@/utils/navigator";
 import { maskPhone } from "@/utils/utils";
 import { useRegister } from "../../hooks/useRegister";
+import { PasswordRequirements } from "./PasswordRequirements";
 
 export default function RegisterForm() {
   const { handleNavigation } = useAppNavigation();
@@ -24,8 +29,14 @@ export default function RegisterForm() {
   } = useRegister();
   const {
     register,
+    control,
     formState: { errors },
   } = form;
+
+  const password = useWatch({ control, name: "password", defaultValue: "" });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const baseInputClass =
     "w-full px-3.5 py-2.5 border-[1.5px] rounded-md bg-white text-sm text-stone-800 outline-none transition-colors font-sans";
@@ -35,43 +46,30 @@ export default function RegisterForm() {
       ? `${baseInputClass} border-red-300 bg-red-50 focus:border-red-400`
       : `${baseInputClass} border-stone-300 hover:border-stone-400 focus:border-teal-400`;
 
-  const handleBackToLogin = () => {
-    handleNavigation({ path: PATHS.login });
-  };
-
   if (isSubmitted) {
     return (
-      <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center font-['Nunito','Segoe_UI',sans-serif] bg-[#f5f0e8] p-4">
+      <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center bg-[#f5f0e8] p-4 font-['Nunito','Segoe_UI',sans-serif]">
         <section className="flex w-full max-w-md flex-col items-center rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)] px-7 py-10 text-center">
           <Image
             src={Images.logoHorizontal}
             alt="SAP iComp Logo"
-            width={200}
-            height={48}
-            className="mb-6 h-10 md:h-12 w-auto"
+            className="mb-6 h-10 w-auto"
+            style={{ height: "auto" }}
             priority
           />
-
-          <div className="mb-5 flex h-18 w-18 items-center justify-center rounded-full bg-[#6bc4a6] text-white">
-            <MailCheck size={36} strokeWidth={2.5} />
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#6bc4a6] text-white">
+            <MailCheck size={32} strokeWidth={2} />
           </div>
-
-          <h1 className="m-0 text-2xl font-bold text-stone-800">Quase lá!</h1>
-          <p className="mt-3 mb-6 max-w-85 text-sm leading-6 text-stone-600">
-            Seu pedido de cadastro está em análise pela administração.
-            Avisaremos no e-mail{" "}
-            <strong className="font-bold text-stone-800">
-              {registeredEmail}
-            </strong>{" "}
-            assim que for aprovado.
+          <h1 className="text-2xl font-bold text-stone-800">Quase lá!</h1>
+          <p className="mt-3 mb-6 text-sm leading-6 text-stone-500">
+            Seu pedido está em análise. Avisaremos no e-mail{" "}
+            <strong className="text-stone-800">{registeredEmail}</strong> assim
+            que for aprovado.
           </p>
-
           <CommonButton
             label="Voltar para o Login"
-            type="button"
-            onClick={handleBackToLogin}
+            onClick={() => handleNavigation({ path: PATHS.login })}
             className="w-full justify-center"
-            aria-label="Voltar para o Login"
           />
         </section>
       </main>
@@ -79,149 +77,232 @@ export default function RegisterForm() {
   }
 
   return (
-    <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center font-['Nunito','Segoe_UI',sans-serif] bg-[#f5f0e8] p-4">
-      <form
-        onSubmit={onSubmit}
-        noValidate
-        className="flex flex-1 min-h-0 w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
-      >
-        <div className="shrink-0 px-7 pt-7 pb-4 flex flex-col items-center">
-          <Image
-            src={Images.logoHorizontal}
-            alt="SAP iComp Logo"
-            width={200}
-            height={48}
-            className="mb-4 h-10 md:h-12 w-auto"
-            priority
-          />
-          <h1 className="m-0 text-2xl font-bold text-stone-800">Criar Conta</h1>
-          <p className="text-sm text-stone-500 mt-1 text-center">
-            Informe seus dados para solicitar acesso
-          </p>
-        </div>
-
-        <div className="flex-1 min-h-0 px-7 pb-4 overflow-y-auto">
-          {globalError && (
-            <div className="mb-4 p-3 text-sm text-red-700 bg-red-50 rounded-md border border-red-200">
-              {globalError}
+    <main className="flex min-w-0 flex-1 w-full min-h-screen items-center justify-center bg-[#f5f0e8] p-4 sm:p-6 font-['Nunito','Segoe_UI',sans-serif]">
+      <div className="flex w-full max-w-5xl overflow-hidden rounded-2xl border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+        <div className="hidden relative lg:flex lg:w-2/5 flex-col justify-between bg-[#1a2e28] border-r border-[#1a2e28] p-10 overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#2a4a3e] opacity-60" />
+          <div className="absolute -bottom-20 -left-10 w-64 h-64 rounded-full bg-[#223d33] opacity-50" />
+          <div className="absolute top-1/2 right-8 w-32 h-32 rounded-full bg-[#6bc4a6] opacity-5" />
+          <div className="relative z-10">
+            <div className="w-full flex justify-center">
+              <Image
+                src={Images.logoHorizontal}
+                alt="SAP iComp Logo"
+                className="h-15 w-auto mb-10 brightness-0 invert justify-center"
+                priority
+              />
             </div>
-          )}
+            <h1 className="text-2xl font-semibold text-white leading-snug mb-3">
+              Bem-vindo(a) ao
+              <br />
+              <span className="text-[#6bc4a6] font-bold">SAP IComp</span>
+            </h1>
+            <p className="text-sm text-[#aac9bf] leading-relaxed">
+              Serviço de Apoio Pedagógico do Instituto de Computação. Solicite
+              seu acesso para começar.
+            </p>
+          </div>
 
-          <div className="flex flex-col gap-5">
-            <Field label="Nome Completo:" error={errors.name?.message} required>
-              <input
-                type="text"
-                placeholder="Pedagogo Teste"
-                {...register("name")}
-                className={getValidationClass(!!errors.name)}
-                aria-label="Nome Completo"
-              />
-            </Field>
-
-            <Field
-              label="Número de Registro:"
-              error={errors.registrationNumber?.message}
-              required
-            >
-              <input
-                type="text"
-                placeholder="123456"
-                {...register("registrationNumber")}
-                className={getValidationClass(!!errors.registrationNumber)}
-                aria-label="Número de Registro"
-              />
-            </Field>
-
-            <Field
-              label="Telefone:"
-              error={errors.phoneNumber?.message}
-              required
-            >
-              <input
-                type="tel"
-                placeholder="(92) 99999-9999"
-                {...register("phoneNumber", {
-                  onChange: (e) => {
-                    const { value } = e.target;
-                    e.target.value = maskPhone(value);
-                  },
-                })}
-                className={getValidationClass(!!errors.phoneNumber)}
-                aria-label="Telefone"
-              />
-            </Field>
-
-            <Field label="E-mail:" error={errors.email?.message} required>
-              <input
-                type="email"
-                placeholder="pedagogo@teste.com"
-                {...register("email")}
-                className={getValidationClass(!!errors.email)}
-                aria-label="E-mail"
-              />
-            </Field>
-
-            <Field
-              label="Repetir E-mail:"
-              error={errors.confirmEmail?.message}
-              required
-            >
-              <input
-                type="email"
-                placeholder="pedagogo@teste.com"
-                {...register("confirmEmail")}
-                className={getValidationClass(!!errors.confirmEmail)}
-                aria-label="Repetir E-mail"
-              />
-            </Field>
-
-            <Field label="Senha:" error={errors.password?.message} required>
-              <input
-                type="password"
-                placeholder="••••••••"
-                {...register("password")}
-                className={getValidationClass(!!errors.password)}
-                aria-label="Senha"
-              />
-            </Field>
-
-            <Field
-              label="Confirmação de Senha:"
-              error={errors.confirmPassword?.message}
-              required
-            >
-              <input
-                type="password"
-                placeholder="••••••••"
-                {...register("confirmPassword")}
-                className={getValidationClass(!!errors.confirmPassword)}
-                aria-label="Confirmação de Senha"
-              />
-            </Field>
+          <div className="relative z-10 border-t border-[rgba(107,196,166,0.2)] pt-6">
+            <p className="text-sm text-[#aac9bf]">
+              Já tem uma conta?{" "}
+              <Link
+                href={PATHS.login}
+                className="font-bold underline text-[#6bc4a6] hover:text-[#8dd4bb] transition-colors"
+              >
+                Fazer login →
+              </Link>
+            </p>
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-stone-200 py-4 px-7">
-          <CommonButton
-            label={isLoading ? "Criando conta..." : "Criar Conta"}
-            type="submit"
-            disabled={isLoading}
-            className="w-full justify-center"
-            aria-label="Criar Conta"
-          />
-        </div>
+        <div className="flex-1 bg-white flex flex-col">
+          <div className="shrink-0 px-8 pt-8 pb-4 flex flex-col items-center border-b border-stone-100 lg:items-start">
+            <Image
+              src={Images.logoHorizontal}
+              alt="SAP iComp Logo"
+              className="mb-4 h-9 w-auto lg:hidden"
+              priority
+            />
+            <h2 className="text-xl font-bold text-stone-800">Criar conta</h2>
+            <p className="text-sm text-stone-500 mt-1">
+              Informe seus dados para solicitar acesso
+            </p>
+          </div>
 
-        <div className="shrink-0 border-t border-stone-200 py-4 px-7 bg-stone-50/50 flex flex-col items-center gap-3">
-          <p className="m-0 text-sm text-stone-600">Já possui conta?</p>
-          <CommonButton
-            label="Voltar para o Login"
-            type="button"
-            onClick={handleBackToLogin}
-            className="w-full justify-center border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 mt-2"
-            aria-label="Voltar para o Login"
-          />
+          <div className="flex-1 min-h-0 px-4 sm:px-8 py-6 overflow-y-auto">
+            {globalError && (
+              <div className="mb-5 p-3 text-sm text-red-700 bg-red-50 rounded-md border border-red-200">
+                {globalError}
+              </div>
+            )}
+
+            <form onSubmit={onSubmit} noValidate>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <Field
+                    label="Nome completo:"
+                    error={errors.name?.message}
+                    required
+                  >
+                    <input
+                      type="text"
+                      placeholder="Ex: Maria da Silva"
+                      {...register("name")}
+                      className={getValidationClass(!!errors.name)}
+                    />
+                  </Field>
+                </div>
+
+                <Field
+                  label="Nº de registro:"
+                  error={errors.registrationNumber?.message}
+                  required
+                >
+                  <input
+                    type="text"
+                    placeholder="1234567"
+                    {...register("registrationNumber")}
+                    className={getValidationClass(!!errors.registrationNumber)}
+                  />
+                </Field>
+
+                <Field
+                  label="Telefone:"
+                  error={errors.phoneNumber?.message}
+                  required
+                >
+                  <input
+                    type="tel"
+                    placeholder="(92) 99999-9999"
+                    {...register("phoneNumber", {
+                      onChange: (e) => {
+                        e.target.value = maskPhone(e.target.value);
+                      },
+                    })}
+                    className={getValidationClass(!!errors.phoneNumber)}
+                  />
+                </Field>
+
+                <Field label="E-mail:" error={errors.email?.message} required>
+                  <input
+                    type="email"
+                    placeholder="nome@icomp.ufam.edu.br"
+                    {...register("email")}
+                    className={getValidationClass(!!errors.email)}
+                  />
+                </Field>
+
+                <Field
+                  label="Confirmar e-mail:"
+                  error={errors.confirmEmail?.message}
+                  required
+                >
+                  <input
+                    type="email"
+                    placeholder="nome@icomp.ufam.edu.br"
+                    {...register("confirmEmail")}
+                    className={getValidationClass(!!errors.confirmEmail)}
+                  />
+                </Field>
+
+                <div className="flex flex-col gap-1">
+                  <Field label="Senha:" required>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        {...register("password")}
+                        className={cn(
+                          getValidationClass(!!errors.password),
+                          "pr-10",
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors focus:outline-none"
+                        aria-label={
+                          showPassword ? "Ocultar senha" : "Mostrar senha"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </Field>
+                  {password.trim().length > 0 && (
+                    <PasswordRequirements password={password} />
+                  )}
+                </div>
+
+                <Field
+                  label="Confirmar senha:"
+                  error={errors.confirmPassword?.message}
+                  required
+                >
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      {...register("confirmPassword")}
+                      className={cn(
+                        getValidationClass(!!errors.confirmPassword),
+                        "pr-10",
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors focus:outline-none"
+                      aria-label={
+                        showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+                  </div>
+                </Field>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3">
+                <CommonButton
+                  label={isLoading ? "Enviando..." : "Solicitar acesso"}
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full justify-center"
+                />
+
+                <div className="flex items-center justify-center gap-1.5">
+                  <Lock size={12} className="text-stone-400" />
+                  <span className="text-xs text-stone-400">
+                    Seus dados são protegidos e criptografados
+                  </span>
+                </div>
+
+                <p className="text-sm text-center text-stone-500 lg:hidden">
+                  Já tem uma conta?{" "}
+                  <Link
+                    href={PATHS.login}
+                    className="font-semibold text-[#6bc4a6] hover:text-teal-700 transition-colors"
+                  >
+                    Fazer login
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
+      </div>
     </main>
   );
 }
