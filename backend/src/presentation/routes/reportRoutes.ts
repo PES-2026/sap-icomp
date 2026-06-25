@@ -9,7 +9,7 @@ export function reportRoutes(controller: ReportController, tokenService: ITokenS
 
   const auth = (req: any, res: any, next: any) => authMiddleware(tokenService, req, res, next);
 
-  router.get("/reports/form-metadata", auth, controller.getInitialData);
+  router.get("/reports/new", auth, controller.getInitialData);
   router.post("/reports", auth, controller.create);
   router.get("/reports/:reportId", auth, controller.getById);
   router.get("/reports", auth, controller.listByStudent);
