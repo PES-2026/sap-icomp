@@ -7,6 +7,12 @@ import { ITokenService } from "@domain/services/tokenService";
 
 export function reportRoutes(controller: ReportController, tokenService: ITokenService): Router {
   const router = Router();
+  const reportRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -19,12 +25,12 @@ export function reportRoutes(controller: ReportController, tokenService: ITokenS
 
   const auth = (req: any, res: any, next: any) => authMiddleware(tokenService, req, res, next);
 
-  router.get("/reports/new", auth, controller.getInitialData);
-  router.post("/reports", auth, controller.create);
-  router.get("/reports/:reportId", auth, controller.getById);
-  router.get("/reports", auth, controller.listByStudent);
-  router.post("/reports/:reportId", auth, controller.edit);
-  router.delete("/reports/:reportId", auth, controller.remove);
+  router.get("/reports/new", reportRateLimiter, auth, controller.getInitialData);
+  router.post("/reports", reportRateLimiter, auth, controller.create);
+  router.get("/reports/:reportId", reportRateLimiter, auth, controller.getById);
+  router.get("/reports", reportRateLimiter, auth, controller.listByStudent);
+  router.post("/reports/:reportId", reportRateLimiter, auth, controller.edit);
+  router.delete("/reports/:reportId", reportRateLimiter, auth, controller.remove);
 
   return router;
 }
