@@ -3,8 +3,8 @@ import { Result } from "@domain/shared/result";
 
 export class UpdateReportDTO {
   constructor(
-    public readonly studentId: string,
     public readonly reportId: string,
+    public readonly studentId: string,
     public readonly pedagogueId: string,
     public readonly condition: string,
     public readonly potential: string,
@@ -13,13 +13,14 @@ export class UpdateReportDTO {
     public readonly conclusion: string,
   ) {}
 
-  static create(studentId: any, reportId: any, data: any): Result<UpdateReportDTO, RequiredFieldError> {
-    const { pedagogueId, condition, potential, difficulties, recommendation, conclusion } = data;
-    if (!studentId || typeof studentId !== "string" || studentId.trim() === "") {
-      return Result.fail<UpdateReportDTO>(new RequiredFieldError("studentId"));
-    }
+  static create(reportId: any, data: any): Result<UpdateReportDTO, RequiredFieldError> {
+    const { studentId, pedagogueId, condition, potential, difficulties, recommendation, conclusion } = data;
+
     if (!reportId || typeof reportId !== "string" || reportId.trim() === "") {
       return Result.fail<UpdateReportDTO>(new RequiredFieldError("reportId"));
+    }
+    if (!studentId || typeof studentId !== "string" || studentId.trim() === "") {
+      return Result.fail<UpdateReportDTO>(new RequiredFieldError("studentId"));
     }
     if (!pedagogueId || typeof pedagogueId !== "string" || pedagogueId.trim() === "") {
       return Result.fail<UpdateReportDTO>(new RequiredFieldError("pedagogueId"));
@@ -42,8 +43,8 @@ export class UpdateReportDTO {
 
     return Result.ok<UpdateReportDTO>(
       new UpdateReportDTO(
-        studentId,
         reportId,
+        studentId,
         pedagogueId,
         condition,
         potential,

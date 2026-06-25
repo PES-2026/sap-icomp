@@ -4,25 +4,24 @@ import { Report } from "@domain/entities/report";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
 import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
-import { ReportOwnershipError } from "@application/errors/report/ReportOwnershipError";
-import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
+import { ReportOwnershipError } from "@application/errors/report/reportOwnershipError";
 
 export class UpdateReport {
   constructor(private readonly reportRepository: IReportRepository) {}
 
-  async execute(dto: UpdateReportDTO): Promise<Result<GetReportByIdResponseDTO, ApplicationError>> {
+  async execute(dto: UpdateReportDTO): Promise<Result<void, ApplicationError>> {
     const reportData = await this.reportRepository.findByIdWithDetails(dto.reportId);
 
     if (!reportData) {
-      return Result.fail<GetReportByIdResponseDTO>(new ReportNotFoundError(dto.reportId));
+      return Result.fail<void>(new ReportNotFoundError(dto.reportId));
     }
 
     if (reportData.student.externalId !== dto.studentId) {
-      return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("student"));
+      return Result.fail<void>(new ReportOwnershipError("student"));
     }
 
     if (reportData.pedagogue.externalId !== dto.pedagogueId) {
-      return Result.fail<GetReportByIdResponseDTO>(new ReportOwnershipError("pedagogue"));
+      return Result.fail<void>(new ReportOwnershipError("pedagogue"));
     }
 
     const report = Report.rehydrate({
@@ -41,11 +40,11 @@ export class UpdateReport {
     );
 
     if (updateResult.isFailure) {
-      return Result.fail<GetReportByIdResponseDTO>(updateResult.error as ApplicationError);
+      return Result.fail<void>(updateResult.error as ApplicationError);
     }
 
     await this.reportRepository.update(report);
 
-    return Result.ok();
+    return Result.ok<void>();
   }
 }
