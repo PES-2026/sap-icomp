@@ -1,7 +1,7 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
-import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdDto";
+import { GetReportByIdResponseDTO } from "@application/dtos/report/getReportByIdResponseDto";
 import { GetReportByIdDTO } from "@application/dtos/report/getReportByIdDto";
 import { ReportTransformerService } from "@domain/services/reportTransformerService";
 import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
