@@ -8,20 +8,11 @@ import { ITokenService } from "@domain/services/tokenService";
 export function reportRoutes(controller: ReportController, tokenService: ITokenService): Router {
   const router = Router();
   const reportRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 1 * 60 * 1000,
     max: 100,
     standardHeaders: true,
     legacyHeaders: false,
   });
-
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
-
-  router.use(limiter);
 
   const auth = (req: any, res: any, next: any) => authMiddleware(tokenService, req, res, next);
 
