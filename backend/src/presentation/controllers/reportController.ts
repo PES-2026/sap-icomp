@@ -3,10 +3,14 @@ import { Request, Response } from "express";
 import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
 import { CreateReport } from "@application/useCases/report/createReport";
 import { UpdateReport } from "@application/useCases/report/updateReport";
+import { RemoveReport } from "@application/useCases/report/removeReport";
 import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
 import { GetReportById } from "@application/useCases/report/getReportById";
 import { CreateReportDTO } from "@application/dtos/report/createReportDto";
 import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
+import { ListReportsByStudentDTO } from "@application/dtos/report/listReportsByStudentDto";
+import { RemoveReportDTO } from "@application/dtos/report/removeReportDto";
+import { GetReportByIdDTO } from "@application/dtos/report/getReportByIdDto";
 import { BaseController } from "./baseController";
 
 export class ReportController extends BaseController {
@@ -14,6 +18,7 @@ export class ReportController extends BaseController {
     private readonly getReportInitialDataUseCase: GetReportInitialData,
     private readonly createReportUseCase: CreateReport,
     private readonly updateReportUseCase: UpdateReport,
+    private readonly removeReportUseCase: RemoveReport,
     private readonly listReportsByStudentUseCase: ListReportsByStudent,
     private readonly getReportByIdUseCase: GetReportById,
   ) {
@@ -22,8 +27,8 @@ export class ReportController extends BaseController {
 
   getInitialData = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = req.params;
-      const result = await this.getReportInitialDataUseCase.execute(studentId);
+      const { studentId } = req.query;
+      const result = await this.getReportInitialDataUseCase.execute(studentId as string);
 
       this.handleResult(res, result);
     } catch (error) {
@@ -33,7 +38,7 @@ export class ReportController extends BaseController {
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = req.params;
+      const { studentId } = req.body;
       const dtoResult = CreateReportDTO.create(studentId, req.body);
 
       const result = await this.createReportUseCase.execute(dtoResult.getValue());
@@ -46,9 +51,9 @@ export class ReportController extends BaseController {
 
   edit = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId, reportId } = req.params;
+      const { reportId } = req.params;
 
-      const dtoResult = UpdateReportDTO.create(studentId, reportId, req.body);
+      const dtoResult = UpdateReportDTO.create(reportId, req.body);
 
       const result = await this.updateReportUseCase.execute(dtoResult.getValue());
 
@@ -60,9 +65,9 @@ export class ReportController extends BaseController {
 
   listByStudent = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = req.params;
+      const dtoResult = ListReportsByStudentDTO.create(req.body);
 
-      const result = await this.listReportsByStudentUseCase.execute(studentId);
+      const result = await this.listReportsByStudentUseCase.execute(dtoResult.getValue().studentId);
 
       this.handleResult(res, result);
     } catch (error) {
@@ -70,10 +75,25 @@ export class ReportController extends BaseController {
     }
   };
 
+  remove = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { reportId } = req.params;
+      const dtoResult = RemoveReportDTO.create(reportId);
+
+      const result = await this.removeReportUseCase.execute(dtoResult.getValue());
+
+      this.handleResult(res, result, 204);
+    } catch (error) {
+      this.handleError(error, res, `${ReportController.name}:remove`);
+    }
+  };
+
   getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { reportId } = req.params;
-      const result = await this.getReportByIdUseCase.execute(reportId);
+      const dtoResult = GetReportByIdDTO.create(reportId);
+
+      const result = await this.getReportByIdUseCase.execute(dtoResult.getValue());
 
       this.handleResult(res, result);
     } catch (error) {

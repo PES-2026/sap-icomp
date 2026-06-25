@@ -98,6 +98,7 @@ import { CreateReport } from "@application/useCases/report/createReport";
 import { GetReportById } from "@application/useCases/report/getReportById";
 import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
 import { UpdateReport } from "@application/useCases/report/updateReport";
+import { RemoveReport } from "@application/useCases/report/removeReport";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -235,10 +236,11 @@ const reportController = new ReportController(
   new GetReportInitialData(studentRepository),
   new CreateReport(reportRepository, attendanceRepository),
   new UpdateReport(reportRepository),
+  new RemoveReport(reportRepository),
   new ListReportsByStudent(reportRepository),
   new GetReportById(reportRepository),
 );
-app.use(reportRoutes(reportController));
+app.use(reportRoutes(reportController, tokenService));
 
 const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 

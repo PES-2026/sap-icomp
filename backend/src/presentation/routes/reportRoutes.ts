@@ -1,19 +1,20 @@
 import { Router } from "express";
 
 import { ReportController } from "../controllers/reportController";
+import { authMiddleware } from "../middlewares/auth";
+import { ITokenService } from "@domain/services/tokenService";
 
-export function reportRoutes(controller: ReportController): Router {
+export function reportRoutes(controller: ReportController, tokenService: ITokenService): Router {
   const router = Router();
 
-  router.get("/pedagogue/students/:studentId/reports/new", controller.getInitialData);
+  const auth = (req: any, res: any, next: any) => authMiddleware(tokenService, req, res, next);
 
-  router.post("/pedagogue/students/:studentId/reports/new", controller.create);
-
-  router.get("/pedagogue/students/:studentId/reports/:reportId", controller.getById);
-
-  router.get("/pedagogue/students/:studentId/reports", controller.listByStudent);
-
-  router.post("/pedagogue/students/:studentId/reports/:reportId/edit", controller.edit);
+  router.get("/reports/form-metadata", auth, controller.getInitialData);
+  router.post("/reports", auth, controller.create);
+  router.get("/reports/:reportId", auth, controller.getById);
+  router.get("/reports", auth, controller.listByStudent);
+  router.post("/reports/:reportId", auth, controller.edit);
+  router.delete("/reports/:reportId", auth, controller.remove);
 
   return router;
 }

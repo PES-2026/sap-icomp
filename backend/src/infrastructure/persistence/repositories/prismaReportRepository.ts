@@ -34,9 +34,16 @@ export class PrismaReportRepository implements IReportRepository {
     });
   }
 
+  async remove(id: string): Promise<void> {
+    await this.prisma.report.update({
+      where: { externalId: id },
+      data: { removed: true },
+    });
+  }
+
   async findByStudentId(studentId: string): Promise<ListReportItemDTO[]> {
     const reports = await this.prisma.report.findMany({
-      where: { student: { externalId: studentId } },
+      where: { student: { externalId: studentId }, removed: false },
       include: { pedagogue: true },
       orderBy: { createdAt: "desc" },
     });
@@ -51,7 +58,7 @@ export class PrismaReportRepository implements IReportRepository {
 
   async findById(id: string): Promise<any | null> {
     const report = await this.prisma.report.findUnique({
-      where: { externalId: id },
+      where: { externalId: id, removed: false },
       include: {
         student: {
           include: {
@@ -73,6 +80,7 @@ export class PrismaReportRepository implements IReportRepository {
         courseName: report.student.course.name,
       },
       pedagogueName: report.pedagogue.name,
+      pedagogueId: report.pedagogue.externalId,
       condition: report.condition,
       potential: report.potential,
       difficulties: report.difficulties,
@@ -82,9 +90,10 @@ export class PrismaReportRepository implements IReportRepository {
       updatedAt: report.updatedAt,
     };
   }
+
   async findByIdWithDetails(id: string): Promise<any | null> {
     const report = await this.prisma.report.findUnique({
-      where: { externalId: id },
+      where: { externalId: id, removed: false },
       include: {
         student: {
           include: {
@@ -101,25 +110,21 @@ export class PrismaReportRepository implements IReportRepository {
 
     return {
       reportExternalId: report.externalId,
-
       student: {
         externalId: report.student.externalId,
         name: report.student.name,
         enrollmentId: report.student.enrollmentId,
         courseName: report.student.course.name,
       },
-
       pedagogue: {
         externalId: report.pedagogue.externalId,
         name: report.pedagogue.name,
       },
-
       condition: report.condition,
       potential: report.potential,
       difficulties: report.difficulties,
       recommendation: report.recommendation,
       conclusion: report.conclusion,
-
       createdAt: report.createdAt,
       updatedAt: report.updatedAt,
     };
