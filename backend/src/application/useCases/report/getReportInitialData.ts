@@ -1,21 +1,18 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
-import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
 import { GetReportInitialDataResponseDTO } from "@application/dtos/report/getReportInitialDataDto";
+import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
 
 export class GetReportInitialData {
   constructor(private readonly studentRepository: IStudentRepository) {}
 
-  async execute(studentId: any): Promise<Result<GetReportInitialDataResponseDTO, ApplicationError>> {
-    if (!studentId || typeof studentId !== "string" || studentId.trim() === "") {
-      return Result.fail<GetReportInitialDataResponseDTO>(new RequiredFieldError("studentId"));
-    }
-    const student = await this.studentRepository.findByUUID(studentId);
+  async execute(dto: GetInitialDataDTO): Promise<Result<GetReportInitialDataResponseDTO, ApplicationError>> {
+    const student = await this.studentRepository.findByUUID(dto.studentId);
 
     if (!student) {
-      return Result.fail<GetReportInitialDataResponseDTO>(new StudentNotFoundError(studentId));
+      return Result.fail<GetReportInitialDataResponseDTO>(new StudentNotFoundError(dto.studentId));
     }
 
     return Result.ok<GetReportInitialDataResponseDTO>({

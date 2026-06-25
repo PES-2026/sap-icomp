@@ -11,6 +11,7 @@ import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
 import { ListReportsByStudentDTO } from "@application/dtos/report/listReportsByStudentDto";
 import { RemoveReportDTO } from "@application/dtos/report/removeReportDto";
 import { GetReportByIdDTO } from "@application/dtos/report/getReportByIdDto";
+import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
 import { BaseController } from "./baseController";
 
 export class ReportController extends BaseController {
@@ -28,7 +29,9 @@ export class ReportController extends BaseController {
   getInitialData = async (req: Request, res: Response): Promise<void> => {
     try {
       const { studentId } = req.query;
-      const result = await this.getReportInitialDataUseCase.execute(studentId as string);
+      const dtoResult = GetInitialDataDTO.create(studentId);
+
+      const result = await this.getReportInitialDataUseCase.execute(dtoResult.getValue());
 
       this.handleResult(res, result);
     } catch (error) {
