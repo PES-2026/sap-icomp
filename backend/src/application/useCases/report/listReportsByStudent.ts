@@ -7,10 +7,7 @@ import { RequiredFieldError } from "@domain/errors/requiredFieldError";
 export class ListReportsByStudent {
   constructor(private readonly reportRepository: IReportRepository) {}
 
-  async execute(studentId: any): Promise<Result<ListReportItemDTO[], ApplicationError>> {
-    if (!studentId || typeof studentId !== "string" || studentId.trim() === "") {
-      return Result.fail<ListReportItemDTO[]>(new RequiredFieldError("studentId"));
-    }
+  async execute(studentId: string): Promise<Result<ListReportItemDTO[], ApplicationError>> {
     const reports = await this.reportRepository.findByStudentId(studentId);
 
     return Result.ok<ListReportItemDTO[]>(reports);

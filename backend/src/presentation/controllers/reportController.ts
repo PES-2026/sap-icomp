@@ -68,7 +68,7 @@ export class ReportController extends BaseController {
 
   listByStudent = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dtoResult = ListReportsByStudentDTO.create(req.body);
+      const dtoResult = ListReportsByStudentDTO.create(req.params);
 
       const result = await this.listReportsByStudentUseCase.execute(dtoResult.getValue().studentId);
 

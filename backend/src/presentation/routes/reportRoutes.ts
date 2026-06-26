@@ -16,11 +16,11 @@ export function reportRoutes(controller: ReportController, tokenService: ITokenS
 
   const auth = (req: any, res: any, next: any) => authMiddleware(tokenService, req, res, next);
 
-  router.get("/reports/new", reportRateLimiter, auth, controller.getInitialData);
+  //router.get("/reports/new", reportRateLimiter, auth, controller.getInitialData);
   router.post("/reports", reportRateLimiter, auth, controller.create);
   router.get("/reports/:reportId", reportRateLimiter, auth, controller.getById);
-  router.get("/reports", reportRateLimiter, auth, controller.listByStudent);
-  router.post("/reports/:reportId", reportRateLimiter, auth, controller.edit);
+  router.get("/:studentId/reports", reportRateLimiter, auth, controller.listByStudent);
+  router.put("/reports/:reportId", reportRateLimiter, auth, controller.edit);
   router.delete("/reports/:reportId", reportRateLimiter, auth, controller.remove);
 
   return router;

@@ -1,5 +1,6 @@
 export interface ListReportItemDTO {
-  pedagogueExternalId: string;
+  reportId: string;
+  pedagogueId: string;
   pedagogueName: string;
   createdAt: Date;
   updatedAt: Date;

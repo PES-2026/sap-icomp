@@ -49,7 +49,8 @@ export class PrismaReportRepository implements IReportRepository {
     });
 
     return reports.map((report) => ({
-      pedagogueExternalId: report.pedagogue.externalId,
+      reportId: report.externalId,
+      pedagogueId: report.pedagogue.externalId,
       pedagogueName: report.pedagogue.name,
       createdAt: report.createdAt,
       updatedAt: report.updatedAt,
