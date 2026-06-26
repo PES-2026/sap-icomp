@@ -56,7 +56,7 @@ export class ReportController extends BaseController {
     try {
       const { reportId } = req.params;
 
-      const dtoResult = UpdateReportDTO.create(reportId, req.body);
+      const dtoResult = UpdateReportDTO.create(reportId, req.userId, req.body);
 
       const result = await this.updateReportUseCase.execute(dtoResult.getValue());
 
@@ -81,7 +81,7 @@ export class ReportController extends BaseController {
   remove = async (req: Request, res: Response): Promise<void> => {
     try {
       const { reportId } = req.params;
-      const dtoResult = RemoveReportDTO.create(reportId);
+      const dtoResult = RemoveReportDTO.create(reportId, req.body);
 
       const result = await this.removeReportUseCase.execute(dtoResult.getValue());
 

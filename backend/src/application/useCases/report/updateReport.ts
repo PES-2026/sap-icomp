@@ -23,7 +23,10 @@ export class UpdateReport {
     if (reportData.pedagogue.externalId !== dto.pedagogueId) {
       return Result.fail<void>(new ReportOwnershipError("pedagogue"));
     }
-
+    if (reportData.pedagogue.externalId !== dto.userId) {
+      return Result.fail<void>(new ReportOwnershipError("userId"));
+    } // this test is a security layer, indicate a potential security issue if the userId does not match the pedagogue's externalId
+    //it's necessary applycate others actions to registre this issue, like log this event, send an alert to the system administrator, or even block the user account until the issue is resolved.
     const report = Report.rehydrate({
       id: reportData.reportExternalId,
       studentId: reportData.student.externalId,
