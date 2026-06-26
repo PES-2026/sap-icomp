@@ -7,7 +7,7 @@ import CommonButton from "@/components/ui/CommonButton";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { SelectInput } from "@/components/ui/FilterSelect";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { UserRoundX } from "lucide-react";
+import { UserRoundCheck, UserRoundX } from "lucide-react";
 import { useUsers } from "../../hooks/useUsers";
 import { UserListItem, UserStatus, UserStatusFilter } from "../../types/user";
 import { formatRole, formatStatus } from "./UserTableColumns";
@@ -24,7 +24,7 @@ export function StatusBadge({ status }: { status: UserStatus }) {
   const colorClass = isActive
     ? "bg-emerald-100 text-emerald-700"
     : isInactive
-      ? "bg-stone-100 text-stone-700"
+      ? "bg-red-100 text-red-700"
       : "bg-amber-100 text-amber-700";
 
   return (
@@ -46,14 +46,19 @@ export default function UserTable() {
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("");
 
   const [showDisableUser, setShowDisableUser] = useState<boolean>(false);
+  const [showEnableUser, setShowEnableUser] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<UserListItem>(
     {} as UserListItem,
   );
 
-  const { users, totalPages, isLoading, removeUser } = useUsers(page, limit, {
-    name: debouncedNameFilter,
-    userStatus: statusFilter,
-  });
+  const { users, totalPages, isLoading, removeUser, activateUser } = useUsers(
+    page,
+    limit,
+    {
+      name: debouncedNameFilter,
+      userStatus: statusFilter,
+    },
+  );
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -82,6 +87,13 @@ export default function UserTable() {
   const handleDisableUser = () => {
     removeUser(selectedUser.id);
     setShowDisableUser(false);
+  };
+
+  const handleEnableUser = () => {
+    if (activateUser) {
+      activateUser(selectedUser.id);
+    }
+    setShowEnableUser(false);
   };
 
   const filteredUsers = users.filter((user) => {
@@ -154,22 +166,41 @@ export default function UserTable() {
     {
       label: "",
       width: "w-[70px]",
-      renderCell: (user) => (
-        <div className="flex justify-center gap-0.5">
-          <CommonButton
-            label=""
-            aria-label="Desativar usuário"
-            title="Desativar usuário"
-            onClick={() => {
-              setSelectedUser(user);
-              setShowDisableUser(true);
-            }}
-            className="flex items-center rounded-lg bg-transparent border-0 hover:bg-red-100 text-red-500 p-1 gap-0"
-            sizeIcon={20}
-            startIcon={UserRoundX}
-          />
-        </div>
-      ),
+      renderCell: (user) => {
+        const isDisabled = user.userStatus === "DISABLED";
+
+        return (
+          <div className="flex justify-center gap-0.5">
+            {isDisabled ? (
+              <CommonButton
+                label=""
+                aria-label="Ativar usuário"
+                title="Ativar usuário"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowEnableUser(true);
+                }}
+                className="flex items-center rounded-lg bg-transparent border-0 hover:bg-emerald-100 text-emerald-500 p-1 gap-0"
+                sizeIcon={20}
+                startIcon={UserRoundCheck}
+              />
+            ) : (
+              <CommonButton
+                label=""
+                aria-label="Desativar usuário"
+                title="Desativar usuário"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowDisableUser(true);
+                }}
+                className="flex items-center rounded-lg bg-transparent border-0 hover:bg-red-100 text-red-500 p-1 gap-0"
+                sizeIcon={20}
+                startIcon={UserRoundX}
+              />
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -197,6 +228,16 @@ export default function UserTable() {
         confirmColor="critical"
         onConfirm={handleDisableUser}
         onCancel={() => setShowDisableUser(false)}
+      />
+
+      <ConfirmModal
+        open={showEnableUser}
+        title={"Ativar Usuário"}
+        message={`Tem certeza que deseja ativar ${selectedUser.name}? O usuário voltará a ter acesso ao sistema.`}
+        confirmLabel="Ativar"
+        confirmColor="primary"
+        onConfirm={handleEnableUser}
+        onCancel={() => setShowEnableUser(false)}
       />
     </>
   );

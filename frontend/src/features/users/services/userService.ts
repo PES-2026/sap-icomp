@@ -33,4 +33,10 @@ export const userService = {
       fallbackMsg: "Não foi possível remover o usuário.",
     });
   },
+
+  async activate(id: string): Promise<void> {
+    await api.post(`/users/${id}/activate`, {
+      fallbackMsg: "Não foi possível ativar o usuário.",
+    });
+  },
 };

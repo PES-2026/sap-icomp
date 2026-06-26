@@ -54,6 +54,7 @@ export const CustomDatePicker = forwardRef<
   ) => {
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState<"days" | "months" | "years">("days");
+    const [alignRight, setAlignRight] = useState(false);
 
     const [currentDate, setCurrentDate] = useState(() => {
       if (value) {
@@ -66,6 +67,14 @@ export const CustomDatePicker = forwardRef<
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const availableSet = new Set(availableDates);
+
+    useEffect(() => {
+      if (isOpen && dropdownRef.current) {
+        const rect = dropdownRef.current.getBoundingClientRect();
+        const spaceToRight = window.innerWidth - rect.left;
+        setAlignRight(spaceToRight < 260);
+      }
+    }, [isOpen]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -239,7 +248,12 @@ export const CustomDatePicker = forwardRef<
           </button>
 
           {isOpen && (
-            <div className="absolute bottom-[calc(100%+6px)] sm:bottom-auto sm:top-[calc(100%+4px)] right-0 z-15 w-60 rounded-xl bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)] ring-1 ring-[#e8e0d5]">
+            <div
+              className={cn(
+                "absolute bottom-[calc(100%+6px)] sm:bottom-auto sm:top-[calc(100%+4px)] z-15 w-60 rounded-xl bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)] ring-1 ring-[#e8e0d5]",
+                alignRight ? "right-0" : "left-0",
+              )}
+            >
               <div className="mb-3 flex items-center justify-between">
                 <button
                   type="button"
