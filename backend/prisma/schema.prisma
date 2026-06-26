@@ -21,13 +21,13 @@ enum UserStatus {
   DISABLED
 }
 
-enum ScheduleSlotStatus {
+enum AvailabilityStatus {
   CREATED
   PENDING
   BOOKED
 }
 
-enum ScheduleStatus {
+enum AppointmentStatus {
   PENDING
   CONFIRMED
   CANCELED_BY_STUDENT
@@ -65,11 +65,11 @@ model Student {
   courseId Int
   course   Course @relation(fields: [courseId], references: [internalId])
 
-  attendances Attendance[]
-  reports     Report[]
-  diagnoses   StudentDiagnosis[]
-  enrollments Enrollment[]
-  schedules   Schedule[]
+  attendances  Attendance[]
+  reports      Report[]
+  diagnoses    StudentDiagnosis[]
+  enrollments  Enrollment[]
+  appointments Appointment[]
 }
 
 model AccountRequest {
@@ -100,17 +100,16 @@ model Pedagogue {
 
   userStatus UserStatus @default(APPROVED)
 
-  maxAttendanceTime Int? @default(60)
-
   removed   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  passwordResets PasswordReset[]
-  attendances    Attendance[]
-  reports        Report[]
-  schedules      Schedule[]
-  scheduleSlots  ScheduleSlot[]
+  passwordResets    PasswordReset[]
+  attendances       Attendance[]
+  reports           Report[]
+  appointments      Appointment[]
+  availabilities    Availability[]
+  appointmentGuests AppointmentGuest[]
 }
 
 model Professor {
@@ -151,10 +150,11 @@ model Attendance {
   observation String?
   removed     Boolean @default(false)
 
-  student   Student        @relation(fields: [studentId], references: [internalId])
-  pedagogue Pedagogue?     @relation(fields: [pedagogueId], references: [internalId])
-  type      AttendanceType @relation(fields: [typeId], references: [internalId])
-  schedules Schedule[]
+  student           Student            @relation(fields: [studentId], references: [internalId])
+  pedagogue         Pedagogue?         @relation(fields: [pedagogueId], references: [internalId])
+  type              AttendanceType     @relation(fields: [typeId], references: [internalId])
+  appointments      Appointment[]
+  appointmentGuests AppointmentGuest[]
 }
 
 model AttendanceType {
@@ -194,8 +194,9 @@ model Course {
   coordinatorId Int?
   coordinator   Professor? @relation("Coordinator", fields: [coordinatorId], references: [internalId])
 
-  students       Student[]
-  classOfferings ClassOffering[]
+  students          Student[]
+  classOfferings    ClassOffering[]
+  appointmentGuests AppointmentGuest[]
 }
 
 model Semester {
@@ -330,53 +331,88 @@ model PasswordReset {
   pedagogue   Pedagogue? @relation(fields: [pedagogueId], references: [internalId])
 }
 
-model Schedule {
+model Appointment {
   internalId Int    @id @default(autoincrement())
   externalId String @unique
 
   pedagogueId Int
   pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
 
-  studentId Int?
-  student   Student? @relation(fields: [studentId], references: [internalId])
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [internalId])
 
-  guestName  String?
-  guestEmail String?
-
-  startDate DateTime
-  endDate   DateTime
-
-  status ScheduleStatus @default(PENDING)
-  token  String         @unique
+  status AppointmentStatus @default(PENDING)
+  token  String            @unique
   reason String?
 
   attendanceId Int?
   attendance   Attendance? @relation(fields: [attendanceId], references: [internalId])
 
+  availabilityId Int          @unique
+  availability   Availability @relation(fields: [availabilityId], references: [internalId])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   removed   Boolean  @default(false)
 
-  slots ScheduleSlot[]
+  @@index([pedagogueId])
+  @@index([studentId])
+  @@index([status])
 }
 
-model ScheduleSlot {
+model AppointmentGuest {
   internalId Int    @id @default(autoincrement())
   externalId String @unique
 
   pedagogueId Int
   pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
 
-  scheduleId Int?
-  schedule   Schedule? @relation(fields: [scheduleId], references: [internalId])
+  courseId Int
+  course   Course @relation(fields: [courseId], references: [internalId])
+
+  availabilityId Int          @unique
+  availability   Availability @relation(fields: [availabilityId], references: [internalId])
+
+  studentName       String
+  studentEmail      String
+  studentEnrollment String
+  token             String  @unique
+  reason            String?
+
+  status AppointmentStatus @default(PENDING)
+
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  removed              Boolean     @default(false)
+  attendance           Attendance? @relation(fields: [attendanceInternalId], references: [internalId])
+  attendanceInternalId Int?
+
+  @@index([pedagogueId])
+  @@index([status])
+}
+
+model Availability {
+  internalId Int    @id @default(autoincrement())
+  externalId String @unique
+
+  pedagogueId Int
+  pedagogue   Pedagogue @relation(fields: [pedagogueId], references: [internalId])
+
+  appointment Appointment?
+
+  appointmentGuest AppointmentGuest?
 
   startDateTime  DateTime
   endDateTime    DateTime
   attendanceTime Int
 
-  status ScheduleSlotStatus @default(CREATED)
+  status AvailabilityStatus @default(CREATED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   removed   Boolean  @default(false)
+
+  @@index([pedagogueId])
+  @@index([startDateTime])
+  @@index([status])
 }
