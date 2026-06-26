@@ -1,8 +1,8 @@
-import { ScheduleStatusEnum } from "@domain/enum/scheduleStatus";
+import { AppointmentStatusEnum } from "@domain/enum/appointmentStatus";
 import { PaginationParams } from "@domain/shared/pagination";
 
-export interface ListScheduleFilters {
-  status?: ScheduleStatusEnum;
+export interface ListAppointmentFilters {
+  status?: AppointmentStatusEnum;
   startDate?: Date;
   endDate?: Date;
   pedagogueId?: string;
@@ -12,7 +12,6 @@ export interface ListScheduleFilters {
   studentEnrollment?: string;
   guestName?: string;
   guestEmail?: string;
-  date?: Date;
 }
 
-export type ScheduleListParams = PaginationParams<"filters", ListScheduleFilters>;
+export type AppointmentListParams = PaginationParams<"filters", ListAppointmentFilters>;
