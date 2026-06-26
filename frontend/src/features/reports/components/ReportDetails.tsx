@@ -4,8 +4,10 @@ import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
 import { useStudentById } from "@/features/students/hooks/useStudentById";
 import { useAuthStore } from "@/store/authStore";
-import { FileDown, Loader2, Pencil, Printer } from "lucide-react";
+import { Loader2, Pencil, Printer } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import { REPORT_TEMPLATE } from "../constants/reportTemplate";
 import { useReportById } from "../hooks/useReportById";
 import { formatReportLongDate } from "../utils/reportDates";
@@ -15,11 +17,26 @@ import { ReportErrorState } from "./ReportErrorState";
 export default function ReportDetails() {
   const params = useParams();
   const router = useRouter();
+
   const authenticatedUser = useAuthStore((state) => state.user);
   const studentId = decodeURIComponent((params.studentId as string) ?? "");
   const reportId = decodeURIComponent((params.reportId as string) ?? "");
+
   const { report, isLoading, error } = useReportById(studentId, reportId);
   const { student, isLoadingStudent } = useStudentById(studentId);
+
+  const documentRef = useRef<HTMLElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: documentRef,
+    documentTitle: `Relatorio_${student?.name?.replace(/\s+/g, "_") || "Aluno"}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 2cm 2cm 2cm 2cm !important;
+      }
+    `,
+  });
 
   if (isLoading || isLoadingStudent) {
     return (
@@ -42,7 +59,7 @@ export default function ReportDetails() {
 
   return (
     <main className="report-view min-h-full p-4 font-sans md:p-7">
-      <div className="report-screen-only mx-auto mb-4 flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3">
+      <div className="mx-auto mb-4 flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-stone-800">
             Visualizar Relatório
@@ -56,28 +73,22 @@ export default function ReportDetails() {
             label="Voltar para Edição"
             startIcon={Pencil}
             onClick={() => router.push(PATHS.edit_report(studentId, reportId))}
-            className="bg-sky-100 text-sky-700 hover:bg-sky-200"
           />
           <CommonButton
-            label="Imprimir"
+            label="Imprimir / Gerar PDF"
             startIcon={Printer}
-            disabled
-            title="Funcionalidade pendente"
-            className="border border-stone-200 bg-white text-stone-400 hover:scale-100 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-          />
-          <CommonButton
-            label="Gerar PDF"
-            startIcon={FileDown}
-            disabled
-            title="Funcionalidade pendente"
-            className="hover:scale-100 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handlePrint}
           />
         </div>
       </div>
 
-      <article className="report-document mx-auto min-h-[297mm] w-full max-w-[210mm] border border-stone-200 bg-white px-6 py-10 font-['Arial',sans-serif] text-black shadow-sm sm:px-[20mm] sm:py-[16mm]">
+      <article
+        ref={documentRef}
+        id="report-document"
+        className="report-document mx-auto min-h-[297mm] w-full max-w-[210mm] border border-stone-200 bg-white px-6 py-10 print:p-0 font-['Arial',sans-serif] text-black shadow-sm sm:px-[20mm] sm:py-[16mm] print:border-none print:shadow-none"
+      >
         <header className="report-document-header text-center">
-          <div className="text-[9.5pt] font-normal uppercase leading-[1.25]">
+          <div className="text-[9.5pt] font-normal uppercase leading-tight">
             {REPORT_TEMPLATE.institution.map((line) => (
               <p key={line}>{line}</p>
             ))}
@@ -118,7 +129,7 @@ export default function ReportDetails() {
           />
         </div>
 
-        <section className="mt-5 text-justify text-[10.5pt] leading-[1.45]">
+        <section className="mt-5 text-justify text-[10.5pt] leading-[1.45] break-inside-avoid">
           <p>
             {REPORT_TEMPLATE.contactIntroduction}{" "}
             <a
@@ -130,14 +141,11 @@ export default function ReportDetails() {
           </p>
         </section>
 
-        <p className="mt-9 text-center text-[10.5pt]">
-          {formatReportLongDate(
-            report.createdAt,
-            REPORT_TEMPLATE.location,
-          )}
+        <p className="mt-9 text-center text-[10.5pt] break-inside-avoid">
+          {formatReportLongDate(report.createdAt, REPORT_TEMPLATE.location)}
         </p>
 
-        <footer className="report-signature mt-14 text-center text-[10.5pt] leading-[1.45]">
+        <footer className="report-signature mt-14 text-center text-[10.5pt] leading-[1.45] break-inside-avoid">
           <p>{report.pedagogueName}</p>
           <p>
             {REPORT_TEMPLATE.signatureRole}
@@ -154,7 +162,7 @@ export default function ReportDetails() {
 
 function ReportSection({ title, content }: { title: string; content: string }) {
   return (
-    <section className="text-[10.5pt] leading-[1.45]">
+    <section className="text-[10.5pt] leading-[1.45] break-inside-avoid pt-2">
       <h2 className="mb-1 font-bold">{title}</h2>
       <LexicalReportEditor value={content} readOnly appearance="document" />
     </section>
