@@ -1,32 +1,32 @@
 import {
-  CreateScheduleAvailabilityDTO,
-  CreateScheduleAvailabilityItemDTO,
-  CreateScheduleAvailabilityResponseItem,
-} from "@application/dtos/schedule/createScheduleAvailability";
+  CreateAvailabilityDTO,
+  CreateAvailabilityItemDTO,
+  CreateAvailabilityResponseItem,
+} from "@application/dtos/availability/createAvailability";
 import { ApplicationError } from "@application/errors/applicationError";
+import { AppointmentConflictError } from "@application/errors/appointment/appointmentConflictError";
+import { DateIntegrityError } from "@application/errors/availability/dateIntegrityError";
 import { PedagogueNotFoundError } from "@application/errors/pedagogue/pedagogueNotFoundError";
-import { DateIntegrityError } from "@application/errors/schedule/dateIntegrityError";
-import { ScheduleConflictError } from "@application/errors/schedule/scheduleConflictError";
-import { ScheduleSlot } from "@domain/entities/scheduleSlot";
+import { Availability } from "@domain/entities/availability";
+import { AvailabilityStatusEnum } from "@domain/enum/availabilityStatus";
 import { DaysOfWeekEnum } from "@domain/enum/daysOfWeek";
-import { ScheduleSlotStatusEnum } from "@domain/enum/scheduleSlotStatus";
 import { DomainError } from "@domain/errors/domainError";
+import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
-import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
 import { Result } from "@domain/shared/result";
 
 import { GetWeekdayFromDate } from "./getWeekdayFromDate";
 
-export class CreateScheduleAvailability {
+export class CreateAvailability {
   constructor(
-    private readonly scheduleSlotRepository: IScheduleSlotRepository,
+    private readonly availabilityRepository: IAvailabilityRepository,
     private readonly pedagogueRepository: IPedagogueRepository,
     private readonly getWeekdayFromDate: GetWeekdayFromDate,
   ) {}
 
   async execute(
-    dto: CreateScheduleAvailabilityDTO,
-  ): Promise<Result<Array<CreateScheduleAvailabilityResponseItem>, ApplicationError | DomainError>> {
+    dto: CreateAvailabilityDTO,
+  ): Promise<Result<Array<CreateAvailabilityResponseItem>, ApplicationError | DomainError>> {
     const uniquePedagogueIds = [...new Set(dto.items.map((item) => item.pedagogueId))];
     const pedagoguesValidation = await this.validateWhetherPedagogueExists(uniquePedagogueIds);
 
@@ -34,8 +34,8 @@ export class CreateScheduleAvailability {
       return Result.fail(pedagoguesValidation.error!);
     }
 
-    const slotsToSave: Array<ScheduleSlot> = [];
-    const responseItems: Array<CreateScheduleAvailabilityResponseItem> = [];
+    const slotsToSave: Array<Availability> = [];
+    const responseItems: Array<CreateAvailabilityResponseItem> = [];
 
     for (const item of dto.items) {
       const weekDayValidation = this.validateWeekDay(item.date, item.weekday);
@@ -59,10 +59,10 @@ export class CreateScheduleAvailability {
         return Result.fail(overlapValidation.error!);
       }
 
-      const slotResult = ScheduleSlot.create({
+      const slotResult = Availability.create({
         startDateTime: startDateTime,
         endDateTime: endDateTime,
-        status: ScheduleSlotStatusEnum.CREATED,
+        status: AvailabilityStatusEnum.CREATED,
         attendanceTime: item.attendanceTime,
         pedagogueId: item.pedagogueId,
       });
@@ -76,7 +76,7 @@ export class CreateScheduleAvailability {
 
       responseItems.push({
         id: slot.id.value,
-        status: ScheduleSlotStatusEnum.CREATED,
+        status: AvailabilityStatusEnum.CREATED,
         date: item.date,
         weekday: item.weekday,
         pedagogueId: item.pedagogueId,
@@ -87,10 +87,10 @@ export class CreateScheduleAvailability {
     }
 
     if (slotsToSave.length > 0) {
-      await this.scheduleSlotRepository.saveMany(slotsToSave);
+      await this.availabilityRepository.saveMany(slotsToSave);
     }
 
-    return Result.ok<Array<CreateScheduleAvailabilityResponseItem>>(responseItems);
+    return Result.ok<Array<CreateAvailabilityResponseItem>>(responseItems);
   }
 
   private async validateWhetherPedagogueExists(pedagoguesIds: Array<string>) {
@@ -112,13 +112,13 @@ export class CreateScheduleAvailability {
     return Result.ok();
   }
 
-  private async validateSlotOverlap(item: CreateScheduleAvailabilityItemDTO, startDateTime: Date, endDateTime: Date) {
+  private async validateSlotOverlap(item: CreateAvailabilityItemDTO, startDateTime: Date, endDateTime: Date) {
     const startOfDay = new Date(startDateTime);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(startDateTime);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(
+    const existingSlots = await this.availabilityRepository.findAllAvailabilitiesByRange(
       item.pedagogueId,
       startOfDay,
       endOfDay,
@@ -132,7 +132,9 @@ export class CreateScheduleAvailability {
     );
 
     if (hasConflict) {
-      return Result.fail(new ScheduleConflictError(item.pedagogueId, item.start, item.end, item.date.toDateString()));
+      return Result.fail(
+        new AppointmentConflictError(item.pedagogueId, item.start, item.end, item.date.toDateString()),
+      );
     }
 
     return Result.ok();

@@ -1,29 +1,29 @@
 import {
-  PreviewScheduleAvailabilityDTO,
-  PreviewScheduleAvailabilityItemResponse,
-  ScheduleSlot,
-} from "@application/dtos/schedule/previewScheduleAvailability";
+  Availability,
+  PreviewAvailabilityDTO,
+  PreviewAvailabilityItemResponse,
+} from "@application/dtos/availability/previewAvailability";
 import { ApplicationError } from "@application/errors/applicationError";
-import { AttendanceTimeGreatherThanZeroError } from "@application/errors/schedule/attendanceTimeGreatherThanZeroError";
-import { EndHourLowerThanStartHourError } from "@application/errors/schedule/endHourLowerThanStartHourError";
-import { ScheduleSlotPreview } from "@domain/entities/scheduleSlotPreview";
-import { ScheduleSlotPreviewStatus } from "@domain/enum/scheduleSlotStatus";
+import { EndHourLowerThanStartHourError } from "@application/errors/appointment/endHourLowerThanStartHourError";
+import { AttendanceTimeGreatherThanZeroError } from "@application/errors/availability/attendanceTimeGreatherThanZeroError";
+import { AvailabilityPreview } from "@domain/entities/availabilityPreview";
+import { AvailabilityPreviewStatus } from "@domain/enum/availabilityStatus";
 import { DomainError } from "@domain/errors/domainError";
-import { ScheduleSlotResult } from "@domain/repositories/results/scheduleSlotResult";
-import { IScheduleSlotRepository } from "@domain/repositories/scheduleSlotRepository";
+import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
+import { AvailabilityResult } from "@domain/repositories/results/availabilityResult";
 import { Result } from "@domain/shared/result";
 
 import { GetWeekdayFromDate } from "./getWeekdayFromDate";
 
-export class PreviewScheduleAvailability {
+export class PreviewAvailability {
   constructor(
-    private readonly scheduleSlotRepository: IScheduleSlotRepository,
+    private readonly availabilityRepository: IAvailabilityRepository,
     private readonly getWeekdayFromDate: GetWeekdayFromDate,
   ) {}
 
   async execute(
-    dto: PreviewScheduleAvailabilityDTO,
-  ): Promise<Result<Array<PreviewScheduleAvailabilityItemResponse>, ApplicationError | DomainError>> {
+    dto: PreviewAvailabilityDTO,
+  ): Promise<Result<Array<PreviewAvailabilityItemResponse>, ApplicationError | DomainError>> {
     if (dto.attendanceTime <= 0) {
       return Result.fail(new AttendanceTimeGreatherThanZeroError());
     }
@@ -38,7 +38,11 @@ export class PreviewScheduleAvailability {
     const endRange = new Date(dto.endDate);
     endRange.setHours(23, 59, 59, 999);
 
-    const existingSlots = await this.scheduleSlotRepository.findAllSlotsByRange(dto.pedagogueId, startRange, endRange);
+    const existingSlots = await this.availabilityRepository.findAllAvailabilitiesByRange(
+      dto.pedagogueId,
+      startRange,
+      endRange,
+    );
 
     const previewItems = this.getAvailabilitySlots(
       dto.pedagogueId,
@@ -66,9 +70,9 @@ export class PreviewScheduleAvailability {
     breakTime: number,
     startHour: number,
     endHour: number,
-    existingSlots: ScheduleSlotResult[],
-  ): Result<Array<PreviewScheduleAvailabilityItemResponse>> {
-    const previewItems: Array<PreviewScheduleAvailabilityItemResponse> = [];
+    existingSlots: AvailabilityResult[],
+  ): Result<Array<PreviewAvailabilityItemResponse>> {
+    const previewItems: Array<PreviewAvailabilityItemResponse> = [];
 
     const tempStartDate = new Date(startDate);
     const tempEndDate = new Date(endDate);
@@ -78,7 +82,7 @@ export class PreviewScheduleAvailability {
     const currentDate = new Date(tempStartDate);
 
     while (currentDate <= tempEndDate) {
-      const slots: Array<ScheduleSlot> = [];
+      const slots: Array<Availability> = [];
       let currentStartMinutes = startHour;
 
       while (currentStartMinutes + attendanceTime <= endHour) {
@@ -93,13 +97,13 @@ export class PreviewScheduleAvailability {
             s.startDateTime.getTime() === startDateTime.getTime() && s.endDateTime.getTime() === endDateTime.getTime(),
         );
 
-        const previewEntityResult = ScheduleSlotPreview.create({
+        const previewEntityResult = AvailabilityPreview.create({
           id: existingSlot?.id,
           pedagogueId: pedagogueId,
           startDateTime: startDateTime,
           endDateTime: endDateTime,
           attendanceTime: attendanceTime,
-          status: existingSlot ? existingSlot.status : ScheduleSlotPreviewStatus.AVAILABLE,
+          status: existingSlot ? existingSlot.status : AvailabilityPreviewStatus.AVAILABLE,
         });
 
         if (previewEntityResult.isFailure) {
@@ -108,7 +112,7 @@ export class PreviewScheduleAvailability {
 
         const previewEntity = previewEntityResult.getValue();
 
-        const slotItem: ScheduleSlot = {
+        const slotItem: Availability = {
           start: currentStartMinutes,
           end: currentStartMinutes + attendanceTime,
           attendanceTime: previewEntity.attendanceTime.value,
