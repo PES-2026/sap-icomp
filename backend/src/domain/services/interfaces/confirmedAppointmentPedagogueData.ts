@@ -1,6 +1,7 @@
-export interface PedagogueAppointmentEmailData {
+export interface AppointmentConfirmedPedagogueEmailData {
   pedagogueName: string;
   studentName: string;
+  enrollment: string;
   course: string;
   email: string;
   date: string;

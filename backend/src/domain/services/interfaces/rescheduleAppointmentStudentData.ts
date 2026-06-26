@@ -1,4 +1,4 @@
-export interface RescheduledStudentEmailData {
+export interface RescheduledAppointmentStudentEmailData {
   name: string;
   pedagogue: string;
   previousDate: string;

@@ -1,4 +1,4 @@
-export interface CancelledPedagogueEmailData {
+export interface CancelledAppointmentPedagogueEmailData {
   pedagogueName: string;
   studentName: string;
   enrollment: string;
