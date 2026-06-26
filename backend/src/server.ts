@@ -5,6 +5,18 @@ import express from "express";
 import { ApproveAccountRequest } from "@application/useCases/accountRequest/approveAccountRequest";
 import { CreateAccountRequest } from "@application/useCases/accountRequest/createAccountRequest";
 import { ListPendingAccountRequests } from "@application/useCases/accountRequest/listPendingAccountRequests";
+import { AppointmentById } from "@application/useCases/appointment/appointmentById";
+import { AppointmentResolver } from "@application/useCases/appointment/appointmentResolver";
+import { CancelAppointment } from "@application/useCases/appointment/cancelAppointment";
+import { CancelAppointmentPedagogue } from "@application/useCases/appointment/cancelAppointmentPedagogue";
+import { CancelAppointmentStudent } from "@application/useCases/appointment/cancelAppointmentStudent";
+import { ConfirmAppointment } from "@application/useCases/appointment/confirmAppointment";
+import { ListAppointmentsByPedagogue } from "@application/useCases/appointment/listAppointmentsByPedagogue";
+import { RequestAppointment } from "@application/useCases/appointment/requestAppointment";
+import { RescheduleAppointment } from "@application/useCases/appointment/rescheduleAppointment";
+import { RescheduleAppointmentPedagogue } from "@application/useCases/appointment/rescheduleAppointmentPedagogue";
+import { RescheduleAppointmentStudent } from "@application/useCases/appointment/rescheduleAppointmentStudent";
+import { VerifyMissedExpiredStatus } from "@application/useCases/appointment/verifyMissedExpiredStatus";
 import { AttendanceById } from "@application/useCases/attendance/attendanceById";
 import { AttendancesByStudent } from "@application/useCases/attendance/attendanceByStudent";
 import { CreateAttendance } from "@application/useCases/attendance/createAttendance";
@@ -16,6 +28,13 @@ import { CreateAttendanceType } from "@application/useCases/attendanceType/creat
 import { ListAttendanceTypes } from "@application/useCases/attendanceType/listAttendanceType";
 import { RemoveAttendanceType } from "@application/useCases/attendanceType/removeAttendanceType";
 import { UpdateAttendanceType } from "@application/useCases/attendanceType/updateAttendanceType";
+import { CreateAvailability } from "@application/useCases/availability/createAvailability";
+import { GetWeekdayFromDate } from "@application/useCases/availability/getWeekdayFromDate";
+import { ListAvailabilitiesByPedagogue } from "@application/useCases/availability/listAvailabilitiesByPedagogue";
+import { PreviewAvailability } from "@application/useCases/availability/previewAvailability";
+import { RemoveAvailability } from "@application/useCases/availability/removeAvailability";
+import { RemoveManyAvailabilities } from "@application/useCases/availability/removeManyAvailabilities";
+import { ValidateAvailability } from "@application/useCases/availability/validateAvailability";
 import { CourseById } from "@application/useCases/course/courseById";
 import { CreateCourse } from "@application/useCases/course/createCourse";
 import { ListCourse } from "@application/useCases/course/listCourse";
@@ -26,19 +45,6 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
-import { CancelSchedule } from "@application/useCases/schedule/cancelSchedule";
-import { CancelScheduleByToken } from "@application/useCases/schedule/cancelScheduleByToken";
-import { ConfirmSchedule } from "@application/useCases/schedule/confirmSchedule";
-import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
-import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
-import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
-import { ListSchedules } from "@application/useCases/schedule/listSchedules";
-import { PreviewScheduleAvailability } from "@application/useCases/schedule/previewScheduleAvailability";
-import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
-import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
-import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
-import { RescheduleSchedule } from "@application/useCases/schedule/rescheduleSchedule";
-import { RescheduleScheduleByToken } from "@application/useCases/schedule/rescheduleScheduleByToken";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -57,64 +63,49 @@ import { UserResolver } from "@application/useCases/user/userResolver";
 import { env } from "@infrastructure/config/env";
 import { prisma } from "@infrastructure/persistence/prisma";
 import { PrismaAccountRequestRepository } from "@infrastructure/persistence/repositories/prismaAccountRequestRepository";
+import { PrismaAppointmentGuestRepository } from "@infrastructure/persistence/repositories/prismaAppointmentGuestRepository";
+import { PrismaAppointmentRepository } from "@infrastructure/persistence/repositories/prismaAppointmentWithStudentRepository";
 import { PrismaAttendanceRepository } from "@infrastructure/persistence/repositories/prismaAttendanceRepository";
 import { PrismaAttendanceTypeRepository } from "@infrastructure/persistence/repositories/prismaAttendanceTypeRepository";
+import { PrismaAvailabilityRepository } from "@infrastructure/persistence/repositories/prismaAvailabilityRepository";
 import { PrismaCourseRepository } from "@infrastructure/persistence/repositories/prismaCourseRepository";
 import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositories/prismaDiagnosesRepository";
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
-import { PrismaScheduleRepository } from "@infrastructure/persistence/repositories/prismaScheduleRepository";
-import { PrismaScheduleSlotRepository } from "@infrastructure/persistence/repositories/prismaScheduleSlotRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { EmailService } from "@infrastructure/services/email/providers/gmailService";
 import { JwtTokenService } from "@infrastructure/services/jwtTokenService";
 import { AccountRequestController } from "@presentation/controllers/accountRequestController";
+import { AppointmentController } from "@presentation/controllers/appointmentController";
 import { AttendanceController } from "@presentation/controllers/attendanceController";
 import { AttendanceTypeController } from "@presentation/controllers/attendanceTypeController";
 import { AuthController } from "@presentation/controllers/authController";
+import { AvailabilityController } from "@presentation/controllers/availabilityController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
-import { ScheduleController } from "@presentation/controllers/scheduleController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
 import { accountRequestRoutes } from "@presentation/routes/accountRequestRoutes";
+import { appointmentRoutes } from "@presentation/routes/appointmentRoutes";
 import { attendanceRoutes } from "@presentation/routes/attendanceRoutes";
 import { attendanceTypeRoutes } from "@presentation/routes/attendanceTypeRoutes";
 import { authRoutes } from "@presentation/routes/authRoutes";
+import { availabilityRoutes } from "@presentation/routes/availabilityRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
-import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
 import { userRoutes } from "@presentation/routes/userRoutes";
 
 const app = express();
-app.set("trust proxy", 1);
-app.use(cookieParser());
-app.use(express.json());
 
 const allowedOrigins = [
   `https://${env.FRONTEND_HOST}`,
   `http://${env.FRONTEND_HOST}`,
   `http://${env.FRONTEND_HOST}:${env.FRONTEND_PORT}`,
 ];
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"), false);
-    },
-    credentials: true,
-  }),
-);
 
 const courseRepository = new PrismaCourseRepository(prisma);
 
@@ -135,10 +126,6 @@ const studentController = new StudentController(
   new RemoveStudent(studentRepository),
 );
 
-app.use(studentRoutes(studentController));
-
-app.use(courseRoutes(courseController));
-
 const attendanceTypeRepository = new PrismaAttendanceTypeRepository(prisma);
 
 const attendanceTypeController = new AttendanceTypeController(
@@ -148,8 +135,6 @@ const attendanceTypeController = new AttendanceTypeController(
   new RemoveAttendanceType(attendanceTypeRepository),
   new AttendanceTypeById(attendanceTypeRepository),
 );
-
-app.use(attendanceTypeRoutes(attendanceTypeController));
 
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
@@ -162,8 +147,6 @@ const accountRequestController = new AccountRequestController(
   new ListPendingAccountRequests(accountRequestRepository),
 );
 
-app.use(accountRequestRoutes(accountRequestController));
-
 const userController = new UserController(
   new ListUsers(pedagogueRepository, professorRepository),
   new UpdateUser(pedagogueRepository, professorRepository, studentRepository),
@@ -171,8 +154,6 @@ const userController = new UserController(
   new GetUserById(pedagogueRepository, professorRepository),
   new RemoveUser(pedagogueRepository, professorRepository),
 );
-
-app.use(userRoutes(userController));
 
 const tokenService = new JwtTokenService();
 const emailService = new EmailService();
@@ -195,8 +176,6 @@ const authController = new AuthController(
   resetPasswordUseCase,
 );
 
-app.use(authRoutes(authController, tokenService));
-
 const attendanceRepository = new PrismaAttendanceRepository(prisma);
 const attendanceController = new AttendanceController(
   new CreateAttendance(attendanceRepository, studentRepository),
@@ -207,8 +186,6 @@ const attendanceController = new AttendanceController(
   new AttendanceById(attendanceRepository),
 );
 
-app.use(attendanceRoutes(attendanceController));
-
 const diagnosisRepository = new PrismaDiagnosesRepository(prisma);
 const diagnosesController = new DiagnosesController(
   new CreateDiagnosis(diagnosisRepository),
@@ -218,100 +195,148 @@ const diagnosesController = new DiagnosesController(
   new DiagnosisById(diagnosisRepository),
 );
 
-app.use(diagnosesRoutes(diagnosesController));
+const availabilityRepository = new PrismaAvailabilityRepository(prisma);
 
-const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
+const appointmentRepository = new PrismaAppointmentRepository(prisma);
 
-const scheduleRepository = new PrismaScheduleRepository(prisma);
+const appointmentGuestRepository = new PrismaAppointmentGuestRepository(prisma);
 
-const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
-const previewScheduleAvailabilityUseCase = new PreviewScheduleAvailability(
-  scheduleSlotRepository,
-  getWeekdayFromDateUseCase,
-);
-const createScheduleAvailabilityUseCase = new CreateScheduleAvailability(
-  scheduleSlotRepository,
-  pedagogueRepository,
-  getWeekdayFromDateUseCase,
+const verifyMissedExpiredUseCase = new VerifyMissedExpiredStatus(appointmentRepository, appointmentGuestRepository);
+
+const listAppointmentsUseCase = new ListAppointmentsByPedagogue(
+  appointmentRepository,
+  appointmentGuestRepository,
+  verifyMissedExpiredUseCase,
 );
 
-const listScheduleSlotsUseCase = new ListScheduleAvailability(scheduleSlotRepository);
+const appointmentResolverUseCase = new AppointmentResolver(
+  appointmentRepository,
+  appointmentGuestRepository,
+  verifyMissedExpiredUseCase,
+);
 
-const listSchedulesUseCase = new ListSchedules(scheduleRepository);
+const appointmentByIdUseCase = new AppointmentById(appointmentResolverUseCase);
 
-const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository);
-
-const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
-
-const confirmScheduleUseCase = new ConfirmSchedule(
-  scheduleRepository,
+const confirmAppointmentUseCase = new ConfirmAppointment(
+  appointmentResolverUseCase,
+  appointmentRepository,
+  appointmentGuestRepository,
   pedagogueRepository,
-  studentRepository,
   emailService,
 );
 
-const cancelScheduleUseCase = new CancelSchedule(
-  scheduleRepository,
-  scheduleSlotRepository,
+const cancelAppointmentUseCase = new CancelAppointment(
+  appointmentResolverUseCase,
+  appointmentRepository,
+  appointmentGuestRepository,
+  availabilityRepository,
   pedagogueRepository,
-  studentRepository,
   emailService,
 );
 
-const rescheduleScheduleUseCase = new RescheduleSchedule(
-  scheduleRepository,
-  scheduleSlotRepository,
-  pedagogueRepository,
-  studentRepository,
-  emailService,
-  env.FRONTEND_URL,
-);
+const validateAvailabilityUseCase = new ValidateAvailability(availabilityRepository, pedagogueRepository);
 
-const cancelScheduleByTokenUseCase = new CancelScheduleByToken(
-  scheduleRepository,
-  scheduleSlotRepository,
+const rescheduleAppointment = new RescheduleAppointment(
+  appointmentResolverUseCase,
+  validateAvailabilityUseCase,
+  appointmentRepository,
+  appointmentGuestRepository,
+  availabilityRepository,
   pedagogueRepository,
-  studentRepository,
   emailService,
 );
 
-const rescheduleScheduleByTokenUseCase = new RescheduleScheduleByToken(
-  scheduleRepository,
-  scheduleSlotRepository,
-  pedagogueRepository,
-  studentRepository,
-  emailService,
-  env.FRONTEND_URL,
-);
+const rescheduleAppointmentPedagogueUseCase = new RescheduleAppointmentPedagogue(rescheduleAppointment);
 
-const requestScheduleUseCase = new RequestSchedule(
-  scheduleRepository,
+const rescheduleAppointmentStudentUseCase = new RescheduleAppointmentStudent(rescheduleAppointment);
+
+const requestAppointmentUseCase = new RequestAppointment(
+  appointmentRepository,
+  appointmentGuestRepository,
+  availabilityRepository,
   pedagogueRepository,
   studentRepository,
-  scheduleSlotRepository,
   courseRepository,
   emailService,
+  validateAvailabilityUseCase,
 );
 
-const scheduleController = new ScheduleController(
-  previewScheduleAvailabilityUseCase,
-  createScheduleAvailabilityUseCase,
-  requestScheduleUseCase,
-  listScheduleSlotsUseCase,
-  removeScheduleSlotUseCase,
-  removeManyScheduleSlotsUseCase,
-  listSchedulesUseCase,
-  confirmScheduleUseCase,
-  cancelScheduleUseCase,
-  rescheduleScheduleUseCase,
-  cancelScheduleByTokenUseCase,
-  rescheduleScheduleByTokenUseCase,
+const cancelAppointmentPedagogueUseCase = new CancelAppointmentPedagogue(cancelAppointmentUseCase);
+
+const cancelAppointmentStudentUseCase = new CancelAppointmentStudent(cancelAppointmentUseCase);
+
+const appointmentController = new AppointmentController(
+  appointmentByIdUseCase,
+  cancelAppointmentPedagogueUseCase,
+  cancelAppointmentStudentUseCase,
+  confirmAppointmentUseCase,
+  requestAppointmentUseCase,
+  listAppointmentsUseCase,
+  rescheduleAppointmentPedagogueUseCase,
+  rescheduleAppointmentStudentUseCase,
 );
 
-app.use(scheduleRoutes(scheduleController, tokenService));
+const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
+const previewAvailabilityUseCase = new PreviewAvailability(availabilityRepository, getWeekdayFromDateUseCase);
+const createAvailabilityUseCase = new CreateAvailability(
+  availabilityRepository,
+  pedagogueRepository,
+  getWeekdayFromDateUseCase,
+);
+const listAvailabilitiesByPedagogueUseCase = new ListAvailabilitiesByPedagogue(availabilityRepository);
+const removeAvailabilityUseCase = new RemoveAvailability(availabilityRepository);
+const removeManyAvailabilitiesUseCase = new RemoveManyAvailabilities(availabilityRepository);
 
-// Global error handler should be the last middleware registered
+const availabililtyController = new AvailabilityController(
+  previewAvailabilityUseCase,
+  createAvailabilityUseCase,
+  listAvailabilitiesByPedagogueUseCase,
+  removeAvailabilityUseCase,
+  removeManyAvailabilitiesUseCase,
+);
+
+app.use(cookieParser());
+
+app.use(express.json());
+
+app.set("trust proxy", 1);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    credentials: true,
+  }),
+);
+
 app.use(errorHandler);
+
+app.use(attendanceTypeRoutes(attendanceTypeController));
+
+app.use(accountRequestRoutes(accountRequestController));
+
+app.use(userRoutes(userController));
+
+app.use(authRoutes(authController, tokenService));
+
+app.use(attendanceRoutes(attendanceController));
+
+app.use(diagnosesRoutes(diagnosesController));
+
+app.use(appointmentRoutes(appointmentController, tokenService));
+
+app.use(studentRoutes(studentController));
+
+app.use(courseRoutes(courseController));
+
+app.use(availabilityRoutes(availabililtyController, tokenService));
 
 const PORT = env.BACKEND_PORT;
 
