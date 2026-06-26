@@ -1,7 +1,7 @@
-import { RescheduledPedagogueAppointmentEmailData } from "@domain/services/interfaces/rescheduleAppointmentPedagogueData";
+import { AppointmentConfirmedPedagogueEmailData } from "@domain/services/interfaces/confirmedAppointmentPedagogueData";
 
-export function buildRescheduledPedagogueTemplate(
-  data: RescheduledPedagogueAppointmentEmailData,
+export function buildAppointmentConfirmedPedagogueTemplate(
+  data: AppointmentConfirmedPedagogueEmailData,
   dashboardLink: string,
 ): string {
   return `
@@ -37,9 +37,21 @@ export function buildRescheduledPedagogueTemplate(
 
         <!-- Header -->
         <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="background-color:#085041;padding:24px 28px;border-radius:16px 16px 0 0;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.8);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px;">Agendamento remarcado</div>
-            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Um atendimento foi remarcado</div>
+          <tr><td style="background-color:#085041;padding:26px 28px;border-radius:16px 16px 0 0;">
+            <table cellpadding="0" cellspacing="0" style="margin-bottom:10px;"><tr>
+              <td style="vertical-align:middle;padding-right:10px;">
+                <div style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.18);display:inline-block;text-align:center;line-height:38px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;">
+                    <path d="M5 13L9 17L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </td>
+              <td style="vertical-align:middle;">
+                <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.85);letter-spacing:0.4px;text-transform:uppercase;">Confirmação registrada</div>
+              </td>
+            </tr></table>
+            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Atendimento confirmado com sucesso</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:6px;">O aluno foi notificado por e-mail.</div>
           </td></tr>
         </table>
 
@@ -51,7 +63,7 @@ export function buildRescheduledPedagogueTemplate(
             <p style="margin:0 0 16px;font-size:15px;font-weight:bold;color:#1a1a1a;">${data.pedagogueName}</p>
 
             <p style="margin:0 0 20px;font-size:14px;color:#555555;line-height:1.7;">
-              Um aluno remarcou um atendimento em sua agenda no <strong style="color:#1a1a1a;">SAP-IComp</strong>. O horário anterior foi liberado e o novo aguarda sua confirmação.
+              Você confirmou o atendimento abaixo no <strong style="color:#1a1a1a;">SAP-IComp</strong>. Este é um resumo para seu controle — o aluno já foi notificado automaticamente.
             </p>
 
             <!-- Dados do aluno -->
@@ -71,73 +83,55 @@ export function buildRescheduledPedagogueTemplate(
                     <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Curso</td>
                     <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.course}</td>
                   </tr>
+                  <tr>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">E-mail</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.email}</td>
+                  </tr>
                 </table>
               </td></tr>
             </table>
 
-            <!-- Horário anterior -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
-              <tr><td style="background-color:#fdf2f2;border-radius:10px;border:1px solid #f5c4b3;padding:14px 18px;">
-                <p style="margin:0 0 10px;font-size:11px;font-weight:bold;color:#c0392b;text-transform:uppercase;letter-spacing:0.5px;">Horário liberado</p>
+            <!-- Detalhes confirmados -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr><td style="background-color:#f0f9f6;border-radius:10px;border:2px solid #4ecba4;padding:16px 18px;">
+                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#085041;text-transform:uppercase;letter-spacing:0.5px;">&#10003; Atendimento confirmado</p>
                 <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
                   <tr>
-                    <td style="color:#888888;padding:4px 0;width:44%;">Data</td>
-                    <td style="color:#aaaaaa;padding:4px 0;text-decoration:line-through;">${data.previousDate}</td>
+                    <td style="color:#555555;padding:5px 0;width:44%;">Data</td>
+                    <td style="color:#085041;font-weight:bold;padding:5px 0;">${data.date}</td>
                   </tr>
                   <tr>
-                    <td style="color:#888888;padding:4px 0;border-top:1px solid #f5c4b3;">Horário</td>
-                    <td style="color:#aaaaaa;padding:4px 0;border-top:1px solid #f5c4b3;text-decoration:line-through;">${data.previousStartTime} &#8212; ${data.previousEndTime}</td>
+                    <td style="color:#555555;padding:5px 0;border-top:1px solid #a0ddc5;">Horário</td>
+                    <td style="color:#085041;font-weight:bold;padding:5px 0;border-top:1px solid #a0ddc5;">${data.startTime} &#8212; ${data.endTime}</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#555555;padding:5px 0;border-top:1px solid #a0ddc5;">Duração</td>
+                    <td style="color:#085041;font-weight:bold;padding:5px 0;border-top:1px solid #a0ddc5;">${data.duration}</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#555555;padding:5px 0;border-top:1px solid #a0ddc5;">Motivo</td>
+                    <td style="color:#085041;font-weight:bold;padding:5px 0;border-top:1px solid #a0ddc5;">${data.reason}</td>
                   </tr>
                 </table>
               </td></tr>
             </table>
 
-            <!-- Seta -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
-              <tr><td align="center" style="font-size:20px;color:#d97706;padding:6px 0;">&#8595;</td></tr>
-            </table>
-
-            <!-- Novo horário -->
+            <!-- Notificação ao aluno -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-              <tr><td style="background-color:#f0f9f6;border-radius:10px;border:1px solid #a0ddc5;padding:14px 18px;">
-                <p style="margin:0 0 10px;font-size:11px;font-weight:bold;color:#085041;text-transform:uppercase;letter-spacing:0.5px;">Novo horário solicitado</p>
-                <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
-                  <tr>
-                    <td style="color:#888888;padding:4px 0;width:44%;">Data</td>
-                    <td style="color:#085041;font-weight:bold;padding:4px 0;">${data.newDate}</td>
-                  </tr>
-                  <tr>
-                    <td style="color:#888888;padding:4px 0;border-top:1px solid #a0ddc5;">Horário</td>
-                    <td style="color:#085041;font-weight:bold;padding:4px 0;border-top:1px solid #a0ddc5;">${data.newStartTime} &#8212; ${data.newEndTime}</td>
-                  </tr>
-                  <tr>
-                    <td style="color:#888888;padding:4px 0;border-top:1px solid #a0ddc5;">Duração</td>
-                    <td style="color:#085041;font-weight:bold;padding:4px 0;border-top:1px solid #a0ddc5;">${data.duration}</td>
-                  </tr>
-                  <tr>
-                    <td style="color:#888888;padding:4px 0;border-top:1px solid #a0ddc5;">Motivo</td>
-                    <td style="color:#085041;font-weight:bold;padding:4px 0;border-top:1px solid #a0ddc5;">${data.reason}</td>
-                  </tr>
-                </table>
+              <tr><td style="background-color:#f0f9f6;border:1px solid #a0ddc5;border-radius:8px;padding:11px 14px;">
+                <p style="margin:0;font-size:12px;color:#085041;line-height:1.6;">
+                  &#9993; Um e-mail de confirmação foi enviado automaticamente para <strong>${data.email}</strong>.
+                </p>
               </td></tr>
             </table>
 
             <!-- CTA -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
               <tr><td align="center">
                 <a href="${dashboardLink}"
                    style="display:inline-block;background:#085041;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:11px 28px;border-radius:7px;">
-                  Acessar painel e confirmar
+                  Ver agenda completa
                 </a>
-              </td></tr>
-            </table>
-
-            <!-- Aviso -->
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background-color:#f0f9f6;border:1px solid #a0ddc5;border-radius:8px;padding:11px 14px;">
-                <p style="margin:0;font-size:12px;color:#085041;line-height:1.6;">
-                  O horário anterior foi liberado. O novo horário está bloqueado e aguarda sua confirmação no sistema.
-                </p>
               </td></tr>
             </table>
 

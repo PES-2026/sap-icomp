@@ -1,6 +1,9 @@
-import { ScheduleConfirmedStudentEmailData } from "@domain/services/interfaces/scheduleConfirmedStudentData";
+import { PedagogueAppointmentEmailData } from "@domain/services/interfaces/pedagogueScheduleEmailData";
 
-export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStudentEmailData): string {
+export function buildAppointmentRequestedPedagogueTemplate(
+  data: PedagogueAppointmentEmailData,
+  dashboardLink: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -32,38 +35,55 @@ export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStu
       <!-- Card -->
       <tr><td style="background-color:#ffffff;border-radius:16px;border:1px solid #d8d4cc;">
 
-        <!-- Header Verde -->
+        <!-- Header escuro (diferencia do e-mail do aluno) -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="background-color:#085041;padding:24px 28px;border-radius:16px 16px 0 0;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.22);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:#ffffff;letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px;">Agendamento confirmado</div>
-            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Tudo certo! Seu atendimento foi confirmado.</div>
+            <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.8);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px;">Novo agendamento</div>
+            <div style="font-size:20px;font-weight:bold;color:#ffffff;">Solicitação recebida em sua agenda</div>
           </td></tr>
         </table>
 
-        <!-- Body -->
+        <!-- Corpo -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="padding:28px;">
 
             <p style="margin:0 0 4px;font-size:12px;color:#888888;">Olá,</p>
-            <p style="margin:0 0 16px;font-size:15px;font-weight:bold;color:#1a1a1a;">${data.studentName}</p>
+            <p style="margin:0 0 16px;font-size:15px;font-weight:bold;color:#1a1a1a;">${data.pedagogueName}</p>
 
             <p style="margin:0 0 20px;font-size:14px;color:#555555;line-height:1.7;">
-              Excelente notícia! Seu agendamento no <strong style="color:#1a1a1a;">SAP IComp</strong> foi confirmado pela pedagoga. 
-              Confira os detalhes finais abaixo e nos vemos em breve.
+              Um novo agendamento foi solicitado para você no <strong style="color:#1a1a1a;">SAP IComp</strong>.
+              O horário está reservado e aguarda sua confirmação pelo sistema.
             </p>
 
-            <!-- Summary -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <!-- Dados do aluno -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
               <tr><td style="background-color:#f7f5f0;border-radius:10px;border:1px solid #d8d4cc;padding:16px 18px;">
-                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Detalhes do atendimento</p>
+                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Dados do aluno</p>
                 <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
                   <tr>
-                    <td style="color:#888888;padding:5px 0;width:44%;">Pedagoga</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;">${data.pedagogueName}</td>
+                    <td style="color:#888888;padding:5px 0;width:44%;">Nome</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;">${data.studentName}</td>
                   </tr>
                   <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Data</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.date}</td>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Curso</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.course}</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">E-mail</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.email}</td>
+                  </tr>
+                </table>
+              </td></tr>
+            </table>
+
+            <!-- Schedule Details -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+              <tr><td style="background-color:#f7f5f0;border-radius:10px;border:1px solid #d8d4cc;padding:16px 18px;">
+                <p style="margin:0 0 12px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Detalhes do agendamento</p>
+                <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
+                  <tr>
+                    <td style="color:#888888;padding:5px 0;width:44%;">Data</td>
+                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;">${data.date}</td>
                   </tr>
                   <tr>
                     <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Horário</td>
@@ -74,10 +94,6 @@ export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStu
                     <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.duration}</td>
                   </tr>
                   <tr>
-                    <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Curso</td>
-                    <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.course}</td>
-                  </tr>
-                  <tr>
                     <td style="color:#888888;padding:5px 0;border-top:1px solid #e8e4dc;">Motivo</td>
                     <td style="color:#1a1a1a;font-weight:500;padding:5px 0;border-top:1px solid #e8e4dc;">${data.reason}</td>
                   </tr>
@@ -85,20 +101,21 @@ export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStu
               </td></tr>
             </table>
 
-            <!-- Status -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-              <tr><td style="background-color:#f0f9f6;border:1px solid #a0ddc5;border-radius:8px;padding:11px 14px;">
-                <p style="margin:0;font-size:13px;color:#085041;line-height:1.6;">
-                  ✅ Status: <strong>Confirmado</strong> — o compromisso já está em sua agenda.
-                </p>
+            <!-- CTA -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr><td align="center">
+                <a href="${dashboardLink}"
+                   style="display:inline-block;background:#085041;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:11px 28px;border-radius:7px;">
+                  Acessar painel e confirmar
+                </a>
               </td></tr>
             </table>
 
-            <!-- Footnote -->
+            <!-- Aviso -->
             <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background-color:#fff8e8;border:1px solid #f0d080;border-radius:8px;padding:11px 14px;">
-                <p style="margin:0;font-size:12px;color:#8a6200;line-height:1.6;">
-                  ⚠️ Caso precise cancelar ou remarcar, por favor utilize os links enviados no e-mail anterior ou entre em contato com antecedência.
+              <tr><td style="background-color:#f0f9f6;border:1px solid #a0ddc5;border-radius:8px;padding:11px 14px;">
+                <p style="margin:0;font-size:12px;color:#085041;line-height:1.6;">
+                  O horário está bloqueado e não aparecerá para outros alunos. Acesse o sistema para confirmar ou recusar o atendimento.
                 </p>
               </td></tr>
             </table>
@@ -106,7 +123,7 @@ export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStu
           </td></tr>
         </table>
 
-        <!-- Footer -->
+        <!-- Card's footer -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="border-top:1px solid #e8e4dc;padding:14px 28px;background-color:#faf9f6;border-radius:0 0 16px 16px;">
             <table width="100%" cellpadding="0" cellspacing="0"><tr>
@@ -118,6 +135,7 @@ export function buildScheduleConfirmedStudentTemplate(data: ScheduleConfirmedStu
 
       </td></tr>
 
+      <!-- Footer -->
       <tr><td align="center" style="padding-top:16px;">
         <p style="margin:0;font-size:11px;color:#aaaaaa;">Este é um e-mail automático. Por favor, não responda.</p>
       </td></tr>
