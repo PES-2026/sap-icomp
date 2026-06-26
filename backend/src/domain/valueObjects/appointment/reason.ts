@@ -1,6 +1,6 @@
+import { ReasonTooLongError } from "@domain/errors/appointment/reasonTooLongError";
+import { ReasonTooShortError } from "@domain/errors/appointment/reasonTooShortError";
 import { RequiredFieldError } from "@domain/errors/requiredFieldError";
-import { ReasonTooLongError } from "@domain/errors/schedule/reasonTooLongError";
-import { ReasonTooShortError } from "@domain/errors/schedule/reasonTooShortError";
 import { Result } from "@domain/shared/result";
 
 export class ReasonVO {
@@ -10,12 +10,12 @@ export class ReasonVO {
     this._value = name;
   }
 
-  static create(name: string): Result<ReasonVO> {
-    const result = ReasonVO.validate(name);
+  static create(reason: string): Result<ReasonVO> {
+    const result = ReasonVO.validate(reason);
     if (result.isFailure) {
       return Result.fail<ReasonVO>(result.error!);
     }
-    return Result.ok<ReasonVO>(new ReasonVO(name.trim()));
+    return Result.ok<ReasonVO>(new ReasonVO(reason.trim()));
   }
 
   static fromTrusted(name: string): ReasonVO {
@@ -26,12 +26,12 @@ export class ReasonVO {
     return this._value;
   }
 
-  private static validate(name: string): Result<ReasonVO> {
-    if (!name) {
-      return Result.fail<ReasonVO>(new RequiredFieldError("course name"));
+  private static validate(reason: string): Result<ReasonVO> {
+    if (!reason) {
+      return Result.fail<ReasonVO>(new RequiredFieldError("reason"));
     }
 
-    const trimmed = name.trim();
+    const trimmed = reason.trim();
     if (trimmed.length < 15) {
       return Result.fail<ReasonVO>(new ReasonTooShortError(trimmed.length));
     } else if (trimmed.length > 350) {
