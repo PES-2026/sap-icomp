@@ -1,5 +1,5 @@
-import { ScheduleSlotStatusEnum } from "@domain/enum/scheduleSlotStatus";
-import { ListScheduleSlotFilters } from "@domain/repositories/filters/scheduleSlotFilters";
+import { AvailabilityStatusEnum } from "@domain/enum/availabilityStatus";
+import { AvailabilityFilters } from "@domain/repositories/filters/availabilityFilters";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import {
   validateDateField,
@@ -10,20 +10,20 @@ import {
 
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
-export class ListScheduleAvailabilityDTO {
+export class ListAvailabilitiesByPedagogueDTO {
   constructor(
     public readonly page: number,
     public readonly limit: number,
-    public readonly filters: ListScheduleSlotFilters,
+    public readonly filters: AvailabilityFilters,
   ) {}
 
-  static create(pedagogueId: unknown, value: unknown): ListScheduleAvailabilityDTO {
+  static create(pedagogueId: unknown, value: unknown): ListAvailabilitiesByPedagogueDTO {
     if (typeof pedagogueId !== "string" || !pedagogueId.trim()) {
       throw new Error("Pedagogue Id is required and must be a string");
     }
 
     if (typeof value !== "object" || value === null) {
-      throw new Error(`Invalid input to ${ListScheduleAvailabilityDTO.name}`);
+      throw new Error(`Invalid input to ${ListAvailabilitiesByPedagogueDTO.name}`);
     }
 
     const raw = value as Record<string, unknown>;
@@ -31,16 +31,13 @@ export class ListScheduleAvailabilityDTO {
     const page = validateNumberField(raw.page, "page");
     const limit = validateNumberField(raw.limit, "limit");
 
-    const filters: ListScheduleSlotFilters = {};
+    const filters: AvailabilityFilters = {};
 
     if (raw.pedagogueId) {
       filters.pedagogueId = validateExternalIdField(raw.pedagogueId, "pedagogueId");
     }
     if (raw.status) {
-      filters.status = findValueInEnum(ScheduleSlotStatusEnum, validateStringField(raw.status, "status"));
-    }
-    if (raw.date) {
-      filters.date = validateDateField(raw.date, "date");
+      filters.status = findValueInEnum(AvailabilityStatusEnum, validateStringField(raw.status, "status"));
     }
     if (raw.startDate) {
       filters.startDate = validateDateField(raw.startDate, "startDate");
@@ -54,6 +51,6 @@ export class ListScheduleAvailabilityDTO {
 
     validatePageLimitValues(page, limit);
 
-    return new ListScheduleAvailabilityDTO(page, limit, filters);
+    return new ListAvailabilitiesByPedagogueDTO(page, limit, filters);
   }
 }

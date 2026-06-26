@@ -1,5 +1,5 @@
-import { ScheduleStatusEnum } from "@domain/enum/scheduleStatus";
-import { ListScheduleFilters } from "@domain/repositories/filters/scheduleFilters";
+import { AppointmentStatusEnum } from "@domain/enum/appointmentStatus";
+import { ListAppointmentFilters } from "@domain/repositories/filters/appointmentFilters";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import {
   validateDateField,
@@ -10,20 +10,20 @@ import {
 
 import { validatePageLimitValues } from "../shared/paginationValidationsDto";
 
-export class ListSchedulesDTO {
+export class ListAppointmentsByPedagogueDTO {
   constructor(
     public readonly page: number,
     public readonly limit: number,
-    public readonly filters: ListScheduleFilters,
+    public readonly filters: ListAppointmentFilters,
   ) {}
 
-  static create(pedagogueId: unknown, value: unknown): ListSchedulesDTO {
+  static create(pedagogueId: unknown, value: unknown): ListAppointmentsByPedagogueDTO {
     if (typeof pedagogueId !== "string" || !pedagogueId.trim()) {
       throw new Error("Pedagogue Id is required and must be a string");
     }
 
     if (typeof value !== "object" || value === null) {
-      throw new Error(`Invalid input to ${ListSchedulesDTO.name}`);
+      throw new Error(`Invalid input to ${ListAppointmentsByPedagogueDTO.name}`);
     }
 
     const raw = value as Record<string, unknown>;
@@ -31,14 +31,11 @@ export class ListSchedulesDTO {
     const page = validateNumberField(raw.page, "page");
     const limit = validateNumberField(raw.limit, "limit");
 
-    const filters: ListScheduleFilters = {};
+    const filters: ListAppointmentFilters = {};
 
     filters.pedagogueId = validateExternalIdField(pedagogueId, "pedagogueId");
     if (raw.status) {
-      filters.status = findValueInEnum(ScheduleStatusEnum, validateStringField(raw.status, "status"));
-    }
-    if (raw.date) {
-      filters.date = validateDateField(raw.date, "date");
+      filters.status = findValueInEnum(AppointmentStatusEnum, validateStringField(raw.status, "status"));
     }
     if (raw.startDate) {
       filters.startDate = validateDateField(raw.startDate, "startDate");
@@ -61,6 +58,6 @@ export class ListSchedulesDTO {
 
     validatePageLimitValues(page, limit);
 
-    return new ListSchedulesDTO(page, limit, filters);
+    return new ListAppointmentsByPedagogueDTO(page, limit, filters);
   }
 }

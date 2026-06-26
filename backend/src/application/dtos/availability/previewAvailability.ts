@@ -1,24 +1,24 @@
+import { AvailabilityPreviewStatus } from "@domain/enum/availabilityStatus";
 import { DaysOfWeekEnum } from "@domain/enum/daysOfWeek";
-import { ScheduleSlotPreviewStatus } from "@domain/enum/scheduleSlotStatus";
 import { validateDateField, validateNumberField, validateStringField } from "@domain/utils/validationUtils";
 
 import { validateStartEndDate } from "../shared/datesValidationsDto";
 
-export interface ScheduleSlot {
+export interface Availability {
   id?: string;
   start: number;
   end: number;
   attendanceTime: number;
-  status: ScheduleSlotPreviewStatus;
+  status: AvailabilityPreviewStatus;
 }
 
-export interface PreviewScheduleAvailabilityItemResponse {
+export interface PreviewAvailabilityItemResponse {
   date: Date;
   weekday: DaysOfWeekEnum;
-  slots: Array<ScheduleSlot>;
+  slots: Array<Availability>;
 }
 
-export class PreviewScheduleAvailabilityDTO {
+export class PreviewAvailabilityDTO {
   constructor(
     public readonly pedagogueId: string,
     public readonly attendanceTime: number,
@@ -29,9 +29,9 @@ export class PreviewScheduleAvailabilityDTO {
     public readonly endHour: number,
   ) {}
 
-  static create(value: unknown): PreviewScheduleAvailabilityDTO {
+  static create(value: unknown): PreviewAvailabilityDTO {
     if (typeof value !== "object" || value === null) {
-      throw new Error(`Invalid input to ${PreviewScheduleAvailabilityDTO.name}`);
+      throw new Error(`Invalid input to ${PreviewAvailabilityDTO.name}`);
     }
 
     const raw = value as Record<string, unknown>;
@@ -46,14 +46,6 @@ export class PreviewScheduleAvailabilityDTO {
 
     validateStartEndDate(startDate, endDate);
 
-    return new PreviewScheduleAvailabilityDTO(
-      pedagogueId,
-      attendanceTime,
-      breakTime,
-      startDate,
-      endDate,
-      startHour,
-      endHour,
-    );
+    return new PreviewAvailabilityDTO(pedagogueId, attendanceTime, breakTime, startDate, endDate, startHour, endHour);
   }
 }

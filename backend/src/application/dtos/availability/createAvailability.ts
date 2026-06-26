@@ -7,7 +7,7 @@ import {
   validateStringField,
 } from "@domain/utils/validationUtils";
 
-export interface CreateScheduleAvailabilityResponseItem {
+export interface CreateAvailabilityResponseItem {
   id: string;
   status: string;
   date: Date;
@@ -18,7 +18,7 @@ export interface CreateScheduleAvailabilityResponseItem {
   attendanceTime: number;
 }
 
-export class CreateScheduleAvailabilityItemDTO {
+export class CreateAvailabilityItemDTO {
   constructor(
     public readonly date: Date,
     public readonly weekday: DaysOfWeekEnum,
@@ -28,9 +28,9 @@ export class CreateScheduleAvailabilityItemDTO {
     public readonly attendanceTime: number,
   ) {}
 
-  static create(value: unknown): CreateScheduleAvailabilityItemDTO {
+  static create(value: unknown): CreateAvailabilityItemDTO {
     if (typeof value !== "object" || value === null) {
-      throw new Error(`Invalid input to ${CreateScheduleAvailabilityItemDTO.name}`);
+      throw new Error(`Invalid input to ${CreateAvailabilityItemDTO.name}`);
     }
 
     const raw = value as Record<string, unknown>;
@@ -44,20 +44,20 @@ export class CreateScheduleAvailabilityItemDTO {
 
     const mappedWeekday: DaysOfWeekEnum = findValueInEnum(DaysOfWeekEnum, weekday);
 
-    return new CreateScheduleAvailabilityItemDTO(date, mappedWeekday, pedagogueId, start, end, attendanceTime);
+    return new CreateAvailabilityItemDTO(date, mappedWeekday, pedagogueId, start, end, attendanceTime);
   }
 }
 
-export class CreateScheduleAvailabilityDTO {
-  constructor(public readonly items: CreateScheduleAvailabilityItemDTO[]) {}
+export class CreateAvailabilityDTO {
+  constructor(public readonly items: CreateAvailabilityItemDTO[]) {}
 
-  static create(value: unknown): CreateScheduleAvailabilityDTO {
+  static create(value: unknown): CreateAvailabilityDTO {
     if (!Array.isArray(value)) {
-      throw new Error(`Invalid input to ${CreateScheduleAvailabilityDTO.name}, expected an array.`);
+      throw new Error(`Invalid input to ${CreateAvailabilityDTO.name}, expected an array.`);
     }
 
-    const items = value.map((item) => CreateScheduleAvailabilityItemDTO.create(item));
+    const items = value.map((item) => CreateAvailabilityItemDTO.create(item));
 
-    return new CreateScheduleAvailabilityDTO(items);
+    return new CreateAvailabilityDTO(items);
   }
 }
