@@ -1,5 +1,5 @@
 import { Result } from "@domain/shared/result";
-import { TimeVO } from "@domain/valueObjects/schedule/time";
+import { TimeVO } from "@domain/valueObjects/appointment/time";
 import { EmailVO } from "@domain/valueObjects/shared/email";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 import { NameVO } from "@domain/valueObjects/shared/name";
@@ -16,7 +16,6 @@ export type PedagogueProps = {
   registrationNumber: string;
   userStatus: string;
   password?: string;
-  maxAttendanceTime?: number;
 };
 
 export type PedagogueVOProps = {
@@ -26,7 +25,6 @@ export type PedagogueVOProps = {
   registrationNumber: RegistrationNumberVO;
   userStatus: UserStatusVO;
   password: PasswordVO;
-  maxAttendanceTime?: TimeVO;
 };
 
 export class Pedagogue {
@@ -47,7 +45,6 @@ export class Pedagogue {
     if (props.phoneNumber !== undefined) this.phoneNumber = props.phoneNumber;
     if (props.registrationNumber !== undefined) this.registrationNumber = props.registrationNumber;
     if (props.userStatus !== undefined) this.userStatus = props.userStatus;
-    if (props.maxAttendanceTime !== undefined) this.maxAttendanceTime = props.maxAttendanceTime;
   }
 
   changePassword(newPassword: PasswordVO): void {
@@ -62,9 +59,8 @@ export class Pedagogue {
     const registrationNumber = RegistrationNumberVO.create(props.registrationNumber);
     const userStatus = UserStatusVO.create(props.userStatus);
     const password = props.password ? PasswordVO.create(props.password, props.password) : undefined;
-    const maxAttendanceTime = props.maxAttendanceTime ? TimeVO.create(props.maxAttendanceTime) : undefined;
 
-    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password, maxAttendanceTime];
+    const results = [id, name, email, phoneNumber, registrationNumber, userStatus, password];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -80,7 +76,6 @@ export class Pedagogue {
         registrationNumber.getValue(),
         userStatus.getValue(),
         password?.getValue(),
-        maxAttendanceTime?.getValue(),
       ),
     );
   }
@@ -94,7 +89,6 @@ export class Pedagogue {
       RegistrationNumberVO.fromTrusted(props.registrationNumber),
       UserStatusVO.fromTrusted(props.userStatus),
       props.password ? PasswordVO.fromTrusted(props.password) : undefined,
-      props.maxAttendanceTime ? TimeVO.fromTrusted(props.maxAttendanceTime) : undefined,
     );
   }
 }

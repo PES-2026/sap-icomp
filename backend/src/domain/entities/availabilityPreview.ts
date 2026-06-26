@@ -1,11 +1,11 @@
 import { Result } from "@domain/shared/result";
 
-import { DurationVO } from "../valueObjects/scheduleSlot/duration";
-import { ScheduleSlotPreviewStatusVO } from "../valueObjects/scheduleSlot/scheduleSlotPreviewStatus";
+import { AvailabilityPreviewStatusVO } from "../valueObjects/availability/availabilityPreviewStatus";
+import { DurationVO } from "../valueObjects/availability/duration";
 import { DateVO } from "../valueObjects/shared/date";
 import { ExternalIdVO } from "../valueObjects/shared/externalId";
 
-export type ScheduleSlotPreviewProps = {
+export type AvailabiltiyPreviewProps = {
   id?: string | undefined;
   pedagogueId: string;
   startDateTime: Date;
@@ -14,23 +14,23 @@ export type ScheduleSlotPreviewProps = {
   status: string;
 };
 
-export class ScheduleSlotPreview {
+export class AvailabilityPreview {
   constructor(
     public readonly id: ExternalIdVO | undefined,
     public readonly pedagogueId: ExternalIdVO,
     public readonly startDateTime: DateVO,
     public readonly endDateTime: DateVO,
     public readonly attendanceTime: DurationVO,
-    public readonly status: ScheduleSlotPreviewStatusVO,
+    public readonly status: AvailabilityPreviewStatusVO,
   ) {}
 
-  static create(props: ScheduleSlotPreviewProps): Result<ScheduleSlotPreview> {
+  static create(props: AvailabiltiyPreviewProps): Result<AvailabilityPreview> {
     const externalId = props.id ? ExternalIdVO.from(props.id) : undefined;
     const pedagogueId = ExternalIdVO.from(props.pedagogueId);
     const startDateTime = DateVO.create(props.startDateTime);
     const endDateTime = DateVO.create(props.endDateTime);
     const attendanceTime = DurationVO.create(props.attendanceTime);
-    const status = ScheduleSlotPreviewStatusVO.create(props.status);
+    const status = AvailabilityPreviewStatusVO.create(props.status);
 
     const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime, status];
 
@@ -40,8 +40,8 @@ export class ScheduleSlotPreview {
       }
     }
 
-    return Result.ok<ScheduleSlotPreview>(
-      new ScheduleSlotPreview(
+    return Result.ok<AvailabilityPreview>(
+      new AvailabilityPreview(
         externalId?.getValue(),
         pedagogueId.getValue(),
         startDateTime.getValue(),
