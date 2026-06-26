@@ -1,8 +1,8 @@
 import { ApplicationError } from "@application/errors/applicationError";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
-import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { RemoveReportDTO } from "@application/dtos/report/removeReportDto";
+import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
 
 export class RemoveReport {
   constructor(private readonly reportRepository: IReportRepository) {}
@@ -11,7 +11,7 @@ export class RemoveReport {
     const report = await this.reportRepository.findById(dto.reportId);
 
     if (!report) {
-      return Result.fail<void>(new StudentNotFoundError()); // Should be ReportNotFoundError
+      return Result.fail<void>(new ReportNotFoundError(dto.reportId));
     }
 
     await this.reportRepository.remove(dto.reportId);
