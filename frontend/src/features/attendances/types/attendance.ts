@@ -10,7 +10,7 @@ export interface Attendance {
   generalObservations: string;
   createdAt: Date;
   updatedAt: Date;
-  status?: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 }
 
 export interface AttendanceFormData {

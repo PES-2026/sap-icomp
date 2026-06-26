@@ -14,12 +14,13 @@ import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useReportById } from "../hooks/useReportById";
 import { ReportSchemaData, reportSchema } from "../schemas/reportSchema";
-import { getReportId, reportService } from "../services/reportService";
+import { reportService } from "../services/reportService";
 import {
   EMPTY_LEXICAL_STATE,
   normalizeLexicalState,
   plainTextToLexical,
 } from "../utils/lexicalState";
+import { getReportId } from "../utils/reportUtils";
 import { LexicalReportEditor } from "./LexicalReportEditor";
 import { ReportConflictModal } from "./ReportConflictModal";
 import { ReportErrorState } from "./ReportErrorState";
@@ -201,11 +202,11 @@ export default function ReportForm({ mode }: ReportFormProps) {
 
   return (
     <>
-      <main className="flex h-full min-w-0 flex-1 flex-col p-4 font-sans md:p-7">
+      <main className="flex h-full min-w-0 flex-1 flex-col p-6 font-sans">
         <form
           noValidate
           onSubmit={handleSubmit(submit)}
-          className="mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-[#ece7db] bg-white shadow-sm"
+          className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-[#ece7db] bg-white shadow-sm"
         >
           <div className="shrink-0 border-b border-stone-100 px-6 py-5 md:px-8">
             <h1 className="text-2xl font-bold text-stone-800">

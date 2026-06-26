@@ -1,10 +1,10 @@
 import api from "@/services/api";
 import {
   CreateReportData,
+  PaginatedReportsResponse,
   ReportDetailsResponse,
   ReportInitialData,
   ReportMutationResponse,
-  ReportSummary,
   UpdateReportData,
 } from "../types/report";
 import { reportMockService } from "./reportMockService";
@@ -12,40 +12,19 @@ import { reportMockService } from "./reportMockService";
 export const REPORTS_MOCK_ENABLED =
   process.env.NEXT_PUBLIC_REPORTS_MOCK === "true";
 
-const studentReportsPath = (studentId: string) =>
-  `/pedagogue/students/${encodeURIComponent(studentId)}/reports`;
-
-export const getReportId = (report: ReportMutationResponse): string => {
-  const id = report.id ?? report.reportId ?? report.externalId;
-  if (!id) {
-    throw new Error("O backend não retornou o identificador do relatório.");
-  }
-  return id;
-};
-
 export const reportService = {
-  async listByStudent(studentId: string): Promise<ReportSummary[]> {
+  async listByStudent(studentId: string): Promise<PaginatedReportsResponse> {
     if (REPORTS_MOCK_ENABLED) {
       return reportMockService.listByStudent(studentId);
     }
 
-    const response = await api.get<
-      ReportMutationResponse[] | { items: ReportMutationResponse[] }
-    >(studentReportsPath(studentId), {
-      fallbackMsg: "Não foi possível carregar os relatórios.",
-    });
-    const reports = Array.isArray(response.data)
-      ? response.data
-      : response.data.items;
-
-    return reports.map((report) => ({
-      id: getReportId(report),
-      pedagogueName: report.pedagogueName ?? "Pedagoga não informada",
-      createdAt: report.createdAt ?? "",
-      updatedAt: report.updatedAt ?? report.createdAt ?? "",
-      shared: report.shared,
-      includedAttendancesCount: report.includedAttendancesCount,
-    }));
+    const response = await api.get<PaginatedReportsResponse>(
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports`,
+      {
+        fallbackMsg: "Não foi possível carregar os relatórios.",
+      },
+    );
+    return response.data;
   },
 
   async getById(
@@ -57,7 +36,7 @@ export const reportService = {
     }
 
     const response = await api.get<ReportDetailsResponse>(
-      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}`,
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}`,
       { fallbackMsg: "Não foi possível carregar o relatório." },
     );
     return response.data;
@@ -69,7 +48,7 @@ export const reportService = {
     }
 
     const response = await api.get<ReportInitialData>(
-      `${studentReportsPath(studentId)}/new`,
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/new`,
       {
         fallbackMsg: "Não foi possível iniciar a criação do relatório.",
       },
@@ -86,7 +65,7 @@ export const reportService = {
     }
 
     const response = await api.post<ReportMutationResponse>(
-      `${studentReportsPath(studentId)}/new`,
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/new`,
       data,
       { fallbackMsg: "Não foi possível criar o relatório." },
     );
@@ -103,7 +82,7 @@ export const reportService = {
     }
 
     const response = await api.post<ReportMutationResponse>(
-      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/edit`,
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}/edit`,
       data,
       { fallbackMsg: "Não foi possível atualizar o relatório." },
     );
@@ -120,7 +99,7 @@ export const reportService = {
     }
 
     await api.post(
-      `${studentReportsPath(studentId)}/${encodeURIComponent(reportId)}/remove`,
+      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}/remove`,
       { password },
       {
         fallbackMsg: "Não foi possível excluir o relatório.",

@@ -4,10 +4,10 @@ import { ApiError } from "@/services/apiError";
 import { useAuthStore } from "@/store/authStore";
 import {
   CreateReportData,
+  PaginatedReportsResponse,
   ReportDetailsResponse,
   ReportInitialData,
   ReportMutationResponse,
-  ReportSummary,
   UpdateReportData,
 } from "../types/report";
 import { plainTextToLexical } from "../utils/lexicalState";
@@ -87,23 +87,22 @@ const getCompletedAttendancesCount = async (studentId: string) => {
 };
 
 export const reportMockService = {
-  async listByStudent(studentId: string): Promise<ReportSummary[]> {
+  async listByStudent(studentId: string): Promise<PaginatedReportsResponse> {
     await wait();
-    return readReports()
+    const reports = readReports()
       .filter(
         (report) => report.studentId === studentId && report.deletedAt == null,
       )
       .sort((first, second) =>
         second.createdAt.localeCompare(first.createdAt),
-      )
-      .map((report) => ({
-        id: report.id,
-        pedagogueName: report.pedagogueName,
-        createdAt: report.createdAt,
-        updatedAt: report.updatedAt,
-        shared: report.shared,
-        includedAttendancesCount: report.includedAttendancesCount,
-      }));
+      );
+
+    return {
+      totalItems: reports.length,
+      totalPages: 1,
+      currentPage: 1,
+      items: reports,
+    };
   },
 
   async getById(

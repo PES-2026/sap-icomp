@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { reportService } from "../services/reportService";
 import { ReportSummary } from "../types/report";
+import { formatReportsSummary } from "../utils/reportUtils";
 
 export const useReportsByStudent = (studentId: string) => {
   const [reports, setReports] = useState<ReportSummary[]>([]);
@@ -17,7 +18,8 @@ export const useReportsByStudent = (studentId: string) => {
 
     try {
       setIsLoading(true);
-      setReports(await reportService.listByStudent(studentId));
+      const response = await reportService.listByStudent(studentId);
+      setReports(formatReportsSummary(response.items));
     } catch (error) {
       toast.error(
         error instanceof Error
