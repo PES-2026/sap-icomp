@@ -2,8 +2,8 @@ import { ErrorCategory } from "@domain/errors/domainError";
 
 import { ApplicationError } from "../applicationError";
 
-export class ScheduleCompletedError extends ApplicationError {
+export class AppointmentMissedError extends ApplicationError {
   constructor(id: string) {
-    super(`Schedule with ID ${id} is already completed.`, ErrorCategory.BUSINESS_RULE);
+    super(`Appointment with ID ${id} is missed.`, ErrorCategory.BUSINESS_RULE);
   }
 }
