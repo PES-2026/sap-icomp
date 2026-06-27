@@ -23,7 +23,7 @@ export class RemoveReport {
     if (!pedagoguePassword) {
       return Result.fail<void>(new ReportNotFoundError(dto.reportId));
     }
-
+    //compare the provided password with the pedagogue's password
     const isPasswordValid = await this.hashService.compare(dto.password, pedagoguePassword);
 
     if (!isPasswordValid) {
