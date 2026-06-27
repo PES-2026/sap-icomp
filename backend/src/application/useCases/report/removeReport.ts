@@ -13,13 +13,18 @@ export class RemoveReport {
   ) {}
 
   async execute(dto: RemoveReportDTO): Promise<Result<void, ApplicationError>> {
-    const report = await this.reportRepository.findById(dto.reportId);
+    const reportExists = await this.reportRepository.existsById(dto.reportId);
 
-    if (!report) {
+    if (!reportExists) {
+      return Result.fail<void>(new ReportNotFoundError(dto.reportId));
+    }
+    const pedagoguePassword = await this.reportRepository.findPedagoguePasswordByReportId(dto.reportId);
+
+    if (!pedagoguePassword) {
       return Result.fail<void>(new ReportNotFoundError(dto.reportId));
     }
 
-    const isPasswordValid = await this.hashService.compare(dto.password, report.pedagogue.password);
+    const isPasswordValid = await this.hashService.compare(dto.password, pedagoguePassword);
 
     if (!isPasswordValid) {
       return Result.fail<void>(new InvalidCredentialsError());

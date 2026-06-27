@@ -8,4 +8,6 @@ export interface IReportRepository {
   findById(id: string): Promise<any | null>;
   findByIdWithDetails(id: string): Promise<any | null>;
   findByStudentId(studentId: string): Promise<ListReportItemDTO[]>;
+  findPedagoguePasswordByReportId(reportId: string): Promise<string | null>;
+  existsById(id: string): Promise<boolean>;
 }

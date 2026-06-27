@@ -130,4 +130,35 @@ export class PrismaReportRepository implements IReportRepository {
       updatedAt: report.updatedAt,
     };
   }
+  async findPedagoguePasswordByReportId(reportId: string): Promise<string | null> {
+    const report = await this.prisma.report.findUnique({
+      where: {
+        externalId: reportId,
+        removed: false,
+      },
+      select: {
+        pedagogue: {
+          select: {
+            password: true,
+          },
+        },
+      },
+    });
+
+    return report?.pedagogue?.password ?? null;
+  }
+
+  async existsById(id: string): Promise<boolean> {
+    const report = await this.prisma.report.findUnique({
+      where: {
+        externalId: id,
+        removed: false,
+      },
+      select: {
+        internalId: true,
+      },
+    });
+
+    return report !== null;
+  }
 }
