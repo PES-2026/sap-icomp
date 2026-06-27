@@ -236,7 +236,7 @@ const reportController = new ReportController(
   new GetReportInitialData(studentRepository),
   new CreateReport(reportRepository, attendanceRepository),
   new UpdateReport(reportRepository),
-  new RemoveReport(reportRepository),
+  new RemoveReport(reportRepository, hashService),
   new ListReportsByStudent(reportRepository),
   new GetReportById(reportRepository),
 );
