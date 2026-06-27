@@ -19,7 +19,7 @@ export function reportRoutes(controller: ReportController, tokenService: ITokenS
   //router.get("/reports/new", reportRateLimiter, auth, controller.getInitialData);
   router.post("/reports", reportRateLimiter, auth, controller.create);
   router.get("/reports/:reportId", reportRateLimiter, auth, controller.getById);
-  router.get("/:studentId/reports", reportRateLimiter, auth, controller.listByStudent);
+  router.get("/reports/student/:studentId", reportRateLimiter, auth, controller.listByStudent);
   router.put("/reports/:reportId", reportRateLimiter, auth, controller.edit);
   router.delete("/reports/:reportId", reportRateLimiter, auth, controller.remove);
 

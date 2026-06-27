@@ -144,8 +144,13 @@ export class PrismaReportRepository implements IReportRepository {
         },
       },
     });
-
-    return report?.pedagogue?.password ?? null;
+    if (!report) {
+      return null;
+    }
+    if (!report.pedagogue.password) {
+      return null;
+    }
+    return report.pedagogue.password;
   }
 
   async existsById(id: string): Promise<boolean> {
