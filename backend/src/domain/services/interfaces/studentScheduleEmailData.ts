@@ -7,6 +7,5 @@ export interface StudentScheduleEmailData {
   duration: string;
   course: string;
   reason: string;
-  // rescheduleLink: string;
-  // cancelLink: string;
+  token: string;
 }

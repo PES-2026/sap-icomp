@@ -1,17 +1,10 @@
-export interface StudentAppointmentEmailData {
-  name: string;
-  pedagogue: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  duration: string;
-  course: string;
-  reason: string;
-  // rescheduleLink: string;
-  // cancelLink: string;
-}
+import { StudentScheduleEmailData } from "@domain/services/interfaces/studentScheduleEmailData";
 
-export function buildScheduleStudentTemplate(data: StudentAppointmentEmailData): string {
+export function buildScheduleStudentTemplate(
+  data: StudentScheduleEmailData,
+  rescheduleUrl: string,
+  cancelUrl: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -111,13 +104,13 @@ export function buildScheduleStudentTemplate(data: StudentAppointmentEmailData):
             <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
               <tr>
                 <td style="padding-right:8px;">
-                  <a href="${data}"
+                  <a href="${rescheduleUrl}"
                      style="display:inline-block;background:#4ecba4;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;">
                     Remarcar
                   </a>
                 </td>
                 <td>
-                  <a href="${data}"
+                  <a href="${cancelUrl}"
                      style="display:inline-block;background:#ffffff;color:#c0392b;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;border:1px solid #f5c4b3;">
                     Cancelar agendamento
                   </a>

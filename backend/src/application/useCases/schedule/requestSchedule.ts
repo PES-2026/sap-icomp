@@ -94,6 +94,7 @@ export class RequestSchedule {
       slot.endDateTime,
       dto.durationMinutes,
       courseName,
+      scheduleEntity.token.value,
       dto.reason ?? undefined,
     );
 
@@ -210,6 +211,7 @@ export class RequestSchedule {
     endDate: Date,
     durationMinutes: number,
     courseName: string,
+    token: string,
     reason?: string | undefined,
   ) {
     try {
@@ -221,6 +223,7 @@ export class RequestSchedule {
         endTime: endDate.toLocaleTimeString(),
         duration: `${durationMinutes} minutos`,
         course: courseName,
+        token: token,
         reason: reason ?? "Não informada",
       });
     } catch (error) {
@@ -251,7 +254,6 @@ export class RequestSchedule {
         endTime: endDate.toLocaleTimeString(),
         duration: `${durationMinutes} minutos`,
         reason: reason ?? "Não informada",
-        dashboardLink: "https://example.com/dashboard",
       });
       return Result.ok();
     } catch (error) {

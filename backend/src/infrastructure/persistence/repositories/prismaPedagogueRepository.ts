@@ -14,9 +14,7 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
   async findAll(filters: UserFilters, page: number, limit: number): Promise<PaginatedResult<PedagogueResult>> {
     const skip = (page - 1) * limit;
 
-    const where: Prisma.PedagogueWhereInput = {
-      removed: false,
-    };
+    const where: Prisma.PedagogueWhereInput = {};
 
     if (filters.name) {
       where.name = { contains: filters.name, mode: "insensitive" };
@@ -202,6 +200,16 @@ export class PrismaPedagogueRepository implements IPedagogueRepository {
       data: {
         removed: true,
         userStatus: UserStatusEnum.DISABLED,
+      },
+    });
+  }
+
+  async activate(id: string): Promise<void> {
+    await this.prisma.pedagogue.update({
+      where: { externalId: id },
+      data: {
+        removed: false,
+        userStatus: UserStatusEnum.ENABLED,
       },
     });
   }

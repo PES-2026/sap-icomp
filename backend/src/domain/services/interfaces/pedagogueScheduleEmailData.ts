@@ -8,5 +8,4 @@ export interface PedagogueScheduleEmailData {
   endTime: string;
   duration: string;
   reason: string;
-  dashboardLink: string;
 }

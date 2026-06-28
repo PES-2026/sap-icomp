@@ -26,6 +26,9 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CancelSchedule } from "@application/useCases/schedule/cancelSchedule";
+import { CancelScheduleByToken } from "@application/useCases/schedule/cancelScheduleByToken";
+import { ConfirmSchedule } from "@application/useCases/schedule/confirmSchedule";
 import { CreateScheduleAvailability } from "@application/useCases/schedule/createScheduleAvailability";
 import { GetWeekdayFromDate } from "@application/useCases/schedule/getWeekdayFromDate";
 import { ListScheduleAvailability } from "@application/useCases/schedule/listScheduleAvailability";
@@ -34,11 +37,14 @@ import { PreviewScheduleAvailability } from "@application/useCases/schedule/prev
 import { RemoveManyScheduleSlots } from "@application/useCases/schedule/removeManyScheduleSlots";
 import { RemoveScheduleSlot } from "@application/useCases/schedule/removeScheduleSlot";
 import { RequestSchedule } from "@application/useCases/schedule/requestSchedule";
+import { RescheduleSchedule } from "@application/useCases/schedule/rescheduleSchedule";
+import { RescheduleScheduleByToken } from "@application/useCases/schedule/rescheduleScheduleByToken";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { ActivateUser } from "@application/useCases/user/activateUser";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { GetUserById } from "@application/useCases/user/getUserById";
@@ -83,7 +89,16 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ReportController } from "@presentation/controllers/reportController";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
+import { reportRoutes } from "@presentation/routes/reportRoutes";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { UpdateReport } from "@application/useCases/report/updateReport";
+import { RemoveReport } from "@application/useCases/report/removeReport";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -165,6 +180,7 @@ const userController = new UserController(
   new UpdateUserPassword(pedagogueRepository, professorRepository, hashService),
   new GetUserById(pedagogueRepository, professorRepository),
   new RemoveUser(pedagogueRepository, professorRepository),
+  new ActivateUser(pedagogueRepository, professorRepository),
 );
 
 app.use(userRoutes(userController));
@@ -215,6 +231,17 @@ const diagnosesController = new DiagnosesController(
 
 app.use(diagnosesRoutes(diagnosesController));
 
+const reportRepository = new PrismaReportRepository(prisma);
+const reportController = new ReportController(
+  new GetReportInitialData(studentRepository),
+  new CreateReport(reportRepository, attendanceRepository),
+  new UpdateReport(reportRepository),
+  new RemoveReport(reportRepository, hashService),
+  new ListReportsByStudent(reportRepository),
+  new GetReportById(reportRepository),
+);
+app.use(reportRoutes(reportController, tokenService));
+
 const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 
 const scheduleRepository = new PrismaScheduleRepository(prisma);
@@ -238,6 +265,47 @@ const removeScheduleSlotUseCase = new RemoveScheduleSlot(scheduleSlotRepository)
 
 const removeManyScheduleSlotsUseCase = new RemoveManyScheduleSlots(scheduleSlotRepository);
 
+const confirmScheduleUseCase = new ConfirmSchedule(
+  scheduleRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const cancelScheduleUseCase = new CancelSchedule(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const rescheduleScheduleUseCase = new RescheduleSchedule(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+  env.FRONTEND_URL,
+);
+
+const cancelScheduleByTokenUseCase = new CancelScheduleByToken(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+);
+
+const rescheduleScheduleByTokenUseCase = new RescheduleScheduleByToken(
+  scheduleRepository,
+  scheduleSlotRepository,
+  pedagogueRepository,
+  studentRepository,
+  emailService,
+  env.FRONTEND_URL,
+);
+
 const requestScheduleUseCase = new RequestSchedule(
   scheduleRepository,
   pedagogueRepository,
@@ -255,6 +323,11 @@ const scheduleController = new ScheduleController(
   removeScheduleSlotUseCase,
   removeManyScheduleSlotsUseCase,
   listSchedulesUseCase,
+  confirmScheduleUseCase,
+  cancelScheduleUseCase,
+  rescheduleScheduleUseCase,
+  cancelScheduleByTokenUseCase,
+  rescheduleScheduleByTokenUseCase,
 );
 
 app.use(scheduleRoutes(scheduleController, tokenService));

@@ -1,6 +1,6 @@
 import { PedagogueScheduleEmailData } from "@domain/services/interfaces/pedagogueScheduleEmailData";
 
-export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData): string {
+export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData, dashboardLink: string): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -101,7 +101,7 @@ export function buildSchedulePedagogueTemplate(data: PedagogueScheduleEmailData)
             <!-- CTA -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
               <tr><td align="center">
-                <a href="${data.dashboardLink}"
+                <a href="${dashboardLink}"
                    style="display:inline-block;background:#085041;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:11px 28px;border-radius:7px;">
                   Acessar painel e confirmar
                 </a>
