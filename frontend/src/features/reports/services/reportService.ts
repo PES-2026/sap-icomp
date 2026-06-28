@@ -1,11 +1,9 @@
 import api from "@/services/api";
 import { attendanceService } from "@/features/attendances/services/attendanceService";
-import { studentService } from "@/features/students/services/studentService";
 import { ApiError } from "@/services/apiError";
 import {
   CreateReportData,
   ReportDetailsResponse,
-  ReportInitialData,
   ReportListItemResponse,
   ReportMutationResponse,
   UpdateReportData,
@@ -33,16 +31,15 @@ export const reportService = {
     return response.data;
   },
 
-  async getInitialData(studentId: string): Promise<ReportInitialData> {
-    const [student, attendances] = await Promise.all([
-      studentService.getStudentById(studentId),
-      attendanceService.getAttendancesByStudent(studentId, 1, 1),
-    ]);
+  async checkEligibility(studentId: string): Promise<void> {
+    const attendances = await attendanceService.getAttendancesByStudent(
+      studentId,
+      1,
+      1,
+    );
 
-    // The current backend branch contains the initial-data use case, but the
-    // GET /reports/new route is commented out. Until it is exposed, the
-    // frontend mirrors the backend create rule and uses the student payload as
-    // the source for default potential/difficulties.
+    // The backend enforces this rule on create, but the frontend checks it
+    // before showing the form so the user gets feedback earlier.
     if (attendances.items.length === 0) {
       throw new ApiError(
         "Não é possível gerar um relatório consolidado para alunos sem histórico de atendimentos realizados.",
@@ -50,11 +47,6 @@ export const reportService = {
         "NO_COMPLETED_ATTENDANCES",
       );
     }
-
-    return {
-      potential: student.potential ?? "",
-      difficulties: student.difficulties ?? "",
-    };
   },
 
   async create(

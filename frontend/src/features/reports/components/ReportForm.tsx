@@ -81,19 +81,23 @@ export default function ReportForm({ mode }: ReportFormProps) {
 
   useEffect(() => {
     if (isEditMode || !studentId) return;
+    if (!student) {
+      if (!isLoadingStudent) setIsLoadingInitialData(false);
+      return;
+    }
 
     let active = true;
     const loadInitialData = async () => {
       try {
         setIsLoadingInitialData(true);
         setInitialLoadError("");
-        const initialData = await reportService.getInitialData(studentId);
+        await reportService.checkEligibility(studentId);
         if (!active) return;
 
         reset({
           ...EMPTY_FORM,
-          potential: plainTextToLexical(initialData.potential),
-          difficulties: plainTextToLexical(initialData.difficulties),
+          potential: plainTextToLexical(student.potential),
+          difficulties: plainTextToLexical(student.difficulties),
         });
       } catch (error) {
         if (!active) return;
@@ -116,7 +120,7 @@ export default function ReportForm({ mode }: ReportFormProps) {
     return () => {
       active = false;
     };
-  }, [isEditMode, reset, studentId]);
+  }, [isEditMode, isLoadingStudent, reset, student, studentId]);
 
   const reloadAfterConflict = async () => {
     setHasConflict(false);

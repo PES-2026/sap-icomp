@@ -23,31 +23,13 @@ interface ReportHistoryCardProps {
 export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
   const router = useRouter();
   const { reports, isLoading, fetchReports } = useReportsByStudent(student.id);
-  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
-  const [eligibilityMessage, setEligibilityMessage] = useState("");
   const [reportToDelete, setReportToDelete] = useState<ReportSummary>();
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [sharedMessage, setSharedMessage] = useState("");
 
-  const handleCreate = async () => {
-    try {
-      setIsCheckingEligibility(true);
-      await reportService.getInitialData(student.id);
-      router.push(PATHS.create_report(student.id));
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 422) {
-        setEligibilityMessage(error.message);
-        return;
-      }
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível iniciar a criação do relatório.",
-      );
-    } finally {
-      setIsCheckingEligibility(false);
-    }
+  const handleCreate = () => {
+    router.push(PATHS.create_report(student.id));
   };
 
   const requestDelete = (report: ReportSummary) => {
@@ -107,13 +89,9 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
             </p>
           </div>
           <CommonButton
-            label={
-              isCheckingEligibility ? "Verificando..." : "Criar Relatório"
-            }
+            label="Criar Relatório"
             startIcon={FilePlus2}
             onClick={handleCreate}
-            disabled={isCheckingEligibility}
-            className="disabled:cursor-wait disabled:opacity-60"
           />
         </div>
 
@@ -187,11 +165,6 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
         )}
       </section>
 
-      <ReportMessageModal
-        open={Boolean(eligibilityMessage)}
-        message={eligibilityMessage}
-        onClose={() => setEligibilityMessage("")}
-      />
       <ReportMessageModal
         open={Boolean(sharedMessage)}
         title="Exclusão não permitida"

@@ -55,11 +55,6 @@ export interface ReportSummary {
   includedAttendancesCount?: number;
 }
 
-export interface ReportInitialData {
-  potential: string;
-  difficulties: string;
-}
-
 export interface CreateReportData extends ReportContent {
   pedagogueId: string;
 }
