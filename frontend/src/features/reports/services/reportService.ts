@@ -23,7 +23,7 @@ export const reportService = {
     }
 
     const response = await api.get<ReportListItemResponse[]>(
-      `/${encodeURIComponent(studentId)}/reports`,
+      `/reports/student/${encodeURIComponent(studentId)}`,
       {
         fallbackMsg: "Não foi possível carregar os relatórios.",
       },
@@ -40,9 +40,12 @@ export const reportService = {
       return reportMockService.getById(studentId, reportId);
     }
 
-    const response = await api.get<ReportDetailsResponse>(`/reports/${encodeURIComponent(reportId)}`, {
-      fallbackMsg: "Não foi possível carregar o relatório.",
-    });
+    const response = await api.get<ReportDetailsResponse>(
+      `/reports/${encodeURIComponent(reportId)}`,
+      {
+        fallbackMsg: "Não foi possível carregar o relatório.",
+      },
+    );
     return response.data;
   },
 
