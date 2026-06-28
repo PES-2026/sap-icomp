@@ -89,7 +89,16 @@ import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { scheduleRoutes } from "@presentation/routes/scheduleRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ReportController } from "@presentation/controllers/reportController";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
+import { reportRoutes } from "@presentation/routes/reportRoutes";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { UpdateReport } from "@application/useCases/report/updateReport";
+import { RemoveReport } from "@application/useCases/report/removeReport";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -221,6 +230,17 @@ const diagnosesController = new DiagnosesController(
 );
 
 app.use(diagnosesRoutes(diagnosesController));
+
+const reportRepository = new PrismaReportRepository(prisma);
+const reportController = new ReportController(
+  new GetReportInitialData(studentRepository),
+  new CreateReport(reportRepository, attendanceRepository),
+  new UpdateReport(reportRepository),
+  new RemoveReport(reportRepository, hashService),
+  new ListReportsByStudent(reportRepository),
+  new GetReportById(reportRepository),
+);
+app.use(reportRoutes(reportController, tokenService));
 
 const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 
