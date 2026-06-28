@@ -52,8 +52,8 @@ export default function ReportDetails() {
   }
 
   // The current backend report detail returns the pedagogue name, but not the
-  // registration/SIAPE. The mock can provide it, and the authenticated user can
-  // fill it locally when the report belongs to the current pedagogue.
+  // registration/SIAPE. The authenticated user can fill it locally when the
+  // report belongs to the current pedagogue.
   const pedagogueRegistrationNumber =
     report.pedagogueRegistrationNumber ??
     (authenticatedUser?.name === report.pedagogueName

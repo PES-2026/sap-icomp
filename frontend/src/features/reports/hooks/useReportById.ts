@@ -19,7 +19,7 @@ export const useReportById = (studentId: string, reportId: string) => {
     try {
       setIsLoading(true);
       setError(undefined);
-      setReport(await reportService.getById(studentId, reportId));
+      setReport(await reportService.getById(reportId));
     } catch (caughtError) {
       setReport(undefined);
       setError(

@@ -18,7 +18,7 @@ export interface ReportDetailsResponse
   studentInformation: string;
   pedagogueName: string;
   // Not returned by the current backend report contract. Kept optional because
-  // the print view can display it when a mock or future backend version provides it.
+  // the print view can display it when a future backend version provides it.
   pedagogueRegistrationNumber?: string;
   createdAt: string;
   updatedAt: string;
@@ -26,10 +26,10 @@ export interface ReportDetailsResponse
   // this optional field so the conflict flow can be enabled without reshaping data.
   version?: number;
   // Current backend does not expose report sharing status yet. The delete guard
-  // remains optional for the mock/future official sharing workflow.
+  // remains optional for the future official sharing workflow.
   shared?: boolean;
   // Current backend only checks if at least one attendance exists when creating.
-  // The mock includes this count for richer list text, so the frontend keeps it optional.
+  // A future backend version can include this count for richer list text.
   includedAttendancesCount?: number;
 }
 
@@ -38,10 +38,10 @@ export interface ReportListItemResponse extends ReportIdentifierResponse {
   pedagogueName?: string;
   createdAt?: string;
   updatedAt?: string;
-  // Not returned by the current backend report list. Kept for the mock/future
+  // Not returned by the current backend report list. Kept for the future
   // sharing workflow that blocks deletion of officially shared reports.
   shared?: boolean;
-  // Not returned by the current backend report list. Kept for the mock/future
+  // Not returned by the current backend report list. Kept for the future
   // UX that displays how many attendances were included in a report.
   includedAttendancesCount?: number;
 }
@@ -53,15 +53,6 @@ export interface ReportSummary {
   updatedAt: string;
   shared?: boolean;
   includedAttendancesCount?: number;
-}
-
-export interface PaginatedReportsResponse {
-  // Mock-only list shape. The current backend report list returns a plain
-  // ReportListItemResponse[] array, and the service exposes that raw shape.
-  totalItems: number;
-  totalPages: number;
-  currentPage: number;
-  items: ReportListItemResponse[];
 }
 
 export interface ReportInitialData {

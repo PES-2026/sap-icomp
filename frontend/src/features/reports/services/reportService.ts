@@ -10,18 +10,9 @@ import {
   ReportMutationResponse,
   UpdateReportData,
 } from "../types/report";
-import { reportMockService } from "./reportMockService";
-
-export const REPORTS_MOCK_ENABLED =
-  process.env.NEXT_PUBLIC_REPORTS_MOCK === "true";
 
 export const reportService = {
   async listByStudent(studentId: string): Promise<ReportListItemResponse[]> {
-    if (REPORTS_MOCK_ENABLED) {
-      const response = await reportMockService.listByStudent(studentId);
-      return response.items;
-    }
-
     const response = await api.get<ReportListItemResponse[]>(
       `/reports/student/${encodeURIComponent(studentId)}`,
       {
@@ -32,14 +23,7 @@ export const reportService = {
     return response.data;
   },
 
-  async getById(
-    studentId: string,
-    reportId: string,
-  ): Promise<ReportDetailsResponse> {
-    if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.getById(studentId, reportId);
-    }
-
+  async getById(reportId: string): Promise<ReportDetailsResponse> {
     const response = await api.get<ReportDetailsResponse>(
       `/reports/${encodeURIComponent(reportId)}`,
       {
@@ -50,10 +34,6 @@ export const reportService = {
   },
 
   async getInitialData(studentId: string): Promise<ReportInitialData> {
-    if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.getInitialData(studentId);
-    }
-
     const [student, attendances] = await Promise.all([
       studentService.getStudentById(studentId),
       attendanceService.getAttendancesByStudent(studentId, 1, 1),
@@ -81,10 +61,6 @@ export const reportService = {
     studentId: string,
     data: CreateReportData,
   ): Promise<ReportMutationResponse> {
-    if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.create(studentId, data);
-    }
-
     const response = await api.post<ReportMutationResponse>(
       "/reports",
       { ...data, studentId },
@@ -98,10 +74,6 @@ export const reportService = {
     reportId: string,
     data: UpdateReportData,
   ): Promise<ReportMutationResponse> {
-    if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.update(studentId, reportId, data);
-    }
-
     const response = await api.put<ReportMutationResponse>(
       `/reports/${encodeURIComponent(reportId)}`,
       { ...data, studentId },
@@ -110,15 +82,7 @@ export const reportService = {
     return response.data;
   },
 
-  async remove(
-    studentId: string,
-    reportId: string,
-    password: string,
-  ): Promise<void> {
-    if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.remove(studentId, reportId, password);
-    }
-
+  async remove(reportId: string, password: string): Promise<void> {
     await api.delete(`/reports/${encodeURIComponent(reportId)}`, {
       data: { password },
       fallbackMsg: "Não foi possível excluir o relatório.",
