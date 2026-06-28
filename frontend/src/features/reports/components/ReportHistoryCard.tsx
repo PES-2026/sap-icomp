@@ -4,7 +4,7 @@ import CommonButton from "@/components/ui/CommonButton";
 import { PATHS } from "@/constants/paths";
 import { Student } from "@/features/students/types/student";
 import { ApiError } from "@/services/apiError";
-import { FilePlus2, FileText, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Edit, Eye, FilePlus2, FileText, FileX, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -125,7 +125,8 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
                     Responsável: {report.pedagogueName}
                     {report.includedAttendancesCount != null && (
                       <>
-                        {" "}· {report.includedAttendancesCount} atendimento
+                        {" "}
+                        · {report.includedAttendancesCount} atendimento
                         {report.includedAttendancesCount !== 1 ? "s" : ""}
                       </>
                     )}
@@ -135,29 +136,26 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
                 <div className="flex items-center gap-1.5">
                   <Link
                     href={PATHS.visualize_report(student.id, report.id)}
-                    title="Visualizar relatório"
-                    aria-label="Visualizar relatório"
-                    className="rounded-lg p-2 text-[#319878] transition-colors hover:bg-emerald-50"
+                    title="Visualizar"
+                    className="flex items-center rounded-md p-1 text-[#53bb98] transition-colors duration-150 hover:bg-[#a5e1cd]"
                   >
-                    <FileText size={18} />
+                    <Eye size={20} />
                   </Link>
                   <Link
                     href={PATHS.edit_report(student.id, report.id)}
-                    title="Editar relatório"
-                    aria-label="Editar relatório"
-                    className="rounded-lg p-2 text-sky-600 transition-colors hover:bg-sky-50"
+                    title="Editar"
+                    className="flex items-center rounded-md p-1 text-[#b0a898] transition-colors duration-150 hover:bg-[#d0d0d0]"
                   >
-                    <Pencil size={18} />
+                    <Edit size={20} />
                   </Link>
-                  <button
-                    type="button"
-                    title="Excluir relatório"
-                    aria-label="Excluir relatório"
+                  <CommonButton
+                    label=""
+                    title="Inativar"
                     onClick={() => requestDelete(report)}
-                    className="cursor-pointer rounded-lg p-2 text-red-400 transition-colors hover:bg-red-50"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                    startIcon={FileX}
+                    sizeIcon={20}
+                    className="flex items-center rounded-md p-1 text-red-400 transition-colors duration-150 bg-transparent hover:bg-red-200 gap-0"
+                  />
                 </div>
               </div>
             ))}
