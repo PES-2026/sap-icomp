@@ -144,6 +144,9 @@ export default function ReportForm({ mode }: ReportFormProps) {
       toast.success("Relatório criado com sucesso.");
       router.push(PATHS.visualize_report(studentId, createdReportId));
     } catch (error) {
+      // The current backend report update does not return 409 yet because
+      // optimistic concurrency/versioning is not implemented there. The UI keeps
+      // this branch ready for the sprint criterion when that contract lands.
       if (error instanceof ApiError && error.status === 409) {
         setHasConflict(true);
         return;

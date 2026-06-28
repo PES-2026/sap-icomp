@@ -18,8 +18,8 @@ export const useReportsByStudent = (studentId: string) => {
 
     try {
       setIsLoading(true);
-      const response = await reportService.listByStudent(studentId);
-      setReports(formatReportsSummary(response.items));
+      const reportsResponse = await reportService.listByStudent(studentId);
+      setReports(formatReportsSummary(reportsResponse));
     } catch (error) {
       toast.error(
         error instanceof Error

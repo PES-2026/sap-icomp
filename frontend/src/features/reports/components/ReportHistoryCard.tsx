@@ -51,6 +51,8 @@ export default function ReportHistoryCard({ student }: ReportHistoryCardProps) {
   };
 
   const requestDelete = (report: ReportSummary) => {
+    // The current backend report list does not return sharing status yet. This
+    // guard is kept for the mock/future sharing workflow described in the sprint.
     if (report.shared) {
       setSharedMessage(
         "Este relatório já foi compartilhado com docentes e não pode ser excluído. Você ainda pode retificá-lo por meio da edição.",

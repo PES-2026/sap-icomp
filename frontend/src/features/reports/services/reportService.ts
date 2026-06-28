@@ -1,9 +1,12 @@
 import api from "@/services/api";
+import { attendanceService } from "@/features/attendances/services/attendanceService";
+import { studentService } from "@/features/students/services/studentService";
+import { ApiError } from "@/services/apiError";
 import {
   CreateReportData,
-  PaginatedReportsResponse,
   ReportDetailsResponse,
   ReportInitialData,
+  ReportListItemResponse,
   ReportMutationResponse,
   UpdateReportData,
 } from "../types/report";
@@ -13,17 +16,19 @@ export const REPORTS_MOCK_ENABLED =
   process.env.NEXT_PUBLIC_REPORTS_MOCK === "true";
 
 export const reportService = {
-  async listByStudent(studentId: string): Promise<PaginatedReportsResponse> {
+  async listByStudent(studentId: string): Promise<ReportListItemResponse[]> {
     if (REPORTS_MOCK_ENABLED) {
-      return reportMockService.listByStudent(studentId);
+      const response = await reportMockService.listByStudent(studentId);
+      return response.items;
     }
 
-    const response = await api.get<PaginatedReportsResponse>(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports`,
+    const response = await api.get<ReportListItemResponse[]>(
+      `/${encodeURIComponent(studentId)}/reports`,
       {
         fallbackMsg: "Não foi possível carregar os relatórios.",
       },
     );
+
     return response.data;
   },
 
@@ -35,10 +40,9 @@ export const reportService = {
       return reportMockService.getById(studentId, reportId);
     }
 
-    const response = await api.get<ReportDetailsResponse>(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}`,
-      { fallbackMsg: "Não foi possível carregar o relatório." },
-    );
+    const response = await api.get<ReportDetailsResponse>(`/reports/${encodeURIComponent(reportId)}`, {
+      fallbackMsg: "Não foi possível carregar o relatório.",
+    });
     return response.data;
   },
 
@@ -47,13 +51,27 @@ export const reportService = {
       return reportMockService.getInitialData(studentId);
     }
 
-    const response = await api.get<ReportInitialData>(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/new`,
-      {
-        fallbackMsg: "Não foi possível iniciar a criação do relatório.",
-      },
-    );
-    return response.data;
+    const [student, attendances] = await Promise.all([
+      studentService.getStudentById(studentId),
+      attendanceService.getAttendancesByStudent(studentId, 1, 1),
+    ]);
+
+    // The current backend branch contains the initial-data use case, but the
+    // GET /reports/new route is commented out. Until it is exposed, the
+    // frontend mirrors the backend create rule and uses the student payload as
+    // the source for default potential/difficulties.
+    if (attendances.items.length === 0) {
+      throw new ApiError(
+        "Não é possível gerar um relatório consolidado para alunos sem histórico de atendimentos realizados.",
+        422,
+        "NO_COMPLETED_ATTENDANCES",
+      );
+    }
+
+    return {
+      potential: student.potential ?? "",
+      difficulties: student.difficulties ?? "",
+    };
   },
 
   async create(
@@ -65,8 +83,8 @@ export const reportService = {
     }
 
     const response = await api.post<ReportMutationResponse>(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/new`,
-      data,
+      "/reports",
+      { ...data, studentId },
       { fallbackMsg: "Não foi possível criar o relatório." },
     );
     return response.data;
@@ -81,9 +99,9 @@ export const reportService = {
       return reportMockService.update(studentId, reportId, data);
     }
 
-    const response = await api.post<ReportMutationResponse>(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}/edit`,
-      data,
+    const response = await api.put<ReportMutationResponse>(
+      `/reports/${encodeURIComponent(reportId)}`,
+      { ...data, studentId },
       { fallbackMsg: "Não foi possível atualizar o relatório." },
     );
     return response.data;
@@ -98,13 +116,10 @@ export const reportService = {
       return reportMockService.remove(studentId, reportId, password);
     }
 
-    await api.post(
-      `/pedagogue/students/${encodeURIComponent(studentId)}/reports/${encodeURIComponent(reportId)}/remove`,
-      { password },
-      {
-        fallbackMsg: "Não foi possível excluir o relatório.",
-        preserveSessionOn401: true,
-      },
-    );
+    await api.delete(`/reports/${encodeURIComponent(reportId)}`, {
+      data: { password },
+      fallbackMsg: "Não foi possível excluir o relatório.",
+      preserveSessionOn401: true,
+    });
   },
 };
