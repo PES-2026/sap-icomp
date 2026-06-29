@@ -21,11 +21,11 @@ export const appointmentRoutes = (controller: AppointmentController, tokenServic
   const auth = (req: Request, res: Response, next: NextFunction) => authMiddleware(tokenService, req, res, next);
 
   routes.post("/appointments/request", scheduleRateLimiter, validateBody(RequestAppointmentDTO), controller.request);
-  routes.get("/appointments/:id", auth, validateParamsAndQuery(ListAppointmentsByPedagogueDTO), controller.getById);
+  routes.get("/appointments/:id", auth, validateParamsAndQuery(AppointmentByIdDTO), controller.getById);
   routes.get(
     "/appointments/pedagogue/:id",
     auth,
-    validateParamsAndQuery(AppointmentByIdDTO),
+    validateParamsAndQuery(ListAppointmentsByPedagogueDTO),
     controller.listByPedagogue,
   );
   routes.post("/appointments/:id/confirm", auth, validateParams(ConfirmAppointmentDTO), controller.confirm);
