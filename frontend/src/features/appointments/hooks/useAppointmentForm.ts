@@ -57,7 +57,7 @@ export const useAppointmentForm = () => {
       setIsLoadingSlots(true);
       try {
         const data = await scheduleService.getAvailability(pedagogueId, date);
-        setSlots(data);
+        setSlots(data.items);
       } catch (error) {
         setSlots([]);
       } finally {
@@ -87,6 +87,7 @@ export const useAppointmentForm = () => {
       const payload: RequestSchedulePayload = {
         name: data.studentName,
         email: data.email,
+        enrollment: data.registrationNumber,
         pedagogueId: data.pedagogueId,
         courseId: data.courseId,
         slotId: data.slotId,
