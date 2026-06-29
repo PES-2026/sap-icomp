@@ -50,6 +50,7 @@ import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
 import { StudentById } from "@application/useCases/student/studentById";
 import { UpdateStudent } from "@application/useCases/student/updateStudent";
+import { ActivateUser } from "@application/useCases/user/activateUser";
 import { AuthenticateUser } from "@application/useCases/user/authenticateUser";
 import { GetAuthenticatedUser } from "@application/useCases/user/getAuthenticatedUser";
 import { GetUserById } from "@application/useCases/user/getUserById";
@@ -97,7 +98,16 @@ import { availabilityRoutes } from "@presentation/routes/availabilityRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
 import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ReportController } from "@presentation/controllers/reportController";
 import { userRoutes } from "@presentation/routes/userRoutes";
+import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
+import { reportRoutes } from "@presentation/routes/reportRoutes";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { UpdateReport } from "@application/useCases/report/updateReport";
+import { RemoveReport } from "@application/useCases/report/removeReport";
 
 const app = express();
 
@@ -153,6 +163,7 @@ const userController = new UserController(
   new UpdateUserPassword(pedagogueRepository, professorRepository, hashService),
   new GetUserById(pedagogueRepository, professorRepository),
   new RemoveUser(pedagogueRepository, professorRepository),
+  new ActivateUser(pedagogueRepository, professorRepository),
 );
 
 const tokenService = new JwtTokenService();
@@ -196,6 +207,20 @@ const diagnosesController = new DiagnosesController(
 );
 
 const availabilityRepository = new PrismaAvailabilityRepository(prisma);
+app.use(diagnosesRoutes(diagnosesController));
+
+const reportRepository = new PrismaReportRepository(prisma);
+const reportController = new ReportController(
+  new GetReportInitialData(studentRepository),
+  new CreateReport(reportRepository, attendanceRepository),
+  new UpdateReport(reportRepository),
+  new RemoveReport(reportRepository, hashService),
+  new ListReportsByStudent(reportRepository),
+  new GetReportById(reportRepository),
+);
+app.use(reportRoutes(reportController, tokenService));
+
+const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 
 const appointmentRepository = new PrismaAppointmentRepository(prisma);
 

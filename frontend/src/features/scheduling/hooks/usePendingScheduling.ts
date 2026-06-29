@@ -75,7 +75,7 @@ export const usePendingSchedulings = (page: number, limit: number) => {
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.confirm(scheduleId, userId),
+      scheduleManagementService.confirm(scheduleId),
     );
   };
 
@@ -88,7 +88,7 @@ export const usePendingSchedulings = (page: number, limit: number) => {
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.reject(scheduleId, userId, justification),
+      scheduleManagementService.reject(scheduleId, justification),
     );
   };
 

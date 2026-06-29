@@ -63,6 +63,7 @@ export type SchedulingSavePayload = CreateAvailabilitySlot[];
 export interface RequestSchedulePayload {
   name: string;
   email: string;
+  enrollment: string;
   pedagogueId: string;
   courseId: string;
   slotId: string;

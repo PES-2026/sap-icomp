@@ -36,6 +36,14 @@ export const PATHS = {
   edit_attendance: (studentId: string, attendanceId: string) =>
     `/${RoleMap.PEDAGOGUE}/students/${studentId}/attendance/${attendanceId}/edit`,
 
+  // Intervention reports
+  create_report: (studentId: string) =>
+    `/${RoleMap.PEDAGOGUE}/students/${studentId}/reports/new`,
+  visualize_report: (studentId: string, reportId: string) =>
+    `/${RoleMap.PEDAGOGUE}/students/${studentId}/reports/${reportId}`,
+  edit_report: (studentId: string, reportId: string) =>
+    `/${RoleMap.PEDAGOGUE}/students/${studentId}/reports/${reportId}/edit`,
+
   // Users
   users_list: `/${RoleMap.PEDAGOGUE}/users`,
   users_pending: `/${RoleMap.PEDAGOGUE}/users/pending`,

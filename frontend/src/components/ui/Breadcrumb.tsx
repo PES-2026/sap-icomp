@@ -13,11 +13,16 @@ const routeTranslations: Record<string, string> = {
   students: "Alunos",
   register: "Cadastrar",
   edit: "Editar",
-  attendance: "Atendimentos",
+  attendances: "Atendimentos",
+  attendance: "Atendimento",
   users: "Usuários",
   pending: "Pendentes",
   settings: "Configurações",
   scheduling: "Agendamentos",
+  reports: "Relatórios",
+  new: "Criar",
+  appointment: "Agendamento",
+  profile: "Perfil",
 };
 
 const isIdSegment = (segment: string) => {
@@ -32,6 +37,18 @@ const formatSegmentName = (segment: string) => {
   return segment
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const isReportsGroupSegment = (pathSegments: string[], index: number) => {
+  const segment = pathSegments[index];
+  const previousSegment = pathSegments[index - 1];
+  const studentSegment = pathSegments[index - 2];
+
+  return (
+    segment === "reports" &&
+    studentSegment === "students" &&
+    Boolean(previousSegment)
+  );
 };
 
 function StudentNameResolver({ id }: { id: string }) {
@@ -74,6 +91,7 @@ export function Breadcrumb() {
         {pathSegments.map((segment, index) => {
           const href = `${rootPath}/${pathSegments.slice(0, index + 1).join("/")}`;
           const isLast = index === pathSegments.length - 1;
+          const isClickable = !isLast && !isReportsGroupSegment(pathSegments, index);
 
           const previousSegment = index > 0 ? pathSegments[index - 1] : "";
           const isId = isIdSegment(segment);
@@ -92,8 +110,15 @@ export function Breadcrumb() {
             <li key={href} className="flex items-center gap-1.5">
               <ChevronRight size={14} className="text-[#c2bcaf]" />
 
-              {isLast ? (
-                <span className="font-bold text-[#3a3530]" aria-current="page">
+              {!isClickable ? (
+                <span
+                  className={
+                    isLast
+                      ? "font-bold text-[#3a3530]"
+                      : "font-medium text-[#8a8075]"
+                  }
+                  aria-current={isLast ? "page" : undefined}
+                >
                   {SegmentContent}
                 </span>
               ) : (
