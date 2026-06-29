@@ -1,7 +1,7 @@
-import { RescheduledStudentEmailData } from "@domain/services/interfaces/rescheduleStudentData";
+import { RescheduledAppointmentStudentEmailData } from "@domain/services/interfaces/rescheduleAppointmentStudentData";
 
 export function buildRescheduledStudentTemplate(
-  data: RescheduledStudentEmailData,
+  data: RescheduledAppointmentStudentEmailData,
   rescheduleLink: string,
   cancelLink: string,
 ): string {

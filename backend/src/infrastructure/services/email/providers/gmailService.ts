@@ -4,23 +4,25 @@ import { fileURLToPath } from "node:url";
 import nodemailer from "nodemailer";
 
 import { IEmailService } from "@domain/services/emailService";
-import { PedagogueScheduleEmailData } from "@domain/services/interfaces/pedagogueScheduleEmailData";
-import { RescheduledPedagogueEmailData } from "@domain/services/interfaces/reschedulePedagogueData";
-import { RescheduledStudentEmailData } from "@domain/services/interfaces/rescheduleStudentData";
-import { CancelledPedagogueEmailData } from "@domain/services/interfaces/scheduleCancelledPedagogueData";
-import { CancelledStudentEmailData } from "@domain/services/interfaces/scheduleCancelledStudentData";
-import { ScheduleConfirmedStudentEmailData } from "@domain/services/interfaces/scheduleConfirmedStudentData";
-import { StudentScheduleEmailData } from "@domain/services/interfaces/studentScheduleEmailData";
+import { CancelledAppointmentPedagogueEmailData } from "@domain/services/interfaces/cancelledAppointmentPedagogueData";
+import { CancelledAppointmentEmailData } from "@domain/services/interfaces/cancelledAppointmentStudentData";
+import { AppointmentConfirmedPedagogueEmailData } from "@domain/services/interfaces/confirmedAppointmentPedagogueData";
+import { AppointmentConfirmedStudentEmailData } from "@domain/services/interfaces/confirmedAppointmentStudentData";
+import { PedagogueAppointmentEmailData } from "@domain/services/interfaces/pedagogueScheduleEmailData";
+import { RescheduledPedagogueAppointmentEmailData } from "@domain/services/interfaces/rescheduleAppointmentPedagogueData";
+import { RescheduledAppointmentStudentEmailData } from "@domain/services/interfaces/rescheduleAppointmentStudentData";
+import { StudentAppointmentEmailData } from "@domain/services/interfaces/studentAppointmentEmailData";
 import { env } from "@infrastructure/config/env";
 
+import { buildAppointmentCancelledPedagogueTemplate } from "../templates/appointmentCancelledPedagogueTemplate";
+import { buildAppointmentCancelledStudentTemplate } from "../templates/appointmentCancelledStudentTemplate";
+import { buildAppointmentConfirmedPedagogueTemplate } from "../templates/appointmentConfirmedPedagogueTemplate";
+import { buildAppointmentConfirmedStudentTemplate } from "../templates/appointmentConfirmedStudentTemplate";
+import { buildAppointmentRequestedPedagogueTemplate } from "../templates/appointmentRequestedPedagogueTemplate";
+import { buildAppointmentRequestedStudentTemplate } from "../templates/appointmentRequestedStudentTemplate";
 import { buildPasswordResetTemplate } from "../templates/passwordResetTemplate";
 import { buildRescheduledPedagogueTemplate } from "../templates/reschedulePedagogueTemplate";
 import { buildRescheduledStudentTemplate } from "../templates/rescheduleStudentTemplate";
-import { buildCancelledPedagogueTemplate } from "../templates/scheduleCancelledPedagogueTemplate";
-import { buildCancelledScheduleStudentTemplate } from "../templates/scheduleCancelledStudentTemplate";
-import { buildScheduleConfirmedStudentTemplate } from "../templates/scheduleConfirmedStudentTemplate";
-import { buildSchedulePedagogueTemplate } from "../templates/scheduleRequestedPedagogueTemplate";
-import { buildScheduleStudentTemplate } from "../templates/scheduleRequestedStudentTemplate";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,61 +67,81 @@ export class EmailService implements IEmailService {
     await this.sendEmail(mailOptions);
   }
 
-  async sendScheduleRequestedStudentEmail(to: string, props: StudentScheduleEmailData): Promise<void> {
+  async sendAppointmentRequestedStudentEmail(to: string, props: StudentAppointmentEmailData): Promise<void> {
     const cancelLink = `${env.FRONTEND_URL}/cancelStudentSchedule?token=${props.token}`;
     const rescheduleLink = `${env.FRONTEND_URL}/rescheduleStudentSchedule?token=${props.token}`;
 
     const mailOptions = {
       to,
       subject: "Agendamento Solicitado - SAP ICOMP",
-      html: buildScheduleStudentTemplate(props, rescheduleLink, cancelLink),
+      html: buildAppointmentRequestedStudentTemplate(props, rescheduleLink, cancelLink),
     };
 
     await this.sendEmail(mailOptions);
   }
 
-  async sendScheduleRequestedPedagogueEmail(to: string, props: PedagogueScheduleEmailData): Promise<void> {
+  async sendAppointmentRequestedPedagogueEmail(to: string, props: PedagogueAppointmentEmailData): Promise<void> {
     const dashboardLink = `${env.FRONTEND_URL}/pedagogue/scheduling`;
     const mailOptions = {
       to,
       subject: "Nova solicitação de agendamento - SAP ICOMP",
-      html: buildSchedulePedagogueTemplate(props, dashboardLink),
+      html: buildAppointmentRequestedPedagogueTemplate(props, dashboardLink),
     };
 
     await this.sendEmail(mailOptions);
   }
 
-  async sendScheduleConfirmedStudentEmail(to: string, props: ScheduleConfirmedStudentEmailData): Promise<void> {
+  async sendAppointmentConfirmedStudentEmail(to: string, props: AppointmentConfirmedStudentEmailData): Promise<void> {
     const mailOptions = {
       to,
       subject: "Agendamento Confirmado - SAP ICOMP",
-      html: buildScheduleConfirmedStudentTemplate(props),
+      html: buildAppointmentConfirmedStudentTemplate(props),
     };
 
     await this.sendEmail(mailOptions);
   }
 
-  async sendScheduleCancelledStudentEmail(to: string, props: CancelledStudentEmailData): Promise<void> {
+  async sendAppointmentConfirmedPedagogueEmail(
+    to: string,
+    props: AppointmentConfirmedPedagogueEmailData,
+  ): Promise<void> {
+    const dashboardLink = `${env.FRONTEND_URL}/pedagogue/scheduling`;
+    const mailOptions = {
+      to,
+      subject: "Agendamento Confirmado - SAP ICOMP",
+      html: buildAppointmentConfirmedPedagogueTemplate(props, dashboardLink),
+    };
+
+    await this.sendEmail(mailOptions);
+  }
+
+  async sendAppointmentCancelledStudentEmail(to: string, props: CancelledAppointmentEmailData): Promise<void> {
     const mailOptions = {
       to,
       subject: "Agendamento Cancelado - SAP ICOMP",
-      html: buildCancelledScheduleStudentTemplate(props),
+      html: buildAppointmentCancelledStudentTemplate(props),
     };
 
     await this.sendEmail(mailOptions);
   }
 
-  async sendScheduleCancelledPedagogueEmail(to: string, props: CancelledPedagogueEmailData): Promise<void> {
+  async sendAppointmentCancelledPedagogueEmail(
+    to: string,
+    props: CancelledAppointmentPedagogueEmailData,
+  ): Promise<void> {
     const mailOptions = {
       to,
       subject: "Agendamento Cancelado pelo Aluno - SAP ICOMP",
-      html: buildCancelledPedagogueTemplate(props),
+      html: buildAppointmentCancelledPedagogueTemplate(props),
     };
 
     await this.sendEmail(mailOptions);
   }
 
-  async sendRescheduledPedagogueEmail(to: string, props: RescheduledPedagogueEmailData): Promise<void> {
+  async sendRescheduledAppointmentPedagogueEmail(
+    to: string,
+    props: RescheduledPedagogueAppointmentEmailData,
+  ): Promise<void> {
     const dashboardLink = `${env.FRONTEND_URL}/pedagogue/scheduling`;
     const mailOptions = {
       to,
@@ -130,7 +152,10 @@ export class EmailService implements IEmailService {
     await this.sendEmail(mailOptions);
   }
 
-  async sendRescheduledStudentEmail(to: string, props: RescheduledStudentEmailData): Promise<void> {
+  async sendRescheduledAppointmentStudentEmail(
+    to: string,
+    props: RescheduledAppointmentStudentEmailData,
+  ): Promise<void> {
     const cancelLink = `${env.FRONTEND_URL}/cancelStudentSchedule?token=${props.token}`;
     const rescheduleLink = `${env.FRONTEND_URL}/rescheduleStudentSchedule?token=${props.token}`;
 
