@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { CreateAvailabilityDTO } from "@application/dtos/availability/createAvailability";
-import { ListAvailabilitiesDTO } from "@application/dtos/availability/listAvailabilities";
+import { ListAvailabilitiesByPedagogueDTO } from "@application/dtos/availability/listAvailabilitiesByPedagogue";
 import { PreviewAvailabilityDTO } from "@application/dtos/availability/previewAvailability";
 import { RemoveAvailabilityDTO } from "@application/dtos/availability/removeAvailability";
 import { RemoveManyAvailabilitiesDTO } from "@application/dtos/availability/removeManyAvailabilities";
@@ -48,7 +48,7 @@ export class AvailabilityController extends BaseController {
 
   list = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = ListAvailabilitiesDTO.create(req.params.id, req.query);
+      const dto = ListAvailabilitiesByPedagogueDTO.create(req.params.id, req.query);
       const result = await this.listAvailability.execute(dto);
 
       this.handleResult(res, result);

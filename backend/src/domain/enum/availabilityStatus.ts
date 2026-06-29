@@ -2,6 +2,7 @@ export enum AvailabilityStatusEnum {
   CREATED = "CREATED",
   PENDING = "PENDING",
   BOOKED = "BOOKED",
+  REMOVED = "REMOVED",
 }
 
 export const AvailabilityPreviewStatus = {

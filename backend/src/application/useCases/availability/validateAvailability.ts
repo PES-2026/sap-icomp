@@ -18,8 +18,8 @@ type ExecuteProps = {
 
 export class ValidateAvailability {
   constructor(
-    private availabilityRepository: IAvailabilityRepository,
-    private pedagogueRepository: IPedagogueRepository,
+    private readonly availabilityRepository: IAvailabilityRepository,
+    private readonly pedagogueRepository: IPedagogueRepository,
   ) {}
 
   async execute(props: ExecuteProps): Promise<Result<AvailabilityResult, DomainError>> {

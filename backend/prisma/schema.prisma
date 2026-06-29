@@ -25,6 +25,7 @@ enum AvailabilityStatus {
   CREATED
   PENDING
   BOOKED
+  REMOVED
 }
 
 enum AppointmentStatus {
@@ -404,6 +405,7 @@ model Availability {
 
   startDateTime  DateTime
   endDateTime    DateTime
+  weekDay        DaysOfWeek
   attendanceTime Int
 
   status AvailabilityStatus @default(CREATED)

@@ -1,4 +1,4 @@
-import { ListAvailabilitiesDTO } from "@application/dtos/availability/listAvailabilities";
+import { ListAvailabilitiesByPedagogueDTO } from "@application/dtos/availability/listAvailabilitiesByPedagogue";
 import { ApplicationError } from "@application/errors/applicationError";
 import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
 import { AvailabilityListParams } from "@domain/repositories/filters/availabilityFilters";
@@ -8,7 +8,9 @@ import { Result } from "@domain/shared/result";
 export class ListAvailabilities {
   constructor(private readonly availabilityRepository: IAvailabilityRepository) {}
 
-  async execute(dto: ListAvailabilitiesDTO): Promise<Result<PaginatedAvailabilityResult, ApplicationError>> {
+  async execute(
+    dto: ListAvailabilitiesByPedagogueDTO,
+  ): Promise<Result<PaginatedAvailabilityResult, ApplicationError>> {
     const params: AvailabilityListParams = {
       page: dto.page,
       limit: dto.limit,

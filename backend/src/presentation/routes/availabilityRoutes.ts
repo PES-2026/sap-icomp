@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 
 import { CreateAvailabilityDTO } from "@application/dtos/availability/createAvailability";
-import { ListAvailabilitiesDTO } from "@application/dtos/availability/listAvailabilities";
 import { ListAvailabilitiesByPedagogueDTO } from "@application/dtos/availability/listAvailabilitiesByPedagogue";
 import { PreviewAvailabilityDTO } from "@application/dtos/availability/previewAvailability";
 import { RemoveAvailabilityDTO } from "@application/dtos/availability/removeAvailability";
@@ -20,8 +19,11 @@ export const availabilityRoutes = (controller: AvailabilityController, tokenServ
 
   routes.post("/availabilities/preview", auth, validateBody(PreviewAvailabilityDTO), controller.preview);
   routes.post("/availabilities", auth, validateBody(CreateAvailabilityDTO), controller.create);
-  routes.get("/availabilities/pedagogue/:id", validateParamsAndQuery(ListAvailabilitiesDTO), controller.list);
-  routes.get("/availabilities", validateParamsAndQuery(ListAvailabilitiesByPedagogueDTO), controller.list);
+  routes.get(
+    "/availabilities/pedagogue/:id",
+    validateParamsAndQuery(ListAvailabilitiesByPedagogueDTO),
+    controller.list,
+  );
   routes.put("/availabilities/:id/remove", validateParams(RemoveAvailabilityDTO), auth, controller.remove);
   routes.put("/availabilities/remove-many", validateBody(RemoveManyAvailabilitiesDTO), auth, controller.removeMany);
 

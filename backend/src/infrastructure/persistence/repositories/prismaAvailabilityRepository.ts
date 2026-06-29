@@ -1,6 +1,7 @@
 import { Availability } from "@domain/entities/availability";
 import { AppointmentType } from "@domain/enum/appointmentType";
 import { AvailabilityStatusEnum } from "@domain/enum/availabilityStatus";
+import { DaysOfWeekEnum } from "@domain/enum/daysOfWeek";
 import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
 import { AvailabilityListParams } from "@domain/repositories/filters/availabilityFilters";
 import { PaginatedAvailabilityResult, AvailabilityResult } from "@domain/repositories/results/availabilityResult";
@@ -27,6 +28,7 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
       attendanceTime: data.attendanceTime,
       appointmentId: data.appointment?.externalId ?? data.appointmentGuest?.externalId ?? undefined,
       status: findValueInEnum(AvailabilityStatusEnum, data.status),
+      weekDay: findValueInEnum(DaysOfWeekEnum, data.weekDay),
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
@@ -40,6 +42,7 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
       endDateTime: availability.endDateTime.value,
       attendanceTime: availability.attendanceTime.value,
       status: availability.status.value,
+      weekDay: availability.dayOfWeek.value,
     };
 
     await this.prisma.availability.create({ data });
@@ -57,13 +60,14 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
     if (!pedagogue) throw new Error(`Pedagogue with ID ${pedagogueExternalId} not found`);
 
     await this.prisma.availability.createMany({
-      data: availabilities.map((slot) => ({
-        externalId: slot.id.value,
+      data: availabilities.map((availability) => ({
+        externalId: availability.id.value,
         pedagogueId: pedagogue.internalId,
-        startDateTime: slot.startDateTime.value,
-        endDateTime: slot.endDateTime.value,
-        attendanceTime: slot.attendanceTime.value,
-        status: slot.status.value,
+        startDateTime: availability.startDateTime.value,
+        endDateTime: availability.endDateTime.value,
+        attendanceTime: availability.attendanceTime.value,
+        status: availability.status.value,
+        weekDay: availability.dayOfWeek.value,
       })),
     });
   }
@@ -160,7 +164,7 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
     try {
       await this.prisma.availability.update({
         where: { externalId: id },
-        data: { removed: true },
+        data: { removed: true, status: AvailabilityStatusEnum.REMOVED },
       });
       return true;
     } catch (_error) {
@@ -176,6 +180,7 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
         externalId: { in: ids },
       },
       data: {
+        status: AvailabilityStatusEnum.REMOVED,
         removed: true,
       },
     });
@@ -191,24 +196,27 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
     return !!slot;
   }
 
+  /* This function does not disconnect the Availability from appointment, it only makes a soft-delete. 
+    It's necessary to the create a clone of the availability after this release. 
+    Verify what was made on the releaseAvability useCase. 
+  */
   async releaseAvailabilityById(availabilityId: string): Promise<void> {
     await this.prisma.availability.update({
       where: {
         externalId: availabilityId,
       },
       data: {
-        status: AvailabilityStatusEnum.CREATED,
-        appointment: { disconnect: true },
-        appointmentGuest: { disconnect: true },
+        status: AvailabilityStatusEnum.REMOVED,
+        removed: true,
       },
     });
   }
 
   async bookAvailabilityById(id: string, appointmentId: string, appointmentType: AppointmentType): Promise<void> {
     let appointment: Appointment | AppointmentGuest | null = null;
-    if (appointmentType === AppointmentType.STUDENT) {
+    if (appointmentType === AppointmentType.GUEST) {
       appointment = await this.prisma.appointmentGuest.findUnique({
-        where: { externalId: id },
+        where: { externalId: appointmentId },
       });
       await this.prisma.availability.update({
         where: {
@@ -219,9 +227,9 @@ export class PrismaAvailabilityRepository implements IAvailabilityRepository {
           appointmentGuest: { connect: { externalId: appointmentId } },
         },
       });
-    } else if (AppointmentType.STUDENT) {
+    } else if (appointmentType === AppointmentType.STUDENT) {
       appointment = await this.prisma.appointment.findUnique({
-        where: { externalId: id },
+        where: { externalId: appointmentId },
       });
       await this.prisma.availability.update({
         where: {

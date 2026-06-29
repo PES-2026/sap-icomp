@@ -32,9 +32,9 @@ export class RequestAppointmentDTO {
     const enrollment: string = validateStringField(raw.enrollment, "enrollment");
     const pedagogueId: string = validateStringField(raw.pedagogueId, "pedagogueId");
     const courseId: string = validateStringField(raw.courseId, "courseId");
-    const slotId: string = validateExternalIdField(raw.slotId, "slotId");
+    const availabilitySlotId: string = validateExternalIdField(raw.availabilitySlotId, "availabilitySlotId");
     const reason: string | undefined = validateOptionalStringField(raw.reason, "reason");
 
-    return new RequestAppointmentDTO(name, email, enrollment, pedagogueId, courseId, slotId, reason);
+    return new RequestAppointmentDTO(name, email, enrollment, pedagogueId, courseId, availabilitySlotId, reason);
   }
 }

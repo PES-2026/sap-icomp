@@ -130,6 +130,7 @@ export class CancelAppointment {
   }
 
   private async releaseAvailabilitySlot(availabilityId: string) {
+    // const newAvailabii;
     await this.availabilityRepository.releaseAvailabilityById(availabilityId);
   }
 

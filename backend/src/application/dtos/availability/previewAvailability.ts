@@ -6,8 +6,8 @@ import { validateStartEndDate } from "../shared/datesValidationsDto";
 
 export interface Availability {
   id?: string;
-  start: number;
-  end: number;
+  start: Date;
+  end: Date;
   attendanceTime: number;
   status: AvailabilityPreviewStatus;
 }
@@ -25,8 +25,8 @@ export class PreviewAvailabilityDTO {
     public readonly breakTime: number,
     public readonly startDate: Date,
     public readonly endDate: Date,
-    public readonly startHour: number,
-    public readonly endHour: number,
+    public readonly startHour: Date,
+    public readonly endHour: Date,
   ) {}
 
   static create(value: unknown): PreviewAvailabilityDTO {
@@ -41,8 +41,8 @@ export class PreviewAvailabilityDTO {
     const breakTime: number = validateNumberField(raw.breakTime, "breakTime");
     const startDate: Date = validateDateField(raw.startDate, "startDate");
     const endDate: Date = validateDateField(raw.endDate, "endDate");
-    const startHour: number = validateNumberField(raw.startHour, "startHour");
-    const endHour: number = validateNumberField(raw.endHour, "endHour");
+    const startHour: Date = validateDateField(raw.startHour, "startHour");
+    const endHour: Date = validateDateField(raw.endHour, "endHour");
 
     validateStartEndDate(startDate, endDate);
 

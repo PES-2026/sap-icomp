@@ -7,17 +7,6 @@ import {
   validateStringField,
 } from "@domain/utils/validationUtils";
 
-export interface CreateAvailabilityResponseItem {
-  id: string;
-  status: string;
-  date: Date;
-  weekday: DaysOfWeekEnum;
-  pedagogueId: string;
-  start: string;
-  end: string;
-  attendanceTime: number;
-}
-
 export class CreateAvailabilityItemDTO {
   constructor(
     public readonly date: Date,

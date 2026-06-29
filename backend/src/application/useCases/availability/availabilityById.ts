@@ -6,7 +6,7 @@ import { AvailabilityResult } from "@domain/repositories/results/availabilityRes
 import { Result } from "@domain/shared/result";
 
 export class AvailabilityById {
-  constructor(private repository: IAvailabilityRepository) {}
+  constructor(private readonly repository: IAvailabilityRepository) {}
 
   async execute(input: AvailabilityByIdDTO): Promise<Result<AvailabilityResult, ApplicationError>> {
     const availability: AvailabilityResult | null = await this.repository.findById(input.id);

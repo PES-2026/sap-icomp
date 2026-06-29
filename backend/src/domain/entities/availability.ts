@@ -1,5 +1,7 @@
+import { DaysOfWeekEnum } from "@domain/enum/daysOfWeek";
 import { Result } from "@domain/shared/result";
 import { AvailabilityStatusVO } from "@domain/valueObjects/availability/availabilityStatus";
+import { DayOfWeekVO } from "@domain/valueObjects/availability/dayOfWeek";
 import { DurationVO } from "@domain/valueObjects/availability/duration";
 
 import { AvailabilityStatusEnum } from "../enum/availabilityStatus";
@@ -12,6 +14,7 @@ export type AvailabilityProps = {
   endDateTime: Date;
   status: AvailabilityStatusEnum;
   attendanceTime: number;
+  dayOfWeek: DaysOfWeekEnum;
   pedagogueId: string;
   appointmentId?: string | undefined;
 };
@@ -24,6 +27,7 @@ export class Availability {
     public endDateTime: DateVO,
     public attendanceTime: DurationVO,
     public status: AvailabilityStatusVO,
+    public dayOfWeek: DayOfWeekVO,
   ) {}
 
   static create(props: AvailabilityProps): Result<Availability> {
@@ -33,8 +37,9 @@ export class Availability {
     const endDateTime = DateVO.create(props.endDateTime);
     const attendanceTime = DurationVO.create(props.attendanceTime);
     const status = AvailabilityStatusVO.from(props.status);
+    const dayOfWeek = DayOfWeekVO.from(props.dayOfWeek);
 
-    const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime];
+    const results = [externalId, pedagogueId, startDateTime, endDateTime, attendanceTime, dayOfWeek];
 
     for (const result of results) {
       if (result?.isFailure) {
@@ -50,6 +55,7 @@ export class Availability {
         endDateTime.getValue(),
         attendanceTime.getValue(),
         status.getValue(),
+        dayOfWeek.getValue(),
       ),
     );
   }
@@ -62,6 +68,7 @@ export class Availability {
       DateVO.fromTrusted(props.endDateTime),
       DurationVO.fromTrusted(props.attendanceTime),
       AvailabilityStatusVO.fromTrusted(props.status),
+      DayOfWeekVO.fromTrusted(props.dayOfWeek),
     );
   }
 }

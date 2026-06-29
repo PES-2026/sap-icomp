@@ -29,7 +29,7 @@ export class PreviewAvailability {
     }
 
     if (dto.endHour < dto.startHour) {
-      return Result.fail(new EndHourLowerThanStartHourError(dto.startHour, dto.endHour));
+      return Result.fail(new EndHourLowerThanStartHourError(dto.startHour.getHours(), dto.endHour.getHours()));
     }
 
     const startRange = new Date(dto.startDate);
@@ -50,8 +50,8 @@ export class PreviewAvailability {
       dto.endDate,
       dto.attendanceTime,
       dto.breakTime,
-      dto.startHour,
-      dto.endHour,
+      dto.startHour.getHours() * 60 + dto.startHour.getMinutes(),
+      dto.endHour.getHours() * 60 + dto.startHour.getMinutes(),
       existingSlots,
     );
 
@@ -113,8 +113,8 @@ export class PreviewAvailability {
         const previewEntity = previewEntityResult.getValue();
 
         const slotItem: Availability = {
-          start: currentStartMinutes,
-          end: currentStartMinutes + attendanceTime,
+          start: startDateTime,
+          end: endDateTime,
           attendanceTime: previewEntity.attendanceTime.value,
           status: previewEntity.status.value,
         };
