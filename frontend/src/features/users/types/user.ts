@@ -1,12 +1,11 @@
-export type UserRole = "PEDAGOGUE" | "PROFESSOR" | string;
+export type UserRole = "PEDAGOGUE" | "PROFESSOR";
 
 export type UserStatus =
   | "ENABLED"
   | "DISABLED"
   | "PENDING"
   | "APPROVED"
-  | "REJECTED"
-  | string;
+  | "REJECTED";
 
 export type UserStatusFilter = "" | "ENABLED" | "DISABLED";
 

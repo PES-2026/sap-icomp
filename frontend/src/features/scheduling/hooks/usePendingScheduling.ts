@@ -69,26 +69,27 @@ export const usePendingSchedulings = (page: number, limit: number) => {
     }
   };
 
-  const confirmScheduling = async (scheduleId: string) => {
+  const confirmScheduling = async (scheduleId: string, type: string) => {
     if (!userId) {
       throw new Error("Não foi possível identificar a pedagoga responsável.");
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.confirm(scheduleId, userId),
+      scheduleManagementService.confirm(scheduleId, type),
     );
   };
 
   const rejectScheduling = async (
     scheduleId: string,
     justification: string,
+    type: string,
   ) => {
     if (!userId) {
       throw new Error("Não foi possível identificar a pedagoga responsável.");
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.reject(scheduleId, userId, justification),
+      scheduleManagementService.reject(scheduleId, justification, type),
     );
   };
 

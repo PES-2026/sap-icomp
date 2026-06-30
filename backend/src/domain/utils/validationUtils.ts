@@ -132,6 +132,21 @@ export function validateTime(value: unknown, fieldName: string): string {
   return value;
 }
 
+export function validateTokenField(value: unknown, fieldName: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${fieldName} is required and must be a non-empty string. Please verify it!`);
+  }
+
+  const trimmed = value.trim();
+
+  const TOKEN_REGEX = /^[a-f0-9]{64}$/;
+  if (!TOKEN_REGEX.test(trimmed)) {
+    throw new Error(`${fieldName} has an invalid format. Please verify it!`);
+  }
+
+  return trimmed;
+}
+
 function isUUID(value: string): boolean {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return UUID_REGEX.test(value);

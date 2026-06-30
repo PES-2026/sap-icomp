@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useStudentById } from "../../hooks/useStudentById";
 import AttendanceHistoryCard from "./AttendanceHistoryCard";
+import ReportHistoryCard from "@/features/reports/components/ReportHistoryCard";
 import StudentFooter from "./StudentFooter";
 import StudentProfileCard from "./StudentProfileCard";
 
@@ -59,6 +60,7 @@ export default function StudentInfo() {
       <main className="flex min-w-0 flex-1 flex-col h-full font-sans bg-[#f5f0e8]">
         <div className="flex flex-1 flex-col p-6 min-h-0 gap-4">
           <StudentProfileCard student={student} />
+          <ReportHistoryCard student={student} />
           <AttendanceHistoryCard studentId={studentId} />
           <StudentFooter student={student} />
         </div>

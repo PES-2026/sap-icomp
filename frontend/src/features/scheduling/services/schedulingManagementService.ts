@@ -14,7 +14,7 @@ export const scheduleManagementService = {
     filters?: ListScheduleFilters,
   ): Promise<PaginatedScheduleResponse> {
     const response = await api.get<PaginatedScheduleResponse>(
-      `/schedule/${userId}`,
+      `/appointments/pedagogue/${userId}`,
       {
         params: {
           page,
@@ -34,7 +34,7 @@ export const scheduleManagementService = {
     limit: number,
   ): Promise<PaginatedScheduleResponse> {
     const response = await api.get<PaginatedScheduleResponse>(
-      `/schedule/${userId}`,
+      `/appointments/pedagogue/${userId}`,
       {
         params: {
           page,
@@ -50,10 +50,10 @@ export const scheduleManagementService = {
 
   async confirm(
     scheduleId: string,
-    pedagogueId: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
-    const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/confirm`,
+    const response = await api.post<ManagedSchedulingActionResult>(
+      `/appointments/${scheduleId}/confirm/${type}`,
       undefined,
       {
         fallbackMsg: "Não foi possível confirmar o atendimento.",
@@ -65,11 +65,11 @@ export const scheduleManagementService = {
 
   async reject(
     scheduleId: string,
-    pedagogueId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível recusar o atendimento.",
@@ -81,11 +81,11 @@ export const scheduleManagementService = {
 
   async cancel(
     scheduleId: string,
-    pedagogueId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível cancelar o agendamento.",
@@ -95,10 +95,7 @@ export const scheduleManagementService = {
     return response.data;
   },
 
-  async finish(
-    scheduleId: string,
-    pedagogueId: string,
-  ): Promise<ManagedSchedulingActionResult> {
+  async finish(scheduleId: string): Promise<ManagedSchedulingActionResult> {
     const response = await api.patch<ManagedSchedulingActionResult>(
       `/schedulings/appointments/${scheduleId}/finish`,
       undefined,

@@ -1,6 +1,6 @@
 import api from "@/services/api";
 
-import { PendingAccountRequestItem } from "../types/user";
+import { PendingAccountRequestItem, UserRole } from "../types/user";
 
 export const accountRequestService = {
   async getPendingAccountRequests(): Promise<PendingAccountRequestItem[]> {
@@ -14,7 +14,11 @@ export const accountRequestService = {
     return response.data;
   },
 
-  async approveAccountRequest(id: string, isApproved: boolean, role?: string): Promise<void> {
+  async approveAccountRequest(
+    id: string,
+    isApproved: boolean,
+    role?: UserRole,
+  ): Promise<void> {
     await api.post(
       "/account-requests/approve-users",
       { id, isApproved, role },

@@ -18,12 +18,12 @@ import {
   generateSchedulingPreview,
   minutesToTime,
 } from "../utils/schedulingPreview";
-import { scheduleSchema, timeToMinutes } from "../utils/validations";
+import { scheduleSchema } from "../utils/validations";
 
 export const SCHEDULING_PREVIEW_MOCK_ENABLED =
   process.env.NEXT_PUBLIC_SCHEDULING_PREVIEW_MOCK === "true";
 
-const getSlotId = (slot: SchedulingSlot & { dayDate?: string }) => {
+const getSlotId = (slot: SchedulingSlot & { dayDate?: Date }) => {
   if (slot.startDateTime && slot.endDateTime) {
     return `${slot.startDateTime}|${slot.endDateTime}`;
   }
@@ -53,9 +53,16 @@ export const useSchedulingPreview = () => {
       startTime: "",
       endTime: "",
       durationMinutes: "50",
-      breakTime: "0",
+      breakTime: "10",
     },
   });
+
+  const convertTimeToDate = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const date = new Date();
+    date.setUTCHours(hours, minutes, 0, 0);
+    return date;
+  };
 
   const generatePreview = async (data: SchedulingFormData) => {
     if (!pedagogueId) {
@@ -65,10 +72,10 @@ export const useSchedulingPreview = () => {
 
     const payload: SchedulingPreviewPayload = {
       pedagogueId,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      startHour: timeToMinutes(data.startTime),
-      endHour: timeToMinutes(data.endTime),
+      startDate: new Date(data.startDate + "T00:00:00.000Z"),
+      endDate: new Date(data.endDate + "T00:00:00.000Z"),
+      startHour: convertTimeToDate(data.startTime),
+      endHour: convertTimeToDate(data.endTime),
       attendanceTime: Number(data.durationMinutes),
       breakTime: Number(data.breakTime),
     };
@@ -139,7 +146,41 @@ export const useSchedulingPreview = () => {
     });
   };
 
-  const isSlotGreen = (slot: SchedulingSlot, dayDate: string) => {
+  const getAllSlots = () =>
+    days.flatMap((day) =>
+      day.slots.map((slot) => ({ ...slot, dayDate: day.date })),
+    );
+
+  const toggleAllDaySlots = (daySlotIds: string[], isEnablingAll: boolean) => {
+    setDisabledSlotIds((current) => {
+      const next = new Set(current);
+      const allSlots = getAllSlots();
+
+      daySlotIds.forEach((slotId) => {
+        const slot = allSlots.find((s) => getSlotId(s) === slotId);
+
+        if (!slot) return;
+
+        if (isEnablingAll) {
+          if (slot.status === "AVAILABLE") {
+            next.add(slotId);
+          } else if (slot.status === "CREATED") {
+            next.delete(slotId);
+          }
+        } else {
+          if (slot.status === "AVAILABLE") {
+            next.delete(slotId);
+          } else if (slot.status === "CREATED") {
+            next.add(slotId);
+          }
+        }
+      });
+
+      return next;
+    });
+  };
+
+  const isSlotGreen = (slot: SchedulingSlot, dayDate: Date) => {
     const slotId = getSlotId({ ...slot, dayDate });
     const isToggled = disabledSlotIds.has(slotId);
 
@@ -151,7 +192,7 @@ export const useSchedulingPreview = () => {
 
   const getActiveSlots = () => {
     const activeSlots: (SchedulingSlot & {
-      dayDate: string;
+      dayDate: Date;
       weekday: string;
     })[] = [];
 
@@ -203,7 +244,6 @@ export const useSchedulingPreview = () => {
 
     const activeSlots = getActiveSlots();
 
-    // Identifica os IDs para remoção (apenas os que já existem/CREATED e foram desmarcados)
     const idsToRemove: string[] = [];
     days.forEach((day) => {
       day.slots.forEach((slot) => {
@@ -218,13 +258,13 @@ export const useSchedulingPreview = () => {
     });
 
     const createPayload: SchedulingSavePayload = activeSlots
-      .filter((slot) => slot.status === "AVAILABLE") // Somente os novos que foram marcados
+      .filter((slot) => slot.status === "AVAILABLE")
       .map((slot) => ({
-        date: slot.dayDate.slice(0, 10),
+        date: slot.dayDate,
         weekday: slot.weekday,
         pedagogueId,
-        start: minutesToTime(slot.start),
-        end: minutesToTime(slot.end),
+        start: slot.start,
+        end: slot.end,
         attendanceTime: slot.attendanceTime,
       }));
 
@@ -270,7 +310,6 @@ export const useSchedulingPreview = () => {
 
       setIsConfirmOpen(false);
 
-      // Re-fetch preview to sync statuses and IDs
       const currentFormData = form.getValues();
       await generatePreview(currentFormData);
     } catch (error: unknown) {
@@ -279,11 +318,6 @@ export const useSchedulingPreview = () => {
       setIsSaving(false);
     }
   };
-
-  const getAllSlots = () =>
-    days.flatMap((day) =>
-      day.slots.map((slot) => ({ ...slot, dayDate: day.date })),
-    );
 
   const activeSlotsCount = getActiveSlots().length;
 
@@ -327,6 +361,7 @@ export const useSchedulingPreview = () => {
     clearPreview,
     invalidatePreview,
     toggleSlot,
+    toggleAllDaySlots,
     confirmPreview,
     cancelSaveConfirmation,
     saveScheduling,

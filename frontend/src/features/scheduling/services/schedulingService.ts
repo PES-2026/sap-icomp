@@ -1,4 +1,7 @@
-import { TimeSlot } from "@/features/appointments/types/appointment";
+import {
+  TimeSlot,
+  TimeSlotResponse,
+} from "@/features/appointments/types/appointment";
 import api from "@/services/api";
 import {
   RequestSchedulePayload,
@@ -6,13 +9,14 @@ import {
   SchedulingPreviewResponse,
   SchedulingSavePayload,
 } from "../types/scheduling";
+import { formatDateInput } from "../utils/schedulingDates";
 
 export const scheduleService = {
   async preview(
     payload: SchedulingPreviewPayload,
   ): Promise<SchedulingPreviewResponse> {
     const response = await api.post<SchedulingPreviewResponse>(
-      "/schedule/preview-availability",
+      "/availabilities/preview",
       payload,
       {
         fallbackMsg: "Não foi possível gerar a prévia da agenda.",
@@ -23,19 +27,19 @@ export const scheduleService = {
   },
 
   async save(payload: SchedulingSavePayload): Promise<void> {
-    await api.post("/schedule/create-availability", payload, {
+    await api.post("/availabilities", payload, {
       fallbackMsg: "Não foi possível salvar a agenda.",
     });
   },
 
   async removeSlots(ids: string[]): Promise<void> {
-    await api.put("/schedule/availability/remove-many", ids, {
+    await api.put("/availabilities/remove-many", ids, {
       fallbackMsg: "Não foi possível remover os horários.",
     });
   },
 
   async request(payload: RequestSchedulePayload): Promise<void> {
-    await api.post("/schedule/request", payload, {
+    await api.post("/appointments/request", payload, {
       fallbackMsg: "Não foi possível solicitar o atendimento.",
     });
   },
@@ -44,50 +48,64 @@ export const scheduleService = {
     date: string,
     pedagogueId: string,
   ): Promise<TimeSlot[]> {
-    const response = await api.get<any[]>("/schedules/slots", {
-      params: { date, pedagogueId },
-      fallbackMsg: "Não foi possível carregar os horários disponíveis.",
-    });
-
-    return response.data.map((slot: any) => {
-      const start = new Date(slot.startDateTime);
-      const end = new Date(slot.endDateTime);
-
-      return {
-        id: slot.id,
-        time: `${String(start.getHours()).padStart(2, "0")}:${String(start.getMinutes()).padStart(2, "0")}`,
-        isAvailable: slot.status === "CREATED",
-        attendanceTime: Math.round((end.getTime() - start.getTime()) / 60000),
-      };
-    });
-  },
-
-  async getAvailability(
-    pedagogueId: string,
-    date: string,
-    page: number = 1,
-    limit: number = 100,
-  ): Promise<TimeSlot[]> {
-    const response = await api.get<{ items: any[] }>(
-      `/schedule/availability/${pedagogueId}`,
+    const response = await api.get<any[]>(
+      `/availabilities/pedagogue/${pedagogueId}`,
       {
-        params: { page, limit, date },
+        params: { startDate: date, endDate: date },
         fallbackMsg: "Não foi possível carregar os horários disponíveis.",
       },
     );
 
-    return response.data.items.map((slot: any) => {
-      const start = new Date(slot.startDateTime);
-      const end = new Date(slot.endDateTime);
+    return response.data;
+  },
 
-      return {
-        id: slot.id,
-        time: `${String(start.getUTCHours()).padStart(2, "0")}:${String(start.getUTCMinutes()).padStart(2, "0")}`,
-        isAvailable: slot.status === "CREATED",
-        attendanceTime:
-          slot.attendanceTime ||
-          Math.round((end.getTime() - start.getTime()) / 60000),
-      };
+  async getAvailability(
+    pedagogueId: string,
+    date: Date,
+    page: number = 1,
+    limit: number = 100,
+  ): Promise<TimeSlotResponse> {
+    const dateFormatted = formatDateInput(date);
+    const response = await api.get<TimeSlotResponse>(
+      `/availabilities/pedagogue/${pedagogueId}`,
+      {
+        params: {
+          page,
+          limit,
+          startDate: `${dateFormatted}T00:00:00.000`,
+          endDate: `${dateFormatted}T23:59:59.999`,
+          status: "CREATED",
+        },
+        fallbackMsg: "Não foi possível carregar os horários disponíveis.",
+      },
+    );
+
+    return response.data;
+  },
+
+  async getAppointmentByToken(token: string): Promise<any> {
+    const response = await api.get<any>(`/appointments/student/${token}`, {
+      fallbackMsg: "Não foi possível carregar os detalhes do agendamento.",
     });
+    return response.data;
+  },
+
+  async rescheduleStudent(
+    token: string,
+    payload: { newSlotId: string; type: string; reason?: string },
+  ): Promise<void> {
+    await api.put(`/appointments/student/${token}/reschedule`, payload, {
+      fallbackMsg: "Não foi possível reagendar o atendimento.",
+    });
+  },
+
+  async cancelStudent(token: string, type: string): Promise<void> {
+    await api.put(
+      `/appointments/student/${token}/cancel/${type}`,
+      {},
+      {
+        fallbackMsg: "Não foi possível cancelar o atendimento.",
+      },
+    );
   },
 };

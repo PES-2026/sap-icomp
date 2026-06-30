@@ -37,9 +37,9 @@ export default function PendingSchedulingTable() {
     reload,
   } = usePendingSchedulings(page, limit);
 
-  const handleConfirmClick = async (scheduleId: string) => {
+  const handleConfirmClick = async (scheduleId: string, type: string) => {
     try {
-      await confirmScheduling(scheduleId);
+      await confirmScheduling(scheduleId, type);
       toast.success("Atendimento confirmado com sucesso!");
     } catch (err) {
       toast.error(
@@ -54,7 +54,11 @@ export default function PendingSchedulingTable() {
     if (!rejectionScheduling) return;
 
     try {
-      await rejectScheduling(rejectionScheduling.id, justification);
+      await rejectScheduling(
+        rejectionScheduling.id,
+        justification,
+        rejectionScheduling.type,
+      );
       setRejectionScheduling(null);
       toast.success("Solicitação recusada com sucesso.");
     } catch (err) {
@@ -142,7 +146,7 @@ export default function PendingSchedulingTable() {
               startIcon={isProcessing ? Loader2 : Check}
               sizeIcon={20}
               disabled={isProcessing}
-              onClick={() => handleConfirmClick(scheduling.id)}
+              onClick={() => handleConfirmClick(scheduling.id, scheduling.type)}
               className={`gap-0 rounded-md p-1 text-[#6bc4a6] bg-transparent hover:bg-[#e8f7f2] ${
                 isProcessing ? "[&_svg]:animate-spin" : ""
               }`}

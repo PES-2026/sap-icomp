@@ -1,19 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 
 interface DTOClassWithCreate {
-  create(id: string): unknown;
+  create(id: string, ...args: unknown[]): unknown;
 }
 
 export function validateParams(DTOClass: DTOClassWithCreate) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const { id, args } = req.params;
 
       if (!id || typeof id !== "string") {
         throw new Error("Id is required in params and must be a string");
       }
 
-      req.dto = DTOClass.create(id);
+      req.dto = DTOClass.create(id, args);
       next();
     } catch (error) {
       if (error instanceof Error) {

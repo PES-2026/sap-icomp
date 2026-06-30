@@ -1,4 +1,4 @@
-export interface PedagogueScheduleEmailData {
+export interface PedagogueAppointmentEmailData {
   pedagogueName: string;
   studentName: string;
   course: string;
@@ -8,5 +8,4 @@ export interface PedagogueScheduleEmailData {
   endTime: string;
   duration: string;
   reason: string;
-  dashboardLink: string;
 }

@@ -3,10 +3,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export const publicRoutes = [
+  "/",
   "/login",
   "/register",
   "/forgot-password",
   "/appointment",
+  "/appointment/reschedule",
+  "/appointment/cancel",
   "/reset-password",
 ];
 
