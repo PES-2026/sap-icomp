@@ -32,10 +32,13 @@ export default function SchedulingTable() {
     reload,
   } = useManagedSchedulings(page, limit);
 
-  const handleApplyFilters = useCallback((filters: any) => {
-    setPage(1);
-    setFilters(filters);
-  }, [setFilters]);
+  const handleApplyFilters = useCallback(
+    (filters: any) => {
+      setPage(1);
+      setFilters(filters);
+    },
+    [setFilters],
+  );
 
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));
 
@@ -67,8 +70,7 @@ export default function SchedulingTable() {
     {
       label: "Data",
       width: "min-w-[120px]",
-      renderCell: (scheduling) =>
-        formatSchedulingDate(scheduling.startDate),
+      renderCell: (scheduling) => formatSchedulingDate(scheduling.startDate),
     },
     {
       label: "Horário",
@@ -162,9 +164,7 @@ export default function SchedulingTable() {
             />
           ) : undefined
         }
-        toolbar={
-          <SchedulingFilters onApply={handleApplyFilters} />
-        }
+        toolbar={<SchedulingFilters onApply={handleApplyFilters} />}
         isLoading={isLoading}
         loadingComponent={loadingComponent}
         data={schedulings}

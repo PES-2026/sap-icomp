@@ -1,10 +1,10 @@
-import { ApplicationError } from "@application/errors/applicationError";
 import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
+import { ApplicationError } from "@application/errors/applicationError";
+import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
+import { ReportOwnershipError } from "@application/errors/report/reportOwnershipError";
 import { Report } from "@domain/entities/report";
 import { IReportRepository } from "@domain/repositories/reportRepository";
 import { Result } from "@domain/shared/result";
-import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
-import { ReportOwnershipError } from "@application/errors/report/reportOwnershipError";
 
 export class UpdateReport {
   constructor(private readonly reportRepository: IReportRepository) {}

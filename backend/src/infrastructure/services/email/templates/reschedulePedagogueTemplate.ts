@@ -1,6 +1,9 @@
-import { RescheduledPedagogueEmailData } from "@domain/services/interfaces/reschedulePedagogueData";
+import { RescheduledPedagogueAppointmentEmailData } from "@domain/services/interfaces/rescheduleAppointmentPedagogueData";
 
-export function buildRescheduledPedagogueTemplate(data: RescheduledPedagogueEmailData, dashboardLink: string): string {
+export function buildRescheduledPedagogueTemplate(
+  data: RescheduledPedagogueAppointmentEmailData,
+  dashboardLink: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">

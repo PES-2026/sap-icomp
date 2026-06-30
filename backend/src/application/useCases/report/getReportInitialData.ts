@@ -1,9 +1,9 @@
+import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
+import { GetReportInitialDataResponseDTO } from "@application/dtos/report/getReportInitialDataDto";
 import { ApplicationError } from "@application/errors/applicationError";
 import { StudentNotFoundError } from "@application/errors/student/studentNotFoundError";
 import { IStudentRepository } from "@domain/repositories/studentRepository";
 import { Result } from "@domain/shared/result";
-import { GetReportInitialDataResponseDTO } from "@application/dtos/report/getReportInitialDataDto";
-import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
 
 export class GetReportInitialData {
   constructor(private readonly studentRepository: IStudentRepository) {}

@@ -8,7 +8,7 @@ import {
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface CustomDatePickerProps {
-  value: string;
+  value: Date | string;
   label: string;
   placeholder?: string;
   error?: string;
@@ -16,6 +16,7 @@ interface CustomDatePickerProps {
   onBlur?: () => void;
   required?: boolean;
   availableDates?: string[];
+  minDate?: string;
 }
 
 const MONTHS = [
@@ -49,18 +50,22 @@ export const CustomDatePicker = forwardRef<
       onBlur,
       required = false,
       availableDates = [],
+      minDate,
     },
     ref,
   ) => {
+    const dateObj = value
+      ? typeof value === "string"
+        ? new Date(value + "T00:00:00")
+        : value
+      : null;
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState<"days" | "months" | "years">("days");
     const [alignRight, setAlignRight] = useState(false);
 
     const [currentDate, setCurrentDate] = useState(() => {
-      if (value) {
-        const datePart = value.split("T")[0];
-        const [y, m] = datePart.split("-").map(Number);
-        return new Date(y, m - 1, 1);
+      if (dateObj) {
+        return new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
       }
       return new Date();
     });
@@ -110,6 +115,9 @@ export const CustomDatePicker = forwardRef<
     };
 
     const isAvailable = (y: number, m: number, d: number) => {
+      const dateStr = formatToYYYYMMDD(y, m, d);
+
+      if (minDate && dateStr < minDate) return false;
       if (availableDates.length === 0) return true;
       return availableSet.has(formatToYYYYMMDD(y, m, d));
     };
@@ -117,7 +125,10 @@ export const CustomDatePicker = forwardRef<
     const hasAvailableDatesInMonth = (y: number, m: number) => {
       if (availableDates.length === 0) return true;
       const prefix = `${y}-${String(m + 1).padStart(2, "0")}`;
-      return availableDates.some((d) => d.startsWith(prefix));
+      return availableDates.some((d) => {
+        if (minDate && d < minDate) return false;
+        return d.startsWith(prefix);
+      });
     };
 
     const handleDateSelect = (d: number) => {
@@ -125,6 +136,16 @@ export const CustomDatePicker = forwardRef<
       onChange(formattedDate);
       setIsOpen(false);
       setView("days");
+    };
+
+    const isTodayOrFuture = (y: number, m: number, d: number) => {
+      const selectedDate = new Date(y, m, d);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return selectedDate >= today;
     };
 
     const renderDays = () => {
@@ -138,7 +159,13 @@ export const CustomDatePicker = forwardRef<
 
       for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = formatToYYYYMMDD(year, month, d);
-        const isSelected = value ? value.startsWith(dateStr) : false;
+        const isSelected = dateObj
+          ? formatToYYYYMMDD(
+              dateObj.getFullYear(),
+              dateObj.getMonth(),
+              dateObj.getDate(),
+            ) === dateStr
+          : false;
         const isValid = isAvailable(year, month, d);
 
         days.push(
@@ -220,8 +247,8 @@ export const CustomDatePicker = forwardRef<
       return years;
     };
 
-    const displayValue = value
-      ? value.split("T")[0].split("-").reverse().join("/")
+    const displayValue = dateObj
+      ? `${String(dateObj.getDate()).padStart(2, "0")}/${String(dateObj.getMonth() + 1).padStart(2, "0")}/${dateObj.getFullYear()}`
       : "";
 
     return (
@@ -241,7 +268,7 @@ export const CustomDatePicker = forwardRef<
                   : "border-stone-300 hover:border-stone-400 text-stone-800",
             )}
           >
-            <span className={value ? "text-[#3a3530]" : "text-[#a0998e]"}>
+            <span className={dateObj ? "text-[#3a3530]" : "text-[#a0998e]"}>
               {displayValue || placeholder}
             </span>
             <CalendarIcon size={16} className="text-[#a0998e]" />
