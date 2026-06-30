@@ -1,9 +1,9 @@
+import { RescheduleAppointmentResponse } from "@application/dtos/appointment/rescheduleAppointmentStudent";
 import { ApplicationError } from "@application/errors/applicationError";
 import { AppointmentNotFoundError } from "@application/errors/appointment/appointmentNotFoundError";
 import { AppointmentResolverOnlyByIdTokenError } from "@application/errors/appointment/appointmentResolverOnlyByIdTokenError";
 import { EmailToPedagogueNotSendError } from "@application/errors/appointment/emailToPedagogueNotSendError";
 import { EmailToStudentNotSendError } from "@application/errors/appointment/emailToStudentNotSendError";
-import { AppointmentTypeNotFoundError } from "@application/errors/availability/appointmentTypeNotFoundError";
 import { PedagogueNotFoundError } from "@application/errors/pedagogue/pedagogueNotFoundError";
 import { Appointment } from "@domain/entities/appointment";
 import { AppointmentGuest } from "@domain/entities/appointmentGuest";
@@ -20,9 +20,8 @@ import { IEmailService } from "@domain/services/emailService";
 import { Result } from "@domain/shared/result";
 import { formatTime } from "@domain/utils/timeUtils";
 import { AppointmentStatusVO } from "@domain/valueObjects/appointment/appointmentStatus";
-import { ReasonVO } from "@domain/valueObjects/appointment/reason";
-import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
 
+import { ReleaseAvailability } from "../availability/releaseAvailability";
 import { ValidateAvailability } from "../availability/validateAvailability";
 
 import { AppointmentResolver } from "./appointmentResolver";
@@ -44,9 +43,10 @@ export class RescheduleAppointment {
     private readonly availabilityRepository: IAvailabilityRepository,
     private readonly pedagogueRepository: IPedagogueRepository,
     private readonly emailService: IEmailService,
+    private readonly releaseAvailability: ReleaseAvailability,
   ) {}
 
-  async execute(props: ExecuteProps): Promise<Result<void, ApplicationError>> {
+  async execute(props: ExecuteProps): Promise<Result<RescheduleAppointmentResponse, ApplicationError>> {
     let appointmentValidation: Result<AppointmentResult>;
     if (props.appointmentId) {
       appointmentValidation = await this.appointmentResolver.execute({ type: props.type, id: props.appointmentId });
@@ -78,10 +78,32 @@ export class RescheduleAppointment {
     }
     const pedagogue = pedagogueResult.getValue();
 
-    await this.releasePreviousAvailability(previousAppointment);
-    await this.bookNewAvailability(newAvailability, previousAppointment.id, previousAppointment.type);
+    const releaseAvailabilityvalidation = await this.releasePreviousAvailability(previousAppointment.availabilityId);
+    if (releaseAvailabilityvalidation.isFailure) {
+      return Result.fail(releaseAvailabilityvalidation.error!);
+    }
 
-    const newAppointmentValidation = await this.saveAppoinmentWithNewAvailaibility(
+    const cancelStatus = props.appointmentToken
+      ? AppointmentStatusEnum.CANCELED_BY_STUDENT
+      : AppointmentStatusEnum.CANCELED_BY_PEDAGOGUE;
+
+    const cancelReason = `Reagendado: movido para o horário de ${newAvailability.startDateTime.toLocaleDateString("pt-BR")}`;
+
+    if (previousAppointment.type === AppointmentType.GUEST) {
+      await this.appointmentGuestRepository.updateStatus(
+        previousAppointment.id,
+        AppointmentStatusVO.fromTrusted(cancelStatus),
+        cancelReason,
+      );
+    } else {
+      await this.appointmentRepository.updateStatus(
+        previousAppointment.id,
+        AppointmentStatusVO.fromTrusted(cancelStatus),
+        cancelReason,
+      );
+    }
+
+    const newAppointmentValidation = await this.saveNewAppointmentWithNewAvailability(
       previousAppointment,
       newAvailability,
       props.reason,
@@ -89,7 +111,9 @@ export class RescheduleAppointment {
     if (newAppointmentValidation.isFailure) {
       return Result.fail(newAppointmentValidation.error!);
     }
-    const newAppointment = appointmentValidation.getValue();
+    const newAppointment = newAppointmentValidation.getValue();
+
+    await this.bookNewAvailability(newAvailability, newAppointment.id, previousAppointment.type);
 
     const studentEmailValidation = await this.sendStudentEmail(previousAppointment, newAppointment, pedagogue);
     if (studentEmailValidation.isFailure) {
@@ -100,7 +124,7 @@ export class RescheduleAppointment {
       return Result.fail(pedagogueEmailValidation.error!);
     }
 
-    return Result.ok();
+    return Result.ok({ appointmentId: newAppointment.id, message: "Appointment successfully rescheduled!" });
   }
 
   private async getPedagogue(pedagogueId: string): Promise<Result<UserResult, PedagogueNotFoundError>> {
@@ -111,8 +135,14 @@ export class RescheduleAppointment {
     return Result.ok<UserResult>(pedagogue);
   }
 
-  private async releasePreviousAvailability(previousAppointment: AppointmentResult) {
-    await this.availabilityRepository.releaseAvailabilityById(previousAppointment.availabilityId);
+  private async releasePreviousAvailability(previousAvailabilityId: string): Promise<Result<AvailabilityResult>> {
+    const releaseAvailabilityValidation = await this.releaseAvailability.execute({
+      availabilityId: previousAvailabilityId,
+    });
+    if (releaseAvailabilityValidation.isFailure) {
+      return Result.fail(releaseAvailabilityValidation.error!);
+    }
+    return Result.ok(releaseAvailabilityValidation.getValue());
   }
 
   private async bookNewAvailability(
@@ -177,95 +207,58 @@ export class RescheduleAppointment {
     }
   }
 
-  private async saveAppoinmentWithNewAvailaibility(
+  private async saveNewAppointmentWithNewAvailability(
     previousAppointment: AppointmentResult,
     newAvailability: AvailabilityResult,
     reason?: string,
   ): Promise<Result<AppointmentResult>> {
-    const statusVO = AppointmentStatusVO.from(AppointmentStatusEnum.PENDING);
-    if (statusVO.isFailure) {
-      return Result.fail(statusVO.error!);
-    }
-    const statusValue = statusVO.getValue();
-
-    const newAvailabilityIdVO = ExternalIdVO.from(newAvailability.id);
-    if (newAvailabilityIdVO.isFailure) {
-      return Result.fail(newAvailabilityIdVO.error!);
-    }
-    const newAvailabilityIdValue = newAvailabilityIdVO.getValue();
-
-    let reasonValue: ReasonVO | undefined = undefined;
-    if (reason) {
-      const reasonVO = ReasonVO.create(reason);
-      if (reasonVO.isFailure) {
-        return Result.fail(reasonVO.error!);
-      }
-      reasonValue = reasonVO.getValue();
-    }
-
     if (previousAppointment.type === AppointmentType.GUEST) {
-      const appointmentGuest = this.createAppointmentGuestStudentEntity(previousAppointment);
-      if (reasonValue) {
-        appointmentGuest.update({ status: statusValue, availabilityId: newAvailabilityIdValue, reason: reasonValue });
-      } else {
-        appointmentGuest.update({ status: statusValue, availabilityId: newAvailabilityIdValue });
-      }
-      await this.appointmentGuestRepository.update(appointmentGuest);
+      const newGuestValidation = AppointmentGuest.create({
+        pedagogueId: previousAppointment.pedagogueId,
+        availabilityId: newAvailability.id,
+        courseId: previousAppointment.studentCourse,
+        studentName: previousAppointment.studentName,
+        studentEmail: previousAppointment.studentEmail,
+        studentEnrollment: previousAppointment.studentEnrollment,
+        status: AppointmentStatusEnum.PENDING,
+        reason: reason ?? previousAppointment.reason,
+      });
 
-      const newAppointment = await this.appointmentGuestRepository.findById(appointmentGuest.id.value);
-
-      if (!newAppointment) {
-        return Result.fail(new AppointmentNotFoundError(appointmentGuest.id.value));
-      }
-
-      return Result.ok(newAppointment);
-    } else if (previousAppointment.type === AppointmentType.STUDENT) {
-      const appointment = this.createAppointmentWithStudentEntity(previousAppointment);
-      if (reasonValue) {
-        appointment.update({ status: statusValue, availabilityId: newAvailabilityIdValue, reason: reasonValue });
-      } else {
-        appointment.update({ status: statusValue, availabilityId: newAvailabilityIdValue });
-      }
-      await this.appointmentRepository.update(appointment);
-
-      const newAppointment = await this.appointmentRepository.findById(appointment.id.value);
-
-      if (!newAppointment) {
-        return Result.fail(new AppointmentNotFoundError(appointment.id.value));
+      if (newGuestValidation.isFailure) {
+        return Result.fail(newGuestValidation.error!);
       }
 
-      return Result.ok(newAppointment);
+      const newGuest = newGuestValidation.getValue();
+      await this.appointmentGuestRepository.save(newGuest);
+
+      const saved = await this.appointmentGuestRepository.findById(newGuest.id.value);
+      if (!saved) {
+        return Result.fail(new AppointmentNotFoundError(newGuest.id.value));
+      }
+
+      return Result.ok(saved);
     } else {
-      return Result.fail(new AppointmentTypeNotFoundError(previousAppointment.type, Object.values(AppointmentType)));
+      const newAppValidation = Appointment.create({
+        pedagogueId: previousAppointment.pedagogueId,
+        availabilityId: newAvailability.id,
+        studentId: previousAppointment.studentId!,
+        status: AppointmentStatusEnum.PENDING,
+        reason: reason ?? previousAppointment.reason,
+      });
+
+      if (newAppValidation.isFailure) {
+        return Result.fail(newAppValidation.error!);
+      }
+
+      const newApp = newAppValidation.getValue();
+      await this.appointmentRepository.save(newApp);
+
+      const saved = await this.appointmentRepository.findById(newApp.id.value);
+      if (!saved) {
+        return Result.fail(new AppointmentNotFoundError(newApp.id.value));
+      }
+
+      return Result.ok(saved);
     }
-  }
-
-  private createAppointmentWithStudentEntity(appointment: AppointmentResult): Appointment {
-    const appointmentEntity = Appointment.rehydrate({
-      id: appointment.id,
-      availabilityId: appointment.availabilityId,
-      pedagogueId: appointment.pedagogueId,
-      status: appointment.status,
-      studentId: appointment.studentId!,
-      reason: appointment.reason ?? undefined,
-      token: appointment.token!,
-    });
-    return appointmentEntity;
-  }
-
-  private createAppointmentGuestStudentEntity(appointment: AppointmentResult): AppointmentGuest {
-    const appointmentEntity = AppointmentGuest.rehydrate({
-      id: appointment.id,
-      availabilityId: appointment.availabilityId,
-      pedagogueId: appointment.pedagogueId,
-      status: appointment.status,
-      courseId: appointment.studentCourse,
-      studentEmail: appointment.studentEmail,
-      studentEnrollment: appointment.studentEnrollment,
-      studentName: appointment.studentName,
-      reason: appointment.reason ?? undefined,
-      token: appointment.token!,
-    });
-    return appointmentEntity;
   }
 }

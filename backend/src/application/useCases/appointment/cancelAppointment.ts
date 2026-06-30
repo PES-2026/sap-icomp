@@ -14,11 +14,14 @@ import { IAppointmentRepository } from "@domain/repositories/appointmentReposito
 import { IAvailabilityRepository } from "@domain/repositories/availabilityRepository";
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { AppointmentResult } from "@domain/repositories/results/appointmentResult";
+import { AvailabilityResult } from "@domain/repositories/results/availabilityResult";
 import { UserResult } from "@domain/repositories/results/userResult";
 import { IEmailService } from "@domain/services/emailService";
 import { Result } from "@domain/shared/result";
 import { formatTime } from "@domain/utils/timeUtils";
 import { AppointmentStatusVO } from "@domain/valueObjects/appointment/appointmentStatus";
+
+import { ReleaseAvailability } from "../availability/releaseAvailability";
 
 import { AppointmentResolver } from "./appointmentResolver";
 
@@ -38,6 +41,7 @@ export type ExecuteCancelReturn = {
 export class CancelAppointment {
   constructor(
     private readonly appointmentResolver: AppointmentResolver,
+    private readonly releaseAvability: ReleaseAvailability,
     private readonly appointmentRepository: IAppointmentRepository,
     private readonly appointmentGuestRepository: IAppointmentGuestRepository,
     private readonly availabilityRepository: IAvailabilityRepository,
@@ -129,9 +133,12 @@ export class CancelAppointment {
     return Result.ok(appointmentValue);
   }
 
-  private async releaseAvailabilitySlot(availabilityId: string) {
-    // const newAvailabii;
-    await this.availabilityRepository.releaseAvailabilityById(availabilityId);
+  private async releaseAvailabilitySlot(availabilityId: string): Promise<Result<AvailabilityResult>> {
+    const releaseAvailabilityValidation = await this.releaseAvability.execute({ availabilityId: availabilityId });
+    if (releaseAvailabilityValidation.isFailure) {
+      return Result.fail(releaseAvailabilityValidation.error!);
+    }
+    return Result.ok(releaseAvailabilityValidation.getValue());
   }
 
   private validateAppointmentStatus(

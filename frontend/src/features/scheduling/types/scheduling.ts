@@ -22,10 +22,10 @@ export interface SchedulingPreviewPayload {
   pedagogueId: string;
   attendanceTime: number;
   breakTime: number;
-  startDate: string;
-  endDate: string;
-  startHour: number;
-  endHour: number;
+  startDate: Date;
+  endDate: Date;
+  startHour: Date;
+  endHour: Date;
 }
 
 export interface SchedulingSlot {
@@ -37,12 +37,12 @@ export interface SchedulingSlot {
   date?: Date;
   weekday?: SlotWeekDay | string;
   attendanceTime: number;
-  start: number;
-  end: number;
+  start: Date;
+  end: Date;
 }
 
 export interface SchedulingDayPreview {
-  date: string;
+  date: Date;
   weekday: string;
   slots: SchedulingSlot[];
 }
@@ -50,11 +50,11 @@ export interface SchedulingDayPreview {
 export type SchedulingPreviewResponse = SchedulingDayPreview[];
 
 export interface CreateAvailabilitySlot {
-  date: string;
+  date: Date;
   weekday: string;
   pedagogueId: string;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   attendanceTime: number;
 }
 
@@ -66,7 +66,7 @@ export interface RequestSchedulePayload {
   enrollment: string;
   pedagogueId: string;
   courseId: string;
-  slotId: string;
+  availabilitySlotId: string;
   durationMinutes: number;
   reason?: string;
 }

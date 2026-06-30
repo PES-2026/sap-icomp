@@ -67,6 +67,19 @@ export default function SchedulingPreviewList({
     );
   }
 
+  const formatSlotTime = (timeVal: Date | string | number) => {
+    if (typeof timeVal === "number") {
+      return formatTimeFromMinutes(timeVal);
+    }
+
+    const date = typeof timeVal === "string" ? new Date(timeVal) : timeVal;
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return `${padTime(date.getUTCHours())}:${padTime(date.getUTCMinutes())}`;
+    }
+
+    return "";
+  };
+
   const allSlots = days.flatMap((day) => day.slots);
 
   if (allSlots.length === 0) {
@@ -237,19 +250,17 @@ export default function SchedulingPreviewList({
                       aria-pressed={
                         (isAvailable && isToggled) || (isCreated && !isToggled)
                       }
-                      aria-label={`Horário de ${formatTimeFromMinutes(
-                        slot.start,
-                      )} às ${formatTimeFromMinutes(slot.end)}`}
+                      aria-label={`Horário de ${formatSlotTime(slot.start)} às ${formatSlotTime(slot.end)}`}
                       className={`group relative flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all active:scale-[0.98] ${buttonClass}`}
                     >
                       <div className="flex flex-col">
                         <span className={`text-sm font-bold ${timeClass}`}>
-                          {formatTimeFromMinutes(slot.start)}
+                          {formatSlotTime(slot.start)}
                         </span>
                         <span
                           className={`text-[11px] font-medium ${subTimeClass}`}
                         >
-                          até {formatTimeFromMinutes(slot.end)}
+                          até {formatSlotTime(slot.end)}
                         </span>
                       </div>
 

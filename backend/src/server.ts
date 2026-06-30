@@ -11,6 +11,7 @@ import { CancelAppointment } from "@application/useCases/appointment/cancelAppoi
 import { CancelAppointmentPedagogue } from "@application/useCases/appointment/cancelAppointmentPedagogue";
 import { CancelAppointmentStudent } from "@application/useCases/appointment/cancelAppointmentStudent";
 import { ConfirmAppointment } from "@application/useCases/appointment/confirmAppointment";
+import { GetAppointmentByToken } from "@application/useCases/appointment/getAppointmentByToken";
 import { ListAppointmentsByPedagogue } from "@application/useCases/appointment/listAppointmentsByPedagogue";
 import { RequestAppointment } from "@application/useCases/appointment/requestAppointment";
 import { RescheduleAppointment } from "@application/useCases/appointment/rescheduleAppointment";
@@ -32,6 +33,7 @@ import { CreateAvailability } from "@application/useCases/availability/createAva
 import { GetWeekdayFromDate } from "@application/useCases/availability/getWeekdayFromDate";
 import { ListAvailabilitiesByPedagogue } from "@application/useCases/availability/listAvailabilitiesByPedagogue";
 import { PreviewAvailability } from "@application/useCases/availability/previewAvailability";
+import { ReleaseAvailability } from "@application/useCases/availability/releaseAvailability";
 import { RemoveAvailability } from "@application/useCases/availability/removeAvailability";
 import { RemoveManyAvailabilities } from "@application/useCases/availability/removeManyAvailabilities";
 import { ValidateAvailability } from "@application/useCases/availability/validateAvailability";
@@ -45,6 +47,12 @@ import { DiagnosisById } from "@application/useCases/diagnoses/diagnosisById";
 import { ListDiagnoses } from "@application/useCases/diagnoses/listDiagnoses";
 import { RemoveDiagnosis } from "@application/useCases/diagnoses/removeDiagnosis";
 import { UpdateDiagnosis } from "@application/useCases/diagnoses/updateDiagnosis";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { RemoveReport } from "@application/useCases/report/removeReport";
+import { UpdateReport } from "@application/useCases/report/updateReport";
 import { CreateStudent } from "@application/useCases/student/createStudent";
 import { ListStudents } from "@application/useCases/student/listStudents";
 import { RemoveStudent } from "@application/useCases/student/removeStudent";
@@ -74,6 +82,7 @@ import { PrismaDiagnosesRepository } from "@infrastructure/persistence/repositor
 import { PrismaPasswordResetRepository } from "@infrastructure/persistence/repositories/prismaPasswordResetRepository";
 import { PrismaPedagogueRepository } from "@infrastructure/persistence/repositories/prismaPedagogueRepository";
 import { PrismaProfessorRepository } from "@infrastructure/persistence/repositories/prismaProfessorRepository";
+import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
 import { PrismaStudentRepository } from "@infrastructure/persistence/repositories/prismaStudentRepository";
 import { BcryptHashService } from "@infrastructure/services/bcryptHashService";
 import { EmailService } from "@infrastructure/services/email/providers/gmailService";
@@ -86,6 +95,7 @@ import { AuthController } from "@presentation/controllers/authController";
 import { AvailabilityController } from "@presentation/controllers/availabilityController";
 import { CourseController } from "@presentation/controllers/courseController";
 import { DiagnosesController } from "@presentation/controllers/diagnosesController";
+import { ReportController } from "@presentation/controllers/reportController";
 import { StudentController } from "@presentation/controllers/studentController";
 import { UserController } from "@presentation/controllers/userController";
 import { errorHandler } from "@presentation/middlewares/errorHandler";
@@ -97,17 +107,9 @@ import { authRoutes } from "@presentation/routes/authRoutes";
 import { availabilityRoutes } from "@presentation/routes/availabilityRoutes";
 import { courseRoutes } from "@presentation/routes/courseRoutes";
 import { diagnosesRoutes } from "@presentation/routes/diagnosesRoutes";
-import { studentRoutes } from "@presentation/routes/studentRoutes";
-import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
-import { ReportController } from "@presentation/controllers/reportController";
-import { userRoutes } from "@presentation/routes/userRoutes";
-import { PrismaReportRepository } from "@infrastructure/persistence/repositories/prismaReportRepository";
 import { reportRoutes } from "@presentation/routes/reportRoutes";
-import { CreateReport } from "@application/useCases/report/createReport";
-import { GetReportById } from "@application/useCases/report/getReportById";
-import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
-import { UpdateReport } from "@application/useCases/report/updateReport";
-import { RemoveReport } from "@application/useCases/report/removeReport";
+import { studentRoutes } from "@presentation/routes/studentRoutes";
+import { userRoutes } from "@presentation/routes/userRoutes";
 
 const app = express();
 
@@ -146,9 +148,20 @@ const attendanceTypeController = new AttendanceTypeController(
   new AttendanceTypeById(attendanceTypeRepository),
 );
 
+const availabilityRepository = new PrismaAvailabilityRepository(prisma);
+
+const pedagogueRepository = new PrismaPedagogueRepository(prisma);
+
+const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
+const createAvailabilityUseCase = new CreateAvailability(
+  availabilityRepository,
+  pedagogueRepository,
+  getWeekdayFromDateUseCase,
+);
+const releaseAvailabilityUseCase = new ReleaseAvailability(availabilityRepository, createAvailabilityUseCase);
+
 const accountRequestRepository = new PrismaAccountRequestRepository(prisma);
 const professorRepository = new PrismaProfessorRepository(prisma);
-const pedagogueRepository = new PrismaPedagogueRepository(prisma);
 const hashService = new BcryptHashService();
 
 const accountRequestController = new AccountRequestController(
@@ -206,7 +219,6 @@ const diagnosesController = new DiagnosesController(
   new DiagnosisById(diagnosisRepository),
 );
 
-const availabilityRepository = new PrismaAvailabilityRepository(prisma);
 app.use(diagnosesRoutes(diagnosesController));
 
 const reportRepository = new PrismaReportRepository(prisma);
@@ -219,8 +231,6 @@ const reportController = new ReportController(
   new GetReportById(reportRepository),
 );
 app.use(reportRoutes(reportController, tokenService));
-
-const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
 
 const appointmentRepository = new PrismaAppointmentRepository(prisma);
 
@@ -252,6 +262,7 @@ const confirmAppointmentUseCase = new ConfirmAppointment(
 
 const cancelAppointmentUseCase = new CancelAppointment(
   appointmentResolverUseCase,
+  releaseAvailabilityUseCase,
   appointmentRepository,
   appointmentGuestRepository,
   availabilityRepository,
@@ -269,11 +280,18 @@ const rescheduleAppointment = new RescheduleAppointment(
   availabilityRepository,
   pedagogueRepository,
   emailService,
+  releaseAvailabilityUseCase,
 );
 
 const rescheduleAppointmentPedagogueUseCase = new RescheduleAppointmentPedagogue(rescheduleAppointment);
 
 const rescheduleAppointmentStudentUseCase = new RescheduleAppointmentStudent(rescheduleAppointment);
+
+const getAppointmentByTokenUseCase = new GetAppointmentByToken(
+  appointmentResolverUseCase,
+  pedagogueRepository,
+  courseRepository,
+);
 
 const requestAppointmentUseCase = new RequestAppointment(
   appointmentRepository,
@@ -299,15 +317,10 @@ const appointmentController = new AppointmentController(
   listAppointmentsUseCase,
   rescheduleAppointmentPedagogueUseCase,
   rescheduleAppointmentStudentUseCase,
+  getAppointmentByTokenUseCase,
 );
 
-const getWeekdayFromDateUseCase = new GetWeekdayFromDate();
 const previewAvailabilityUseCase = new PreviewAvailability(availabilityRepository, getWeekdayFromDateUseCase);
-const createAvailabilityUseCase = new CreateAvailability(
-  availabilityRepository,
-  pedagogueRepository,
-  getWeekdayFromDateUseCase,
-);
 const listAvailabilitiesByPedagogueUseCase = new ListAvailabilitiesByPedagogue(availabilityRepository);
 const removeAvailabilityUseCase = new RemoveAvailability(availabilityRepository);
 const removeManyAvailabilitiesUseCase = new RemoveManyAvailabilities(availabilityRepository);

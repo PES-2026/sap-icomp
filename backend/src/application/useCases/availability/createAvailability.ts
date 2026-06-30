@@ -11,6 +11,7 @@ import { IAvailabilityRepository } from "@domain/repositories/availabilityReposi
 import { IPedagogueRepository } from "@domain/repositories/pedagogueRepository";
 import { AvailabilityResult } from "@domain/repositories/results/availabilityResult";
 import { Result } from "@domain/shared/result";
+import { formatTime } from "@domain/utils/timeUtils";
 
 import { GetWeekdayFromDate } from "./getWeekdayFromDate";
 
@@ -41,14 +42,16 @@ export class CreateAvailability {
         return Result.fail(weekDayValidation.error!);
       }
 
-      const [startHour, startMinute] = item.start.split(":").map(Number);
-      const [endHour, endMinute] = item.end.split(":").map(Number);
+      const startHour = item.start.getHours();
+      const startMinute = item.start.getMinutes();
+      const endHour = item.end.getHours();
+      const endMinute = item.end.getMinutes();
 
       const startDateTime = new Date(item.date);
-      startDateTime.setHours(startHour!, startMinute!, 0, 0);
+      startDateTime.setHours(startHour, startMinute, 0, 0);
 
       const endDateTime = new Date(item.date);
-      endDateTime.setHours(endHour!, endMinute!, 0, 0);
+      endDateTime.setHours(endHour, endMinute, 0, 0);
 
       const overlapValidation = await this.validateSlotOverlap(item, startDateTime, endDateTime);
 
@@ -77,9 +80,11 @@ export class CreateAvailability {
         status: AvailabilityStatusEnum.CREATED,
         weekDay: item.weekday,
         pedagogueId: item.pedagogueId,
-        startDateTime: item.start,
-        endDateTime: item.end,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
         attendanceTime: item.attendanceTime,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
     }
 
@@ -130,7 +135,12 @@ export class CreateAvailability {
 
     if (hasConflict) {
       return Result.fail(
-        new AppointmentConflictError(item.pedagogueId, item.start, item.end, item.date.toDateString()),
+        new AppointmentConflictError(
+          item.pedagogueId,
+          formatTime(item.start),
+          formatTime(item.end),
+          item.date.toDateString(),
+        ),
       );
     }
 

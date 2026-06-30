@@ -2,6 +2,11 @@ import { AppointmentType } from "@domain/enum/appointmentType";
 import { findValueInEnum } from "@domain/utils/enumUtils";
 import { validateOptionalStringField, validateStringField, validateTokenField } from "@domain/utils/validationUtils";
 
+export interface CancelAppointmentResponse {
+  appointmentId: string;
+  message: string;
+}
+
 export class CancelAppointmentStudentDTO {
   constructor(
     public readonly token: string,

@@ -1,10 +1,10 @@
-import { ApplicationError } from "@application/errors/applicationError";
-import { IReportRepository } from "@domain/repositories/reportRepository";
-import { Result } from "@domain/shared/result";
 import { RemoveReportDTO } from "@application/dtos/report/removeReportDto";
+import { ApplicationError } from "@application/errors/applicationError";
 import { ReportNotFoundError } from "@application/errors/report/reportNotFoundError";
-import { IHashService } from "@domain/services/hashService";
 import { InvalidCredentialsError } from "@application/errors/user/invalidCredentialsError";
+import { IReportRepository } from "@domain/repositories/reportRepository";
+import { IHashService } from "@domain/services/hashService";
+import { Result } from "@domain/shared/result";
 
 export class RemoveReport {
   constructor(

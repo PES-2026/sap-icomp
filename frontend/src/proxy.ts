@@ -8,6 +8,8 @@ export const publicRoutes = [
   "/register",
   "/forgot-password",
   "/appointment",
+  "/appointment/reschedule",
+  "/appointment/cancel",
   "/reset-password",
 ];
 

@@ -68,8 +68,8 @@ export class EmailService implements IEmailService {
   }
 
   async sendAppointmentRequestedStudentEmail(to: string, props: StudentAppointmentEmailData): Promise<void> {
-    const cancelLink = `${env.FRONTEND_URL}/cancelStudentSchedule?token=${props.token}`;
-    const rescheduleLink = `${env.FRONTEND_URL}/rescheduleStudentSchedule?token=${props.token}`;
+    const cancelLink = `${env.FRONTEND_URL}/appointment/cancel?token=${props.token}`;
+    const rescheduleLink = `${env.FRONTEND_URL}/appointment/reschedule?token=${props.token}`;
 
     const mailOptions = {
       to,
@@ -156,8 +156,8 @@ export class EmailService implements IEmailService {
     to: string,
     props: RescheduledAppointmentStudentEmailData,
   ): Promise<void> {
-    const cancelLink = `${env.FRONTEND_URL}/cancelStudentSchedule?token=${props.token}`;
-    const rescheduleLink = `${env.FRONTEND_URL}/rescheduleStudentSchedule?token=${props.token}`;
+    const cancelLink = `${env.FRONTEND_URL}/appointment/cancel?token=${props.token}`;
+    const rescheduleLink = `${env.FRONTEND_URL}/appointment/reschedule?token=${props.token}`;
 
     const mailOptions = {
       to,

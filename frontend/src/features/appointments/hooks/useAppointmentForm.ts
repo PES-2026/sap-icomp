@@ -25,7 +25,7 @@ export const useAppointmentForm = () => {
       email: "",
       registrationNumber: "",
       pedagogueId: "",
-      date: "",
+      date: new Date(),
       courseId: "",
       slotId: "",
       durationMinutes: 60,
@@ -90,7 +90,7 @@ export const useAppointmentForm = () => {
         enrollment: data.registrationNumber,
         pedagogueId: data.pedagogueId,
         courseId: data.courseId,
-        slotId: data.slotId,
+        availabilitySlotId: data.slotId,
         durationMinutes: data.durationMinutes,
         reason: data.reason,
       };
