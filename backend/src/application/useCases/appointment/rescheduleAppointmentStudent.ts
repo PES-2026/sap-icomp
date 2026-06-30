@@ -1,4 +1,7 @@
-import { RescheduleAppointmentStudentDTO } from "@application/dtos/appointment/rescheduleAppointmentStudent";
+import {
+  RescheduleAppointmentStudentDTO,
+  RescheduleAppointmentResponse,
+} from "@application/dtos/appointment/rescheduleAppointmentStudent";
 import { ApplicationError } from "@application/errors/applicationError";
 import { Result } from "@domain/shared/result";
 
@@ -7,11 +10,13 @@ import { RescheduleAppointment } from "./rescheduleAppointment";
 export class RescheduleAppointmentStudent {
   constructor(private readonly rescheduleAppointment: RescheduleAppointment) {}
 
-  async execute(dto: RescheduleAppointmentStudentDTO): Promise<Result<void, ApplicationError>> {
+  async execute(
+    dto: RescheduleAppointmentStudentDTO,
+  ): Promise<Result<RescheduleAppointmentResponse, ApplicationError>> {
     const rescheduleAppointmentValidation = await this.rescheduleAppointment.execute({
       newAvailabilityId: dto.newAvailabilityId,
       type: dto.type,
-      appointmentId: dto.token,
+      appointmentToken: dto.token,
       reason: dto.reason,
     });
     if (rescheduleAppointmentValidation.isFailure) {

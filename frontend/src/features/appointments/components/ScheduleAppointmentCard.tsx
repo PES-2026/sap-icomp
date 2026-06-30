@@ -41,6 +41,8 @@ export default function ScheduleAppointmentCard() {
       ? `${baseInputClass} border-red-400 text-red-900`
       : `${baseInputClass} bg-white border-stone-300 hover:border-stone-400 focus:border-teal-400 placeholder:text-stone-400`;
 
+  const todayStr = new Date().toLocaleDateString("sv-SE");
+
   return (
     <div className="flex flex-col w-full h-full min-w-[320px] font-sans bg-[#f5f0e8] p-4 sm:p-7">
       <div className="flex flex-col flex-1 h-full max-h-full min-w-0 overflow-hidden rounded-2xl bg-white border border-[#ece7db] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -158,10 +160,11 @@ export default function ScheduleAppointmentCard() {
                   <CustomDatePicker
                     ref={ref as any}
                     value={value}
-                    onChange={onChange}
+                    onChange={(val) => onChange(new Date(val + "T00:00:00"))}
                     onBlur={onBlur}
                     label="Data:"
                     error={error?.message}
+                    minDate={todayStr}
                     required
                   />
                 )}

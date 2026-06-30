@@ -47,6 +47,14 @@ export default function SchedulingForm() {
     formState: { errors },
   } = form;
 
+  const todayStr = new Date().toLocaleDateString("sv-SE");
+  const startDateValue = form.watch("startDate") as unknown as string | Date;
+  const startDateStr = startDateValue
+    ? typeof startDateValue === "string"
+      ? startDateValue
+      : startDateValue.toLocaleDateString("sv-SE")
+    : "";
+
   return (
     <main className="flex h-full w-full flex-col p-4 md:p-6 font-sans">
       <div className="flex flex-col flex-1 min-h-0 w-full">
@@ -93,6 +101,7 @@ export default function SchedulingForm() {
                       onBlur={onBlur}
                       label="Data de início:"
                       error={error?.message}
+                      minDate={todayStr}
                       required
                     />
                   )}
@@ -115,6 +124,7 @@ export default function SchedulingForm() {
                       onBlur={onBlur}
                       label="Data de fim:"
                       error={error?.message}
+                      minDate={startDateStr || todayStr}
                       required
                     />
                   )}

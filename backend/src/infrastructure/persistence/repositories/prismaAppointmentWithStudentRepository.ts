@@ -88,8 +88,8 @@ export class PrismaAppointmentRepository implements IAppointmentRepository {
       removed: false,
       ...(pedagogue && { pedagogueId: pedagogue.internalId }),
       ...(filters.status && { status: filters.status as AppointmentStatus }),
-      ...(filters.startDate && { startDate: { gte: filters.startDate } }),
-      ...(filters.endDate && { endDate: { lte: filters.endDate } }),
+      ...(filters.startDate && { availability: { startDateTime: { gte: filters.startDate } } }),
+      ...(filters.endDate && { availability: { endDateTime: { lte: filters.endDate } } }),
       ...(filters.studentName && { student: { name: { contains: filters.studentName, mode: "insensitive" } } }),
       ...(filters.studentEmail && { student: { email: { contains: filters.studentEmail, mode: "insensitive" } } }),
       ...(filters.studentEnrollment && {

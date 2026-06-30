@@ -7,6 +7,10 @@ import {
   validateTokenField,
 } from "@domain/utils/validationUtils";
 
+export interface RescheduleAppointmentResponse {
+  appointmentId: string;
+  message: string;
+}
 export class RescheduleAppointmentStudentDTO {
   constructor(
     public readonly token: string,

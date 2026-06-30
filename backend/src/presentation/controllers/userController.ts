@@ -12,6 +12,7 @@ import { ListUsers } from "@application/useCases/user/listUsers";
 import { RemoveUser } from "@application/useCases/user/removeUser";
 import { UpdateUser } from "@application/useCases/user/updateUser";
 import { UpdateUserPassword } from "@application/useCases/user/updateUserPassword";
+
 import { BaseController } from "./baseController";
 
 export class UserController extends BaseController {

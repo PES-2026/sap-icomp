@@ -7,4 +7,5 @@ export interface AppointmentConfirmedStudentEmailData {
   duration: string;
   course: string;
   reason: string;
+  token: string;
 }

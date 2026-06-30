@@ -18,12 +18,12 @@ import {
   generateSchedulingPreview,
   minutesToTime,
 } from "../utils/schedulingPreview";
-import { scheduleSchema, timeToMinutes } from "../utils/validations";
+import { scheduleSchema } from "../utils/validations";
 
 export const SCHEDULING_PREVIEW_MOCK_ENABLED =
   process.env.NEXT_PUBLIC_SCHEDULING_PREVIEW_MOCK === "true";
 
-const getSlotId = (slot: SchedulingSlot & { dayDate?: string }) => {
+const getSlotId = (slot: SchedulingSlot & { dayDate?: Date }) => {
   if (slot.startDateTime && slot.endDateTime) {
     return `${slot.startDateTime}|${slot.endDateTime}`;
   }
@@ -53,9 +53,16 @@ export const useSchedulingPreview = () => {
       startTime: "",
       endTime: "",
       durationMinutes: "50",
-      breakTime: "0",
+      breakTime: "10",
     },
   });
+
+  const convertTimeToDate = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const date = new Date();
+    date.setUTCHours(hours, minutes, 0, 0);
+    return date;
+  };
 
   const generatePreview = async (data: SchedulingFormData) => {
     if (!pedagogueId) {
@@ -65,10 +72,10 @@ export const useSchedulingPreview = () => {
 
     const payload: SchedulingPreviewPayload = {
       pedagogueId,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      startHour: timeToMinutes(data.startTime),
-      endHour: timeToMinutes(data.endTime),
+      startDate: new Date(data.startDate + "T00:00:00.000Z"),
+      endDate: new Date(data.endDate + "T00:00:00.000Z"),
+      startHour: convertTimeToDate(data.startTime),
+      endHour: convertTimeToDate(data.endTime),
       attendanceTime: Number(data.durationMinutes),
       breakTime: Number(data.breakTime),
     };
@@ -173,7 +180,7 @@ export const useSchedulingPreview = () => {
     });
   };
 
-  const isSlotGreen = (slot: SchedulingSlot, dayDate: string) => {
+  const isSlotGreen = (slot: SchedulingSlot, dayDate: Date) => {
     const slotId = getSlotId({ ...slot, dayDate });
     const isToggled = disabledSlotIds.has(slotId);
 
@@ -185,7 +192,7 @@ export const useSchedulingPreview = () => {
 
   const getActiveSlots = () => {
     const activeSlots: (SchedulingSlot & {
-      dayDate: string;
+      dayDate: Date;
       weekday: string;
     })[] = [];
 
@@ -253,11 +260,11 @@ export const useSchedulingPreview = () => {
     const createPayload: SchedulingSavePayload = activeSlots
       .filter((slot) => slot.status === "AVAILABLE")
       .map((slot) => ({
-        date: slot.dayDate.slice(0, 10),
+        date: slot.dayDate,
         weekday: slot.weekday,
         pedagogueId,
-        start: minutesToTime(slot.start),
-        end: minutesToTime(slot.end),
+        start: slot.start,
+        end: slot.end,
         attendanceTime: slot.attendanceTime,
       }));
 

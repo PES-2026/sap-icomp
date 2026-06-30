@@ -62,12 +62,20 @@ export const useManagedSchedulings = (page: number, limit: number) => {
     }
   }, [filters, userId, page, limit]);
 
-  const cancelScheduling = async (id: string, justification: string) => {
+  const cancelScheduling = async (
+    id: string,
+    justification: string,
+    type: string,
+  ) => {
     if (!userId) throw new Error("Usuário não autenticado.");
 
     try {
       setProcessingId(id);
-      const result = await scheduleManagementService.cancel(id, justification);
+      const result = await scheduleManagementService.cancel(
+        id,
+        justification,
+        type,
+      );
       await loadSchedulings();
       return result;
     } finally {

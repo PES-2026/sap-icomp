@@ -1,17 +1,18 @@
 import { Request, Response } from "express";
 
-import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
-import { CreateReport } from "@application/useCases/report/createReport";
-import { UpdateReport } from "@application/useCases/report/updateReport";
-import { RemoveReport } from "@application/useCases/report/removeReport";
-import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
-import { GetReportById } from "@application/useCases/report/getReportById";
 import { CreateReportDTO } from "@application/dtos/report/createReportDto";
-import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
+import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
+import { GetReportByIdDTO } from "@application/dtos/report/getReportByIdDto";
 import { ListReportsByStudentDTO } from "@application/dtos/report/listReportsByStudentDto";
 import { RemoveReportDTO } from "@application/dtos/report/removeReportDto";
-import { GetReportByIdDTO } from "@application/dtos/report/getReportByIdDto";
-import { GetInitialDataDTO } from "@application/dtos/report/getInitialDataDto";
+import { UpdateReportDTO } from "@application/dtos/report/updateReportDto";
+import { CreateReport } from "@application/useCases/report/createReport";
+import { GetReportById } from "@application/useCases/report/getReportById";
+import { GetReportInitialData } from "@application/useCases/report/getReportInitialData";
+import { ListReportsByStudent } from "@application/useCases/report/listReportsByStudent";
+import { RemoveReport } from "@application/useCases/report/removeReport";
+import { UpdateReport } from "@application/useCases/report/updateReport";
+
 import { BaseController } from "./baseController";
 
 export class ReportController extends BaseController {

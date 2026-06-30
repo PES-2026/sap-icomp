@@ -28,7 +28,10 @@ export class PreviewAvailability {
       return Result.fail(new AttendanceTimeGreatherThanZeroError());
     }
 
-    if (dto.endHour < dto.startHour) {
+    const startHourMinutes = dto.startHour.getHours() * 60 + dto.startHour.getMinutes();
+    const endHourMinutes = dto.endHour.getHours() * 60 + dto.endHour.getMinutes();
+
+    if (endHourMinutes < startHourMinutes) {
       return Result.fail(new EndHourLowerThanStartHourError(dto.startHour.getHours(), dto.endHour.getHours()));
     }
 
@@ -50,8 +53,8 @@ export class PreviewAvailability {
       dto.endDate,
       dto.attendanceTime,
       dto.breakTime,
-      dto.startHour.getHours() * 60 + dto.startHour.getMinutes(),
-      dto.endHour.getHours() * 60 + dto.startHour.getMinutes(),
+      dto.startHour,
+      dto.endHour,
       existingSlots,
     );
 
@@ -68,8 +71,8 @@ export class PreviewAvailability {
     endDate: Date,
     attendanceTime: number,
     breakTime: number,
-    startHour: number,
-    endHour: number,
+    startHour: Date,
+    endHour: Date,
     existingSlots: AvailabilityResult[],
   ): Result<Array<PreviewAvailabilityItemResponse>> {
     const previewItems: Array<PreviewAvailabilityItemResponse> = [];
@@ -78,24 +81,36 @@ export class PreviewAvailability {
     const tempEndDate = new Date(endDate);
     tempStartDate.setHours(0, 0, 0, 0);
     tempEndDate.setHours(0, 0, 0, 0);
+    const startHourMinutes = startHour.getHours() * 60 + startHour.getMinutes();
+    const endHourMinutes = endHour.getHours() * 60 + endHour.getMinutes();
 
     const currentDate = new Date(tempStartDate);
 
     while (currentDate <= tempEndDate) {
       const slots: Array<Availability> = [];
-      let currentStartMinutes = startHour;
+      let currentStartMinutes = startHourMinutes;
 
-      while (currentStartMinutes + attendanceTime <= endHour) {
+      while (currentStartMinutes + attendanceTime <= endHourMinutes) {
         const startDateTime = new Date(currentDate);
         startDateTime.setMinutes(startDateTime.getMinutes() + currentStartMinutes);
 
         const endDateTime = new Date(currentDate);
         endDateTime.setMinutes(endDateTime.getMinutes() + currentStartMinutes + attendanceTime);
 
-        const existingSlot = existingSlots.find(
-          (s) =>
-            s.startDateTime.getTime() === startDateTime.getTime() && s.endDateTime.getTime() === endDateTime.getTime(),
-        );
+        const existingSlot = existingSlots.find((s) => {
+          const sStart = s.startDateTime.getTime();
+          const sEnd = s.endDateTime.getTime();
+          const genStart = startDateTime.getTime();
+          const genEnd = endDateTime.getTime();
+
+          const offsetMs = startDateTime.getTimezoneOffset() * 60000;
+
+          const matchExact = sStart === genStart && sEnd === genEnd;
+          const matchShiftedGen = sStart === genStart - offsetMs && sEnd === genEnd - offsetMs;
+          const matchShiftedDb = sStart - offsetMs === genStart && sEnd - offsetMs === genEnd;
+
+          return matchExact || matchShiftedGen || matchShiftedDb;
+        });
 
         const previewEntityResult = AvailabilityPreview.create({
           id: existingSlot?.id,

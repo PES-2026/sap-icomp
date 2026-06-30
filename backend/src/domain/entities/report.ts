@@ -1,10 +1,11 @@
 import { Result } from "@domain/shared/result";
 import { ExternalIdVO } from "@domain/valueObjects/shared/externalId";
-import { ConditionVO } from "../valueObjects/report/condition";
-import { PotentialVO } from "../valueObjects/student/potential";
-import { DifficultiesVO } from "../valueObjects/student/difficulties";
-import { RecommendationVO } from "../valueObjects/report/recommendation";
+
 import { ConclusionVO } from "../valueObjects/report/conclusion";
+import { ConditionVO } from "../valueObjects/report/condition";
+import { RecommendationVO } from "../valueObjects/report/recommendation";
+import { DifficultiesVO } from "../valueObjects/student/difficulties";
+import { PotentialVO } from "../valueObjects/student/potential";
 
 type ReportProps = {
   id?: string;

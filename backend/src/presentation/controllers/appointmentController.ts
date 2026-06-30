@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { AppointmentByIdDTO } from "@application/dtos/appointment/appointmentById";
+import { AppointmentByTokenDTO } from "@application/dtos/appointment/appointmentByToken";
 import { CancelAppointmentPedagogueDTO } from "@application/dtos/appointment/cancelAppointmentPedagogue";
 import { CancelAppointmentStudentDTO } from "@application/dtos/appointment/cancelAppointmentStudent";
 import { ConfirmAppointmentDTO } from "@application/dtos/appointment/confirmAppointment";
@@ -12,6 +13,7 @@ import { AppointmentById } from "@application/useCases/appointment/appointmentBy
 import { CancelAppointmentPedagogue } from "@application/useCases/appointment/cancelAppointmentPedagogue";
 import { CancelAppointmentStudent } from "@application/useCases/appointment/cancelAppointmentStudent";
 import { ConfirmAppointment } from "@application/useCases/appointment/confirmAppointment";
+import { GetAppointmentByToken } from "@application/useCases/appointment/getAppointmentByToken";
 import { ListAppointmentsByPedagogue } from "@application/useCases/appointment/listAppointmentsByPedagogue";
 import { RequestAppointment } from "@application/useCases/appointment/requestAppointment";
 import { RescheduleAppointmentPedagogue } from "@application/useCases/appointment/rescheduleAppointmentPedagogue";
@@ -29,6 +31,7 @@ export class AppointmentController extends BaseController {
     private listAppointmentsByPedagogue: ListAppointmentsByPedagogue,
     private rescheduleAppointmentPedagogue: RescheduleAppointmentPedagogue,
     private rescheduleAppointmentStudent: RescheduleAppointmentStudent,
+    private getAppointmentByToken: GetAppointmentByToken,
   ) {
     super();
   }
@@ -57,7 +60,7 @@ export class AppointmentController extends BaseController {
 
   cancelStudent = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = CancelAppointmentStudentDTO.create(req.params.token, req.body);
+      const dto = CancelAppointmentStudentDTO.create(req.params.token, req.params.type, req.body);
       const result = await this.cancelAppointmentStudent.execute(dto);
 
       this.handleResult(res, result);
@@ -118,6 +121,16 @@ export class AppointmentController extends BaseController {
       this.handleResult(res, result);
     } catch (error) {
       this.handleError(error, res, `${AppointmentController.name}:rescheduleStudent`);
+    }
+  };
+
+  getByToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const dto = AppointmentByTokenDTO.create(req.params.token);
+      const result = await this.getAppointmentByToken.execute(dto);
+      this.handleResult(res, result);
+    } catch (error) {
+      this.handleError(error, res, `${AppointmentController.name}:getByToken`);
     }
   };
 }

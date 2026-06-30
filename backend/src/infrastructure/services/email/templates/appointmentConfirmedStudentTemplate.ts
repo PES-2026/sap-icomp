@@ -1,6 +1,10 @@
 import { AppointmentConfirmedStudentEmailData } from "@domain/services/interfaces/confirmedAppointmentStudentData";
 
-export function buildAppointmentConfirmedStudentTemplate(data: AppointmentConfirmedStudentEmailData): string {
+export function buildAppointmentConfirmedStudentTemplate(
+  data: AppointmentConfirmedStudentEmailData,
+  rescheduleLink: string,
+  cancelLink: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -94,13 +98,23 @@ export function buildAppointmentConfirmedStudentTemplate(data: AppointmentConfir
               </td></tr>
             </table>
 
-            <!-- Footnote -->
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background-color:#fff8e8;border:1px solid #f0d080;border-radius:8px;padding:11px 14px;">
-                <p style="margin:0;font-size:12px;color:#8a6200;line-height:1.6;">
-                  ⚠️ Caso precise cancelar ou remarcar, por favor utilize os links enviados no e-mail anterior ou entre em contato com antecedência.
-                </p>
-              </td></tr>
+            <!-- Botões -->
+            <p style="margin:0 0 10px;font-size:11px;font-weight:bold;color:#888888;text-transform:uppercase;letter-spacing:0.4px;">Gerenciar agendamento</p>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding-right:8px;">
+                  <a href="${rescheduleLink}"
+                     style="display:inline-block;background:#4ecba4;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;">
+                    Remarcar atendimento
+                  </a>
+                </td>
+                <td>
+                  <a href="${cancelLink}"
+                     style="display:inline-block;background:#ffffff;color:#c0392b;text-decoration:none;font-size:13px;font-weight:bold;padding:10px 20px;border-radius:7px;border:1px solid #f5c4b3;">
+                    Cancelar agendamento
+                  </a>
+                </td>
+              </tr>
             </table>
 
           </td></tr>

@@ -12,8 +12,8 @@ export class CreateAvailabilityItemDTO {
     public readonly date: Date,
     public readonly weekday: DaysOfWeekEnum,
     public readonly pedagogueId: string,
-    public readonly start: string,
-    public readonly end: string,
+    public readonly start: Date,
+    public readonly end: Date,
     public readonly attendanceTime: number,
   ) {}
 
@@ -27,8 +27,8 @@ export class CreateAvailabilityItemDTO {
     const date: Date = validateDateField(raw.date, "date");
     const weekday: string = validateStringField(raw.weekday, "weekday");
     const pedagogueId: string = validateExternalIdField(raw.pedagogueId, "pedagogueId");
-    const start: string = validateStringField(raw.start, "start");
-    const end: string = validateStringField(raw.end, "end");
+    const start: Date = validateDateField(raw.start, "start");
+    const end: Date = validateDateField(raw.end, "end");
     const attendanceTime: number = validateNumberField(raw.attendanceTime, "attendanceTime");
 
     const mappedWeekday: DaysOfWeekEnum = findValueInEnum(DaysOfWeekEnum, weekday);

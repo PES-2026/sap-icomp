@@ -1,5 +1,5 @@
-import { Report } from "@domain/entities/report";
 import { ListReportItemDTO } from "@application/dtos/report/listReportDto";
+import { Report } from "@domain/entities/report";
 
 export interface IReportRepository {
   save(report: Report): Promise<void>;

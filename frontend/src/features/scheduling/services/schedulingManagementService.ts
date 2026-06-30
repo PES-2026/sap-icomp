@@ -14,7 +14,7 @@ export const scheduleManagementService = {
     filters?: ListScheduleFilters,
   ): Promise<PaginatedScheduleResponse> {
     const response = await api.get<PaginatedScheduleResponse>(
-      `/schedule/${userId}`,
+      `/appointments/pedagogue/${userId}`,
       {
         params: {
           page,
@@ -34,7 +34,7 @@ export const scheduleManagementService = {
     limit: number,
   ): Promise<PaginatedScheduleResponse> {
     const response = await api.get<PaginatedScheduleResponse>(
-      `/schedule/${userId}`,
+      `/appointments/pedagogue/${userId}`,
       {
         params: {
           page,
@@ -48,9 +48,12 @@ export const scheduleManagementService = {
     return response.data;
   },
 
-  async confirm(scheduleId: string): Promise<ManagedSchedulingActionResult> {
-    const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/confirm`,
+  async confirm(
+    scheduleId: string,
+    type: string,
+  ): Promise<ManagedSchedulingActionResult> {
+    const response = await api.post<ManagedSchedulingActionResult>(
+      `/appointments/${scheduleId}/confirm/${type}`,
       undefined,
       {
         fallbackMsg: "Não foi possível confirmar o atendimento.",
@@ -63,9 +66,10 @@ export const scheduleManagementService = {
   async reject(
     scheduleId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível recusar o atendimento.",
@@ -78,9 +82,10 @@ export const scheduleManagementService = {
   async cancel(
     scheduleId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível cancelar o agendamento.",

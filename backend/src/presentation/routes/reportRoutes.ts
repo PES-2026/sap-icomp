@@ -1,9 +1,10 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
 
+import { ITokenService } from "@domain/services/tokenService";
+
 import { ReportController } from "../controllers/reportController";
 import { authMiddleware } from "../middlewares/auth";
-import { ITokenService } from "@domain/services/tokenService";
 
 export function reportRoutes(controller: ReportController, tokenService: ITokenService): Router {
   const router = Router();

@@ -12,21 +12,25 @@ interface SchedulingPreviewListProps {
   onToggleAllDaySlots: (daySlots: string[], isEnablingAll: boolean) => void;
 }
 
-const formatDateLabel = (date: string) =>
-  new Intl.DateTimeFormat("pt-BR", {
+const formatDateLabel = (date: Date | string) => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(date));
+  }).format(d);
+};
 
-const formatWeekday = (date: string) =>
-  new Intl.DateTimeFormat("pt-BR", {
+const formatWeekday = (date: Date | string) => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat("pt-BR", {
     weekday: "short",
     timeZone: "UTC",
   })
-    .format(new Date(date))
+    .format(d)
     .replace(".", "");
+};
 
 const padTime = (value: number) => String(value).padStart(2, "0");
 
@@ -36,11 +40,12 @@ const formatTimeFromMinutes = (totalMinutes: number) => {
   return `${padTime(hours)}:${padTime(minutes)}`;
 };
 
-const getSlotId = (slot: SchedulingSlot, dayDate: string) => {
+const getSlotId = (slot: SchedulingSlot, dayDate: Date | string) => {
   if (slot.startDateTime && slot.endDateTime) {
     return `${slot.startDateTime}|${slot.endDateTime}`;
   }
-  return `${dayDate}|${slot.start}|${slot.end}`;
+  const dateStr = typeof dayDate === "string" ? dayDate : dayDate.toISOString();
+  return `${dateStr}|${slot.start}|${slot.end}`;
 };
 
 export default function SchedulingPreviewList({
@@ -66,6 +71,19 @@ export default function SchedulingPreviewList({
       </div>
     );
   }
+
+  const formatSlotTime = (timeVal: Date | string | number) => {
+    if (typeof timeVal === "number") {
+      return formatTimeFromMinutes(timeVal);
+    }
+
+    const date = typeof timeVal === "string" ? new Date(timeVal) : timeVal;
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return `${padTime(date.getUTCHours())}:${padTime(date.getUTCMinutes())}`;
+    }
+
+    return "";
+  };
 
   const allSlots = days.flatMap((day) => day.slots);
 
@@ -113,7 +131,7 @@ export default function SchedulingPreviewList({
 
           return (
             <article
-              key={day.date}
+              key={day.date instanceof Date ? day.date.toISOString() : day.date}
               className="shrink-0 w-[85vw] sm:w-64 md:w-auto md:flex-1 md:min-w-60 snap-center overflow-hidden rounded-2xl border border-stone-200 bg-white"
             >
               <header className="flex flex-col items-center justify-center border-b border-stone-100 bg-stone-50 px-4 py-3">
@@ -237,19 +255,17 @@ export default function SchedulingPreviewList({
                       aria-pressed={
                         (isAvailable && isToggled) || (isCreated && !isToggled)
                       }
-                      aria-label={`Horário de ${formatTimeFromMinutes(
-                        slot.start,
-                      )} às ${formatTimeFromMinutes(slot.end)}`}
+                      aria-label={`Horário de ${formatSlotTime(slot.start)} às ${formatSlotTime(slot.end)}`}
                       className={`group relative flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all active:scale-[0.98] ${buttonClass}`}
                     >
                       <div className="flex flex-col">
                         <span className={`text-sm font-bold ${timeClass}`}>
-                          {formatTimeFromMinutes(slot.start)}
+                          {formatSlotTime(slot.start)}
                         </span>
                         <span
                           className={`text-[11px] font-medium ${subTimeClass}`}
                         >
-                          até {formatTimeFromMinutes(slot.end)}
+                          até {formatSlotTime(slot.end)}
                         </span>
                       </div>
 

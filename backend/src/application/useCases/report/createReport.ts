@@ -1,10 +1,10 @@
-import { ApplicationError } from "@application/errors/applicationError";
 import { CreateReportDTO, CreateReportResponseDTO } from "@application/dtos/report/createReportDto";
+import { ApplicationError } from "@application/errors/applicationError";
 import { Report } from "@domain/entities/report";
-import { IReportRepository } from "@domain/repositories/reportRepository";
-import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
-import { Result } from "@domain/shared/result";
 import { NoAttendanceRealizedError } from "@domain/errors/attendance/noAttendanceRealizedError";
+import { IAttendanceRepository } from "@domain/repositories/attendanceRepository";
+import { IReportRepository } from "@domain/repositories/reportRepository";
+import { Result } from "@domain/shared/result";
 
 export class CreateReport {
   constructor(

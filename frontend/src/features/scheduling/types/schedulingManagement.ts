@@ -37,6 +37,7 @@ export interface ScheduleItem {
   reason: string;
   createdAt: string;
   updatedAt: string;
+  type: string;
 }
 
 export interface PaginatedScheduleResponse {
