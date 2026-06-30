@@ -125,6 +125,7 @@ export class ConfirmAppointment {
         duration: `${appointment.attendanceTime} minutos`,
         course: appointment.studentCourse,
         reason: appointment.reason ?? "Não informado",
+        token: appointment.token,
       });
       return Result.ok();
     } catch (error) {

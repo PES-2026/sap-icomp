@@ -48,7 +48,7 @@ export default function SchedulingForm() {
   } = form;
 
   const todayStr = new Date().toLocaleDateString("sv-SE");
-  const startDateValue = form.watch("startDate");
+  const startDateValue = form.watch("startDate") as unknown as string | Date;
   const startDateStr = startDateValue
     ? typeof startDateValue === "string"
       ? startDateValue

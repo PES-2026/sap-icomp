@@ -39,7 +39,7 @@ export const appointmentRoutes = (controller: AppointmentController, tokenServic
     validateParamsAndBody(RescheduleAppointmentPedagogueDTO),
     controller.reschedulePedagogue,
   );
-  routes.put("/appointments/student/:token/cancel", controller.cancelStudent);
+  routes.put("/appointments/student/:token/cancel/:type", controller.cancelStudent);
   routes.put("/appointments/student/:token/reschedule", controller.rescheduleStudent);
   routes.get("/appointments/student/:token", controller.getByToken);
 

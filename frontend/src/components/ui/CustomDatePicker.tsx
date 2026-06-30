@@ -8,7 +8,7 @@ import {
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface CustomDatePickerProps {
-  value: Date;
+  value: Date | string;
   label: string;
   placeholder?: string;
   error?: string;

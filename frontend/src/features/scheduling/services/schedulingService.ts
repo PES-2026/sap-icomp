@@ -99,9 +99,13 @@ export const scheduleService = {
     });
   },
 
-  async cancelStudent(token: string): Promise<void> {
-    await api.put(`/appointments/student/${token}/cancel`, {}, {
-      fallbackMsg: "Não foi possível cancelar o atendimento.",
-    });
+  async cancelStudent(token: string, type: string): Promise<void> {
+    await api.put(
+      `/appointments/student/${token}/cancel/${type}`,
+      {},
+      {
+        fallbackMsg: "Não foi possível cancelar o atendimento.",
+      },
+    );
   },
 };

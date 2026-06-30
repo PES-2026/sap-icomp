@@ -16,7 +16,7 @@ export default function CancelAppointmentCard() {
   const [appointment, setAppointment] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -36,7 +36,9 @@ export default function CancelAppointmentCard() {
         setAppointment(data);
       } catch (err: any) {
         console.error(err);
-        setErrorMsg("Não foi possível carregar os detalhes do agendamento. O link pode ter expirado ou ser inválido.");
+        setErrorMsg(
+          "Não foi possível carregar os detalhes do agendamento. O link pode ter expirado ou ser inválido.",
+        );
       } finally {
         setIsLoadingDetails(false);
       }
@@ -47,11 +49,11 @@ export default function CancelAppointmentCard() {
 
   const handleCancelSubmit = async () => {
     if (!token) return;
-    
+
     setIsSubmitting(true);
     setShowConfirmSubmit(false);
     try {
-      await scheduleService.cancelStudent(token);
+      await scheduleService.cancelStudent(token, appointment?.type);
       setSuccess(true);
       toast.success("Atendimento cancelado com sucesso!");
     } catch (err: any) {
@@ -65,7 +67,9 @@ export default function CancelAppointmentCard() {
   const formatDateTime = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    const adjustedDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    const adjustedDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60000,
+    );
     const formatter = new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -89,11 +93,13 @@ export default function CancelAppointmentCard() {
     return (
       <div className="flex flex-col items-center justify-center p-6 sm:p-12 text-center max-w-md mx-auto my-8 bg-white border border-[#ece7db] rounded-2xl shadow-sm">
         <AlertCircle className="text-red-400 mb-4" size={48} />
-        <h2 className="text-xl font-bold text-stone-800 mb-2">Erro ao Cancelar</h2>
+        <h2 className="text-xl font-bold text-stone-800 mb-2">
+          Erro ao Cancelar
+        </h2>
         <p className="text-sm text-stone-600 mb-6">{errorMsg}</p>
         <CommonButton
           label="Voltar para o Início"
-          onClick={() => window.location.href = "/"}
+          onClick={() => (window.location.href = "/")}
           className="bg-stone-600 hover:bg-stone-700 text-white"
         />
       </div>
@@ -104,16 +110,20 @@ export default function CancelAppointmentCard() {
     return (
       <div className="flex flex-col items-center justify-center p-6 sm:p-12 text-center max-w-md mx-auto my-8 bg-white border border-[#ece7db] rounded-2xl shadow-sm">
         <CheckCircle className="text-teal-400 mb-4" size={48} />
-        <h2 className="text-xl font-bold text-stone-800 mb-2">Cancelamento Confirmado</h2>
+        <h2 className="text-xl font-bold text-stone-800 mb-2">
+          Cancelamento Confirmado
+        </h2>
         <p className="text-sm text-stone-600 mb-2">
-          Seu atendimento com <strong>{appointment?.pedagogueName}</strong> foi cancelado.
+          Seu atendimento com <strong>{appointment?.pedagogueName}</strong> foi
+          cancelado.
         </p>
         <p className="text-xs text-stone-500 mb-6">
-          O horário foi liberado com sucesso no sistema. Você receberá um e-mail confirmando o cancelamento.
+          O horário foi liberado com sucesso no sistema. Você receberá um e-mail
+          confirmando o cancelamento.
         </p>
         <CommonButton
           label="Ir para o Início"
-          onClick={() => window.location.href = "/"}
+          onClick={() => (window.location.href = "/")}
           className="bg-teal-600 hover:bg-teal-700 text-white"
         />
       </div>
@@ -129,12 +139,12 @@ export default function CancelAppointmentCard() {
             Cancelar Atendimento
           </h1>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
-            Confirme os detalhes abaixo para realizar o cancelamento do seu atendimento.
+            Confirme os detalhes abaixo para realizar o cancelamento do seu
+            atendimento.
           </p>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 sm:px-7 py-6 flex flex-col gap-6 custom-scroll">
-          
           <div className="rounded-xl border border-red-100 bg-[#fffdfd] p-4">
             <h2 className="text-xs font-bold text-red-600 uppercase tracking-wider mb-3 flex items-center gap-1.5 justify-center">
               <Clock size={14} /> Detalhes do Atendimento a ser Cancelado
@@ -142,15 +152,21 @@ export default function CancelAppointmentCard() {
             <div className="flex flex-col gap-3 text-sm text-stone-700 border-t border-red-50/50 pt-3">
               <div className="flex justify-between border-b border-stone-100 pb-2">
                 <span className="text-stone-500">Aluno(a):</span>
-                <span className="font-semibold text-stone-800">{appointment?.studentName}</span>
+                <span className="font-semibold text-stone-800">
+                  {appointment?.studentName}
+                </span>
               </div>
               <div className="flex justify-between border-b border-stone-100 pb-2">
                 <span className="text-stone-500">Matrícula:</span>
-                <span className="font-semibold text-stone-800">{appointment?.studentEnrollment}</span>
+                <span className="font-semibold text-stone-800">
+                  {appointment?.studentEnrollment}
+                </span>
               </div>
               <div className="flex justify-between border-b border-stone-100 pb-2">
                 <span className="text-stone-500">Pedagogo(a):</span>
-                <span className="font-semibold text-stone-800">{appointment?.pedagogueName}</span>
+                <span className="font-semibold text-stone-800">
+                  {appointment?.pedagogueName}
+                </span>
               </div>
               <div className="flex justify-between pb-1">
                 <span className="text-stone-500">Data e Horário:</span>
@@ -162,7 +178,9 @@ export default function CancelAppointmentCard() {
           </div>
 
           <p className="text-xs text-[#a88273] bg-[#fff5f2] border border-[#fcbca5]/30 rounded-lg p-3 text-center">
-            Atenção: Ao confirmar o cancelamento, este horário será imediatamente liberado para outros alunos e a ação não poderá ser desfeita.
+            Atenção: Ao confirmar o cancelamento, este horário será
+            imediatamente liberado para outros alunos e a ação não poderá ser
+            desfeita.
           </p>
         </div>
 
@@ -170,7 +188,7 @@ export default function CancelAppointmentCard() {
           <CommonButton
             label="Voltar"
             type="button"
-            onClick={() => window.location.href = "/"}
+            onClick={() => (window.location.href = "/")}
             className="w-full sm:w-auto justify-center bg-stone-300 hover:bg-stone-400 text-stone-700"
           />
           <CommonButton

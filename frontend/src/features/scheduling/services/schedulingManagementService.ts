@@ -66,9 +66,10 @@ export const scheduleManagementService = {
   async reject(
     scheduleId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível recusar o atendimento.",
@@ -81,9 +82,10 @@ export const scheduleManagementService = {
   async cancel(
     scheduleId: string,
     justification: string,
+    type: string,
   ): Promise<ManagedSchedulingActionResult> {
     const response = await api.put<ManagedSchedulingActionResult>(
-      `/schedule/${scheduleId}/cancel`,
+      `/appointments/${scheduleId}/cancel/${type}`,
       { reason: justification },
       {
         fallbackMsg: "Não foi possível cancelar o agendamento.",

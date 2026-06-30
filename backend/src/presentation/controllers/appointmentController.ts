@@ -60,7 +60,7 @@ export class AppointmentController extends BaseController {
 
   cancelStudent = async (req: Request, res: Response): Promise<void> => {
     try {
-      const dto = CancelAppointmentStudentDTO.create(req.params.token, req.body);
+      const dto = CancelAppointmentStudentDTO.create(req.params.token, req.params.type, req.body);
       const result = await this.cancelAppointmentStudent.execute(dto);
 
       this.handleResult(res, result);

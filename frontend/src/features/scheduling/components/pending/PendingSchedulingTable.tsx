@@ -54,7 +54,11 @@ export default function PendingSchedulingTable() {
     if (!rejectionScheduling) return;
 
     try {
-      await rejectScheduling(rejectionScheduling.id, justification);
+      await rejectScheduling(
+        rejectionScheduling.id,
+        justification,
+        rejectionScheduling.type,
+      );
       setRejectionScheduling(null);
       toast.success("Solicitação recusada com sucesso.");
     } catch (err) {

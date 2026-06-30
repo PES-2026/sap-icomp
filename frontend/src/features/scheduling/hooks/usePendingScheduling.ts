@@ -82,13 +82,14 @@ export const usePendingSchedulings = (page: number, limit: number) => {
   const rejectScheduling = async (
     scheduleId: string,
     justification: string,
+    type: string,
   ) => {
     if (!userId) {
       throw new Error("Não foi possível identificar a pedagoga responsável.");
     }
 
     return runAction(scheduleId, () =>
-      scheduleManagementService.reject(scheduleId, justification),
+      scheduleManagementService.reject(scheduleId, justification, type),
     );
   };
 

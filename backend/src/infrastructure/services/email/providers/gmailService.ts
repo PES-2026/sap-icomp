@@ -92,10 +92,13 @@ export class EmailService implements IEmailService {
   }
 
   async sendAppointmentConfirmedStudentEmail(to: string, props: AppointmentConfirmedStudentEmailData): Promise<void> {
+    const cancelLink = `${env.FRONTEND_URL}/appointment/cancel?token=${props.token}`;
+    const rescheduleLink = `${env.FRONTEND_URL}/appointment/reschedule?token=${props.token}`;
+
     const mailOptions = {
       to,
       subject: "Agendamento Confirmado - SAP ICOMP",
-      html: buildAppointmentConfirmedStudentTemplate(props),
+      html: buildAppointmentConfirmedStudentTemplate(props, rescheduleLink, cancelLink),
     };
 
     await this.sendEmail(mailOptions);
@@ -162,7 +165,7 @@ export class EmailService implements IEmailService {
     const mailOptions = {
       to,
       subject: "Agendamento Remarcado - SAP ICOMP",
-      html: buildRescheduledStudentTemplate(props, cancelLink, rescheduleLink),
+      html: buildRescheduledStudentTemplate(props, rescheduleLink, cancelLink),
     };
 
     await this.sendEmail(mailOptions);
