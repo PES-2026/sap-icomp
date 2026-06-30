@@ -138,6 +138,16 @@ export const CustomDatePicker = forwardRef<
       setView("days");
     };
 
+    const isTodayOrFuture = (y: number, m: number, d: number) => {
+      const selectedDate = new Date(y, m, d);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return selectedDate >= today;
+    };
+
     const renderDays = () => {
       const daysInMonth = getDaysInMonth(year, month);
       const firstDay = getFirstDayOfMonth(year, month);
