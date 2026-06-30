@@ -220,8 +220,6 @@ const reportController = new ReportController(
 );
 app.use(reportRoutes(reportController, tokenService));
 
-const scheduleSlotRepository = new PrismaScheduleSlotRepository(prisma);
-
 const appointmentRepository = new PrismaAppointmentRepository(prisma);
 
 const appointmentGuestRepository = new PrismaAppointmentGuestRepository(prisma);
