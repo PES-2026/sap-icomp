@@ -33,7 +33,7 @@ export class ListAvailabilitiesByPedagogueDTO {
 
     const filters: AvailabilityFilters = {};
 
-    filters.pedagogueId = pegagogueId;
+    filters.pedagogueId = pedagogueId as string;
     if (raw.status) {
       filters.status = findValueInEnum(AvailabilityStatusEnum, validateStringField(raw.status, "status"));
     }
