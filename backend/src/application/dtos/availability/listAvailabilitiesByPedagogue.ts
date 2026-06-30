@@ -33,9 +33,7 @@ export class ListAvailabilitiesByPedagogueDTO {
 
     const filters: AvailabilityFilters = {};
 
-    if (raw.pedagogueId) {
-      filters.pedagogueId = validateExternalIdField(raw.pedagogueId, "pedagogueId");
-    }
+    filters.pedagogueId = validateExternalIdField(raw.pedagogueId, "pedagogueId");
     if (raw.status) {
       filters.status = findValueInEnum(AvailabilityStatusEnum, validateStringField(raw.status, "status"));
     }
