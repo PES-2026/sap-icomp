@@ -119,6 +119,24 @@ const allowedOrigins = [
   `http://${env.FRONTEND_HOST}:${env.FRONTEND_PORT}`,
 ];
 
+app.use(cookieParser());
+app.use(express.json());
+app.set("trust proxy", 1);
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    credentials: true,
+  }),
+);
+
 const courseRepository = new PrismaCourseRepository(prisma);
 
 const courseController = new CourseController(
@@ -219,8 +237,6 @@ const diagnosesController = new DiagnosesController(
   new DiagnosisById(diagnosisRepository),
 );
 
-app.use(diagnosesRoutes(diagnosesController));
-
 const reportRepository = new PrismaReportRepository(prisma);
 const reportController = new ReportController(
   new GetReportInitialData(studentRepository),
@@ -230,7 +246,6 @@ const reportController = new ReportController(
   new ListReportsByStudent(reportRepository),
   new GetReportById(reportRepository),
 );
-app.use(reportRoutes(reportController, tokenService));
 
 const appointmentRepository = new PrismaAppointmentRepository(prisma);
 
@@ -333,29 +348,6 @@ const availabililtyController = new AvailabilityController(
   removeManyAvailabilitiesUseCase,
 );
 
-app.use(cookieParser());
-
-app.use(express.json());
-
-app.set("trust proxy", 1);
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"), false);
-    },
-    credentials: true,
-  }),
-);
-
-app.use(errorHandler);
-
 app.use(attendanceTypeRoutes(attendanceTypeController));
 
 app.use(accountRequestRoutes(accountRequestController));
@@ -375,6 +367,10 @@ app.use(studentRoutes(studentController));
 app.use(courseRoutes(courseController));
 
 app.use(availabilityRoutes(availabililtyController, tokenService));
+
+app.use(reportRoutes(reportController, tokenService));
+
+app.use(errorHandler);
 
 const PORT = env.BACKEND_PORT;
 
